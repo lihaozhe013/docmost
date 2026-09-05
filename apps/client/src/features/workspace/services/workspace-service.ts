@@ -1,16 +1,13 @@
 import api from "@/lib/api-client";
 import { IUser } from "@/features/user/types/user.types";
 import {
-  ICreateInvite,
-  IInvitation,
+  ICreateWorkspaceUser,
   IWorkspace,
-  IAcceptInvite,
   IPublicWorkspace,
-  IInvitationLink,
+  IResetUserPasswordResult,
   IVersion,
 } from "../types/workspace.types";
 import { IPagination, QueryParams } from "@/lib/types.ts";
-import { ISetupWorkspace } from "@/features/auth/types/auth.types.ts";
 
 export async function getWorkspace(): Promise<IWorkspace> {
   const req = await api.post<IWorkspace>("/workspace/info");
@@ -66,55 +63,17 @@ export async function changeMemberRole(data: {
   await api.post("/workspace/members/change-role", data);
 }
 
-export async function getPendingInvitations(
-  params?: QueryParams,
-): Promise<IPagination<IInvitation>> {
-  const req = await api.post("/workspace/invites", params);
+export async function createWorkspaceMember(
+  data: ICreateWorkspaceUser,
+): Promise<{ user: IUser; password: string }> {
+  const req = await api.post("/workspace/members/create", data);
   return req.data;
 }
 
-export async function createInvitation(data: ICreateInvite) {
-  const req = await api.post("/workspace/invites/create", data);
-  return req.data;
-}
-
-export async function acceptInvitation(
-  data: IAcceptInvite,
-): Promise<{ requiresLogin?: boolean }> {
-  const req = await api.post("/workspace/invites/accept", data);
-  return req.data;
-}
-
-export async function getInviteLink(data: {
-  invitationId: string;
-}): Promise<IInvitationLink> {
-  const req = await api.post("/workspace/invites/link", data);
-  return req.data;
-}
-
-export async function resendInvitation(data: {
-  invitationId: string;
-}): Promise<void> {
-  await api.post("/workspace/invites/resend", data);
-}
-
-export async function revokeInvitation(data: {
-  invitationId: string;
-}): Promise<void> {
-  await api.post("/workspace/invites/revoke", data);
-}
-
-export async function getInvitationById(data: {
-  invitationId: string;
-}): Promise<IInvitation> {
-  const req = await api.post("/workspace/invites/info", data);
-  return req.data;
-}
-
-export async function createWorkspace(
-  data: ISetupWorkspace,
-): Promise<{ workspace: IWorkspace; exchangeToken?: string; requiresEmailVerification?: boolean; emailSignature?: string }> {
-  const req = await api.post("/workspace/create", data);
+export async function resetWorkspaceMemberPassword(
+  data: { userId: string },
+): Promise<IResetUserPasswordResult> {
+  const req = await api.post("/workspace/members/reset-password", data);
   return req.data;
 }
 

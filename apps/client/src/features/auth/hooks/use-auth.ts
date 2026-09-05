@@ -1,33 +1,13 @@
 import { useState } from "react";
-import {
-  forgotPassword,
-  login,
-  logout,
-  passwordReset,
-  setupWorkspace,
-  verifyUserToken,
-} from "@/features/auth/services/auth-service";
+import { login, logout, setupWorkspace } from "@/features/auth/services/auth-service";
 import { useNavigate } from "react-router-dom";
 import { useAtom } from "jotai";
 import { currentUserAtom } from "@/features/user/atoms/current-user-atom";
-import {
-  IForgotPassword,
-  ILogin,
-  IPasswordReset,
-  ISetupWorkspace,
-  IVerifyUserToken,
-} from "@/features/auth/types/auth.types";
+import { ILogin, ISetupWorkspace } from "@/features/auth/types/auth.types";
 import { notifications } from "@mantine/notifications";
-import { IAcceptInvite } from "@/features/workspace/types/workspace.types.ts";
-import {
-  acceptInvitation,
-  createWorkspace,
-} from "@/features/workspace/services/workspace-service.ts";
 import APP_ROUTE, { getPostLoginRedirect } from "@/lib/app-route.ts";
 import { RESET } from "jotai/utils";
 import { useTranslation } from "react-i18next";
-import { isCloud } from "@/lib/config.ts";
-import { exchangeTokenRedirectUrl, getHostnameUrl } from "@/ee/utils.ts";
 
 export default function useAuth() {
   const { t } = useTranslation();
@@ -54,42 +34,9 @@ export default function useAuth() {
       setIsLoading(false);
 
       const message = err.response?.data?.message;
-      if (isCloud() && message?.includes("verify your email")) {
-        const sig = err.response?.data?.emailSignature;
-        navigate(
-          `${APP_ROUTE.AUTH.VERIFY_EMAIL}?email=${encodeURIComponent(data.email)}${sig ? `&sig=${sig}` : ""}`,
-        );
-        return;
-      }
 
       notifications.show({
         message,
-        color: "red",
-      });
-    }
-  };
-
-  const handleInvitationSignUp = async (data: IAcceptInvite) => {
-    setIsLoading(true);
-
-    try {
-      const response = await acceptInvitation(data);
-      setIsLoading(false);
-
-      if (response?.requiresLogin) {
-        notifications.show({
-          message: t(
-            "Account created successfully. Please log in to set up two-factor authentication.",
-          ),
-        });
-        navigate(APP_ROUTE.AUTH.LOGIN);
-      } else {
-        navigate(APP_ROUTE.HOME);
-      }
-    } catch (err) {
-      setIsLoading(false);
-      notifications.show({
-        message: err.response?.data.message,
         color: "red",
       });
     }
@@ -99,61 +46,9 @@ export default function useAuth() {
     setIsLoading(true);
 
     try {
-      if (isCloud()) {
-        const res = await createWorkspace(data);
-
-        if (res?.requiresEmailVerification) {
-          const hostname = res?.workspace?.hostname;
-          if (hostname) {
-            window.location.href =
-              getHostnameUrl(hostname) +
-              `/verify-email?email=${encodeURIComponent(data.email)}&sig=${res.emailSignature}`;
-          }
-          return;
-        }
-
-        const hostname = res?.workspace?.hostname;
-        const exchangeToken = res?.exchangeToken;
-        if (hostname && exchangeToken) {
-          window.location.href = exchangeTokenRedirectUrl(
-            hostname,
-            exchangeToken,
-          );
-        }
-      } else {
-        const res = await setupWorkspace(data);
-        setIsLoading(false);
-        navigate(APP_ROUTE.HOME);
-      }
-    } catch (err) {
+      const res = await setupWorkspace(data);
       setIsLoading(false);
-      notifications.show({
-        message: err.response?.data.message,
-        color: "red",
-      });
-    }
-  };
-
-  const handlePasswordReset = async (data: IPasswordReset) => {
-    setIsLoading(true);
-
-    try {
-      const response = await passwordReset(data);
-      setIsLoading(false);
-
-      if (response?.requiresLogin) {
-        notifications.show({
-          message: t(
-            "Password reset was successful. Please log in with your new password.",
-          ),
-        });
-        navigate(APP_ROUTE.AUTH.LOGIN);
-      } else {
-        navigate(APP_ROUTE.HOME);
-        notifications.show({
-          message: t("Password reset was successful"),
-        });
-      }
+      navigate(APP_ROUTE.HOME);
     } catch (err) {
       setIsLoading(false);
       notifications.show({
@@ -169,49 +64,9 @@ export default function useAuth() {
     window.location.replace(`${APP_ROUTE.AUTH.LOGIN}?logout=1`);
   };
 
-  const handleForgotPassword = async (data: IForgotPassword) => {
-    setIsLoading(true);
-
-    try {
-      await forgotPassword(data);
-      setIsLoading(false);
-
-      return true;
-    } catch (err) {
-      console.log(err);
-      setIsLoading(false);
-      notifications.show({
-        message: err.response?.data.message,
-        color: "red",
-      });
-
-      return false;
-    }
-  };
-
-  const handleVerifyUserToken = async (data: IVerifyUserToken) => {
-    setIsLoading(true);
-
-    try {
-      await verifyUserToken(data);
-      setIsLoading(false);
-    } catch (err) {
-      console.log(err);
-      setIsLoading(false);
-      notifications.show({
-        message: err.response?.data.message,
-        color: "red",
-      });
-    }
-  };
-
   return {
     signIn: handleSignIn,
-    invitationSignup: handleInvitationSignUp,
     setupWorkspace: handleSetupWorkspace,
-    forgotPassword: handleForgotPassword,
-    passwordReset: handlePasswordReset,
-    verifyUserToken: handleVerifyUserToken,
     logout: handleLogout,
     isLoading,
   };

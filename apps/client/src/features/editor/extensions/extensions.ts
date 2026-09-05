@@ -63,7 +63,6 @@ import {
   TransclusionSource,
   TransclusionReference,
   TableView,
-  BaseEmbed as BaseEmbedNode,
   Footnotes,
   Footnote,
   FootnoteReference,
@@ -97,7 +96,6 @@ import PdfView from "@/features/editor/components/pdf/pdf-view.tsx";
 import SubpagesView from "@/features/editor/components/subpages/subpages-view.tsx";
 import TransclusionView from "@/features/editor/components/transclusion/transclusion-view.tsx";
 import TransclusionReferenceView from "@/features/editor/components/transclusion/transclusion-reference-view.tsx";
-import { BaseEmbedView } from "@/features/editor/components/base-embed/base-embed-view.tsx";
 import { common, createLowlight } from "lowlight";
 import plaintext from "highlight.js/lib/languages/plaintext";
 import powershell from "highlight.js/lib/languages/powershell";
@@ -395,11 +393,6 @@ export const mainExtensions = [
   }),
   TransclusionReference.configure({
     view: TransclusionReferenceView,
-  }),
-  BaseEmbedNode.extend({
-    addNodeView() {
-      return ReactNodeViewRenderer(BaseEmbedView);
-    },
   }),
   MarkdownClipboard.configure({
     transformPastedText: true,

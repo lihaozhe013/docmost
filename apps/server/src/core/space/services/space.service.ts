@@ -143,14 +143,12 @@ export class SpaceService {
       typeof updateSpaceDto.disablePublicSharing !== 'undefined' ||
       typeof updateSpaceDto.allowViewerComments !== 'undefined'
     ) {
-      const workspace = await this.workspaceRepo.findById(workspaceId, {
-        withLicenseKey: true,
-      });
+      const workspace = await this.workspaceRepo.findById(workspaceId);
 
       if (
         typeof updateSpaceDto.disablePublicSharing !== 'undefined' &&
         !this.licenseCheckService.hasFeature(
-          workspace.licenseKey,
+          '',
           Feature.SECURITY_SETTINGS,
           workspace.plan,
         )
@@ -161,7 +159,7 @@ export class SpaceService {
       if (
         typeof updateSpaceDto.allowViewerComments !== 'undefined' &&
         !this.licenseCheckService.hasFeature(
-          workspace.licenseKey,
+          '',
           Feature.VIEWER_COMMENTS,
           workspace.plan,
         )

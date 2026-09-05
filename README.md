@@ -1,62 +1,96 @@
-<div align="center">
-    <h1><b>Docmost</b></h1>
-    <p>
-        Open-source collaborative wiki and documentation software.
-        <br />
-        <a href="https://docmost.com"><strong>Website</strong></a> | 
-        <a href="https://docmost.com/docs"><strong>Documentation</strong></a> |
-        <a href="https://twitter.com/DocmostHQ"><strong>Twitter / X</strong></a>
-    </p>
-</div>
-<br />
+# Docmost (Personal fork)
+
+A trimmed, self-hosted fork of [Docmost](https://docmost.com) for private use among
+family, friends and colleagues. It is free for everyone and is not intended for
+public signups.
+
+This fork diverges from upstream on purpose: enterprise/cloud features, email
+(SMTP) delivery, and license-gated surfaces have been removed, and user
+provisioning is done by an administrator.
+
+## What changed compared to upstream
+
+Removed:
+
+- Email / SMTP integration (invitations, password reset, email notifications)
+- Workspace invitation flow (invite links, pending invites)
+- Cloud-only code: billing/Stripe, license page, cloud login, trials
+- Enterprise-gated UI and features: SSO, MFA, SCIM, API keys, audit logs & SIEM,
+  page verification, templates, personal spaces, bases, PDF export, OAuth apps,
+  confluence/docx/pdf imports (server still enforces license gates on these)
+- "Forgot password" flow
+
+Added:
+
+- **Admin-managed accounts**: an owner/admin creates a member by name/email/role;
+  the server generates a one-time random password shown only to the admin. The
+  member signs in with it and changes it in Account settings.
+  (`POST /api/workspace/members/create`)
+- **Admin password reset**: an owner/admin can reset any member's password,
+  which signs the member out of all sessions. The new one-time password is shown
+  only to the admin. (`POST /api/workspace/members/reset-password`)
+
+Kept:
+
+- Real-time collaboration (Yjs)
+- Pages, spaces, groups, comments (including comment resolution), page history
+- Public share links (`/share/...`)
+- Search, attachments, embeds, diagrams
+- In-app notifications
+- AI-related client scaffolding (AI settings/chat UI) so future AI work can
+  build on it
 
 ## Getting started
 
-To get started with Docmost, please refer to our [documentation](https://docmost.com/docs) or try our [cloud version](https://docmost.com/pricing) .
+### Prerequisites
 
-## Features
+- Docker and Docker Compose
+- PostgreSQL and Redis are bundled in `docker-compose.yml`
 
-- Real-time collaboration
-- Diagrams (Draw.io, Excalidraw and Mermaid)
-- Spaces
-- Permissions management
-- Groups
-- Comments
-- Page history
-- Search
-- File attachments
-- Embeds (Airtable, Loom, Miro and more)
-- Translations (10+ languages)
+### Deploy
 
-### Screenshots
+1. Copy `.env.example` to `.env` and set a strong `APP_SECRET`, `DATABASE_URL`
+   and `REDIS_URL` (see the compose file for defaults).
+2. Run:
 
-<p align="center">
-<img alt="home" src="https://docmost.com/screenshots/home.png" width="70%">
-<img alt="editor" src="https://docmost.com/screenshots/editor.png" width="70%">
-</p>
+```bash
+docker compose up -d
+```
 
-### License
-Docmost core is licensed under the open-source AGPL 3.0 license.  
-Enterprise features are available under an enterprise license (Enterprise Edition).  
+3. Open `http://localhost:3000`, complete the initial setup
+   (`/setup/register`) which creates the workspace owner.
+4. Create accounts for other people: Workspace settings → Members →
+   **Create member**. Share the one-time password with the member outside of
+   Docmost (chat, phone, etc.) — it cannot be retrieved later.
+5. Members change their password at Account → My profile → Change password.
 
-All files in the following directories are licensed under the Docmost Enterprise license defined in `packages/ee/License`.
-  - apps/server/src/ee
-  - apps/client/src/ee
-  - packages/ee
+### Notes
 
-### Contributing
+- Sign-in uses the email address as the username. It does not need to be a
+  reachable mailbox (e.g. `zhangsan@local.dm` works fine).
+- There is no self-registration and no "forgot password" — lost passwords are
+  reset by an admin.
+- Public share links work out of the box; disable sharing at the page level in
+  the share popover when needed.
 
-See the [development documentation](https://docmost.com/docs/self-hosting/development)
+## Development
 
-## Thanks
-Special thanks to;
+```bash
+pnpm install
+pnpm dev          # starts client (vite) and server (nest) with watch
+```
 
-<img width="100" alt="Crowdin" src="https://github.com/user-attachments/assets/a6c3d352-e41b-448d-b6cd-3fbca3109f07" />
+Build:
 
-[Crowdin](https://crowdin.com/) for providing access to their localization platform.
+```bash
+pnpm build        # or: pnpm server:build && pnpm client:build
+```
 
+The server needs PostgreSQL and Redis running; point `DATABASE_URL` and
+`REDIS_URL` at them.
 
-<img width="48" alt="Algolia-mark-square-white" src="https://github.com/user-attachments/assets/6ccad04a-9589-4965-b6a1-d5cb1f4f9e94" />
+## License
 
-[Algolia](https://www.algolia.com/) for providing full-text search to the docs.
-
+The original Docmost core is AGPL-3.0. This fork retains that license for the
+derived code. Removed upstream enterprise files are not part of this
+distribution.

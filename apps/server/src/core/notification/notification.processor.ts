@@ -21,7 +21,6 @@ import {
 import { CommentNotificationService } from './services/comment.notification';
 import { PageNotificationService } from './services/page.notification';
 import { VerificationNotificationService } from './services/verification.notification';
-import { DomainService } from '../../integrations/environment/domain.service';
 
 @Processor(QueueName.NOTIFICATION_QUEUE)
 export class NotificationProcessor
@@ -34,7 +33,6 @@ export class NotificationProcessor
     private readonly commentNotificationService: CommentNotificationService,
     private readonly pageNotificationService: PageNotificationService,
     private readonly verificationNotificationService: VerificationNotificationService,
-    private readonly domainService: DomainService,
     private readonly moduleRef: ModuleRef,
     @InjectKysely() private readonly db: KyselyDB,
   ) {
@@ -64,13 +62,11 @@ export class NotificationProcessor
       }
 
       const workspaceId = await this.resolveWorkspaceId(job);
-      const appUrl = await this.getWorkspaceUrl(workspaceId);
 
       switch (job.name) {
         case QueueJob.COMMENT_NOTIFICATION: {
           await this.commentNotificationService.processComment(
             job.data as ICommentNotificationJob,
-            appUrl,
           );
           break;
         }
@@ -78,7 +74,6 @@ export class NotificationProcessor
         case QueueJob.COMMENT_RESOLVED_NOTIFICATION: {
           await this.commentNotificationService.processResolved(
             job.data as ICommentResolvedNotificationJob,
-            appUrl,
           );
           break;
         }
@@ -86,7 +81,6 @@ export class NotificationProcessor
         case QueueJob.PAGE_MENTION_NOTIFICATION: {
           await this.pageNotificationService.processPageMention(
             job.data as IPageMentionNotificationJob,
-            appUrl,
           );
           break;
         }
@@ -94,7 +88,6 @@ export class NotificationProcessor
         case QueueJob.PAGE_PERMISSION_GRANTED: {
           await this.pageNotificationService.processPermissionGranted(
             job.data as IPermissionGrantedNotificationJob,
-            appUrl,
           );
           break;
         }
@@ -102,21 +95,13 @@ export class NotificationProcessor
         case QueueJob.PAGE_UPDATED: {
           await this.pageNotificationService.processPageUpdate(
             job.data as IPageUpdateNotificationJob,
-            appUrl,
           );
-          break;
-        }
-
-        case QueueJob.PAGE_UPDATE_DIGEST: {
-          const { userId } = job.data as unknown as { userId: string };
-          await this.pageNotificationService.processDigest(userId, appUrl);
           break;
         }
 
         case QueueJob.PAGE_VERIFICATION_EXPIRING: {
           await this.verificationNotificationService.processVerificationExpiring(
             job.data as IVerificationExpiringNotificationJob,
-            appUrl,
           );
           break;
         }
@@ -124,7 +109,6 @@ export class NotificationProcessor
         case QueueJob.PAGE_VERIFICATION_EXPIRED: {
           await this.verificationNotificationService.processVerificationExpired(
             job.data as IVerificationExpiredNotificationJob,
-            appUrl,
           );
           break;
         }
@@ -139,7 +123,6 @@ export class NotificationProcessor
         case QueueJob.PAGE_APPROVAL_REQUESTED_NOTIFICATION: {
           await this.verificationNotificationService.processApprovalRequested(
             job.data as IApprovalRequestedNotificationJob,
-            appUrl,
           );
           break;
         }
@@ -147,7 +130,6 @@ export class NotificationProcessor
         case QueueJob.PAGE_APPROVAL_REJECTED_NOTIFICATION: {
           await this.verificationNotificationService.processApprovalRejected(
             job.data as IApprovalRejectedNotificationJob,
-            appUrl,
           );
           break;
         }
@@ -203,16 +185,6 @@ export class NotificationProcessor
       return;
     }
     await scheduler.reconcile();
-  }
-
-  private async getWorkspaceUrl(workspaceId: string): Promise<string> {
-    const workspace = await this.db
-      .selectFrom('workspaces')
-      .select('hostname')
-      .where('id', '=', workspaceId)
-      .executeTakeFirst();
-
-    return this.domainService.getUrl(workspace?.hostname);
   }
 
   @OnWorkerEvent('failed')

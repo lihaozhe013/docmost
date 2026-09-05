@@ -1,8 +1,6 @@
 export enum QueueName {
-  EMAIL_QUEUE = '{email-queue}',
   ATTACHMENT_QUEUE = '{attachment-queue}',
   GENERAL_QUEUE = '{general-queue}',
-  BILLING_QUEUE = '{billing-queue}',
   FILE_TASK_QUEUE = '{file-task-queue}',
   SEARCH_QUEUE = '{search-queue}',
   AI_QUEUE = '{ai-queue}',
@@ -14,7 +12,6 @@ export enum QueueName {
 }
 
 export enum QueueJob {
-  SEND_EMAIL = 'send-email',
   DELETE_SPACE_ATTACHMENTS = 'delete-space-attachments',
   ATTACHMENT_INDEX_CONTENT = 'attachment-index-content',
   ATTACHMENT_INDEXING = 'attachment-indexing',
@@ -25,11 +22,6 @@ export enum QueueJob {
 
   PAGE_BACKLINKS = 'page-backlinks',
   ADD_PAGE_WATCHERS = 'add-page-watchers',
-
-  STRIPE_SEATS_SYNC = 'sync-stripe-seats',
-  TRIAL_ENDED = 'trial-ended',
-  WELCOME_EMAIL = 'welcome-email',
-  FIRST_PAYMENT_EMAIL = 'first-payment-email',
 
   IMPORT_TASK = 'import-task',
   EXPORT_TASK = 'export-task',
@@ -73,7 +65,6 @@ export enum QueueJob {
   COMMENT_RESOLVED_NOTIFICATION = 'comment-resolved-notification',
   PAGE_MENTION_NOTIFICATION = 'page-mention-notification',
   PAGE_PERMISSION_GRANTED = 'page-permission-granted',
-  PAGE_UPDATE_DIGEST = 'page-update-digest',
   PAGE_VERIFICATION_EXPIRING = 'page-verification-expiring',
   PAGE_VERIFICATION_EXPIRED = 'page-verification-expired',
   VERIFICATION_RECONCILE = 'verification-reconcile',

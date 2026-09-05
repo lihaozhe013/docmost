@@ -2,9 +2,6 @@ export const AuditEvent = {
   // Workspace
   WORKSPACE_CREATED: 'workspace.created',
   WORKSPACE_UPDATED: 'workspace.updated',
-  WORKSPACE_INVITE_CREATED: 'workspace.invite_created',
-  WORKSPACE_INVITE_RESENT: 'workspace.invite_resent',
-  WORKSPACE_INVITE_REVOKED: 'workspace.invite_revoked',
 
   // User
   USER_CREATED: 'user.created',
@@ -99,10 +96,6 @@ export const AuditEvent = {
   USER_MFA_DISABLED: 'user.mfa_disabled',
   USER_MFA_BACKUP_CODE_GENERATED: 'user.mfa_backup_code_generated',
 
-  // License
-  LICENSE_ACTIVATED: 'license.activated',
-  LICENSE_REMOVED: 'license.removed',
-
   // Attachment
   ATTACHMENT_UPLOADED: 'attachment.uploaded',
   // ATTACHMENT_DELETED: 'attachment.deleted',
@@ -148,7 +141,6 @@ export const AuditResource = {
   SSO_PROVIDER: 'sso_provider',
   WORKSPACE_INVITATION: 'workspace_invitation',
   ATTACHMENT: 'attachment',
-  LICENSE: 'license',
   SIEM_DESTINATION: 'siem_destination',
   TEMPLATE: 'template',
 } as const;

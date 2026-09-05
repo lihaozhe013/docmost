@@ -13,9 +13,6 @@ import { IconAlertTriangle, IconFileOff } from "@tabler/icons-react";
 import { Button } from "@mantine/core";
 import { Link } from "react-router-dom";
 import { ErrorBoundary } from "react-error-boundary";
-import { BaseView } from "@/ee/base/components/base-view";
-import { useHasFeature } from "@/ee/hooks/use-feature";
-import { Feature } from "@/ee/features";
 import { getPageTitle } from "@/features/page/page.utils";
 import { DocumentTitle } from "@/components/ui/document-title.tsx";
 const MemoizedFullEditor = React.memo(FullEditor);
@@ -58,7 +55,6 @@ function PageContent({ pageSlug }: { pageSlug: string | undefined }) {
   } = usePageQuery({ pageId: extractPageSlugId(pageSlug) });
   const { data: space } = useGetSpaceBySlugQuery(page?.space?.slug);
 
-  const hasBases = useHasFeature(Feature.BASES);
   const canEdit = !page?.deletedAt && (page?.permissions?.canEdit ?? false);
   const canComment =
     canEdit ||
@@ -99,61 +95,13 @@ function PageContent({ pageSlug }: { pageSlug: string | undefined }) {
 
   if (page?.isBase) {
     return (
-      <div
-        className="base-page-root"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          // Height: see `.base-page-root` in core.css.
-          // Clear the fixed PageHeader (breadcrumb) plus a little extra so the
-          // pinned column-header row isn't tucked half under it.
-          paddingTop: "calc(var(--page-header-height) + 6px)",
-        }}
-      >
-        <DocumentTitle
-          title={`${page?.icon || ""}  ${getPageTitle(page?.title, page?.isBase, t)}`}
-          withAppName={false}
-        />
-        <MemoizedPageHeader readOnly={!canEdit} />
-        <div
-          style={{
-            flex: 1,
-            minHeight: 0,
-            display: "flex",
-            flexDirection: "column",
-            paddingInline: 24,
-          }}
-        >
-          <div
-            style={{
-              flex: 1,
-              minHeight: 0,
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            <BaseView
-              pageId={page.id}
-              editable={hasBases && canEdit}
-              titleSlot={
-                <div
-                  className="base-page-title"
-                  style={{ paddingTop: 2, paddingBottom: 6 }}
-                >
-                  <MemoizedTitleEditor
-                    pageId={page.id}
-                    slugId={page.slugId}
-                    title={page.title}
-                    spaceSlug={page.space?.slug ?? ""}
-                    editable={hasBases && canEdit}
-                    isBase
-                  />
-                </div>
-              }
-            />
-          </div>
-        </div>
-      </div>
+      <EmptyState
+        icon={IconFileOff}
+        title={t("Page type unavailable")}
+        description={t(
+          "This page uses bases, which are not supported in this edition.",
+        )}
+      />
     );
   }
 

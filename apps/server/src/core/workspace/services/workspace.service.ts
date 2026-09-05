@@ -10,6 +10,8 @@ import { LicenseCheckService } from '../../../integrations/environment/license-c
 import { UserSessionRepo } from '@docmost/db/repos/session/user-session.repo';
 import { CreateWorkspaceDto } from '../dto/create-workspace.dto';
 import { UpdateWorkspaceDto } from '../dto/update-workspace.dto';
+import { CreateWorkspaceUserDto } from '../dto/create-workspace-user.dto';
+import { ResetWorkspaceUserPasswordDto } from '../dto/reset-workspace-user-password.dto';
 import { SpaceService } from '../../space/services/space.service';
 import { CreateSpaceDto } from '../../space/dto/create-space.dto';
 import { SpaceRole, UserRole } from '../../../common/helpers/types/permission';
@@ -28,16 +30,16 @@ import { UserRepo } from '@docmost/db/repos/user/user.repo';
 import { EnvironmentService } from '../../../integrations/environment/environment.service';
 import { DomainService } from '../../../integrations/environment/domain.service';
 import { jsonArrayFrom } from 'kysely/helpers/postgres';
-import { addDays } from 'date-fns';
-import { DISALLOWED_HOSTNAMES, WorkspaceStatus } from '../workspace.constants';
-import { isAdminActingOnOwner } from '../workspace.util';
+import { DISALLOWED_HOSTNAMES } from '../workspace.constants';
+import { getWorkspaceDefaultPageEditMode, isAdminActingOnOwner } from '../workspace.util';
 import { v4 } from 'uuid';
 import { InjectQueue } from '@nestjs/bullmq';
 import { QueueJob, QueueName } from '../../../integrations/queue/constants';
 import { Queue } from 'bullmq';
 import {
-  generateRandomSuffixNumbers,
   diffAuditTrackedFields,
+  hashPassword,
+  nanoIdGen,
 } from '../../../common/helpers';
 import { isPageEmbeddingsTableExists } from '@docmost/db/helpers/helpers';
 import { CursorPaginationResult } from '@docmost/db/pagination/cursor-pagination';
@@ -69,7 +71,6 @@ export class WorkspaceService {
     private favoriteRepo: FavoriteRepo,
     @InjectKysely() private readonly db: KyselyDB,
     @InjectQueue(QueueName.ATTACHMENT_QUEUE) private attachmentQueue: Queue,
-    @InjectQueue(QueueName.BILLING_QUEUE) private billingQueue: Queue,
     @InjectQueue(QueueName.AI_QUEUE) private aiQueue: Queue,
     @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService,
     private userSessionRepo: UserSessionRepo,
@@ -91,7 +92,7 @@ export class WorkspaceService {
   async getWorkspacePublicData(workspaceId: string) {
     const workspace = await this.db
       .selectFrom('workspaces')
-      .select(['id', 'name', 'logo', 'hostname', 'enforceSso', 'licenseKey', 'plan'])
+      .select(['id', 'name', 'logo', 'hostname', 'enforceSso', 'plan'])
       .select((eb) =>
         jsonArrayFrom(
           eb
@@ -112,9 +113,7 @@ export class WorkspaceService {
       throw new NotFoundException('Workspace not found');
     }
 
-    const { licenseKey, plan, ...rest } = workspace;
-
-    return rest;
+    return workspace;
   }
 
   async create(
@@ -122,43 +121,14 @@ export class WorkspaceService {
     createWorkspaceDto: CreateWorkspaceDto,
     trx?: KyselyTransaction,
   ) {
-    let trialEndAt = undefined;
-
     const createdWorkspace = await executeTx(
       this.db,
       async (trx) => {
-        let hostname = undefined;
-        let status = undefined;
-        let plan = undefined;
-        let billingEmail = undefined;
-        let settings = undefined;
-
-        if (this.environmentService.isCloud()) {
-          // generate unique hostname
-          hostname = await this.generateHostname(
-            createWorkspaceDto.hostname ?? createWorkspaceDto.name,
-          );
-          trialEndAt = addDays(
-            new Date(),
-            this.environmentService.getBillingTrialDays(),
-          );
-          status = WorkspaceStatus.Active;
-          plan = 'standard';
-          billingEmail = user.email;
-          settings = { ai: { generative: true, chat: true } };
-        }
-
         // create workspace
         const workspace = await this.workspaceRepo.insertWorkspace(
           {
             name: createWorkspaceDto.name,
             description: createWorkspaceDto.description,
-            hostname,
-            status,
-            trialEndAt,
-            plan,
-            billingEmail,
-            settings,
           },
           trx,
         );
@@ -233,26 +203,6 @@ export class WorkspaceService {
       },
       trx,
     );
-
-    if (this.environmentService.isCloud() && trialEndAt) {
-      try {
-        const delay = trialEndAt.getTime() - Date.now();
-
-        await this.billingQueue.add(
-          QueueJob.TRIAL_ENDED,
-          { workspaceId: createdWorkspace.id },
-          { delay },
-        );
-
-        await this.billingQueue.add(
-          QueueJob.WELCOME_EMAIL,
-          { userId: user.id },
-          { delay: 30 * 60 * 1000 }, // 30m
-        );
-      } catch (err) {
-        this.logger.error(err);
-      }
-    }
 
     return createdWorkspace;
   }
@@ -656,7 +606,6 @@ export class WorkspaceService {
 
     const workspace = await this.workspaceRepo.findById(workspaceId, {
       withMemberCount: true,
-      withLicenseKey: true,
     });
 
     const columnChanges = diffAuditTrackedFields(
@@ -686,8 +635,7 @@ export class WorkspaceService {
       });
     }
 
-    const { licenseKey, ...rest } = workspace;
-    return rest;
+    return workspace;
   }
 
   async getWorkspaceUsers(
@@ -752,42 +700,115 @@ export class WorkspaceService {
     });
   }
 
-  async generateHostname(
-    name: string,
-    trx?: KyselyTransaction,
-  ): Promise<string> {
-    let subdomain = name
-      .toLowerCase()
-      .replace(/[^a-z0-9-]/g, '')
-      .substring(0, 20)
-      .replace(/^-+|-+$/g, ''); //remove any hyphen at the start or end
-    // Ensure we leave room for a random suffix.
-    const maxSuffixLength = 6;
+  async createUser(
+    authUser: User,
+    dto: CreateWorkspaceUserDto,
+    workspaceId: string,
+  ) {
+    const role = dto.role ? (dto.role as UserRole) : UserRole.MEMBER;
 
-    if (subdomain.length < 4) {
-      subdomain = `${subdomain}-${generateRandomSuffixNumbers(maxSuffixLength)}`;
+    if (isAdminActingOnOwner(authUser.role, role)) {
+      throw new ForbiddenException(
+        'Admins cannot create users with the owner role',
+      );
     }
 
-    if (DISALLOWED_HOSTNAMES.includes(subdomain)) {
-      subdomain = `workspace-${generateRandomSuffixNumbers(maxSuffixLength)}`;
+    const existingUser = await this.userRepo.findByEmail(
+      dto.email,
+      workspaceId,
+    );
+    if (existingUser) {
+      throw new BadRequestException(
+        'An account with this email already exists in this workspace',
+      );
     }
 
-    let uniqueHostname = subdomain;
+    const password = nanoIdGen(12);
 
-    while (true) {
-      const exists = await this.workspaceRepo.hostnameExists(
-        uniqueHostname,
+    let user: User;
+    await executeTx(this.db, async (trx) => {
+      const workspace = await this.workspaceRepo.findById(workspaceId, { trx });
+      user = await this.userRepo.insertUser(
+        {
+          name: dto.name,
+          email: dto.email,
+          password,
+          role,
+          emailVerifiedAt: new Date(),
+          workspaceId,
+        },
+        trx,
+        { pageEditMode: getWorkspaceDefaultPageEditMode(workspace) },
+      );
+
+      await this.addUserToWorkspace(user.id, workspaceId, role, trx);
+      await this.groupUserRepo.addUserToDefaultGroup(user.id, workspaceId, trx);
+    });
+
+    this.auditService.log({
+      event: AuditEvent.USER_CREATED,
+      resourceType: AuditResource.USER,
+      resourceId: user.id,
+      changes: {
+        after: {
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
+      },
+      metadata: {
+        source: 'admin_created',
+      },
+    });
+
+    return {
+      user: { id: user.id, name: user.name, email: user.email, role: user.role },
+      password,
+    };
+  }
+
+  async resetUserPassword(
+    authUser: User,
+    dto: ResetWorkspaceUserPasswordDto,
+    workspaceId: string,
+  ) {
+    const user = await this.userRepo.findById(dto.userId, workspaceId);
+
+    if (!user || user.deletedAt) {
+      throw new BadRequestException('Workspace member not found');
+    }
+
+    if (isAdminActingOnOwner(authUser.role, user.role)) {
+      throw new ForbiddenException('Admins cannot reset the owner password');
+    }
+
+    const password = nanoIdGen(12);
+    const passwordHash = await hashPassword(password);
+
+    await executeTx(this.db, async (trx) => {
+      await this.userRepo.updateUser(
+        {
+          password: passwordHash,
+          hasGeneratedPassword: true,
+          emailVerifiedAt: new Date(),
+        },
+        user.id,
+        workspaceId,
         trx,
       );
-      if (!exists) {
-        break;
-      }
-      // Append a random suffix and retry.
-      const randomSuffix = generateRandomSuffixNumbers(maxSuffixLength);
-      uniqueHostname = `${subdomain}-${randomSuffix}`.substring(0, 25);
-    }
+      await this.userSessionRepo.revokeByUserId(user.id, workspaceId, trx);
+    });
 
-    return uniqueHostname;
+    this.auditService.log({
+      event: AuditEvent.USER_PASSWORD_RESET,
+      resourceType: AuditResource.USER,
+      resourceId: user.id,
+    });
+
+    return {
+      user: { id: user.id, name: user.name, email: user.email },
+      password,
+    };
   }
 
   async checkHostname(hostname: string) {

@@ -10,7 +10,6 @@ import { CollaborationModule } from './collaboration/collaboration.module';
 import { WsModule } from './ws/ws.module';
 import { DatabaseModule } from '@docmost/db/database.module';
 import { StorageModule } from './integrations/storage/storage.module';
-import { MailModule } from './integrations/mail/mail.module';
 import { QueueModule } from './integrations/queue/queue.module';
 import { StaticModule } from './integrations/static/static.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
@@ -90,9 +89,6 @@ try {
     ImportModule,
     ExportModule,
     StorageModule.forRootAsync({
-      imports: [EnvironmentModule],
-    }),
-    MailModule.forRootAsync({
       imports: [EnvironmentModule],
     }),
     EventEmitterModule.forRoot(),

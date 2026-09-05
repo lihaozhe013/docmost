@@ -10,11 +10,6 @@ import {
 } from '../../../integrations/queue/constants/queue.interface';
 import { NotificationService } from '../notification.service';
 import { NotificationType } from '../notification.constants';
-import { VerificationExpiringEmail } from '@docmost/transactional/emails/verification-expiring-email';
-import { VerificationExpiredEmail } from '@docmost/transactional/emails/verification-expired-email';
-import { ApprovalRequestedEmail } from '@docmost/transactional/emails/approval-requested-email';
-import { ApprovalRejectedEmail } from '@docmost/transactional/emails/approval-rejected-email';
-import { getPageTitle } from '../../../common/helpers';
 import { SpaceMemberRepo } from '@docmost/db/repos/space/space-member.repo';
 import { PagePermissionRepo } from '@docmost/db/repos/page/page-permission.repo';
 
@@ -58,7 +53,6 @@ export class VerificationNotificationService {
 
   async processVerificationExpiring(
     data: IVerificationExpiringNotificationJob,
-    appUrl: string,
   ) {
     const verification = await this.db
       .selectFrom('pageVerifications')
@@ -96,18 +90,10 @@ export class VerificationNotificationService {
     );
     if (recipients.length === 0) return;
 
-    const context = await this.getPageContext(
-      verification.pageId,
-      verification.spaceId,
-      appUrl,
-    );
-    if (!context) return;
-
-    const { pageTitle, spaceName, basePageUrl } = context;
     const expiresAtIso = new Date(verification.expiresAt).toISOString();
 
     for (const userId of recipients) {
-      const notification = await this.notificationService.create({
+      await this.notificationService.create({
         userId,
         workspaceId: verification.workspaceId,
         type: NotificationType.PAGE_VERIFICATION_EXPIRING,
@@ -116,26 +102,11 @@ export class VerificationNotificationService {
         pageVerificationId: verification.id,
         data: { expiresAt: expiresAtIso },
       });
-
-      const subject = `"${pageTitle}" needs to be re-verified soon`;
-
-      await this.notificationService.queueEmail(
-        userId,
-        notification.id,
-        subject,
-        VerificationExpiringEmail({
-          pageTitle,
-          spaceName,
-          pageUrl: basePageUrl,
-          expiresAt: new Date(verification.expiresAt).toLocaleDateString(),
-        }),
-      );
     }
   }
 
   async processVerificationExpired(
     data: IVerificationExpiredNotificationJob,
-    appUrl: string,
   ) {
     const verification = await this.db
       .selectFrom('pageVerifications')
@@ -172,17 +143,8 @@ export class VerificationNotificationService {
     );
     if (recipients.length === 0) return;
 
-    const context = await this.getPageContext(
-      verification.pageId,
-      verification.spaceId,
-      appUrl,
-    );
-    if (!context) return;
-
-    const { pageTitle, spaceName, basePageUrl } = context;
-
     for (const userId of recipients) {
-      const notification = await this.notificationService.create({
+      await this.notificationService.create({
         userId,
         workspaceId: verification.workspaceId,
         type: NotificationType.PAGE_VERIFICATION_EXPIRED,
@@ -190,19 +152,6 @@ export class VerificationNotificationService {
         spaceId: verification.spaceId,
         pageVerificationId: verification.id,
       });
-
-      const subject = `"${pageTitle}" verification has expired`;
-
-      await this.notificationService.queueEmail(
-        userId,
-        notification.id,
-        subject,
-        VerificationExpiredEmail({
-          pageTitle,
-          spaceName,
-          pageUrl: basePageUrl,
-        }),
-      );
     }
   }
 
@@ -231,7 +180,6 @@ export class VerificationNotificationService {
 
   async processApprovalRequested(
     data: IApprovalRequestedNotificationJob,
-    appUrl: string,
   ) {
     const { verifierIds, pageId, spaceId, workspaceId, actorId } = data;
     if (verifierIds.length === 0) return;
@@ -243,14 +191,8 @@ export class VerificationNotificationService {
     );
     if (accessibleVerifierIds.length === 0) return;
 
-    const context = await this.getPageContext(pageId, spaceId, appUrl);
-    if (!context) return;
-
-    const { pageTitle, spaceName, basePageUrl } = context;
-    const actorName = await this.getUserName(actorId);
-
     for (const userId of accessibleVerifierIds) {
-      const notification = await this.notificationService.create({
+      await this.notificationService.create({
         userId,
         workspaceId,
         type: NotificationType.PAGE_APPROVAL_REQUESTED,
@@ -258,29 +200,13 @@ export class VerificationNotificationService {
         pageId,
         spaceId,
       });
-
-      const subject = `"${pageTitle}" needs your approval`;
-
-      await this.notificationService.queueEmail(
-        userId,
-        notification.id,
-        subject,
-        ApprovalRequestedEmail({
-          actorName,
-          pageTitle,
-          spaceName,
-          pageUrl: basePageUrl,
-        }),
-      );
     }
   }
 
   async processApprovalRejected(
     data: IApprovalRejectedNotificationJob,
-    appUrl: string,
   ) {
-    const { pageId, spaceId, workspaceId, actorId, requestedById, comment } =
-      data;
+    const { pageId, spaceId, workspaceId, actorId, requestedById } = data;
 
     const recipients = await this.filterAccessibleRecipients(
       [requestedById],
@@ -289,13 +215,7 @@ export class VerificationNotificationService {
     );
     if (recipients.length === 0) return;
 
-    const context = await this.getPageContext(pageId, spaceId, appUrl);
-    if (!context) return;
-
-    const { pageTitle, spaceName, basePageUrl } = context;
-    const actorName = await this.getUserName(actorId);
-
-    const notification = await this.notificationService.create({
+    await this.notificationService.create({
       userId: requestedById,
       workspaceId,
       type: NotificationType.PAGE_APPROVAL_REJECTED,
@@ -303,53 +223,5 @@ export class VerificationNotificationService {
       pageId,
       spaceId,
     });
-
-    const subject = `"${pageTitle}" was returned for revision`;
-
-    await this.notificationService.queueEmail(
-      requestedById,
-      notification.id,
-      subject,
-      ApprovalRejectedEmail({
-        actorName,
-        pageTitle,
-        spaceName,
-        pageUrl: basePageUrl,
-        comment,
-      }),
-    );
-  }
-
-  private async getUserName(userId: string): Promise<string> {
-    const user = await this.db
-      .selectFrom('users')
-      .select('name')
-      .where('id', '=', userId)
-      .executeTakeFirst();
-    return user?.name ?? 'Someone';
-  }
-
-  private async getPageContext(
-    pageId: string,
-    spaceId: string,
-    appUrl: string,
-  ) {
-    const [page, space] = await Promise.all([
-      this.db
-        .selectFrom('pages')
-        .select(['id', 'title', 'slugId'])
-        .where('id', '=', pageId)
-        .executeTakeFirst(),
-      this.db
-        .selectFrom('spaces')
-        .select(['id', 'slug', 'name'])
-        .where('id', '=', spaceId)
-        .executeTakeFirst(),
-    ]);
-
-    if (!page || !space) return null;
-
-    const basePageUrl = `${appUrl}/s/${space.slug}/p/${page.slugId}`;
-    return { pageTitle: getPageTitle(page.title), spaceName: space.name ?? space.slug, basePageUrl };
   }
 }

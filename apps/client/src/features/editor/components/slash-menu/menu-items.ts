@@ -59,7 +59,6 @@ import {
   VimeoIcon,
   YoutubeIcon,
 } from "@/components/icons";
-import { insertBaseEmbedBlock } from "@/features/editor/components/base-embed/insert-base-embed";
 
 const CommandGroups: SlashMenuGroupedItemsType = {
   basic: [
@@ -371,26 +370,6 @@ const CommandGroups: SlashMenuGroupedItemsType = {
           .deleteRange(range)
           .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
           .run(),
-    },
-    {
-      title: "Base (Inline)",
-      description: "Insert an inline base on this page",
-      searchTerms: ["base", "database", "table", "grid", "spreadsheet"],
-      icon: IconTable,
-      requiresBases: true,
-      command: ({ editor, range }: CommandProps) => {
-        insertBaseEmbedBlock(editor, { range });
-      },
-    },
-    {
-      title: "Kanban",
-      description: "Insert a kanban board on this page",
-      searchTerms: ["kanban", "board", "cards", "status", "task", "database"],
-      icon: IconLayoutKanban,
-      requiresBases: true,
-      command: ({ editor, range }: CommandProps) => {
-        insertBaseEmbedBlock(editor, { range, template: "kanban" });
-      },
     },
     {
       title: "Toggle block",

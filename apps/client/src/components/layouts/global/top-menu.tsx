@@ -15,16 +15,9 @@ import {
   IconMoon,
   IconSettings,
   IconSun,
-  IconUser,
   IconUserCircle,
   IconUsers,
 } from "@tabler/icons-react";
-import { useDisclosure } from "@mantine/hooks";
-import { getSpaceUrl } from "@/lib/config.ts";
-import { useHasFeature } from "@/ee/hooks/use-feature";
-import { Feature } from "@/ee/features";
-import { usePersonalSpaceQuery } from "@/ee/personal-space/queries/personal-space-query";
-import CreatePersonalSpaceModal from "@/ee/personal-space/components/create-personal-space-modal";
 import { useAtom } from "jotai";
 import { currentUserAtom } from "@/features/user/atoms/current-user-atom.ts";
 import { Link } from "react-router-dom";
@@ -42,14 +35,6 @@ export default function TopMenu() {
 
   const user = currentUser?.user;
   const workspace = currentUser?.workspace;
-
-  const hasPersonalSpaces = useHasFeature(Feature.PERSONAL_SPACES);
-  const settingEnabled = workspace?.settings?.spaces?.allowPersonal === true;
-  const { data: personalSpace } = usePersonalSpaceQuery(hasPersonalSpaces);
-  const [
-    createOpened,
-    { open: openCreate, close: closeCreate },
-  ] = useDisclosure(false);
 
   if (!user || !workspace) {
     return <></>;
@@ -131,26 +116,6 @@ export default function TopMenu() {
           {t("My preferences")}
         </Menu.Item>
 
-        {personalSpace ? (
-          <Menu.Item
-            component={Link}
-            to={getSpaceUrl(personalSpace.slug)}
-            leftSection={<IconUser size={16} />}
-          >
-            {t("Personal space")}
-          </Menu.Item>
-        ) : (
-          hasPersonalSpaces &&
-          settingEnabled && (
-            <Menu.Item
-              onClick={openCreate}
-              leftSection={<IconUser size={16} />}
-            >
-              {t("Create personal space")}
-            </Menu.Item>
-          )
-        )}
-
         <Menu.Sub>
           <Menu.Sub.Target>
             <Menu.Sub.Item leftSection={<IconBrightnessFilled size={16} />}>
@@ -196,8 +161,6 @@ export default function TopMenu() {
         </Menu.Item>
       </Menu.Dropdown>
     </Menu>
-
-      <CreatePersonalSpaceModal opened={createOpened} onClose={closeCreate} />
     </>
   );
 }

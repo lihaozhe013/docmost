@@ -13,7 +13,6 @@ import {
 import classes from "./auth.module.css";
 import { useRedirectIfAuthenticated } from "@/features/auth/hooks/use-redirect-if-authenticated.ts";
 import { useTranslation } from "react-i18next";
-import SsoLogin from "@/ee/components/sso-login.tsx";
 import { useWorkspacePublicDataQuery } from "@/features/workspace/queries/workspace-query.ts";
 import { Error404 } from "@/components/ui/error-404.tsx";
 import React from "react";
@@ -72,8 +71,6 @@ export function LoginForm() {
           <Title order={1} size="h2" ta="center" fw={500} mb="md">
             {t("Login")}
           </Title>
-
-          <SsoLogin />
 
           {!data?.enforceSso && (
             <>

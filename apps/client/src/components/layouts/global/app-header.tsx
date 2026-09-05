@@ -22,8 +22,6 @@ import {
 import { useToggleSidebar } from "@/components/layouts/global/hooks/hooks/use-toggle-sidebar.ts";
 import SidebarToggle from "@/components/ui/sidebar-toggle-button.tsx";
 import { useTranslation } from "react-i18next";
-import useTrial from "@/ee/hooks/use-trial.tsx";
-import { isCloud } from "@/lib/config.ts";
 import {
   SearchControl,
   SearchMobileControl,
@@ -46,7 +44,6 @@ export function AppHeader() {
 
   const [desktopOpened] = useAtom(desktopSidebarAtom);
   const toggleDesktop = useToggleSidebar(desktopSidebarAtom);
-  const { isTrial, trialDaysLeft } = useTrial();
   const location = useLocation();
   const toggleAside = useToggleAside();
   const [workspace] = useAtom(workspaceAtom);
@@ -162,19 +159,6 @@ export function AppHeader() {
             </>
           )}
           <NotificationPopover />
-          {isCloud() && isTrial && trialDaysLeft !== 0 && (
-            <Badge
-              variant="light"
-              style={{ cursor: "pointer" }}
-              component={Link}
-              to={APP_ROUTE.SETTINGS.WORKSPACE.BILLING}
-              visibleFrom="xs"
-            >
-              {trialDaysLeft === 1
-                ? "1 day left"
-                : `${trialDaysLeft} days left`}
-            </Badge>
-          )}
           <TopMenu />
         </Group>
       </Group>

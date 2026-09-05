@@ -2,9 +2,7 @@ import { lazy, Suspense, useEffect } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Layout from "@/components/layouts/global/layout.tsx";
 import { Error404 } from "@/components/ui/error-404.tsx";
-import { isCloud } from "@/lib/config.ts";
 import { useTranslation } from "react-i18next";
-import { useRedirectToCloudSelect } from "@/ee/hooks/use-redirect-to-cloud-select.tsx";
 import { useTrackOrigin } from "@/hooks/use-track-origin";
 
 
@@ -32,11 +30,6 @@ const PageRedirect = lazy(() => import("@/pages/page/page-redirect.tsx"));
 const InviteSignup = lazy(() => import("@/pages/auth/invite-signup.tsx"));
 const ForgotPassword = lazy(() => import("@/pages/auth/forgot-password.tsx"));
 const PasswordReset = lazy(() => import("./pages/auth/password-reset"));
-const Billing = lazy(() => import("@/ee/billing/pages/billing.tsx"));
-const CloudLogin = lazy(() => import("@/ee/pages/cloud-login.tsx"));
-const CreateWorkspace = lazy(() => import("@/ee/pages/create-workspace.tsx"));
-const Security = lazy(() => import("@/ee/security/pages/security.tsx"));
-const License = lazy(() => import("@/ee/licence/pages/license.tsx"));
 const SharedPage = lazy(() => import("@/pages/share/shared-page.tsx"));
 const PdfRenderPage = lazy(() => import("@/ee/pdf-export/pdf-render-page.tsx"));
 const Shares = lazy(() => import("@/pages/settings/shares/shares.tsx"));
@@ -72,13 +65,12 @@ const TemplateEditor = lazy(
 );
 const FavoritesPage = lazy(() => import("@/pages/favorites/favorites-page"));
 const AiChat = lazy(() => import("@/ee/ai-chat/pages/ai-chat.tsx"));
-const VerifyEmail = lazy(() => import("@/ee/pages/verify-email.tsx"));
+const Security = lazy(() => import("@/ee/security/pages/security.tsx"));
 const LabelPage = lazy(() => import("@/pages/label/label-page"));
 const OAuthConsent = lazy(() => import("@/ee/oauth/pages/oauth-consent.tsx"));
 
 export default function App() {
   const { t } = useTranslation();
-  useRedirectToCloudSelect();
   useTrackOrigin();
 
   useEffect(() => {
@@ -99,17 +91,7 @@ export default function App() {
         <Route path={"/login/mfa/setup"} element={<MfaSetupRequiredPage />} />
         <Route path={"/oauth/consent"} element={<OAuthConsent />} />
 
-        {!isCloud() && (
-          <Route path={"/setup/register"} element={<SetupWorkspace />} />
-        )}
-
-        {isCloud() && (
-          <>
-            <Route path={"/create"} element={<CreateWorkspace />} />
-            <Route path={"/select"} element={<CloudLogin />} />
-            <Route path={"/verify-email"} element={<VerifyEmail />} />
-          </>
-        )}
+        <Route path={"/setup/register"} element={<SetupWorkspace />} />
 
         <Route element={<ShareLayout />}>
           <Route
@@ -172,8 +154,6 @@ export default function App() {
               element={<Navigate to="/settings/audit/siem" replace />}
             />
             <Route path={"verifications"} element={<VerifiedPages />} />
-            {!isCloud() && <Route path={"license"} element={<License />} />}
-            {isCloud() && <Route path={"billing"} element={<Billing />} />}
           </Route>
         </Route>
 

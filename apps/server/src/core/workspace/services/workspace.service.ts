@@ -10,6 +10,8 @@ import { LicenseCheckService } from '../../../integrations/environment/license-c
 import { UserSessionRepo } from '@docmost/db/repos/session/user-session.repo';
 import { CreateWorkspaceDto } from '../dto/create-workspace.dto';
 import { UpdateWorkspaceDto } from '../dto/update-workspace.dto';
+import { CreateWorkspaceUserDto } from '../dto/create-workspace-user.dto';
+import { ResetWorkspaceUserPasswordDto } from '../dto/reset-workspace-user-password.dto';
 import { SpaceService } from '../../space/services/space.service';
 import { CreateSpaceDto } from '../../space/dto/create-space.dto';
 import { SpaceRole, UserRole } from '../../../common/helpers/types/permission';
@@ -29,12 +31,16 @@ import { EnvironmentService } from '../../../integrations/environment/environmen
 import { DomainService } from '../../../integrations/environment/domain.service';
 import { jsonArrayFrom } from 'kysely/helpers/postgres';
 import { DISALLOWED_HOSTNAMES } from '../workspace.constants';
-import { isAdminActingOnOwner } from '../workspace.util';
+import { getWorkspaceDefaultPageEditMode, isAdminActingOnOwner } from '../workspace.util';
 import { v4 } from 'uuid';
 import { InjectQueue } from '@nestjs/bullmq';
 import { QueueJob, QueueName } from '../../../integrations/queue/constants';
 import { Queue } from 'bullmq';
-import { diffAuditTrackedFields } from '../../../common/helpers';
+import {
+  diffAuditTrackedFields,
+  hashPassword,
+  nanoIdGen,
+} from '../../../common/helpers';
 import { isPageEmbeddingsTableExists } from '@docmost/db/helpers/helpers';
 import { CursorPaginationResult } from '@docmost/db/pagination/cursor-pagination';
 import { ShareRepo } from '@docmost/db/repos/share/share.repo';
@@ -692,6 +698,117 @@ export class WorkspaceService {
         after: { role: newRole },
       },
     });
+  }
+
+  async createUser(
+    authUser: User,
+    dto: CreateWorkspaceUserDto,
+    workspaceId: string,
+  ) {
+    const role = dto.role ? (dto.role as UserRole) : UserRole.MEMBER;
+
+    if (isAdminActingOnOwner(authUser.role, role)) {
+      throw new ForbiddenException(
+        'Admins cannot create users with the owner role',
+      );
+    }
+
+    const existingUser = await this.userRepo.findByEmail(
+      dto.email,
+      workspaceId,
+    );
+    if (existingUser) {
+      throw new BadRequestException(
+        'An account with this email already exists in this workspace',
+      );
+    }
+
+    const password = nanoIdGen(12);
+
+    let user: User;
+    await executeTx(this.db, async (trx) => {
+      const workspace = await this.workspaceRepo.findById(workspaceId, { trx });
+      user = await this.userRepo.insertUser(
+        {
+          name: dto.name,
+          email: dto.email,
+          password,
+          role,
+          emailVerifiedAt: new Date(),
+          workspaceId,
+        },
+        trx,
+        { pageEditMode: getWorkspaceDefaultPageEditMode(workspace) },
+      );
+
+      await this.addUserToWorkspace(user.id, workspaceId, role, trx);
+      await this.groupUserRepo.addUserToDefaultGroup(user.id, workspaceId, trx);
+    });
+
+    this.auditService.log({
+      event: AuditEvent.USER_CREATED,
+      resourceType: AuditResource.USER,
+      resourceId: user.id,
+      changes: {
+        after: {
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
+      },
+      metadata: {
+        source: 'admin_created',
+      },
+    });
+
+    return {
+      user: { id: user.id, name: user.name, email: user.email, role: user.role },
+      password,
+    };
+  }
+
+  async resetUserPassword(
+    authUser: User,
+    dto: ResetWorkspaceUserPasswordDto,
+    workspaceId: string,
+  ) {
+    const user = await this.userRepo.findById(dto.userId, workspaceId);
+
+    if (!user || user.deletedAt) {
+      throw new BadRequestException('Workspace member not found');
+    }
+
+    if (isAdminActingOnOwner(authUser.role, user.role)) {
+      throw new ForbiddenException('Admins cannot reset the owner password');
+    }
+
+    const password = nanoIdGen(12);
+    const passwordHash = await hashPassword(password);
+
+    await executeTx(this.db, async (trx) => {
+      await this.userRepo.updateUser(
+        {
+          password: passwordHash,
+          hasGeneratedPassword: true,
+          emailVerifiedAt: new Date(),
+        },
+        user.id,
+        workspaceId,
+        trx,
+      );
+      await this.userSessionRepo.revokeByUserId(user.id, workspaceId, trx);
+    });
+
+    this.auditService.log({
+      event: AuditEvent.USER_PASSWORD_RESET,
+      resourceType: AuditResource.USER,
+      resourceId: user.id,
+    });
+
+    return {
+      user: { id: user.id, name: user.name, email: user.email },
+      password,
+    };
   }
 
   async checkHostname(hostname: string) {

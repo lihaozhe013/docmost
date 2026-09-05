@@ -46,10 +46,6 @@ export class EnvironmentVariables {
   APP_SECRET: string;
 
   @IsOptional()
-  @IsIn(['smtp', 'postmark'])
-  MAIL_DRIVER: string;
-
-  @IsOptional()
   @IsIn(['local', 's3', 'azure'])
   STORAGE_DRIVER: string;
 

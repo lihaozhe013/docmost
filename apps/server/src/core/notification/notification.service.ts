@@ -1,23 +1,19 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectKysely } from 'nestjs-kysely';
 import { KyselyDB } from '@docmost/db/types/kysely.types';
 import { NotificationRepo } from '@docmost/db/repos/notification/notification.repo';
 import { InsertableNotification } from '@docmost/db/types/entity.types';
 import { PaginationOptions } from '@docmost/db/pagination/pagination-options';
 import { WsGateway } from '../../ws/ws.gateway';
-import { MailService } from '../../integrations/mail/mail.service';
-import { NotificationTab, NotificationType, NotificationTypeToSettingKey } from './notification.constants';
+import { NotificationTab } from './notification.constants';
 import { PagePermissionRepo } from '@docmost/db/repos/page/page-permission.repo';
 
 @Injectable()
 export class NotificationService {
-  private readonly logger = new Logger(NotificationService.name);
-
   constructor(
     private readonly notificationRepo: NotificationRepo,
     private readonly pagePermissionRepo: PagePermissionRepo,
     private readonly wsGateway: WsGateway,
-    private readonly mailService: MailService,
     @InjectKysely() private readonly db: KyselyDB,
   ) {}
 
@@ -86,45 +82,5 @@ export class NotificationService {
 
   async markAllAsRead(userId: string) {
     return this.notificationRepo.markAllAsRead(userId);
-  }
-
-  async queueEmail(
-    userId: string,
-    notificationId: string,
-    subject: string,
-    template: any,
-    type?: NotificationType,
-  ) {
-    try {
-      const user = await this.db
-        .selectFrom('users')
-        .select(['email', 'settings'])
-        .where('id', '=', userId)
-        .where('deletedAt', 'is', null)
-        .where('deactivatedAt', 'is', null)
-        .executeTakeFirst();
-
-      if (!user?.email) return;
-
-      if (type) {
-        const settingKey = NotificationTypeToSettingKey[type];
-        if (settingKey) {
-          const settings = user.settings as any;
-          if (settings?.notifications?.[settingKey] === false) return;
-        }
-      }
-
-      await this.mailService.sendToQueue({
-        to: user.email,
-        subject,
-        template,
-        notificationId,
-      });
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Unknown error';
-      this.logger.error(
-        `Failed to queue email for notification ${notificationId}: ${message}`,
-      );
-    }
   }
 }

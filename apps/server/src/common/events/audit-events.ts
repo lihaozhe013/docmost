@@ -2,9 +2,6 @@ export const AuditEvent = {
   // Workspace
   WORKSPACE_CREATED: 'workspace.created',
   WORKSPACE_UPDATED: 'workspace.updated',
-  WORKSPACE_INVITE_CREATED: 'workspace.invite_created',
-  WORKSPACE_INVITE_RESENT: 'workspace.invite_resent',
-  WORKSPACE_INVITE_REVOKED: 'workspace.invite_revoked',
 
   // User
   USER_CREATED: 'user.created',

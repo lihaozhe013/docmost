@@ -7,24 +7,20 @@ import {
 } from "@tanstack/react-query";
 import {
   changeMemberRole,
-  getInvitationById,
-  getPendingInvitations,
   getWorkspaceMembers,
-  createInvitation,
-  resendInvitation,
-  revokeInvitation,
   getWorkspace,
   getWorkspacePublicData,
   getAppVersion,
   deleteWorkspaceMember,
   deactivateWorkspaceMember,
   activateWorkspaceMember,
+  createWorkspaceMember,
+  resetWorkspaceMemberPassword,
 } from "@/features/workspace/services/workspace-service";
 import { IPagination, QueryParams } from "@/lib/types.ts";
 import { notifications } from "@mantine/notifications";
 import {
-  ICreateInvite,
-  IInvitation,
+  ICreateWorkspaceUser,
   IPublicWorkspace,
   IVersion,
   IWorkspace,
@@ -147,69 +143,18 @@ export function useChangeMemberRoleMutation() {
   });
 }
 
-export function useWorkspaceInvitationsQuery(
-  params?: QueryParams,
-): UseQueryResult<IPagination<IInvitation>, Error> {
-  return useQuery({
-    queryKey: ["invitations", params],
-    queryFn: () => getPendingInvitations(params),
-    placeholderData: keepPreviousData,
-  });
-}
-
-export function useCreateInvitationMutation() {
-  const { t } = useTranslation();
-  const queryClient = useQueryClient();
-
-  return useMutation<void, Error, ICreateInvite>({
-    mutationFn: (data) => createInvitation(data),
-    onSuccess: (data, variables) => {
-      notifications.show({ message: t("Invitation sent") });
-      queryClient.refetchQueries({
-        queryKey: ["invitations"],
-      });
-    },
-    onError: (error) => {
-      const errorMessage = error["response"]?.data?.message;
-      notifications.show({ message: errorMessage, color: "red" });
-    },
-  });
-}
-
-export function useResendInvitationMutation() {
-  return useMutation<
-    void,
-    Error,
-    {
-      invitationId: string;
-    }
-  >({
-    mutationFn: (data) => resendInvitation(data),
-    onSuccess: (data, variables) => {
-      notifications.show({ message: "Invitation resent" });
-    },
-    onError: (error) => {
-      const errorMessage = error["response"]?.data?.message;
-      notifications.show({ message: errorMessage, color: "red" });
-    },
-  });
-}
-
-export function useRevokeInvitationMutation() {
+export function useCreateWorkspaceMemberMutation() {
   const queryClient = useQueryClient();
 
   return useMutation<
-    void,
+    { user: IUser; password: string },
     Error,
-    {
-      invitationId: string;
-    }
+    ICreateWorkspaceUser
   >({
-    mutationFn: (data) => revokeInvitation(data),
-    onSuccess: (data, variables) => {
-      notifications.show({ message: "Invitation revoked" });
+    mutationFn: (data) => createWorkspaceMember(data),
+    onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["invitations"],
+        queryKey: ["workspaceMembers"],
       });
     },
     onError: (error) => {
@@ -219,13 +164,25 @@ export function useRevokeInvitationMutation() {
   });
 }
 
-export function useGetInvitationQuery(
-  invitationId: string,
-): UseQueryResult<IInvitation, Error> {
-  return useQuery({
-    queryKey: ["invitations", invitationId],
-    queryFn: () => getInvitationById({ invitationId }),
-    enabled: !!invitationId,
+export function useResetWorkspaceMemberPasswordMutation() {
+  const queryClient = useQueryClient();
+  const { t } = useTranslation();
+
+  return useMutation<
+    { user: { id: string; name: string; email: string }; password: string },
+    Error,
+    { userId: string }
+  >({
+    mutationFn: (data) => resetWorkspaceMemberPassword(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["workspaceMembers"],
+      });
+    },
+    onError: (error) => {
+      const errorMessage = error["response"]?.data?.message;
+      notifications.show({ message: errorMessage, color: "red" });
+    },
   });
 }
 

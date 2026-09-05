@@ -12,17 +12,12 @@ import {
 import { WorkspaceService } from '../services/workspace.service';
 import { UpdateWorkspaceDto } from '../dto/update-workspace.dto';
 import { UpdateWorkspaceUserRoleDto } from '../dto/update-workspace-user-role.dto';
+import { CreateWorkspaceUserDto } from '../dto/create-workspace-user.dto';
+import { ResetWorkspaceUserPasswordDto } from '../dto/reset-workspace-user-password.dto';
 import { AuthUser } from '../../../common/decorators/auth-user.decorator';
 import { AuthWorkspace } from '../../../common/decorators/auth-workspace.decorator';
 import { PaginationOptions } from '@docmost/db/pagination/pagination-options';
-import { WorkspaceInvitationService } from '../services/workspace-invitation.service';
 import { Public } from '../../../common/decorators/public.decorator';
-import {
-  AcceptInviteDto,
-  InvitationIdDto,
-  InviteUserDto,
-  RevokeInviteDto,
-} from '../dto/invitation.dto';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 import { OAuthScope } from '../../../common/decorators/oauth-scope.decorator';
 import { User, Workspace } from '@docmost/db/types/entity.types';
@@ -41,7 +36,6 @@ import { RemoveWorkspaceUserDto } from '../dto/remove-workspace-user.dto';
 export class WorkspaceController {
   constructor(
     private readonly workspaceService: WorkspaceService,
-    private readonly workspaceInvitationService: WorkspaceInvitationService,
     private readonly workspaceAbility: WorkspaceAbilityFactory,
     private environmentService: EnvironmentService,
   ) {}
@@ -189,41 +183,9 @@ export class WorkspaceController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Post('invites')
-  async getInvitations(
-    @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
-    @Body()
-    pagination: PaginationOptions,
-  ) {
-    const ability = this.workspaceAbility.createForUser(user, workspace);
-    if (ability.cannot(WorkspaceCaslAction.Read, WorkspaceCaslSubject.Member)) {
-      throw new ForbiddenException();
-    }
-
-    return this.workspaceInvitationService.getInvitations(
-      workspace.id,
-      pagination,
-    );
-  }
-
-  @Public()
-  @HttpCode(HttpStatus.OK)
-  @Post('invites/info')
-  async getInvitationById(
-    @Body() dto: InvitationIdDto,
-    @AuthWorkspace() workspace: Workspace,
-  ) {
-    return this.workspaceInvitationService.getInvitationById(
-      dto.invitationId,
-      workspace,
-    );
-  }
-
-  @HttpCode(HttpStatus.OK)
-  @Post('invites/create')
-  async inviteUser(
-    @Body() inviteUserDto: InviteUserDto,
+  @Post('members/create')
+  async createWorkspaceMember(
+    @Body() dto: CreateWorkspaceUserDto,
     @AuthUser() user: User,
     @AuthWorkspace() workspace: Workspace,
   ) {
@@ -234,17 +196,13 @@ export class WorkspaceController {
       throw new ForbiddenException();
     }
 
-    return this.workspaceInvitationService.createInvitation(
-      inviteUserDto,
-      workspace,
-      user,
-    );
+    return this.workspaceService.createUser(user, dto, workspace.id);
   }
 
   @HttpCode(HttpStatus.OK)
-  @Post('invites/resend')
-  async resendInvite(
-    @Body() revokeInviteDto: RevokeInviteDto,
+  @Post('members/reset-password')
+  async resetWorkspaceMemberPassword(
+    @Body() dto: ResetWorkspaceUserPasswordDto,
     @AuthUser() user: User,
     @AuthWorkspace() workspace: Workspace,
   ) {
@@ -255,61 +213,7 @@ export class WorkspaceController {
       throw new ForbiddenException();
     }
 
-    return this.workspaceInvitationService.resendInvitation(
-      revokeInviteDto.invitationId,
-      workspace,
-    );
-  }
-
-  @HttpCode(HttpStatus.OK)
-  @Post('invites/revoke')
-  async revokeInvite(
-    @Body() revokeInviteDto: RevokeInviteDto,
-    @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
-  ) {
-    const ability = this.workspaceAbility.createForUser(user, workspace);
-    if (
-      ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Member)
-    ) {
-      throw new ForbiddenException();
-    }
-
-    return this.workspaceInvitationService.revokeInvitation(
-      revokeInviteDto.invitationId,
-      workspace.id,
-    );
-  }
-
-  @Public()
-  @HttpCode(HttpStatus.OK)
-  @Post('invites/accept')
-  async acceptInvite(
-    @Body() acceptInviteDto: AcceptInviteDto,
-    @AuthWorkspace() workspace: Workspace,
-    @Res({ passthrough: true }) res: FastifyReply,
-  ) {
-    const result = await this.workspaceInvitationService.acceptInvitation(
-      acceptInviteDto,
-      workspace,
-    );
-
-    if (result.requiresLogin) {
-      return {
-        requiresLogin: true,
-      };
-    }
-
-    res.setCookie('authToken', result.authToken, {
-      httpOnly: true,
-      path: '/',
-      expires: this.environmentService.getCookieExpiresIn(),
-      secure: this.environmentService.isHttps(),
-    });
-
-    return {
-      requiresLogin: false,
-    };
+    return this.workspaceService.resetUserPassword(user, dto, workspace.id);
   }
 
   @Public()
@@ -317,31 +221,5 @@ export class WorkspaceController {
   @Post('/check-hostname')
   async checkHostname(@Body() checkHostnameDto: CheckHostnameDto) {
     return this.workspaceService.checkHostname(checkHostnameDto.hostname);
-  }
-
-  @HttpCode(HttpStatus.OK)
-  @Post('invites/link')
-  async getInviteLink(
-    @Body() inviteDto: InvitationIdDto,
-    @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
-  ) {
-    if (this.environmentService.isCloud()) {
-      throw new ForbiddenException();
-    }
-
-    const ability = this.workspaceAbility.createForUser(user, workspace);
-    if (
-      ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Member)
-    ) {
-      throw new ForbiddenException();
-    }
-    const inviteLink =
-      await this.workspaceInvitationService.getInvitationLinkById(
-        inviteDto.invitationId,
-        workspace,
-      );
-
-    return { inviteLink };
   }
 }

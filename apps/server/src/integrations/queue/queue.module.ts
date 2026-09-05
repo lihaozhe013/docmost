@@ -40,9 +40,6 @@ import { GeneralQueueProcessor } from './processors/general-queue.processor';
       inject: [EnvironmentService],
     }),
     BullModule.registerQueue({
-      name: QueueName.EMAIL_QUEUE,
-    }),
-    BullModule.registerQueue({
       name: QueueName.ATTACHMENT_QUEUE,
     }),
     BullModule.registerQueue({

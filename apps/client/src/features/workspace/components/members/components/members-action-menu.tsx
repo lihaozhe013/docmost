@@ -1,11 +1,18 @@
-import { Menu, ActionIcon, Text } from "@mantine/core";
-import React from "react";
-import { IconDots, IconTrash, IconUserOff, IconUserCheck } from "@tabler/icons-react";
+import { Alert, Menu, ActionIcon, Text, Button, Group } from "@mantine/core";
+import React, { useState } from "react";
+import {
+  IconDots,
+  IconTrash,
+  IconUserOff,
+  IconUserCheck,
+  IconKey,
+} from "@tabler/icons-react";
 import { modals } from "@mantine/modals";
 import {
   useDeleteWorkspaceMemberMutation,
   useDeactivateWorkspaceMemberMutation,
   useActivateWorkspaceMemberMutation,
+  useResetWorkspaceMemberPasswordMutation,
 } from "@/features/workspace/queries/workspace-query.ts";
 import { useTranslation } from "react-i18next";
 import useUserRole from "@/hooks/use-user-role.tsx";
@@ -24,7 +31,9 @@ export default function MemberActionMenu({
   const deleteWorkspaceMemberMutation = useDeleteWorkspaceMemberMutation();
   const deactivateMutation = useDeactivateWorkspaceMemberMutation();
   const activateMutation = useActivateWorkspaceMemberMutation();
+  const resetPasswordMutation = useResetWorkspaceMemberPasswordMutation();
   const { isAdmin } = useUserRole();
+  const [resetPassword, setResetPassword] = useState<string | null>(null);
 
   const isDeactivated = !!deactivatedAt;
 
@@ -77,8 +86,53 @@ export default function MemberActionMenu({
       onConfirm: onRevoke,
     });
 
+  const openResetPasswordModal = () =>
+    modals.openConfirmModal({
+      title: t("Reset password"),
+      children: (
+        <Text size="sm">
+          {t(
+            "A new random password will be generated and shared only with you. The member will be signed out of all sessions.",
+          )}
+        </Text>
+      ),
+      centered: true,
+      labels: { confirm: t("Reset password"), cancel: t("Cancel") },
+      confirmProps: { color: "orange" },
+      onConfirm: async () => {
+        const result = await resetPasswordMutation.mutateAsync({ userId });
+        setResetPassword(result.password);
+      },
+    });
+
+  const closePasswordAlert = () => setResetPassword(null);
+
   return (
     <>
+      {resetPassword && (
+        <Alert
+          color="yellow"
+          title={`${t("One-time password for")} ${name}`}
+          withCloseButton
+          onClose={closePasswordAlert}
+          m="sm"
+        >
+          <Text size="sm">
+            {t(
+              "Share this password with the member. It will not be shown again.",
+            )}
+          </Text>
+          <Text size="sm" fw={700} ta="center" my="sm">
+            {resetPassword}
+          </Text>
+          <Group justify="flex-end">
+            <Button size="xs" variant="light" onClick={closePasswordAlert}>
+              {t("Close")}
+            </Button>
+          </Group>
+        </Alert>
+      )}
+
       <Menu
         shadow="xl"
         position="bottom-end"
@@ -98,6 +152,16 @@ export default function MemberActionMenu({
         </Menu.Target>
 
         <Menu.Dropdown>
+          {!isDeactivated && (
+            <Menu.Item
+              onClick={openResetPasswordModal}
+              leftSection={<IconKey size={16} />}
+              disabled={!isAdmin}
+            >
+              {t("Reset password")}
+            </Menu.Item>
+          )}
+
           <Menu.Item
             onClick={openDeactivateModal}
             leftSection={

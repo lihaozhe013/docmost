@@ -1,5 +1,4 @@
 export enum QueueName {
-  EMAIL_QUEUE = '{email-queue}',
   ATTACHMENT_QUEUE = '{attachment-queue}',
   GENERAL_QUEUE = '{general-queue}',
   FILE_TASK_QUEUE = '{file-task-queue}',
@@ -13,7 +12,6 @@ export enum QueueName {
 }
 
 export enum QueueJob {
-  SEND_EMAIL = 'send-email',
   DELETE_SPACE_ATTACHMENTS = 'delete-space-attachments',
   ATTACHMENT_INDEX_CONTENT = 'attachment-index-content',
   ATTACHMENT_INDEXING = 'attachment-indexing',
@@ -67,7 +65,6 @@ export enum QueueJob {
   COMMENT_RESOLVED_NOTIFICATION = 'comment-resolved-notification',
   PAGE_MENTION_NOTIFICATION = 'page-mention-notification',
   PAGE_PERMISSION_GRANTED = 'page-permission-granted',
-  PAGE_UPDATE_DIGEST = 'page-update-digest',
   PAGE_VERIFICATION_EXPIRING = 'page-verification-expiring',
   PAGE_VERIFICATION_EXPIRED = 'page-verification-expired',
   VERIFICATION_RECONCILE = 'verification-reconcile',

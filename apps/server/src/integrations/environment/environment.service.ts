@@ -142,63 +142,6 @@ export class EnvironmentService {
     return this.configService.get<string>('AZURE_STORAGE_URL');
   }
 
-  getMailDriver(): string {
-    return this.configService.get<string>('MAIL_DRIVER', 'log');
-  }
-
-  getMailFromAddress(): string {
-    return this.configService.get<string>('MAIL_FROM_ADDRESS');
-  }
-
-  getMailFromName(): string {
-    return this.configService.get<string>('MAIL_FROM_NAME', 'Docmost');
-  }
-
-  getMailBlockedRecipientDomains(): string[] {
-    const raw = this.configService.get<string>(
-      'MAIL_BLOCKED_RECIPIENT_DOMAINS',
-      '',
-    );
-    return raw
-      .split(',')
-      .map((d) => d.trim().toLowerCase())
-      .filter(Boolean);
-  }
-
-  getSmtpHost(): string {
-    return this.configService.get<string>('SMTP_HOST');
-  }
-
-  getSmtpPort(): number {
-    return parseInt(this.configService.get<string>('SMTP_PORT'));
-  }
-
-  getSmtpSecure(): boolean {
-    const secure = this.configService
-      .get<string>('SMTP_SECURE', 'false')
-      .toLowerCase();
-    return secure === 'true';
-  }
-
-  getSmtpIgnoreTLS(): boolean {
-    const ignoretls = this.configService
-      .get<string>('SMTP_IGNORETLS', 'false')
-      .toLowerCase();
-    return ignoretls === 'true';
-  }
-
-  getSmtpUsername(): string {
-    return this.configService.get<string>('SMTP_USERNAME');
-  }
-
-  getSmtpPassword(): string {
-    return this.configService.get<string>('SMTP_PASSWORD');
-  }
-
-  getPostmarkToken(): string {
-    return this.configService.get<string>('POSTMARK_TOKEN');
-  }
-
   getDrawioUrl(): string {
     return this.configService.get<string>('DRAWIO_URL');
   }

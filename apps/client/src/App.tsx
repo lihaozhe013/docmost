@@ -27,9 +27,6 @@ const AccountPreferences = lazy(
 );
 const SpaceHome = lazy(() => import("@/pages/space/space-home.tsx"));
 const PageRedirect = lazy(() => import("@/pages/page/page-redirect.tsx"));
-const InviteSignup = lazy(() => import("@/pages/auth/invite-signup.tsx"));
-const ForgotPassword = lazy(() => import("@/pages/auth/forgot-password.tsx"));
-const PasswordReset = lazy(() => import("./pages/auth/password-reset"));
 const SharedPage = lazy(() => import("@/pages/share/shared-page.tsx"));
 const PdfRenderPage = lazy(() => import("@/ee/pdf-export/pdf-render-page.tsx"));
 const Shares = lazy(() => import("@/pages/settings/shares/shares.tsx"));
@@ -84,9 +81,6 @@ export default function App() {
       <Routes>
         <Route index element={<Navigate to="/home" />} />
         <Route path={"/login"} element={<LoginPage />} />
-        <Route path={"/invites/:invitationId"} element={<InviteSignup />} />
-        <Route path={"/forgot-password"} element={<ForgotPassword />} />
-        <Route path={"/password-reset"} element={<PasswordReset />} />
         <Route path={"/login/mfa"} element={<MfaChallengePage />} />
         <Route path={"/login/mfa/setup"} element={<MfaSetupRequiredPage />} />
         <Route path={"/oauth/consent"} element={<OAuthConsent />} />

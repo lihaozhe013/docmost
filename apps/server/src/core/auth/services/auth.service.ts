@@ -2,7 +2,6 @@ import {
   BadRequestException,
   Inject,
   Injectable,
-  Logger,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -18,47 +17,28 @@ import {
   comparePasswordHash,
   hashPassword,
   isUserDisabled,
-  nanoIdGen,
 } from '../../../common/helpers';
 import { throwIfEmailNotVerified } from '../auth.util';
 import { ChangePasswordDto } from '../dto/change-password.dto';
-import { MailService } from '../../../integrations/mail/mail.service';
-import ChangePasswordEmail from '@docmost/transactional/emails/change-password-email';
-import { ForgotPasswordDto } from '../dto/forgot-password.dto';
-import ForgotPasswordEmail from '@docmost/transactional/emails/forgot-password-email';
-import { UserTokenRepo } from '@docmost/db/repos/user-token/user-token.repo';
-import { PasswordResetDto } from '../dto/password-reset.dto';
-import { User, UserToken, Workspace } from '@docmost/db/types/entity.types';
-import { UserTokenType } from '../auth.constants';
+import { User } from '@docmost/db/types/entity.types';
 import { KyselyDB } from '@docmost/db/types/kysely.types';
 import { InjectKysely } from 'nestjs-kysely';
-import { executeTx } from '@docmost/db/utils';
-import { VerifyUserTokenDto } from '../dto/verify-user-token.dto';
-import { DomainService } from '../../../integrations/environment/domain.service';
 import { AuditEvent, AuditResource } from '../../../common/events/audit-events';
 import {
   AUDIT_SERVICE,
   IAuditService,
 } from '../../../integrations/audit/audit.service';
 import { EnvironmentService } from '../../../integrations/environment/environment.service';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { EventName } from '../../../common/events/event.contants';
 
 @Injectable()
 export class AuthService {
-  private readonly logger = new Logger(AuthService.name);
-
   constructor(
     private signupService: SignupService,
     private tokenService: TokenService,
     private sessionService: SessionService,
     private userSessionRepo: UserSessionRepo,
     private userRepo: UserRepo,
-    private userTokenRepo: UserTokenRepo,
-    private mailService: MailService,
-    private domainService: DomainService,
     private environmentService: EnvironmentService,
-    private eventEmitter: EventEmitter2,
     @InjectKysely() private readonly db: KyselyDB,
     @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService,
   ) {}
@@ -164,181 +144,6 @@ export class AuthService {
       resourceType: AuditResource.USER,
       resourceId: userId,
     });
-
-    const emailTemplate = ChangePasswordEmail({ username: user.name });
-    await this.mailService.sendToQueue({
-      to: user.email,
-      subject: 'Your password has been changed',
-      template: emailTemplate,
-    });
-  }
-
-  async forgotPassword(
-    forgotPasswordDto: ForgotPasswordDto,
-    workspace: Workspace,
-  ): Promise<void> {
-    const user = await this.userRepo.findByEmail(
-      forgotPasswordDto.email,
-      workspace.id,
-    );
-
-    if (!user || isUserDisabled(user)) {
-      return;
-    }
-
-    const token = nanoIdGen(16);
-
-    await executeTx(this.db, async (trx) => {
-      await trx
-        .deleteFrom('userTokens')
-        .where('userId', '=', user.id)
-        .where('type', '=', UserTokenType.FORGOT_PASSWORD)
-        .execute();
-
-      await this.userTokenRepo.insertUserToken(
-        {
-          token,
-          userId: user.id,
-          workspaceId: user.workspaceId,
-          expiresAt: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes
-          type: UserTokenType.FORGOT_PASSWORD,
-        },
-        { trx },
-      );
-    });
-
-    const resetLink = `${this.domainService.getUrl(workspace.hostname)}/password-reset?token=${token}`;
-
-    const emailTemplate = ForgotPasswordEmail({
-      username: user.name,
-      resetLink: resetLink,
-    });
-
-    await this.mailService.sendToQueue({
-      to: user.email,
-      subject: 'Reset your password',
-      template: emailTemplate,
-    });
-
-    this.auditService.log({
-      event: AuditEvent.USER_PASSWORD_RESET_REQUESTED,
-      resourceType: AuditResource.USER,
-      resourceId: user.id,
-      metadata: { source: 'forgot_password' },
-    });
-  }
-
-  async passwordReset(
-    passwordResetDto: PasswordResetDto,
-    workspace: Workspace,
-  ) {
-    const userToken = await this.userTokenRepo.findById(
-      passwordResetDto.token,
-      workspace.id,
-    );
-
-    if (
-      !userToken ||
-      userToken.type !== UserTokenType.FORGOT_PASSWORD ||
-      userToken.expiresAt < new Date()
-    ) {
-      throw new BadRequestException('Invalid or expired token');
-    }
-
-    const user = await this.userRepo.findById(userToken.userId, workspace.id, {
-      includeUserMfa: true,
-    });
-    if (!user || isUserDisabled(user)) {
-      throw new NotFoundException('User not found');
-    }
-
-    const newPasswordHash = await hashPassword(passwordResetDto.newPassword);
-
-    await executeTx(this.db, async (trx) => {
-      await this.userRepo.updateUser(
-        {
-          password: newPasswordHash,
-          hasGeneratedPassword: false,
-        },
-        user.id,
-        workspace.id,
-        trx,
-      );
-
-      await trx
-        .deleteFrom('userTokens')
-        .where('userId', '=', user.id)
-        .where('type', '=', UserTokenType.FORGOT_PASSWORD)
-        .execute();
-    });
-
-    await this.userSessionRepo.deleteByUserId(user.id, workspace.id);
-
-    // A failed revocation must not block the reset itself; log loudly instead.
-    try {
-      await this.eventEmitter.emitAsync(EventName.USER_PASSWORD_RESET, {
-        userId: user.id,
-        workspaceId: workspace.id,
-      });
-    } catch (err) {
-      this.logger.error(
-        `failed to revoke oauth grants for user ${user.id} after password reset`,
-        err,
-      );
-    }
-
-    this.auditService.setActorId(user.id);
-    this.auditService.log({
-      event: AuditEvent.USER_PASSWORD_RESET,
-      resourceType: AuditResource.USER,
-      resourceId: user.id,
-    });
-
-    const emailTemplate = ChangePasswordEmail({ username: user.name });
-    await this.mailService.sendToQueue({
-      to: user.email,
-      subject: 'Your password has been changed',
-      template: emailTemplate,
-    });
-
-    if (this.environmentService.isCloud() && !user.emailVerifiedAt) {
-      await this.userRepo.updateUser(
-        { emailVerifiedAt: new Date() },
-        user.id,
-        workspace.id,
-      );
-    }
-
-    // Check if user has MFA enabled or workspace enforces MFA
-    const userHasMfa = user?.['mfa']?.isEnabled || false;
-    const workspaceEnforcesMfa = workspace.enforceMfa || false;
-
-    if (userHasMfa || workspaceEnforcesMfa) {
-      return {
-        requiresLogin: true,
-      };
-    }
-
-    const authToken = await this.sessionService.createSessionAndToken(user);
-    return { authToken };
-  }
-
-  async verifyUserToken(
-    userTokenDto: VerifyUserTokenDto,
-    workspaceId: string,
-  ): Promise<void> {
-    const userToken: UserToken = await this.userTokenRepo.findById(
-      userTokenDto.token,
-      workspaceId,
-    );
-
-    if (
-      !userToken ||
-      userToken.type !== userTokenDto.type ||
-      userToken.expiresAt < new Date()
-    ) {
-      throw new BadRequestException('Invalid or expired token');
-    }
   }
 
   async getCollabToken(user: User, workspaceId: string) {

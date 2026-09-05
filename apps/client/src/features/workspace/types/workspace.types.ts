@@ -8,7 +8,6 @@ export interface IWorkspace {
   hostname: string;
   defaultSpaceId: string;
   customDomain: string;
-  enableInvite: boolean;
   settings: IWorkspaceSettings;
   status: string;
   enforceSso: boolean;
@@ -71,31 +70,15 @@ export interface IWorkspaceSpaceSettings {
   allowPersonal?: boolean;
 }
 
-export interface ICreateInvite {
-  role: string;
-  emails: string[];
-  groupIds: string[];
-}
-
-export interface IInvitation {
-  id: string;
-  role: string;
+export interface ICreateWorkspaceUser {
+  name?: string;
   email: string;
-  workspaceId: string;
-  invitedById: string;
-  createdAt: Date;
-  enforceSso: boolean;
+  role: "admin" | "member";
 }
 
-export interface IInvitationLink {
-  inviteLink: string;
-}
-
-export interface IAcceptInvite {
-  invitationId: string;
-  name: string;
+export interface IResetUserPasswordResult {
+  user: { id: string; name: string; email: string };
   password: string;
-  token: string;
 }
 
 export interface IPublicWorkspace {

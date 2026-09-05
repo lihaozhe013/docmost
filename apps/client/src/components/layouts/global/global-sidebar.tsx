@@ -18,7 +18,8 @@ import { useToggleSidebar } from "@/components/layouts/global/hooks/hooks/use-to
 import { useFavoritesQuery } from "@/features/favorite/queries/favorite-query";
 import { getSpaceUrl } from "@/lib/config";
 import { useDisclosure } from "@mantine/hooks";
-import { WorkspaceInviteForm } from "@/features/workspace/components/members/components/workspace-invite-form";
+import CreateMemberModal from "@/features/workspace/components/members/components/create-member-modal.tsx";
+import useUserRole from "@/hooks/use-user-role.tsx";
 import { CustomAvatar } from "@/components/ui/custom-avatar";
 import { AvatarIconType } from "@/features/attachments/types/attachment.types";
 import { useHasFeature } from "@/ee/hooks/use-feature";
@@ -31,6 +32,7 @@ export default function GlobalSidebar() {
   const [active, setActive] = useState(location.pathname);
   const [mobileSidebarOpened] = useAtom(mobileSidebarAtom);
   const toggleMobileSidebar = useToggleSidebar(mobileSidebarAtom);
+  const { isAdmin } = useUserRole();
   const hasTemplates = useHasFeature(Feature.TEMPLATES);
   const upgradeLabel = useUpgradeLabel();
   const mainNavItems = [
@@ -150,13 +152,15 @@ export default function GlobalSidebar() {
       </ScrollArea>
 
       <div className={classes.bottomSection}>
-        <UnstyledButton
-          className={classes.link}
-          onClick={openInvite}
-        >
-          <IconUserPlus className={classes.linkIcon} stroke={2} />
-          <span>{t("Invite People")}</span>
-        </UnstyledButton>
+        {isAdmin && (
+          <UnstyledButton
+            className={classes.link}
+            onClick={openInvite}
+          >
+            <IconUserPlus className={classes.linkIcon} stroke={2} />
+            <span>{t("Create Member")}</span>
+          </UnstyledButton>
+        )}
         <Link
           className={classes.link}
           data-active={active.startsWith("/settings") || undefined}
@@ -169,18 +173,10 @@ export default function GlobalSidebar() {
         </Link>
       </div>
 
-      <Modal
-        size="550"
+      <CreateMemberModal
         opened={inviteOpened}
         onClose={closeInvite}
-        title={t("Invite new members")}
-        centered
-      >
-        <Divider size="xs" mb="xs" />
-        <ScrollArea h="80%">
-          <WorkspaceInviteForm onClose={closeInvite} />
-        </ScrollArea>
-      </Modal>
+      />
     </div>
   );
 }

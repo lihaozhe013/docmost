@@ -10,10 +10,6 @@ import { NotificationType } from '../notification.constants';
 import { SpaceMemberRepo } from '@docmost/db/repos/space/space-member.repo';
 import { PagePermissionRepo } from '@docmost/db/repos/page/page-permission.repo';
 import { WatcherRepo } from '@docmost/db/repos/watcher/watcher.repo';
-import { CommentMentionEmail } from '@docmost/transactional/emails/comment-mention-email';
-import { CommentCreateEmail } from '@docmost/transactional/emails/comment-created-email';
-import { CommentResolvedEmail } from '@docmost/transactional/emails/comment-resolved-email';
-import { getPageTitle } from '../../../common/helpers';
 
 @Injectable()
 export class CommentNotificationService {
@@ -27,7 +23,7 @@ export class CommentNotificationService {
     private readonly watcherRepo: WatcherRepo,
   ) {}
 
-  async processComment(data: ICommentNotificationJob, appUrl: string) {
+  async processComment(data: ICommentNotificationJob) {
     const {
       commentId,
       parentCommentId,
@@ -39,16 +35,6 @@ export class CommentNotificationService {
       notifyWatchers,
     } = data;
 
-    const context = await this.getCommentContext(
-      actorId,
-      pageId,
-      spaceId,
-      commentId,
-      appUrl,
-    );
-    if (!context) return;
-
-    const { actor, pageTitle, pageUrl } = context;
     const notifiedUserIds = new Set<string>();
     notifiedUserIds.add(actorId);
 
@@ -88,14 +74,6 @@ export class CommentNotificationService {
       });
       if (!notification) continue;
 
-      await this.notificationService.queueEmail(
-        userId,
-        notification.id,
-        `${actor.name} mentioned you in a comment`,
-        CommentMentionEmail({ actorName: actor.name, pageTitle, pageUrl }),
-        NotificationType.COMMENT_USER_MENTION,
-      );
-
       notifiedUserIds.add(userId);
     }
 
@@ -113,18 +91,10 @@ export class CommentNotificationService {
         commentId,
       });
       if (!notification) continue;
-
-      await this.notificationService.queueEmail(
-        recipientId,
-        notification.id,
-        `${actor.name} commented on ${pageTitle}`,
-        CommentCreateEmail({ actorName: actor.name, pageTitle, pageUrl }),
-        NotificationType.COMMENT_CREATED,
-      );
     }
   }
 
-  async processResolved(data: ICommentResolvedNotificationJob, appUrl: string) {
+  async processResolved(data: ICommentResolvedNotificationJob) {
     const {
       commentId,
       commentCreatorId,
@@ -135,17 +105,6 @@ export class CommentNotificationService {
     } = data;
 
     if (commentCreatorId === actorId) return;
-
-    const context = await this.getCommentContext(
-      actorId,
-      pageId,
-      spaceId,
-      commentId,
-      appUrl,
-    );
-    if (!context) return;
-
-    const { actor, pageTitle, pageUrl } = context;
 
     const roles = await this.spaceMemberRepo.getUserSpaceRoles(
       commentCreatorId,
@@ -176,16 +135,6 @@ export class CommentNotificationService {
       commentId,
     });
     if (!notification) return;
-
-    const subject = `${actor.name} resolved a comment on ${pageTitle}`;
-
-    await this.notificationService.queueEmail(
-      commentCreatorId,
-      notification.id,
-      subject,
-      CommentResolvedEmail({ actorName: actor.name, pageTitle, pageUrl }),
-      NotificationType.COMMENT_RESOLVED,
-    );
   }
 
   private async getThreadParticipantIds(
@@ -203,39 +152,5 @@ export class CommentNotificationService {
       .execute();
 
     return [...new Set(participants.map((p) => p.creatorId))];
-  }
-
-  private async getCommentContext(
-    actorId: string,
-    pageId: string,
-    spaceId: string,
-    commentId: string,
-    appUrl: string,
-  ) {
-    const [actor, page, space] = await Promise.all([
-      this.db
-        .selectFrom('users')
-        .select(['id', 'name'])
-        .where('id', '=', actorId)
-        .executeTakeFirst(),
-      this.db
-        .selectFrom('pages')
-        .select(['id', 'title', 'slugId'])
-        .where('id', '=', pageId)
-        .executeTakeFirst(),
-      this.db
-        .selectFrom('spaces')
-        .select(['id', 'slug'])
-        .where('id', '=', spaceId)
-        .executeTakeFirst(),
-    ]);
-
-    if (!actor || !page || !space) {
-      return null;
-    }
-
-    const pageUrl = `${appUrl}/s/${space.slug}/p/${page.slugId}`;
-
-    return { actor, pageTitle: getPageTitle(page.title), pageUrl };
   }
 }

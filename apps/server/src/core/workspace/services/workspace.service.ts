@@ -28,17 +28,13 @@ import { UserRepo } from '@docmost/db/repos/user/user.repo';
 import { EnvironmentService } from '../../../integrations/environment/environment.service';
 import { DomainService } from '../../../integrations/environment/domain.service';
 import { jsonArrayFrom } from 'kysely/helpers/postgres';
-import { addDays } from 'date-fns';
-import { DISALLOWED_HOSTNAMES, WorkspaceStatus } from '../workspace.constants';
+import { DISALLOWED_HOSTNAMES } from '../workspace.constants';
 import { isAdminActingOnOwner } from '../workspace.util';
 import { v4 } from 'uuid';
 import { InjectQueue } from '@nestjs/bullmq';
 import { QueueJob, QueueName } from '../../../integrations/queue/constants';
 import { Queue } from 'bullmq';
-import {
-  generateRandomSuffixNumbers,
-  diffAuditTrackedFields,
-} from '../../../common/helpers';
+import { diffAuditTrackedFields } from '../../../common/helpers';
 import { isPageEmbeddingsTableExists } from '@docmost/db/helpers/helpers';
 import { CursorPaginationResult } from '@docmost/db/pagination/cursor-pagination';
 import { ShareRepo } from '@docmost/db/repos/share/share.repo';
@@ -69,7 +65,6 @@ export class WorkspaceService {
     private favoriteRepo: FavoriteRepo,
     @InjectKysely() private readonly db: KyselyDB,
     @InjectQueue(QueueName.ATTACHMENT_QUEUE) private attachmentQueue: Queue,
-    @InjectQueue(QueueName.BILLING_QUEUE) private billingQueue: Queue,
     @InjectQueue(QueueName.AI_QUEUE) private aiQueue: Queue,
     @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService,
     private userSessionRepo: UserSessionRepo,
@@ -91,7 +86,7 @@ export class WorkspaceService {
   async getWorkspacePublicData(workspaceId: string) {
     const workspace = await this.db
       .selectFrom('workspaces')
-      .select(['id', 'name', 'logo', 'hostname', 'enforceSso', 'licenseKey', 'plan'])
+      .select(['id', 'name', 'logo', 'hostname', 'enforceSso', 'plan'])
       .select((eb) =>
         jsonArrayFrom(
           eb
@@ -112,9 +107,7 @@ export class WorkspaceService {
       throw new NotFoundException('Workspace not found');
     }
 
-    const { licenseKey, plan, ...rest } = workspace;
-
-    return rest;
+    return workspace;
   }
 
   async create(
@@ -122,43 +115,14 @@ export class WorkspaceService {
     createWorkspaceDto: CreateWorkspaceDto,
     trx?: KyselyTransaction,
   ) {
-    let trialEndAt = undefined;
-
     const createdWorkspace = await executeTx(
       this.db,
       async (trx) => {
-        let hostname = undefined;
-        let status = undefined;
-        let plan = undefined;
-        let billingEmail = undefined;
-        let settings = undefined;
-
-        if (this.environmentService.isCloud()) {
-          // generate unique hostname
-          hostname = await this.generateHostname(
-            createWorkspaceDto.hostname ?? createWorkspaceDto.name,
-          );
-          trialEndAt = addDays(
-            new Date(),
-            this.environmentService.getBillingTrialDays(),
-          );
-          status = WorkspaceStatus.Active;
-          plan = 'standard';
-          billingEmail = user.email;
-          settings = { ai: { generative: true, chat: true } };
-        }
-
         // create workspace
         const workspace = await this.workspaceRepo.insertWorkspace(
           {
             name: createWorkspaceDto.name,
             description: createWorkspaceDto.description,
-            hostname,
-            status,
-            trialEndAt,
-            plan,
-            billingEmail,
-            settings,
           },
           trx,
         );
@@ -233,26 +197,6 @@ export class WorkspaceService {
       },
       trx,
     );
-
-    if (this.environmentService.isCloud() && trialEndAt) {
-      try {
-        const delay = trialEndAt.getTime() - Date.now();
-
-        await this.billingQueue.add(
-          QueueJob.TRIAL_ENDED,
-          { workspaceId: createdWorkspace.id },
-          { delay },
-        );
-
-        await this.billingQueue.add(
-          QueueJob.WELCOME_EMAIL,
-          { userId: user.id },
-          { delay: 30 * 60 * 1000 }, // 30m
-        );
-      } catch (err) {
-        this.logger.error(err);
-      }
-    }
 
     return createdWorkspace;
   }
@@ -656,7 +600,6 @@ export class WorkspaceService {
 
     const workspace = await this.workspaceRepo.findById(workspaceId, {
       withMemberCount: true,
-      withLicenseKey: true,
     });
 
     const columnChanges = diffAuditTrackedFields(
@@ -686,8 +629,7 @@ export class WorkspaceService {
       });
     }
 
-    const { licenseKey, ...rest } = workspace;
-    return rest;
+    return workspace;
   }
 
   async getWorkspaceUsers(
@@ -750,44 +692,6 @@ export class WorkspaceService {
         after: { role: newRole },
       },
     });
-  }
-
-  async generateHostname(
-    name: string,
-    trx?: KyselyTransaction,
-  ): Promise<string> {
-    let subdomain = name
-      .toLowerCase()
-      .replace(/[^a-z0-9-]/g, '')
-      .substring(0, 20)
-      .replace(/^-+|-+$/g, ''); //remove any hyphen at the start or end
-    // Ensure we leave room for a random suffix.
-    const maxSuffixLength = 6;
-
-    if (subdomain.length < 4) {
-      subdomain = `${subdomain}-${generateRandomSuffixNumbers(maxSuffixLength)}`;
-    }
-
-    if (DISALLOWED_HOSTNAMES.includes(subdomain)) {
-      subdomain = `workspace-${generateRandomSuffixNumbers(maxSuffixLength)}`;
-    }
-
-    let uniqueHostname = subdomain;
-
-    while (true) {
-      const exists = await this.workspaceRepo.hostnameExists(
-        uniqueHostname,
-        trx,
-      );
-      if (!exists) {
-        break;
-      }
-      // Append a random suffix and retry.
-      const randomSuffix = generateRandomSuffixNumbers(maxSuffixLength);
-      uniqueHostname = `${subdomain}-${randomSuffix}`.substring(0, 25);
-    }
-
-    return uniqueHostname;
   }
 
   async checkHostname(hostname: string) {

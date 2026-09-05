@@ -57,7 +57,6 @@ export class WorkspaceInvitationService {
     private tokenService: TokenService,
     private sessionService: SessionService,
     @InjectKysely() private readonly db: KyselyDB,
-    @InjectQueue(QueueName.BILLING_QUEUE) private billingQueue: Queue,
     private readonly environmentService: EnvironmentService,
     @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService,
   ) {}
@@ -349,12 +348,6 @@ export class WorkspaceInvitationService {
         invitationId: invitation.id,
       },
     });
-
-    if (this.environmentService.isCloud()) {
-      await this.billingQueue.add(QueueJob.STRIPE_SEATS_SYNC, {
-        workspaceId: workspace.id,
-      });
-    }
 
     if (workspace.enforceMfa) {
       return {

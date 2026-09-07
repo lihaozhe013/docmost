@@ -1,12 +1,55 @@
 # Docmost (Personal fork)
 
-A trimmed, self-hosted fork of [Docmost](https://docmost.com) for private use
-among family, friends and colleagues. It is free for everyone and is not
-intended for public signups.
+A focused, self-hosted fork of [Docmost](https://docmost.com) for private use
+by one person or a small group of family, friends, or colleagues. The project
+is intended to be deployed on infrastructure controlled by its users. It is
+free, open-source, and non-commercial by default, and it is not intended to
+become a public hosted service or a general enterprise distribution.
 
-This fork diverges from upstream on purpose: enterprise/cloud features, email
-(SMTP) delivery, and license-gated surfaces have been removed, and user
-provisioning is done by an administrator.
+## Project direction
+
+This fork is built around a simple operating model: a small trusted group runs
+one private instance for its own documents and collaboration. The project
+therefore prioritizes useful pages, real-time editing, search, sharing, and
+straightforward administration over features designed for public SaaS
+operations or commercial product management.
+
+Account management follows the same idea. An administrator creates accounts
+and resets passwords directly, so the deployment does not need a reachable
+mailbox, SMTP service, public registration, or a customer-facing onboarding
+system. An email address is used as a sign-in identifier, but it does not need
+to deliver mail.
+
+The default product scope deliberately excludes billing, subscriptions, paid
+plans, feature tiers, trials, license sales, public signup funnels, and other
+commercial workflows. Enterprise features such as SSO, MFA, SCIM, audit
+systems, and large-organization governance are also outside the default goal
+unless a concrete local use case requires them.
+
+## Relationship with upstream
+
+This repository started as a fork of Docmost, but it is maintained as an
+independent project with its own scope and priorities. It is intentionally not
+a compatibility layer or a synchronization project for upstream Docmost.
+
+There is no requirement to preserve upstream APIs, internal extension points,
+feature coverage, architecture, or merge friendliness. Upstream changes may be
+adopted when they are useful to this project, but they do not define the
+direction of this fork. When upstream assumptions conflict with the needs of a
+private self-hosted deployment, the local project scope takes priority.
+
+## Development principles
+
+- Implement the supported local workflows directly and keep the resulting code
+  easy to understand and operate.
+- Avoid defensive code, compatibility layers, and fallback paths that exist
+  only for hypothetical upstream changes, unsupported integrations, unknown
+  consumers, or enterprise-scale deployments.
+- Keep the safeguards required by the actual application, including
+  authorization, security checks, input validation, data integrity, and useful
+  error handling.
+- If a newly added file grows beyond 1,000 lines, evaluate whether its
+  responsibilities should be split into smaller files or decoupled modules.
 
 ## What changed compared to upstream
 

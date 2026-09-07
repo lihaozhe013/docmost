@@ -55,8 +55,12 @@ RUN pnpm install --frozen-lockfile --prod && rm -rf /home/node/.cache/pnpm
 
 RUN mkdir -p /app/data/storage
 
+ENV NODE_ENV=production
+
 VOLUME ["/app/data/storage"]
 
 EXPOSE 3000
 
-CMD ["pnpm", "start"]
+WORKDIR /app/apps/server
+
+CMD ["node", "dist/main.js"]

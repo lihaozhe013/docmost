@@ -622,9 +622,6 @@ importers:
       csv-stringify:
         specifier: 6.8.0
         version: 6.8.0
-      fast-bm25:
-        specifier: 0.0.5
-        version: 0.0.5(@typescript/typescript6@6.0.2)
       fastify-ip:
         specifier: 2.0.0
         version: 2.0.0
@@ -9960,15 +9957,6 @@ packages:
       }
     engines: { node: '>= 18' }
 
-  fast-bm25@0.0.5:
-    resolution:
-      {
-        integrity: sha512-6HTiLmPkgeqcPJHccN0pXdqnA7OzhaEQZTFzWnfjIyPoX5sGVKUUpfRc2K2o6zMwK+g009miRhADYn/f2Ax0Mg==
-      }
-    engines: { node: '>=14.0.0' }
-    peerDependencies:
-      typescript: ^5.6.3
-
   fast-copy@4.0.2:
     resolution:
       {
@@ -13340,12 +13328,6 @@ packages:
     resolution:
       {
         integrity: sha512-25ClnWWuw7JbWZcgqY/gJ4FQWadKxGWk+3kR/7kD0tCaDtPPMj7oHu2ToLaVhfpnHrZzYby2w6tUA0eOIuUg8g==
-      }
-
-  porter2@1.1.0:
-    resolution:
-      {
-        integrity: sha512-Io2cLEdZn0O1dH60pRsjmr/cH/qJJ/j6Cjubz8wQWi0b6vPdQIUxSBQKyx9d+8CN7fSnY+5uOU3rErMFjNqcLw==
       }
 
   possible-typed-array-names@1.0.0:
@@ -22900,11 +22882,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  fast-bm25@0.0.5(@typescript/typescript6@6.0.2):
-    dependencies:
-      porter2: 1.1.0
-      typescript: '@typescript/typescript6@6.0.2'
-
   fast-copy@4.0.2: {}
 
   fast-decode-uri-component@1.0.1: {}
@@ -25146,8 +25123,6 @@ snapshots:
     dependencies:
       path-data-parser: 0.1.0
       points-on-curve: 0.2.0
-
-  porter2@1.1.0: {}
 
   possible-typed-array-names@1.0.0: {}
 

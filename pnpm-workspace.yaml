@@ -33,7 +33,6 @@ peerDependencyRules:
   allowedVersions:
     i18next>typescript: '6'
     react-i18next>typescript: '6'
-    fast-bm25>typescript: '6'
 allowBuilds:
   '@swc/core': true
   bcrypt: true

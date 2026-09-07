@@ -203,6 +203,7 @@ function CollabPageEditor({
     [isComponentMounted]
   );
   const { handleScrollTo } = useEditorScroll({ canScroll });
+  const user = currentUser?.user;
 
   useEffect(() => {
     const local = new IndexeddbPersistence(
@@ -240,12 +241,12 @@ function CollabPageEditor({
   }, [isIdle, documentState, provider, resetIdle]);
 
   const extensions = useMemo(() => {
-    if (!currentUser?.user) {
+    if (!user) {
       return mainExtensions;
     }
 
-    return [...mainExtensions, ...collabExtensions(provider, currentUser.user)];
-  }, [provider, currentUser?.user]);
+    return [...mainExtensions, ...collabExtensions(provider, user)];
+  }, [provider, user]);
 
   const debouncedUpdateContent = useDebouncedCallback((newContent: any) => {
     const pageData = queryClient.getQueryData<IPage>(['pages', slugId]);
@@ -359,10 +360,16 @@ function CollabPageEditor({
     if (editor && !editor.isDestroyed) {
       // @ts-ignore
       setEditor(editor);
-      // @ts-ignore
-      editor.storage.pageId = pageId;
       editorRef.current = editor;
     }
+
+    return () => {
+      if (editor && editorRef.current === editor) {
+        // @ts-ignore
+        setEditor(null);
+        editorRef.current = null;
+      }
+    };
   }, [editor, pageId, setEditor]);
 
   const editorIsEditable = useEditorState({
@@ -441,6 +448,7 @@ function CollabPageEditor({
       isSynced
     ) {
       hasConnectedOnceRef.current = true;
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- switch from the static fallback after synchronization
       setShowStatic(false);
     }
   }, [yjsConnectionStatus, isSynced]);

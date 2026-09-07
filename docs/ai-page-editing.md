@@ -1,7 +1,6 @@
 # AI Page Editing Architecture and Implementation Standard
 
-Status: implementation specification; the functionality described here is not
-yet implemented.
+Status: implementation specification and current implementation reference.
 
 Scope: conversational editing of the currently open page in this private,
 self-hosted Docmost fork.
@@ -93,9 +92,11 @@ specification:
 | Markdown conversion       | [`markdown/index.ts`](../packages/editor-ext/src/lib/markdown/index.ts)                                  | Existing import/export helpers are reusable only where their supported conversion behavior matches the tool contract.                                       |
 | Model dependencies        | [`apps/server/package.json`](../apps/server/package.json)                                                | AI SDK 6 and several provider integrations are declared already.                                                                                            |
 
-The inspected checkout contains client AI entry points but no reusable AI
-implementation files under `apps/server/src/ee`. Dependency declarations and
-client routes do not establish a working server-side agent feature.
+No reusable AI implementation is kept under `apps/server/src/ee`. The current
+feature lives under `apps/server/src/integrations/ai-page-editing` so the
+runtime, session host, and provider adapter remain separate from enterprise
+feature modules. Dependency declarations and client routes alone do not
+establish a working server-side agent feature.
 
 The implementation must preserve the existing collaboration and persistence
 lifecycle. Updating page JSON or text directly in the database would bypass the
@@ -202,6 +203,24 @@ package surface, and applicable license. External main-branch links are
 informative references, not frozen behavioral specifications. This document
 defines the behavior required by Docmost.
 
+### 5.1 Provider configuration
+
+The server reuses the existing AI environment configuration. Set `AI_DRIVER` and
+`AI_COMPLETION_MODEL` to enable a provider. `AI_CHAT_MODEL` may override the
+completion model for this feature. The supported drivers are `openai`,
+`openai-compatible`, `gemini`, and `ollama`. Provider credentials and endpoints
+are read only by the server:
+
+| Driver              | Required configuration                        |
+| ------------------- | --------------------------------------------- |
+| `openai`            | `OPENAI_API_KEY`; optionally `OPENAI_API_URL` |
+| `openai-compatible` | `OPENAI_API_KEY` and `OPENAI_API_URL`         |
+| `gemini`            | `GEMINI_API_KEY`                              |
+| `ollama`            | `OLLAMA_API_URL`                              |
+
+An unavailable or incomplete provider configuration fails the run with a
+structured error. It never exposes credentials to the browser.
+
 ## 6. Document Buffer Model
 
 ### 6.1 Authority and representation
@@ -303,13 +322,15 @@ its wire messages.
 ### 7.1 `read_buffer`
 
 Inputs select the whole page or explicit block handles, with optional bounded
-pagination for long documents. The result includes:
+pagination for long documents. `offset` is zero-based and `limit` is bounded to
+100 blocks per call. The result includes:
 
 - Buffer revision and whether the requested view is complete.
 - Ordered block records and supported operations.
 - Selection context captured when the user submitted the message, if still
   resolvable.
-- An explicit continuation indicator when content is truncated.
+- An explicit `complete` flag and `nextOffset` continuation value when content
+  is truncated.
 
 For small pages, inject an initial read result when the run starts. Retain the
 read tool for verification, recovery, and large pages. Initial context injection
@@ -433,9 +454,11 @@ assistant response must represent that partial outcome.
 
 ### 8.2 Undo
 
-Record AI mutations with session, run, tool-call, and change identifiers.
-Provide undo for the most recent eligible AI change, and allow repeated undo
-where it remains safe.
+The session host associates each browser request with its session, run, and
+tool-call identifiers. The document adapter records a change identifier for each
+applied transaction and returns it with the affected handles. Provide undo for
+the most recent eligible AI change, and allow repeated undo where it remains
+safe.
 
 Undo must revert only the recorded AI operation and preserve subsequent
 unrelated local or remote edits. Implement this with collaboration-aware history
@@ -475,9 +498,14 @@ Define application-owned messages for:
 - Tool requests and tool results.
 - Run completion, failure, and stopping.
 
-Every relevant message carries a session ID, run ID, and tool-call ID. Use
-sequence numbers for ordered UI processing within a live connection. Sequence
-numbers do not imply durable event replay.
+Every run-scoped outbound event and tool request carries the owning Socket.IO
+session ID and page ID; run events carry a run ID and tool requests carry a
+tool-call ID. The host adds a monotonic sequence number to outbound messages
+within a run for ordered UI processing. Sequence numbers do not imply durable
+event replay. Incoming tool results are bound to the authenticated socket and
+the outstanding call rather than trusting a client-supplied identity. The
+browser accepts a request only when its page ID matches the active editor
+instance.
 
 A tool result is accepted only from the bound browser connection for an
 outstanding call, after schema validation. The browser stores a bounded result
@@ -529,6 +557,15 @@ Set explicit configuration for model steps, total run duration, individual tool
 timeouts, context size, insertion size, and recovery attempts. Use a small
 bounded recovery budget for repeated edit errors; do not allow unbounded
 guess-and-retry loops.
+
+The current implementation uses eight model steps per run, 24 browser tool
+requests including the initial read, a 45-second browser result timeout, a
+five-minute run timeout, a 20-message history window with an 80,000-character
+aggregate history budget, 20,000-character prompt and block-text limits, a
+40,000-character Markdown insertion limit, 100 blocks per read page, an
+80,000-character read-result budget, and a 60,000-character initial buffer
+context. These limits are implementation defaults and must be changed together
+with this document and the corresponding schemas.
 
 Writes execute sequentially regardless of the chosen library's default tool
 concurrency. A model-generated batch of dependent writes must either be
@@ -599,55 +636,51 @@ Once that scenario exists, the following command executes the feature flow and
 writes focused diagnostics:
 
 ```bash
-pnpm --filter server test -- --runInBand --testPathPatterns=ai-page-editing.integration.spec.ts 2>&1 | rg --line-buffered '\[ai_page_editing\]' > ai-page-editing.debug.log
+pnpm --filter server exec jest --runInBand --testPathPatterns=integrations/ai-page-editing/ai-page-editing.integration.spec.ts 2>&1 | rg --line-buffered '\[ai_page_editing\]' > ai-page-editing.debug.log
 ```
 
-This command is an implementation deliverable, not a currently available test.
-The scenario must emit meaningful prefixed diagnostics. For pass/fail
-verification, also run the test directly: the log-filtering pipeline is intended
-for diagnosis and does not reliably report the test runner's exit status in
-every shell.
+The scenario emits meaningful prefixed diagnostics. For pass/fail verification,
+also run the test directly: the log-filtering pipeline is intended for diagnosis
+and does not reliably report the test runner's exit status in every shell.
 
-## 14. Proposed Code Organization
+## 14. Code Organization
 
-The following paths describe responsibility boundaries; they are not existing
-implementation files:
+The following paths describe the responsibility boundaries. The current first
+release implementation occupies the server integration and client feature paths
+shown below; future extraction into a standalone package may preserve the same
+contracts:
 
 ```text
-packages/agent-runtime/
-  src/contracts.ts
-  src/runtime.ts
-  src/adapters/ai-sdk.ts
-
-packages/page-editing-contracts/
-  src/buffer.ts
-  src/tools.ts
-  src/session.ts
-
 apps/server/src/integrations/ai-page-editing/
-  session-host.ts
-  session-transport.ts
-  page-tool-dispatcher.ts
+  contracts.ts
+  agent-runtime.ts
+  model.ts
+  ai-page-editing.service.ts
   ai-page-editing.integration.spec.ts
 
 apps/client/src/features/ai-page-editing/
-  components/
-  session/
-  adapter/
-    document-buffer.ts
-    projection.ts
-    apply-edit.ts
-    change-history.ts
+  ai-page-editing-panel.tsx
+  ai-page-editing-panel.module.css
+  document-buffer.ts
+  document-buffer-types.ts
+  document-buffer-utils.ts
+  document-buffer.test.ts
 ```
 
-`agent-runtime` must not depend on `page-editing-contracts`; the host supplies
-document tools through generic runtime interfaces. The document contracts
-package is transport-neutral and contains no editor or provider implementation.
-The client must not import server runtime code.
+`agent-runtime.ts` must not depend on page repositories, editors, collaboration
+services, or application authorization. The host supplies document tools through
+generic runtime interfaces. The protocol types are transport-neutral and the
+client imports no server runtime code.
 
 Keep parsing, position mapping, mutation validation, and history
 responsibilities separable. Follow repository formatting and file-size rules.
 Create only the modules needed for the current delivery stage.
+
+The automated coverage currently exercises the deterministic buffer and a
+server-side read/edit loop with a deterministic model. Collaborative
+persistence, provider smoke checks, and multi-browser behavior remain release
+verification work because they require a running application and external
+services.
 
 ## 15. Implementation Sequence
 

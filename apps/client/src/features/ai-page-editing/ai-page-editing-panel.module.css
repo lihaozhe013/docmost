@@ -1,0 +1,46 @@
+.root {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 300;
+}
+
+.panel {
+  position: fixed;
+  right: 24px;
+  bottom: 80px;
+  width: min(420px, calc(100vw - 32px));
+  max-height: min(620px, calc(100vh - 120px));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 300;
+}
+
+.messages {
+  min-height: 120px;
+  max-height: 430px;
+  overflow-y: auto;
+}
+
+.message {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.tool {
+  font-family: var(--mantine-font-family-monospace);
+  font-size: var(--mantine-font-size-xs);
+}
+
+@media (max-width: 48em) {
+  .root {
+    right: 16px;
+    bottom: 16px;
+  }
+
+  .panel {
+    right: 16px;
+    bottom: 72px;
+  }
+}

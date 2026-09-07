@@ -25,6 +25,7 @@ import { useAsideTriggerProps } from '@/hooks/use-toggle-aside.tsx';
 import { DeletedPageBanner } from '@/features/page/trash/components/deleted-page-banner.tsx';
 import clsx from 'clsx';
 import { currentPageEditModeAtom } from '@/features/editor/atoms/editor-atoms.ts';
+import { AiPageEditingPanel } from '@/features/ai-page-editing/ai-page-editing-panel';
 
 const MemoizedTitleEditor = React.memo(TitleEditor);
 const MemoizedPageEditor = React.memo(PageEditor);
@@ -112,6 +113,11 @@ export function FullEditor({
         editable={editable}
         content={content}
         canComment={canComment}
+      />
+      <AiPageEditingPanel
+        key={pageId}
+        pageId={pageId}
+        enabled={editable && isEditMode}
       />
     </Container>
   );

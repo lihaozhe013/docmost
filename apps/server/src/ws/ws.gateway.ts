@@ -16,6 +16,7 @@ import { WsService } from './ws.service';
 import { getSpaceRoomName, getUserRoomName } from './ws.utils';
 import { BaseRealtimeBridge } from './base-realtime.bridge';
 import * as cookie from 'cookie';
+import { AiPageEditingService } from '../integrations/ai-page-editing/ai-page-editing.service';
 
 @WebSocketGateway({
   cors: { origin: '*' },
@@ -35,7 +36,8 @@ export class WsGateway
     private tokenService: TokenService,
     private spaceMemberRepo: SpaceMemberRepo,
     private wsService: WsService,
-    private baseRealtime: BaseRealtimeBridge
+    private baseRealtime: BaseRealtimeBridge,
+    private aiPageEditingService: AiPageEditingService
   ) {}
 
   afterInit(server: Server): void {
@@ -71,11 +73,19 @@ export class WsGateway
   }
 
   async handleDisconnect(client: Socket): Promise<void> {
+    this.aiPageEditingService.handleDisconnect(client);
     await this.baseRealtime.handleDisconnect(client);
   }
 
   @SubscribeMessage('message')
   async handleMessage(client: Socket, data: any): Promise<void> {
+    if (
+      data?.operation &&
+      String(data.operation).startsWith('aiPageEditing.')
+    ) {
+      await this.aiPageEditingService.handleMessage(client, data);
+      return;
+    }
     if (this.wsService.isTreeEvent(data)) {
       await this.wsService.handleTreeEvent(client, data);
       return;

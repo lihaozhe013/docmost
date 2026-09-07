@@ -1,3 +1,4 @@
+// @ts-ignore require(esm)
 import { imageDimensionsFromData } from 'image-dimensions';
 import { MediaUploadOptions, UploadFn } from '../media-utils';
 import { IAttachment } from '../types';

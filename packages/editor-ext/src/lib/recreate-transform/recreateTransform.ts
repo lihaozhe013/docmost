@@ -148,7 +148,7 @@ export class RecreateTransform {
       const nodeType = fromNode.type === toNode.type ? null : toNode.type;
       try {
         this.tr.setNodeMarkup(start, nodeType, toNode.attrs, toNode.marks);
-      } catch (e) {
+      } catch (e: any) {
         // if nodetypes differ, the updated node-type and contents might not be compatible
         // with schema and requires a replace
         if (nodeType && e.message.includes("Invalid content")) {

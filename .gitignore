@@ -4,7 +4,8 @@
 data
 # compiled output
 dist
-/node_modules
+*.tsbuildinfo
+node_modules/
 
 # Logs
 logs

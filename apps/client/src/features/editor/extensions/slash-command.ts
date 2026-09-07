@@ -42,7 +42,7 @@ const Command = Extension.create({
 
 const SlashCommand = Command.configure({
   suggestion: {
-    items: getSuggestionItems,
+    items: ({ query }) => getSuggestionItems({ query }) as any,
     render: renderItems,
   },
 });

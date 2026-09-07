@@ -1,3 +1,4 @@
+// @ts-ignore require(esm)
 import { marked } from "marked";
 import { calloutExtension } from "./callout.marked";
 import { mathBlockExtension } from "./math-block.marked";

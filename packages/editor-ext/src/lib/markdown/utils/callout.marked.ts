@@ -1,3 +1,4 @@
+// @ts-ignore require(esm)
 import { Token, marked } from 'marked';
 
 interface CalloutToken {

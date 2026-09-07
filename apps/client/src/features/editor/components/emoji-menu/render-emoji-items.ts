@@ -1,4 +1,5 @@
-import { ReactRenderer, useEditor } from "@tiptap/react";
+import { ReactRenderer } from "@tiptap/react";
+import type { SuggestionProps } from "@tiptap/suggestion";
 import EmojiList from "./emoji-list";
 import {
   autoUpdate,
@@ -32,10 +33,7 @@ const renderEmojiItems = () => {
   };
 
   return {
-    onBeforeStart: (props: {
-      editor: ReturnType<typeof useEditor>;
-      clientRect: () => DOMRect;
-    }) => {
+    onBeforeStart: (props: SuggestionProps) => {
       component = new ReactRenderer(EmojiList, {
         props: { isLoading: true, items: [] },
         editor: props.editor,
@@ -77,20 +75,14 @@ const renderEmojiItems = () => {
         });
       });
     },
-    onStart: (props: {
-      editor: ReturnType<typeof useEditor>;
-      clientRect: () => DOMRect;
-    }) => {
+    onStart: (props: SuggestionProps) => {
       component?.updateProps({ ...props, isLoading: false });
 
       if (props.clientRect) {
         getReferenceClientRect = props.clientRect;
       }
     },
-    onUpdate: (props: {
-      editor: ReturnType<typeof useEditor>;
-      clientRect: () => DOMRect;
-    }) => {
+    onUpdate: (props: SuggestionProps) => {
       component?.updateProps(props);
 
       if (props.clientRect) {

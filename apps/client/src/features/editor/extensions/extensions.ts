@@ -443,11 +443,11 @@ const TEMPLATE_EXCLUDED_SLASH_ITEMS = new Set([
 
 const TemplateSlashCommand = Command.configure({
   suggestion: {
-    items: ({ query }: { query: string }) =>
+    items: ({ query }) =>
       getSuggestionItems({
         query,
         excludeItems: TEMPLATE_EXCLUDED_SLASH_ITEMS,
-      }),
+      }) as any,
     render: renderItems,
   },
 });

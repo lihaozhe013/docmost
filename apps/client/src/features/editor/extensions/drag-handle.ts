@@ -526,6 +526,7 @@ const GlobalDragHandle = Extension.create({
     return {
       dragHandleWidth: 20,
       scrollThreshold: 100,
+      dragHandleSelector: undefined,
       excludedTags: [],
       customNodes: [],
       atomNodes: [],

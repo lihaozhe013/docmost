@@ -1,4 +1,5 @@
-import { ReactRenderer, useEditor } from "@tiptap/react";
+import { ReactRenderer } from "@tiptap/react";
+import type { SuggestionProps } from "@tiptap/suggestion";
 import CommandList from "@/features/editor/components/slash-menu/command-list";
 import {
   autoUpdate,
@@ -32,10 +33,7 @@ const renderItems = () => {
   };
 
   return {
-    onStart: (props: {
-      editor: ReturnType<typeof useEditor>;
-      clientRect: DOMRect;
-    }) => {
+    onStart: (props: SuggestionProps) => {
       component = new ReactRenderer(CommandList, {
         props,
         editor: props.editor,
@@ -70,10 +68,7 @@ const renderItems = () => {
         updatePosition
       );
     },
-    onUpdate: (props: {
-      editor: ReturnType<typeof useEditor>;
-      clientRect: DOMRect;
-    }) => {
+    onUpdate: (props: SuggestionProps) => {
       component?.updateProps(props);
 
       if (!props.clientRect) {

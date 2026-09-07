@@ -29,6 +29,11 @@ overrides:
   js-yaml@>=4.0.0 <4.3.1: 4.3.1
 shamefullyHoist: true
 minimumReleaseAge: 4320
+peerDependencyRules:
+  allowedVersions:
+    i18next>typescript: '6'
+    react-i18next>typescript: '6'
+    fast-bm25>typescript: '6'
 allowBuilds:
   '@swc/core': true
   bcrypt: true

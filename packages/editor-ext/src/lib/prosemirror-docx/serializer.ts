@@ -1,3 +1,4 @@
+// @ts-ignore require(esm)
 import { Node, Mark } from 'prosemirror-model';
 import {
   IParagraphOptions,
@@ -27,6 +28,7 @@ import {
   ITableRowOptions,
   IPropertiesOptions,
 } from 'docx';
+// @ts-ignore require(esm)
 import { imageDimensionsFromData } from 'image-dimensions';
 import { createNumbering, NumberingStyles } from './numbering';
 import { buildDoc, createShortId } from './utils';

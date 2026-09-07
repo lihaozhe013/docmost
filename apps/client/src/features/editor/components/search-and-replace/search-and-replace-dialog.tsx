@@ -220,8 +220,9 @@ function SearchAndReplaceDialog({ editor, editable = true }: PageFindDialogDialo
               ["Enter", next],
               ["shift+Enter", previous],
               ["alt+C", caseSensitiveToggle],
-              //@ts-ignore
-              ...(editable ? [["alt+R", replaceButtonToggle]] : []),
+              ...(editable
+                ? ([["alt+R", replaceButtonToggle]] as [string, () => void][])
+                : []),
             ])}
           />
 

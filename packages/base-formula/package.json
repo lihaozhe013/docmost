@@ -24,5 +24,8 @@
     }
   },
   "types": "dist/index.server.d.ts",
-  "dependencies": {}
+  "dependencies": {},
+  "devDependencies": {
+    "@typescript/native": "npm:typescript@^7.0.2"
+  }
 }

@@ -30,9 +30,6 @@
     "test:e2e": "jest --config test/jest-e2e.json"
   },
   "dependencies": {
-    "@ai-sdk/google": "3.0.52",
-    "@ai-sdk/openai": "3.0.47",
-    "@ai-sdk/openai-compatible": "2.0.37",
     "@aws-sdk/client-s3": "3.1050.0",
     "@aws-sdk/lib-storage": "3.1050.0",
     "@aws-sdk/s3-request-presigner": "3.1050.0",
@@ -68,8 +65,6 @@
     "@node-saml/passport-saml": "5.1.0",
     "@socket.io/redis-adapter": "8.3.0",
     "@turbopuffer/turbopuffer": "^2.8.0",
-    "ai": "6.0.134",
-    "ai-sdk-ollama": "3.8.1",
     "bcrypt": "6.0.0",
     "bowser": "2.14.1",
     "bullmq": "5.79.0",

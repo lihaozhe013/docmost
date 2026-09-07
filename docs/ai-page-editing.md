@@ -90,11 +90,11 @@ specification:
 | Collaboration persistence | [`persistence.extension.ts`](../apps/server/src/collaboration/extensions/persistence.extension.ts)       | Persistence derives stored JSON, text, and Yjs state from the collaboration document and triggers associated application work.                              |
 | Collaboration access      | [`authentication.extension.ts`](../apps/server/src/collaboration/extensions/authentication.extension.ts) | Server-side collaboration authorization remains authoritative.                                                                                              |
 | Markdown conversion       | [`markdown/index.ts`](../packages/editor-ext/src/lib/markdown/index.ts)                                  | Existing import/export helpers are reusable only where their supported conversion behavior matches the tool contract.                                       |
-| Model dependencies        | [`apps/server/package.json`](../apps/server/package.json)                                                | AI SDK 6 and several provider integrations are declared already.                                                                                            |
+| Model dependencies        | [`apps/server/package.json`](../apps/server/package.json)                                                | Page editing uses a small native HTTP client for the OpenAI Responses protocol.                                                                             |
 
 No reusable AI implementation is kept under `apps/server/src/ee`. The current
 feature lives under `apps/server/src/integrations/ai-page-editing` so the
-runtime, session host, and provider adapter remain separate from enterprise
+runtime, session host, and Responses client remain separate from enterprise
 feature modules. Dependency declarations and client routes alone do not
 establish a working server-side agent feature.
 
@@ -108,7 +108,7 @@ active document and is prohibited for agent edits.
 flowchart LR
     UI[Page chat UI] --> Host[Server session host]
     Host --> Runtime[Agent runtime]
-    Runtime --> Provider[Model provider]
+    Runtime --> Provider[Responses HTTP client]
     Runtime --> Dispatcher[Injected tool dispatcher]
     Dispatcher --> Bridge[Authenticated session channel]
     Bridge --> Adapter[Browser document adapter]
@@ -121,7 +121,7 @@ flowchart LR
 
 The runtime owns:
 
-- Model invocation and provider adaptation.
+- The bounded model and tool loop through a provider-neutral client.
 - The assistant/tool message loop.
 - Tool schema registration and dispatch through injected callbacks.
 - Streaming text and execution lifecycle events.
@@ -139,7 +139,7 @@ application-owned contracts.
 
 ### 4.2 Session host
 
-The server session host owns authentication, page scope, run lifecycle, provider
+The server session host owns authentication, page scope, run lifecycle, API
 credentials, and the connection to the owning browser session. It instantiates
 the runtime and injects tools bound to that session.
 
@@ -183,10 +183,11 @@ The separation is successful when:
 
 ## 5. Runtime Selection
 
-Use the repository's existing AI SDK dependency for the first runtime adapter.
-Its multi-step tool loop, streaming, and stop conditions are sufficient for the
-initial scope. Keep the wrapper small and avoid building a general agent
-framework.
+The first runtime uses a small native HTTP client for the OpenAI Responses API.
+Keeping the protocol client local makes the request and stream behavior
+explicit, avoids provider SDK coupling, and keeps the runtime independent from
+the page editor. The runtime owns the bounded tool loop and does not expose the
+provider's wire types to the application.
 
 Pi agent core is the preferred alternative when a concrete requirement benefits
 from its agent lifecycle and event model. Pi's file edit implementation also
@@ -203,23 +204,31 @@ package surface, and applicable license. External main-branch links are
 informative references, not frozen behavioral specifications. This document
 defines the behavior required by Docmost.
 
-### 5.1 Provider configuration
+### 5.1 Responses API configuration
 
-The server reuses the existing AI environment configuration. Set `AI_DRIVER` and
-`AI_COMPLETION_MODEL` to enable a provider. `AI_CHAT_MODEL` may override the
-completion model for this feature. The supported drivers are `openai`,
-`openai-compatible`, `gemini`, and `ollama`. Provider credentials and endpoints
-are read only by the server:
+Page editing is configured with three server-only environment variables:
 
-| Driver              | Required configuration                        |
-| ------------------- | --------------------------------------------- |
-| `openai`            | `OPENAI_API_KEY`; optionally `OPENAI_API_URL` |
-| `openai-compatible` | `OPENAI_API_KEY` and `OPENAI_API_URL`         |
-| `gemini`            | `GEMINI_API_KEY`                              |
-| `ollama`            | `OLLAMA_API_URL`                              |
+| Variable     | Meaning                                                                             |
+| ------------ | ----------------------------------------------------------------------------------- |
+| `AI_API_URL` | Complete Responses endpoint URL, for example `https://api.openai.com/v1/responses`. |
+| `AI_API_KEY` | Bearer credential sent only by the server.                                          |
+| `AI_MODEL`   | Model identifier accepted by the configured endpoint.                               |
 
-An unavailable or incomplete provider configuration fails the run with a
-structured error. It never exposes credentials to the browser.
+All three values must be set to enable page editing. The URL is used exactly as
+configured; the client does not append a provider-specific path. Requests use
+`stream: true`, `store: false`, and include encrypted reasoning content so the
+stateless tool loop can replay reasoning items on the next request. The
+configured service must support standard Responses streaming and function
+calling. Chat Completions-only endpoints are outside the supported contract.
+
+An unavailable or incomplete configuration fails the run with a structured
+error. Credentials, authorization headers, and request bodies are never sent to
+the browser or written to logs.
+
+Deployments using the previous provider-specific settings must remove
+`AI_DRIVER`, `AI_COMPLETION_MODEL`, `AI_CHAT_MODEL`, and provider-specific key
+or URL variables, then set `AI_API_URL`, `AI_API_KEY`, and `AI_MODEL` above. The
+page-editing integration does not fall back to the removed settings.
 
 ## 6. Document Buffer Model
 
@@ -627,16 +636,17 @@ and adapter diagnostic entries. Include identifiers, tool names, timings,
 revisions, result codes, and operation counts where useful. Do not log raw
 prompts, replacement text, or credentials.
 
-Provide an integration scenario named `ai-page-editing.integration.spec.ts`
-under the server's AI page-editing test area. It must exercise the real runtime
-wrapper and session host with a deterministic model substitute and an in-memory
-tool bridge, including read, edit, result feedback, and completion.
+Provide integration scenarios under the server's AI page-editing test area. The
+session test uses a deterministic Responses client substitute, while the HTTP
+client test feeds chunked SSE events. Together they exercise the runtime
+wrapper, session host, browser tool bridge, request shape, streaming parser,
+reasoning-item preservation, read, edit, result feedback, and completion.
 
 Once that scenario exists, the following command executes the feature flow and
 writes focused diagnostics:
 
 ```bash
-pnpm --filter server exec jest --runInBand --testPathPatterns=integrations/ai-page-editing/ai-page-editing.integration.spec.ts 2>&1 | rg --line-buffered '\[ai_page_editing\]' > ai-page-editing.debug.log
+pnpm --filter server exec jest --runInBand --testPathPatterns=integrations/ai-page-editing 2>&1 | rg --line-buffered '\[ai_page_editing\]' > ai-page-editing.debug.log
 ```
 
 The scenario emits meaningful prefixed diagnostics. For pass/fail verification,
@@ -655,8 +665,11 @@ apps/server/src/integrations/ai-page-editing/
   contracts.ts
   agent-runtime.ts
   model.ts
+  responses-client.ts
   ai-page-editing.service.ts
+  agent-runtime.spec.ts
   ai-page-editing.integration.spec.ts
+  responses-client.spec.ts
 
 apps/client/src/features/ai-page-editing/
   ai-page-editing-panel.tsx
@@ -676,11 +689,11 @@ Keep parsing, position mapping, mutation validation, and history
 responsibilities separable. Follow repository formatting and file-size rules.
 Create only the modules needed for the current delivery stage.
 
-The automated coverage currently exercises the deterministic buffer and a
-server-side read/edit loop with a deterministic model. Collaborative
-persistence, provider smoke checks, and multi-browser behavior remain release
-verification work because they require a running application and external
-services.
+The automated coverage currently exercises the deterministic buffer, the
+Responses HTTP/SSE client, and a server-side read/edit loop with a deterministic
+client. Collaborative persistence, endpoint smoke checks, and multi-browser
+behavior remain release verification work because they require a running
+application and external services.
 
 ## 15. Implementation Sequence
 
@@ -696,9 +709,10 @@ prove these properties.
 
 ### Stage 2: Runtime and session contracts
 
-Implement the generic AI SDK wrapper, application events, scoped session host,
-authenticated tool bridge, call deduplication, cancellation, and limits. Use a
-deterministic model substitute to exercise the full loop.
+Implement the provider-independent Responses runtime, native HTTP/SSE client,
+application events, scoped session host, authenticated tool bridge, call
+deduplication, cancellation, and limits. Use a deterministic client substitute
+to exercise the full loop.
 
 Exit criteria: successful multi-step execution, error recovery, cancellation
 races, and connection-loss behavior are verified without external model
@@ -708,7 +722,7 @@ credentials.
 
 Connect the runtime to the browser adapter and add the page chat UI, selection
 capture, tool summaries, stop control, and undo actions. Add the configured
-provider integration with server-held credentials.
+Responses endpoint integration with server-held credentials.
 
 Exit criteria: the supported user scenarios work in a real collaborative page,
 including a second browser editing concurrently.
@@ -786,10 +800,12 @@ consistency rules, and acceptance tests.
 
 ## 18. References
 
-- [AI SDK ToolLoopAgent](https://ai-sdk.dev/docs/reference/ai-sdk-core/tool-loop-agent):
-  reusable multi-step model and tool execution.
-- [AI SDK loop control](https://ai-sdk.dev/docs/agents/loop-control): stop
-  conditions and step preparation.
+- [Responses API function calling](https://developers.openai.com/api/docs/guides/function-calling):
+  function definitions, call arguments, and tool outputs.
+- [Responses API streaming](https://developers.openai.com/api/docs/guides/streaming-responses):
+  streamed text and function-call event handling.
+- [Responses API migration guide](https://developers.openai.com/api/docs/guides/migrate-to-responses):
+  replaying output and encrypted reasoning items with `store: false`.
 - [Pi agent core](https://github.com/earendil-works/pi/tree/main/packages/agent):
   independent agent execution and event streaming.
 - [Pi edit tool](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/src/core/tools/edit.ts):

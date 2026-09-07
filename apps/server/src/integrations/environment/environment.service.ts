@@ -205,23 +205,20 @@ export class EnvironmentService {
       .toLowerCase();
   }
 
-  getAiDriver(): string {
-    return this.configService.get<string>('AI_DRIVER');
-  }
-
   getAiEmbeddingModel(): string {
     return this.configService.get<string>('AI_EMBEDDING_MODEL');
   }
 
-  getAiCompletionModel(): string {
-    return this.configService.get<string>('AI_COMPLETION_MODEL');
+  getAiApiUrl(): string {
+    return this.configService.get<string>('AI_API_URL');
   }
 
-  getAiChatModel(): string {
-    return (
-      this.configService.get<string>('AI_CHAT_MODEL') ||
-      this.configService.get<string>('AI_COMPLETION_MODEL')
-    );
+  getAiApiKey(): string {
+    return this.configService.get<string>('AI_API_KEY');
+  }
+
+  getAiModel(): string {
+    return this.configService.get<string>('AI_MODEL');
   }
 
   getAiEmbeddingDimension(): number {
@@ -259,25 +256,6 @@ export class EnvironmentService {
     return this.configService.get<string>(
       'TURBOPUFFER_NAMESPACE_PREFIX',
       'docmost'
-    );
-  }
-
-  getOpenAiApiKey(): string {
-    return this.configService.get<string>('OPENAI_API_KEY');
-  }
-
-  getOpenAiApiUrl(): string {
-    return this.configService.get<string>('OPENAI_API_URL');
-  }
-
-  getGeminiApiKey(): string {
-    return this.configService.get<string>('GEMINI_API_KEY');
-  }
-
-  getOllamaApiUrl(): string {
-    return this.configService.get<string>(
-      'OLLAMA_API_URL',
-      'http://localhost:11434'
     );
   }
 

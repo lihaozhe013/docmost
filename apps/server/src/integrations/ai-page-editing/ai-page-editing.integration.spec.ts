@@ -1,75 +1,96 @@
-import { MockLanguageModelV3, simulateReadableStream } from 'ai/test';
 import { AgentRuntime } from './agent-runtime';
 import { AiPageEditingService } from './ai-page-editing.service';
+import { ResponsesApiClient, ResponsesStreamOptions } from './responses-client';
 
 describe('AI page editing session', () => {
   it('runs a read/edit loop through the runtime and browser bridge', async () => {
     const serviceRef: { current?: AiPageEditingService } = {};
     const emitted: any[] = [];
+    const requests: ResponsesStreamOptions[] = [];
     let finish!: () => void;
     const completed = new Promise<void>((resolve) => {
       finish = resolve;
     });
-    const usage = {
-      inputTokens: {
-        total: 1,
-        noCache: 1,
-        cacheRead: 0,
-        cacheWrite: 0
-      },
-      outputTokens: { total: 1, text: 1, reasoning: 0 }
-    };
     let modelCall = 0;
-    let modelPrompt: unknown;
-    const model = new MockLanguageModelV3({
-      doStream: async (options: any) => {
-        modelPrompt = options.prompt;
+    const client: ResponsesApiClient = {
+      stream: async (options) => {
+        requests.push(options);
         modelCall += 1;
-        const chunks =
-          modelCall === 1
-            ? [
-                { type: 'stream-start', warnings: [] },
-                {
-                  type: 'tool-call',
-                  toolCallId: 'read-1',
-                  toolName: 'read_buffer',
-                  input: '{}'
-                },
-                { type: 'finish', usage, finishReason: 'tool-calls' }
-              ]
-            : modelCall === 2
-              ? [
-                  { type: 'stream-start', warnings: [] },
-                  {
-                    type: 'tool-call',
-                    toolCallId: 'edit-1',
-                    toolName: 'edit_buffer',
-                    input: JSON.stringify({
-                      expectedRevision: 'r1',
-                      operations: [
-                        {
-                          type: 'replace_text',
-                          blockId: 'b0',
-                          oldText: 'before',
-                          newText: 'after'
-                        }
-                      ]
-                    })
-                  },
-                  { type: 'finish', usage, finishReason: 'tool-calls' }
-                ]
-              : [
-                  { type: 'stream-start', warnings: [] },
-                  { type: 'text-start', id: 'text-1' },
-                  { type: 'text-delta', id: 'text-1', delta: 'Applied.' },
-                  { type: 'text-end', id: 'text-1' },
-                  { type: 'finish', usage, finishReason: 'stop' }
-                ];
+        if (modelCall === 1) {
+          return {
+            text: '',
+            output: [
+              {
+                type: 'function_call',
+                id: 'fc-read',
+                call_id: 'read-1',
+                name: 'read_buffer',
+                arguments: '{}'
+              }
+            ],
+            functionCalls: [
+              { callId: 'read-1', name: 'read_buffer', arguments: '{}' }
+            ],
+            usage: { inputTokens: 1, outputTokens: 1, totalTokens: 2 }
+          };
+        }
+        if (modelCall === 2) {
+          return {
+            text: '',
+            output: [
+              {
+                type: 'function_call',
+                id: 'fc-edit',
+                call_id: 'edit-1',
+                name: 'edit_buffer',
+                arguments: JSON.stringify({
+                  expectedRevision: 'r1',
+                  operations: [
+                    {
+                      type: 'replace_text',
+                      blockId: 'b0',
+                      oldText: 'before',
+                      newText: 'after'
+                    }
+                  ]
+                })
+              }
+            ],
+            functionCalls: [
+              {
+                callId: 'edit-1',
+                name: 'edit_buffer',
+                arguments: JSON.stringify({
+                  expectedRevision: 'r1',
+                  operations: [
+                    {
+                      type: 'replace_text',
+                      blockId: 'b0',
+                      oldText: 'before',
+                      newText: 'after'
+                    }
+                  ]
+                })
+              }
+            ],
+            usage: { inputTokens: 1, outputTokens: 1, totalTokens: 2 }
+          };
+        }
+        await options.onTextDelta?.('Applied.');
         return {
-          stream: simulateReadableStream({ chunks: chunks as any[] })
+          text: 'Applied.',
+          output: [
+            {
+              type: 'message',
+              role: 'assistant',
+              content: [{ type: 'output_text', text: 'Applied.' }]
+            }
+          ],
+          functionCalls: [],
+          usage: { inputTokens: 1, outputTokens: 1, totalTokens: 2 }
         };
       }
-    });
+    };
 
     const socket: any = {
       id: 'socket-1',
@@ -112,7 +133,7 @@ describe('AI page editing session', () => {
         })
       } as any,
       { validateCanEdit: async () => undefined } as any,
-      { create: () => model } as any,
+      { create: () => client, getModel: () => 'test-model' } as any,
       new AgentRuntime()
     );
     serviceRef.current = service;
@@ -139,6 +160,14 @@ describe('AI page editing session', () => {
     expect(emitted.some((event) => event.event === 'text.delta')).toBe(true);
     expect(emitted.some((event) => event.event === 'run.completed')).toBe(true);
     expect(modelCall).toBe(3);
-    expect(JSON.stringify(modelPrompt)).toContain('revision: r1');
+    expect(requests[0]?.tools.map((tool) => tool.name)).toEqual([
+      'read_buffer',
+      'edit_buffer',
+      'insert_blocks'
+    ]);
+    expect(requests[0]?.tools[0]?.strict).toBe(false);
+    expect(requests[0]?.tools[0]?.parameters).not.toHaveProperty('$schema');
+    expect(JSON.stringify(requests[1]?.input)).toContain('r1');
+    expect(JSON.stringify(requests[2]?.input)).toContain('change-1');
   });
 });

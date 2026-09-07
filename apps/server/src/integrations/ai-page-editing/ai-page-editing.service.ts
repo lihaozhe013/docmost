@@ -5,15 +5,18 @@ import { UserRepo } from '@docmost/db/repos/user/user.repo';
 import { PageRepo } from '@docmost/db/repos/page/page.repo';
 import { PageAccessService } from '../../core/page/page-access/page-access.service';
 import { isUserDisabled } from '../../common/helpers';
-import { AgentRuntime, RuntimeToolDefinition } from './agent-runtime';
-import { AiPageEditingModelFactory } from './model';
+import {
+  AgentRuntime,
+  RuntimeMessage,
+  RuntimeToolDefinition
+} from './agent-runtime';
+import { OpenAiResponsesClientFactory } from './model';
 import {
   aiPageEditingMessageSchema,
   AiPageEditingEvent,
   AiPageEditingMessage,
   AiPageEditingToolRequest
 } from './contracts';
-import { ModelMessage } from 'ai';
 import { nanoid } from 'nanoid';
 
 const MAX_TOOL_REQUESTS = 24;
@@ -129,10 +132,10 @@ function boundedHistory(
     AiPageEditingMessage,
     { operation: 'aiPageEditing.start' }
   >['messages']
-): ModelMessage[] {
+): RuntimeMessage[] {
   if (!items?.length) return [];
 
-  const selected: ModelMessage[] = [];
+  const selected: RuntimeMessage[] = [];
   let totalChars = 0;
   for (let index = items.length - 1; index >= 0; index -= 1) {
     const item = items[index];
@@ -212,7 +215,7 @@ export class AiPageEditingService {
     private readonly userRepo: UserRepo,
     private readonly pageRepo: PageRepo,
     private readonly pageAccessService: PageAccessService,
-    private readonly modelFactory: AiPageEditingModelFactory,
+    private readonly responsesClientFactory: OpenAiResponsesClientFactory,
     private readonly runtime: AgentRuntime
   ) {}
 
@@ -379,7 +382,8 @@ export class AiPageEditingService {
     );
 
     try {
-      const model = this.modelFactory.create();
+      const client = this.responsesClientFactory.create();
+      const model = this.responsesClientFactory.getModel();
       const messages = boundedHistory(message.messages);
       const selectionContext = message.selection?.text
         ? `\nThe user selected this text when submitting the request:\n<selection>\n${message.selection.text}\n</selection>`
@@ -402,6 +406,7 @@ export class AiPageEditingService {
       const bufferContext = initialBufferContext(initialRead);
 
       const result = await this.runtime.run({
+        client,
         model,
         system:
           SYSTEM_PROMPT +

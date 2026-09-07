@@ -100,12 +100,6 @@ export class EnvironmentVariables {
   TYPESENSE_LOCALE: string;
 
   @IsOptional()
-  @ValidateIf((obj) => obj.AI_DRIVER)
-  @IsIn(['openai', 'openai-compatible', 'gemini', 'ollama'])
-  @IsString()
-  AI_DRIVER: string;
-
-  @IsOptional()
   @ValidateIf((obj) => obj.AI_VECTOR_DRIVER)
   @IsIn(['pgvector', 'turbopuffer'])
   @IsString()
@@ -156,37 +150,20 @@ export class EnvironmentVariables {
   @IsString()
   AI_EMBEDDING_SUPPORTS_MRL: string;
 
-  @ValidateIf((obj) => obj.AI_DRIVER)
-  @IsString()
-  @IsNotEmpty()
-  AI_COMPLETION_MODEL: string;
-
-  @IsOptional()
-  @ValidateIf(
-    (obj) =>
-      obj.AI_DRIVER && ['openai', 'openai-compatible'].includes(obj.AI_DRIVER)
-  )
-  @IsString()
-  @IsNotEmpty()
-  OPENAI_API_KEY: string;
-
-  @IsOptional()
-  @ValidateIf(
-    (obj) =>
-      obj.AI_DRIVER === 'openai-compatible' ||
-      (obj.AI_DRIVER === 'openai' && obj.OPENAI_API_URL)
-  )
+  @ValidateIf((obj) => obj.AI_API_URL || obj.AI_API_KEY || obj.AI_MODEL)
   @IsUrl({ protocols: ['http', 'https'], require_tld: false })
-  OPENAI_API_URL: string;
+  @IsNotEmpty()
+  AI_API_URL: string;
 
-  @ValidateIf((obj) => obj.AI_DRIVER && obj.AI_DRIVER === 'gemini')
+  @ValidateIf((obj) => obj.AI_API_URL || obj.AI_API_KEY || obj.AI_MODEL)
   @IsString()
   @IsNotEmpty()
-  GEMINI_API_KEY: string;
+  AI_API_KEY: string;
 
-  @ValidateIf((obj) => obj.AI_DRIVER && obj.AI_DRIVER === 'ollama')
-  @IsUrl({ protocols: ['http', 'https'], require_tld: false })
-  OLLAMA_API_URL: string;
+  @ValidateIf((obj) => obj.AI_API_URL || obj.AI_API_KEY || obj.AI_MODEL)
+  @IsString()
+  @IsNotEmpty()
+  AI_MODEL: string;
 
   @IsOptional()
   @IsIn(['postgres', 'clickhouse'])

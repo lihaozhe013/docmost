@@ -6,7 +6,7 @@ import { TokenModule } from '../core/auth/token.module';
 import { BaseRealtimeBridge } from './base-realtime.bridge';
 import { AiPageEditingService } from '../integrations/ai-page-editing/ai-page-editing.service';
 import { AgentRuntime } from '../integrations/ai-page-editing/agent-runtime';
-import { AiPageEditingModelFactory } from '../integrations/ai-page-editing/model';
+import { OpenAiResponsesClientFactory } from '../integrations/ai-page-editing/model';
 
 @Global()
 @Module({
@@ -18,7 +18,7 @@ import { AiPageEditingModelFactory } from '../integrations/ai-page-editing/model
     BaseRealtimeBridge,
     AiPageEditingService,
     AgentRuntime,
-    AiPageEditingModelFactory
+    OpenAiResponsesClientFactory
   ],
   exports: [WsGateway, WsService, WsTreeService]
 })

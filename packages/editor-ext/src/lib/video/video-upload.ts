@@ -1,8 +1,8 @@
-import { MediaUploadOptions, UploadFn } from "../media-utils";
-import { IAttachment } from "../types";
-import { generateNodeId } from "../utils";
-import { Node } from "@tiptap/pm/model";
-import { Command } from "@tiptap/core";
+import { MediaUploadOptions, UploadFn } from '../media-utils';
+import { IAttachment } from '../types';
+import { generateNodeId } from '../utils';
+import { Node } from '@tiptap/pm/model';
+import { Command } from '@tiptap/core';
 
 const findVideoNodeByPlaceholderId = (
   doc: Node,
@@ -14,7 +14,7 @@ const findVideoNodeByPlaceholderId = (
     if (result) return false;
 
     if (
-      node.type.name === "video" &&
+      node.type.name === 'video' &&
       node.attrs.placeholder?.id === placeholderId
     ) {
       result = { node, pos };
@@ -34,9 +34,9 @@ const getVideoDimensions = (
   return new Promise<
     { width: number; height: number; aspectRatio: number } | undefined
   >((resolve) => {
-    const video = document.createElement("video");
+    const video = document.createElement('video');
 
-    video.preload = "metadata";
+    video.preload = 'metadata';
     video.onloadedmetadata = () => {
       const width = video.videoWidth;
       const height = video.videoHeight;

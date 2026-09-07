@@ -1,12 +1,12 @@
-import { ReactRenderer, useEditor } from "@tiptap/react";
+import { ReactRenderer, useEditor } from '@tiptap/react';
 import {
   autoUpdate,
   computePosition,
   flip,
   offset,
-  shift,
-} from "@floating-ui/dom";
-import MentionList from "@/features/editor/components/mention/mention-list.tsx";
+  shift
+} from '@floating-ui/dom';
+import MentionList from '@/features/editor/components/mention/mention-list.tsx';
 
 function getWhitespaceCount(query: string) {
   const matches = query?.match(/([\s]+)/g);
@@ -21,7 +21,7 @@ const mentionRenderItems = () => {
 
   const destroy = () => {
     if (outsideClickHandler) {
-      document.removeEventListener("pointerdown", outsideClickHandler);
+      document.removeEventListener('pointerdown', outsideClickHandler);
       outsideClickHandler = null;
     }
     updatePositionCleanup?.();
@@ -40,7 +40,7 @@ const mentionRenderItems = () => {
       query: string;
     }) => {
       // query must not start with a whitespace
-      if (props.query.charAt(0) === " ") {
+      if (props.query.charAt(0) === ' ') {
         return;
       }
 
@@ -51,14 +51,14 @@ const mentionRenderItems = () => {
       }
 
       const editorDom = props.editor?.view?.dom;
-      const asideEl = editorDom?.closest(".mantine-AppShell-aside");
-      const dialogEl = editorDom?.closest("[data-comment-dialog]");
-      const chatInput = editorDom?.closest("[data-chat-input]");
+      const asideEl = editorDom?.closest('.mantine-AppShell-aside');
+      const dialogEl = editorDom?.closest('[data-comment-dialog]');
+      const chatInput = editorDom?.closest('[data-chat-input]');
       const isInCommentContext = !!(asideEl || dialogEl || chatInput);
 
       component = new ReactRenderer(MentionList, {
         props: { ...props, isInCommentContext },
-        editor: props.editor,
+        editor: props.editor
       });
 
       if (!props.clientRect) {
@@ -76,7 +76,7 @@ const mentionRenderItems = () => {
           destroy();
         }
       };
-      document.addEventListener("pointerdown", outsideClickHandler);
+      document.addEventListener('pointerdown', outsideClickHandler);
 
       const shiftMiddleware = asideEl
         ? shift({ boundary: asideEl, crossAxis: true, padding: 8 })
@@ -85,7 +85,7 @@ const mentionRenderItems = () => {
       updatePositionCleanup = autoUpdate(
         {
           getBoundingClientRect: () =>
-            activeClientRect ? activeClientRect() : new DOMRect(),
+            activeClientRect ? activeClientRect() : new DOMRect()
         },
         element,
         () => {
@@ -94,22 +94,22 @@ const mentionRenderItems = () => {
             {
               getBoundingClientRect: () => {
                 return activeClientRect ? activeClientRect() : new DOMRect();
-              },
+              }
             },
             element,
             {
-              placement: "bottom-start",
-              middleware: [offset(4), flip(), shiftMiddleware],
-            },
+              placement: 'bottom-start',
+              middleware: [offset(4), flip(), shiftMiddleware]
+            }
           ).then(({ x, y }) => {
             Object.assign(element.style, {
               left: `${x}px`,
               top: `${y}px`,
-              position: "absolute",
-              zIndex: "190",
+              position: 'absolute',
+              zIndex: '190'
             });
           });
-        },
+        }
       );
     },
     onUpdate: (props: {
@@ -118,7 +118,7 @@ const mentionRenderItems = () => {
       query: string;
     }) => {
       // query must not start with a whitespace
-      if (props.query.charAt(0) === " ") {
+      if (props.query.charAt(0) === ' ') {
         destroy();
         return;
       }
@@ -152,12 +152,12 @@ const mentionRenderItems = () => {
       }
     },
     onKeyDown: (props: { event: KeyboardEvent }) => {
-      if (props.event.key === "Escape") {
+      if (props.event.key === 'Escape') {
         destroy();
         return true;
       }
 
-      if (props.event.key === "Enter" && !component) {
+      if (props.event.key === 'Enter' && !component) {
         destroy();
         return false;
       }
@@ -166,7 +166,7 @@ const mentionRenderItems = () => {
     },
     onExit: () => {
       destroy();
-    },
+    }
   };
 };
 

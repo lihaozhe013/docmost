@@ -1,20 +1,20 @@
-import axios, { AxiosInstance } from "axios";
-import APP_ROUTE from "@/lib/app-route.ts";
-import { isCloud } from "@/lib/config.ts";
+import axios, { AxiosInstance } from 'axios';
+import APP_ROUTE from '@/lib/app-route.ts';
+import { isCloud } from '@/lib/config.ts';
 
 const api: AxiosInstance = axios.create({
-  baseURL: "/api",
-  withCredentials: true,
+  baseURL: '/api',
+  withCredentials: true
 });
 
 api.interceptors.response.use(
   (response) => {
     // we need the response headers for these endpoints
     const exemptEndpoints = [
-      "/api/pages/export",
-      "/api/spaces/export",
-      "/api/docx-export",
-      "/api/bases/export-csv",
+      '/api/pages/export',
+      '/api/spaces/export',
+      '/api/docx-export',
+      '/api/bases/export-csv'
     ];
     if (response.request.responseURL) {
       const path = new URL(response.request.responseURL)?.pathname;
@@ -30,8 +30,8 @@ api.interceptors.response.use(
       switch (error.response.status) {
         case 401: {
           const url = new URL(error.request.responseURL)?.pathname;
-          if (url === "/api/auth/collab-token") return;
-          if (window.location.pathname.startsWith("/share/")) return;
+          if (url === '/api/auth/collab-token') return;
+          if (window.location.pathname.startsWith('/share/')) return;
 
           // Handle unauthorized error
           redirectToLogin();
@@ -45,9 +45,9 @@ api.interceptors.response.use(
           if (
             error.response.data.message
               .toLowerCase()
-              .includes("workspace not found")
+              .includes('workspace not found')
           ) {
-            console.log("workspace not found");
+            console.log('workspace not found');
             if (
               !isCloud() &&
               window.location.pathname != APP_ROUTE.AUTH.SETUP
@@ -64,7 +64,7 @@ api.interceptors.response.use(
       }
     }
     return Promise.reject(error);
-  },
+  }
 );
 
 function redirectToLogin() {
@@ -73,7 +73,7 @@ function redirectToLogin() {
     APP_ROUTE.AUTH.MFA_CHALLENGE,
     APP_ROUTE.AUTH.MFA_SETUP_REQUIRED,
     // the oauth consent page redirects to login itself, preserving its query string
-    "/oauth/consent",
+    '/oauth/consent'
   ];
   if (!exemptPaths.some((path) => window.location.pathname.startsWith(path))) {
     const redirectTo = window.location.pathname;

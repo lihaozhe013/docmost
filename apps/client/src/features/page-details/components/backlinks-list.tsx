@@ -5,17 +5,17 @@ import {
   Loader,
   Stack,
   Text,
-  UnstyledButton,
-} from "@mantine/core";
-import { Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { useBacklinksQuery } from "@/features/page-details/queries/backlinks-query.ts";
+  UnstyledButton
+} from '@mantine/core';
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useBacklinksQuery } from '@/features/page-details/queries/backlinks-query.ts';
 import {
   BacklinkDirection,
-  IBacklinkPageItem,
-} from "@/features/page-details/types/backlink.types.ts";
-import { buildPageUrl, getPageTitle } from "@/features/page/page.utils.ts";
-import { getPageIcon } from "@/lib";
+  IBacklinkPageItem
+} from '@/features/page-details/types/backlink.types.ts';
+import { buildPageUrl, getPageTitle } from '@/features/page/page.utils.ts';
+import { getPageIcon } from '@/lib';
 
 interface BacklinksListProps {
   pageId: string;
@@ -28,7 +28,7 @@ export function BacklinksList({
   pageId,
   direction,
   enabled,
-  onItemClick,
+  onItemClick
 }: BacklinksListProps) {
   const { t } = useTranslation();
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
@@ -50,8 +50,8 @@ export function BacklinksList({
   if (items.length === 0) {
     return (
       <Text c="dimmed" size="sm" py="md">
-        {direction === "incoming"
-          ? t("No pages link here yet.")
+        {direction === 'incoming'
+          ? t('No pages link here yet.')
           : t("This page doesn't link to other pages yet.")}
       </Text>
     );
@@ -75,15 +75,15 @@ export function BacklinksList({
               ? buildPageUrl(
                   item.space.slug,
                   item.slugId,
-                  item.title ?? undefined,
+                  item.title ?? undefined
                 )
-              : "#"
+              : '#'
           }
           onClick={handleClick}
-          style={{ padding: "8px 4px", borderRadius: 4, userSelect: "none" }}
+          style={{ padding: '8px 4px', borderRadius: 4, userSelect: 'none' }}
         >
           <Group gap="xs" wrap="nowrap">
-            {getPageIcon(item.icon ?? "")}
+            {getPageIcon(item.icon ?? '')}
             <Stack gap={0} style={{ flex: 1, minWidth: 0 }}>
               <Text size="sm" fw={500} lineClamp={1}>
                 {getPageTitle(item.title, undefined, t)}
@@ -105,7 +105,7 @@ export function BacklinksList({
           onClick={() => fetchNextPage()}
           mt="xs"
         >
-          {t("Load more")}
+          {t('Load more')}
         </Button>
       )}
     </Stack>

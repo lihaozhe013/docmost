@@ -18,7 +18,7 @@ import { Window } from 'happy-dom';
 export function getHTMLFromFragment(
   doc: Node,
   schema: Schema,
-  options?: { document?: Document },
+  options?: { document?: Document }
 ): string {
   if (options?.document) {
     const wrap = options.document.createElement('div');
@@ -26,7 +26,7 @@ export function getHTMLFromFragment(
     DOMSerializer.fromSchema(schema).serializeFragment(
       doc.content,
       { document: options.document },
-      wrap,
+      wrap
     );
     return wrap.innerHTML;
   }
@@ -38,8 +38,8 @@ export function getHTMLFromFragment(
     const fragment = DOMSerializer.fromSchema(schema).serializeFragment(
       doc.content,
       {
-        document: localWindow.document as unknown as Document,
-      },
+        document: localWindow.document as unknown as Document
+      }
     );
 
     const serializer = new localWindow.XMLSerializer();

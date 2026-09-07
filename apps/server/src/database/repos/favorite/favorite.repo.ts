@@ -12,7 +12,7 @@ import { dbOrTx } from '@docmost/db/utils';
 export const FavoriteType = {
   PAGE: 'page',
   SPACE: 'space',
-  TEMPLATE: 'template',
+  TEMPLATE: 'template'
 } as const;
 
 export type FavoriteType = (typeof FavoriteType)[keyof typeof FavoriteType];
@@ -53,7 +53,7 @@ export class FavoriteRepo {
 
   async deleteByUserAndTemplate(
     userId: string,
-    templateId: string,
+    templateId: string
   ): Promise<void> {
     await this.db
       .deleteFrom('favorites')
@@ -66,7 +66,7 @@ export class FavoriteRepo {
     userId: string,
     workspaceId: string,
     type: FavoriteType,
-    spaceId?: string,
+    spaceId?: string
   ): Promise<{ items: string[]; meta: any }> {
     const idColumn =
       type === FavoriteType.PAGE
@@ -89,14 +89,14 @@ export class FavoriteRepo {
     const result = await executeWithCursorPagination(query, {
       perPage: 250,
       fields: [{ expression: 'favorites.id', direction: 'desc' }],
-      parseCursor: (cursor) => ({ id: cursor.id }),
+      parseCursor: (cursor) => ({ id: cursor.id })
     });
 
     return {
       items: result.items
         .map((r) => (r as any).entityId as string)
         .filter(Boolean),
-      meta: result.meta,
+      meta: result.meta
     };
   }
 
@@ -105,7 +105,7 @@ export class FavoriteRepo {
     workspaceId: string,
     pagination: PaginationOptions,
     type?: FavoriteType,
-    spaceId?: string,
+    spaceId?: string
   ) {
     let query = this.db
       .selectFrom('favorites')
@@ -143,15 +143,15 @@ export class FavoriteRepo {
       beforeCursor: pagination.beforeCursor,
       fields: [{ expression: 'favorites.id', direction: 'desc' }],
       parseCursor: (cursor) => ({
-        id: cursor.id,
-      }),
+        id: cursor.id
+      })
     });
   }
 
   async deleteByUsersWithoutSpaceAccess(
     userIds: string[],
     spaceId: string,
-    opts?: { trx?: KyselyTransaction },
+    opts?: { trx?: KyselyTransaction }
   ): Promise<void> {
     if (userIds.length === 0) return;
 
@@ -168,7 +168,7 @@ export class FavoriteRepo {
           .selectFrom('spaceMembers')
           .innerJoin('groupUsers', 'groupUsers.groupId', 'spaceMembers.groupId')
           .select('groupUsers.userId')
-          .where('spaceMembers.spaceId', '=', spaceId),
+          .where('spaceMembers.spaceId', '=', spaceId)
       );
 
     await db
@@ -182,7 +182,7 @@ export class FavoriteRepo {
   async deleteByUserAndWorkspace(
     userId: string,
     workspaceId: string,
-    opts?: { trx?: KyselyTransaction },
+    opts?: { trx?: KyselyTransaction }
   ): Promise<void> {
     const { trx } = opts;
     const db = dbOrTx(this.db, trx);
@@ -197,7 +197,7 @@ export class FavoriteRepo {
   private applySpaceFilter<Q extends SelectQueryBuilder<any, any, any>>(
     query: Q,
     type: FavoriteType | undefined,
-    spaceId: string,
+    spaceId: string
   ): Q {
     if (type === FavoriteType.PAGE) {
       return query.where((eb: any) =>
@@ -206,8 +206,8 @@ export class FavoriteRepo {
             .selectFrom('pages')
             .select(sql`1`.as('one'))
             .whereRef('pages.id', '=', 'favorites.pageId')
-            .where('pages.spaceId', '=', spaceId),
-        ),
+            .where('pages.spaceId', '=', spaceId)
+        )
       ) as Q;
     }
     if (type === FavoriteType.SPACE) {
@@ -220,8 +220,8 @@ export class FavoriteRepo {
             .selectFrom('templates')
             .select(sql`1`.as('one'))
             .whereRef('templates.id', '=', 'favorites.templateId')
-            .where('templates.spaceId', '=', spaceId),
-        ),
+            .where('templates.spaceId', '=', spaceId)
+        )
       ) as Q;
     }
     return query;
@@ -237,9 +237,9 @@ export class FavoriteRepo {
           'pages.title',
           'pages.icon',
           'pages.isBase',
-          'pages.spaceId',
+          'pages.spaceId'
         ])
-        .whereRef('pages.id', '=', 'favorites.pageId'),
+        .whereRef('pages.id', '=', 'favorites.pageId')
     ).as('page');
   }
 
@@ -248,7 +248,7 @@ export class FavoriteRepo {
       eb
         .selectFrom('spaces')
         .select(['spaces.id', 'spaces.name', 'spaces.slug', 'spaces.logo'])
-        .whereRef('spaces.id', '=', 'favorites.spaceId'),
+        .whereRef('spaces.id', '=', 'favorites.spaceId')
     ).as('space');
   }
 
@@ -258,7 +258,7 @@ export class FavoriteRepo {
         .selectFrom('spaces')
         .innerJoin('pages', 'pages.spaceId', 'spaces.id')
         .select(['spaces.id', 'spaces.name', 'spaces.slug', 'spaces.logo'])
-        .whereRef('pages.id', '=', 'favorites.pageId'),
+        .whereRef('pages.id', '=', 'favorites.pageId')
     ).as('space');
   }
 
@@ -270,9 +270,9 @@ export class FavoriteRepo {
         .where(({ or, ref }) =>
           or([
             sql<boolean>`${ref('spaces.id')} = ${ref('favorites.spaceId')}`,
-            sql<boolean>`${ref('spaces.id')} = (SELECT pages.space_id FROM pages WHERE pages.id = ${ref('favorites.pageId')})`,
-          ]),
-        ),
+            sql<boolean>`${ref('spaces.id')} = (SELECT pages.space_id FROM pages WHERE pages.id = ${ref('favorites.pageId')})`
+          ])
+        )
     ).as('space');
   }
 
@@ -285,9 +285,9 @@ export class FavoriteRepo {
           'templates.title',
           'templates.description',
           'templates.icon',
-          'templates.spaceId',
+          'templates.spaceId'
         ])
-        .whereRef('templates.id', '=', 'favorites.templateId'),
+        .whereRef('templates.id', '=', 'favorites.templateId')
     ).as('template');
   }
 }

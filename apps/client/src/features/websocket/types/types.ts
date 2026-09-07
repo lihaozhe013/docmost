@@ -1,40 +1,40 @@
-import { SpaceTreeNode } from "@/features/page/tree/types.ts";
-import { IPage } from "@/features/page/types/page.types";
-import { IComment } from "@/features/comment/types/comment.types";
+import { SpaceTreeNode } from '@/features/page/tree/types.ts';
+import { IPage } from '@/features/page/types/page.types';
+import { IComment } from '@/features/comment/types/comment.types';
 
 export type InvalidateEvent = {
-  operation: "invalidate";
+  operation: 'invalidate';
   spaceId: string;
   entity: Array<string>;
   id?: string;
 };
 
 export type CommentCreatedEvent = {
-  operation: "commentCreated";
+  operation: 'commentCreated';
   pageId: string;
   comment: IComment;
 };
 
 export type CommentUpdatedEvent = {
-  operation: "commentUpdated";
+  operation: 'commentUpdated';
   pageId: string;
   comment: IComment;
 };
 
 export type CommentDeletedEvent = {
-  operation: "commentDeleted";
+  operation: 'commentDeleted';
   pageId: string;
   commentId: string;
 };
 
 export type CommentResolvedEvent = {
-  operation: "commentResolved";
+  operation: 'commentResolved';
   pageId: string;
   comment: IComment;
 };
 
 export type UpdateEvent = {
-  operation: "updateOne";
+  operation: 'updateOne';
   spaceId: string;
   entity: Array<string>;
   id: string;
@@ -42,7 +42,7 @@ export type UpdateEvent = {
 };
 
 export type DeleteEvent = {
-  operation: "deleteOne";
+  operation: 'deleteOne';
   spaceId: string;
   entity: Array<string>;
   id: string;
@@ -50,7 +50,7 @@ export type DeleteEvent = {
 };
 
 export type AddTreeNodeEvent = {
-  operation: "addTreeNode";
+  operation: 'addTreeNode';
   spaceId: string;
   payload: {
     parentId: string;
@@ -60,7 +60,7 @@ export type AddTreeNodeEvent = {
 };
 
 export type MoveTreeNodeEvent = {
-  operation: "moveTreeNode";
+  operation: 'moveTreeNode';
   spaceId: string;
   payload: {
     id: string;
@@ -73,7 +73,7 @@ export type MoveTreeNodeEvent = {
 };
 
 export type DeleteTreeNodeEvent = {
-  operation: "deleteTreeNode";
+  operation: 'deleteTreeNode';
   spaceId: string;
   payload: {
     node: SpaceTreeNode;
@@ -81,12 +81,12 @@ export type DeleteTreeNodeEvent = {
 };
 
 export type RefetchRootTreeNodeEvent = {
-  operation: "refetchRootTreeNodeEvent";
+  operation: 'refetchRootTreeNodeEvent';
   spaceId: string;
 };
 
 export type VerificationUpdatedEvent = {
-  operation: "verificationUpdated";
+  operation: 'verificationUpdated';
   pageId: string;
 };
 

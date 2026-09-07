@@ -1,20 +1,20 @@
-import React, { FC } from "react";
+import React, { FC } from 'react';
 import {
   IconAlignCenter,
   IconAlignLeft,
   IconAlignRight,
-  IconCheck,
-} from "@tabler/icons-react";
+  IconCheck
+} from '@tabler/icons-react';
 import {
   ActionIcon,
   Button,
   Popover,
   ScrollArea,
-  Tooltip,
-} from "@mantine/core";
-import type { Editor } from "@tiptap/react";
-import { useEditorState } from "@tiptap/react";
-import { useTranslation } from "react-i18next";
+  Tooltip
+} from '@mantine/core';
+import type { Editor } from '@tiptap/react';
+import { useEditorState } from '@tiptap/react';
+import { useTranslation } from 'react-i18next';
 
 interface TableTextAlignmentProps {
   editor: Editor | null;
@@ -40,11 +40,11 @@ export const TableTextAlignment: FC<TableTextAlignmentProps> = ({ editor }) => {
       }
 
       return {
-        isAlignLeft: ctx.editor.isActive({ textAlign: "left" }),
-        isAlignCenter: ctx.editor.isActive({ textAlign: "center" }),
-        isAlignRight: ctx.editor.isActive({ textAlign: "right" }),
+        isAlignLeft: ctx.editor.isActive({ textAlign: 'left' }),
+        isAlignCenter: ctx.editor.isActive({ textAlign: 'center' }),
+        isAlignRight: ctx.editor.isActive({ textAlign: 'right' })
       };
-    },
+    }
   });
 
   if (!editor || !editorState) {
@@ -53,26 +53,26 @@ export const TableTextAlignment: FC<TableTextAlignmentProps> = ({ editor }) => {
 
   const items: AlignmentItem[] = [
     {
-      name: "Align left",
-      value: "left",
+      name: 'Align left',
+      value: 'left',
       isActive: () => editorState?.isAlignLeft,
-      command: () => editor.chain().focus().setTextAlign("left").run(),
-      icon: IconAlignLeft,
+      command: () => editor.chain().focus().setTextAlign('left').run(),
+      icon: IconAlignLeft
     },
     {
-      name: "Align center",
-      value: "center",
+      name: 'Align center',
+      value: 'center',
       isActive: () => editorState?.isAlignCenter,
-      command: () => editor.chain().focus().setTextAlign("center").run(),
-      icon: IconAlignCenter,
+      command: () => editor.chain().focus().setTextAlign('center').run(),
+      icon: IconAlignCenter
     },
     {
-      name: "Align right",
-      value: "right",
+      name: 'Align right',
+      value: 'right',
       isActive: () => editorState?.isAlignRight,
-      command: () => editor.chain().focus().setTextAlign("right").run(),
-      icon: IconAlignRight,
-    },
+      command: () => editor.chain().focus().setTextAlign('right').run(),
+      icon: IconAlignRight
+    }
   ];
 
   const activeItem = items.find((item) => item.isActive()) || items[0];
@@ -83,14 +83,14 @@ export const TableTextAlignment: FC<TableTextAlignmentProps> = ({ editor }) => {
       onChange={setOpened}
       position="bottom"
       withArrow
-      transitionProps={{ transition: "pop" }}
+      transitionProps={{ transition: 'pop' }}
     >
       <Popover.Target>
-        <Tooltip label={t("Text align")} withArrow>
+        <Tooltip label={t('Text align')} withArrow>
           <ActionIcon
             variant="subtle"
             size="lg"
-            aria-label={t("Text align")}
+            aria-label={t('Text align')}
             onClick={() => setOpened(!opened)}
           >
             <activeItem.icon size={18} />
@@ -113,7 +113,7 @@ export const TableTextAlignment: FC<TableTextAlignmentProps> = ({ editor }) => {
                   item.command();
                   setOpened(false);
                 }}
-                style={{ border: "none" }}
+                style={{ border: 'none' }}
               >
                 {t(item.name)}
               </Button>

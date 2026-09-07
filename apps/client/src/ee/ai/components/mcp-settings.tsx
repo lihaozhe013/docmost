@@ -9,20 +9,20 @@ import {
   ActionIcon,
   Tooltip,
   Stack,
-  Alert,
-} from "@mantine/core";
-import { useAtom } from "jotai";
-import { workspaceAtom } from "@/features/user/atoms/current-user-atom.ts";
-import React, { useState } from "react";
-import { Trans, useTranslation } from "react-i18next";
-import { updateWorkspace } from "@/features/workspace/services/workspace-service.ts";
-import { notifications } from "@mantine/notifications";
-import { useHasFeature } from "@/ee/hooks/use-feature";
-import { Feature } from "@/ee/features";
-import { useUpgradeLabel } from "@/ee/hooks/use-upgrade-label";
-import { getAppUrl } from "@/lib/config.ts";
-import { IconCheck, IconCopy, IconInfoCircle } from "@tabler/icons-react";
-import { CopyButton } from "@/components/common/copy-button.tsx";
+  Alert
+} from '@mantine/core';
+import { useAtom } from 'jotai';
+import { workspaceAtom } from '@/features/user/atoms/current-user-atom.ts';
+import React, { useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
+import { updateWorkspace } from '@/features/workspace/services/workspace-service.ts';
+import { notifications } from '@mantine/notifications';
+import { useHasFeature } from '@/ee/hooks/use-feature';
+import { Feature } from '@/ee/features';
+import { useUpgradeLabel } from '@/ee/hooks/use-upgrade-label';
+import { getAppUrl } from '@/lib/config.ts';
+import { IconCheck, IconCopy, IconInfoCircle } from '@tabler/icons-react';
+import { CopyButton } from '@/components/common/copy-button.tsx';
 
 export default function McpSettings() {
   const { t } = useTranslation();
@@ -42,7 +42,7 @@ export default function McpSettings() {
     } catch (err) {
       notifications.show({
         message: err?.response?.data?.message,
-        color: "red",
+        color: 'red'
       });
     }
   };
@@ -52,22 +52,28 @@ export default function McpSettings() {
       {!hasAccess && (
         <Alert icon={<IconInfoCircle />} title={upgradeLabel} color="blue">
           {t(
-            "MCP is only available in the Docmost enterprise edition. Contact sales@docmost.com.",
+            'MCP is only available in the Docmost enterprise edition. Contact sales@docmost.com.'
           )}
         </Alert>
       )}
 
       <Group justify="space-between" wrap="nowrap" gap="xl">
         <div>
-          <Text size="md">{t("Model Context Protocol (MCP)")}</Text>
+          <Text size="md">{t('Model Context Protocol (MCP)')}</Text>
           <Text size="sm" c="dimmed">
             {t(
-              "Enable the MCP server to allow AI assistants and tools to interact with your workspace content.",
-            )}{" "}
+              'Enable the MCP server to allow AI assistants and tools to interact with your workspace content.'
+            )}{' '}
             <Trans
               i18nKey="View the <anchor>MCP documentation</anchor>."
               components={{
-                anchor: <Anchor href="https://docmost.com/docs/user-guide/mcp" target="_blank" size="sm" />,
+                anchor: (
+                  <Anchor
+                    href="https://docmost.com/docs/user-guide/mcp"
+                    target="_blank"
+                    size="sm"
+                  />
+                )
               }}
             />
           </Text>
@@ -85,19 +91,19 @@ export default function McpSettings() {
       {checked && (
         <div>
           <Text size="sm" fw={500} mb={4}>
-            {t("MCP Server URL")}
+            {t('MCP Server URL')}
           </Text>
           <Group gap="xs">
             <TextInput value={mcpUrl} readOnly style={{ flex: 1 }} />
             <CopyButton value={mcpUrl} timeout={2000}>
               {({ copied, copy }) => (
                 <Tooltip
-                  label={copied ? t("Copied") : t("Copy")}
+                  label={copied ? t('Copied') : t('Copy')}
                   withArrow
                   position="right"
                 >
                   <ActionIcon
-                    color={copied ? "teal" : "gray"}
+                    color={copied ? 'teal' : 'gray'}
                     variant="subtle"
                     onClick={copy}
                   >
@@ -108,14 +114,14 @@ export default function McpSettings() {
             </CopyButton>
           </Group>
           <Text size="sm" c="dimmed" mt="xs">
-            {t("Connect AI assistants with your Docmost account via OAuth.")}
+            {t('Connect AI assistants with your Docmost account via OAuth.')}
           </Text>
 
           <McpEnforceOauthSetting />
 
           <div>
             <Text size="sm" fw={500} mt="md" mb={4}>
-              {t("Supported tools")}
+              {t('Supported tools')}
             </Text>
             <List size="sm" spacing={2}>
               <List.Item>
@@ -159,20 +165,24 @@ export default function McpSettings() {
 function McpEnforceOauthSetting() {
   const { t } = useTranslation();
   const [workspace, setWorkspace] = useAtom(workspaceAtom);
-  const [checked, setChecked] = useState(workspace?.settings?.ai?.enforceMcpOauth);
+  const [checked, setChecked] = useState(
+    workspace?.settings?.ai?.enforceMcpOauth
+  );
   const hasAccess = useHasFeature(Feature.MCP_CONTROLS);
   const upgradeLabel = useUpgradeLabel();
 
   const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.currentTarget.checked;
     try {
-      const updatedWorkspace = await updateWorkspace({ enforceMcpOauth: value });
+      const updatedWorkspace = await updateWorkspace({
+        enforceMcpOauth: value
+      });
       setChecked(value);
       setWorkspace(updatedWorkspace);
     } catch (err) {
       notifications.show({
         message: err?.response?.data?.message,
-        color: "red",
+        color: 'red'
       });
     }
   };
@@ -182,17 +192,17 @@ function McpEnforceOauthSetting() {
       <div>
         <Group gap="xs" align="center">
           <Text size="sm" fw={500}>
-            {t("Enforce OAuth")}
+            {t('Enforce OAuth')}
           </Text>
           {!hasAccess && (
             <Badge variant="light" size="sm" radius="sm">
-              {t("Enterprise")}
+              {t('Enterprise')}
             </Badge>
           )}
         </Group>
         <Text size="sm" c="dimmed">
           {t(
-            "AI assistants must connect with a Docmost account via OAuth. API keys cannot be used with the MCP server.",
+            'AI assistants must connect with a Docmost account via OAuth. API keys cannot be used with the MCP server.'
           )}
         </Text>
       </div>
@@ -202,7 +212,7 @@ function McpEnforceOauthSetting() {
           defaultChecked={checked}
           onChange={handleChange}
           disabled={!hasAccess}
-          aria-label={t("Toggle enforce OAuth for MCP")}
+          aria-label={t('Toggle enforce OAuth for MCP')}
         />
       </Tooltip>
     </Group>

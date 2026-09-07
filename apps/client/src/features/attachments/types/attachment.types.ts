@@ -25,14 +25,14 @@ export interface IPageAttachment extends IAttachment {
 }
 
 export enum AvatarIconType {
-  AVATAR = "avatar",
-  SPACE_ICON = "space-icon",
-  WORKSPACE_ICON = "workspace-icon",
+  AVATAR = 'avatar',
+  SPACE_ICON = 'space-icon',
+  WORKSPACE_ICON = 'workspace-icon'
 }
 
 export enum AttachmentType {
-  AVATAR = "avatar",
-  WORKSPACE_ICON = "workspace-icon",
-  SPACE_ICON = "space-icon",
-  FILE = "file",
+  AVATAR = 'avatar',
+  WORKSPACE_ICON = 'workspace-icon',
+  SPACE_ICON = 'space-icon',
+  FILE = 'file'
 }

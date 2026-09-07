@@ -1,11 +1,11 @@
-import { useQuery, UseQueryResult } from "@tanstack/react-query";
-import { getCollabToken } from "../services/auth-service";
-import { ICollabToken } from "../types/auth.types";
-import { isAxiosError } from "axios";
+import { useQuery, UseQueryResult } from '@tanstack/react-query';
+import { getCollabToken } from '../services/auth-service';
+import { ICollabToken } from '../types/auth.types';
+import { isAxiosError } from 'axios';
 
 export function useCollabToken(): UseQueryResult<ICollabToken, Error> {
   return useQuery({
-    queryKey: ["collab-token"],
+    queryKey: ['collab-token'],
     queryFn: () => getCollabToken(),
     staleTime: 20 * 60 * 60 * 1000, //20hrs
     //refetchInterval: 12 * 60 * 60 * 1000, // 12hrs
@@ -21,6 +21,6 @@ export function useCollabToken(): UseQueryResult<ICollabToken, Error> {
     retryDelay: (retryAttempt) => {
       // Exponential backoff: 5s, 10s, 20s, etc.
       return 5000 * Math.pow(2, retryAttempt - 1);
-    },
+    }
   });
 }

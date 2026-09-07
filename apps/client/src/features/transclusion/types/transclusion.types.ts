@@ -5,8 +5,8 @@ export type TransclusionLookup =
       content: unknown;
       sourceUpdatedAt: string;
     }
-  | { sourcePageId: string; transclusionId: string; status: "not_found" }
-  | { sourcePageId: string; transclusionId: string; status: "no_access" };
+  | { sourcePageId: string; transclusionId: string; status: 'not_found' }
+  | { sourcePageId: string; transclusionId: string; status: 'no_access' };
 
 export type ReferencingPage = {
   id: string;

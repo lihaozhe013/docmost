@@ -1,7 +1,7 @@
-import { Node, nodeInputRule } from "@tiptap/core";
-import { ReactNodeViewRenderer } from "@tiptap/react";
+import { Node, nodeInputRule } from '@tiptap/core';
+import { ReactNodeViewRenderer } from '@tiptap/react';
 
-declare module "@tiptap/core" {
+declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     mathBlock: {
       setMathBlock: () => ReturnType;
@@ -21,8 +21,8 @@ export interface MathBlockAttributes {
 export const inputRegex = /(?:^|\s)((?:\$\$\$)((?:[^$]+))(?:\$\$\$))$/;
 
 export const MathBlock = Node.create({
-  name: "mathBlock",
-  group: "block",
+  name: 'mathBlock',
+  group: 'block',
   atom: true,
   isolating: true,
 
@@ -36,7 +36,7 @@ export const MathBlock = Node.create({
   addAttributes() {
     return {
       text: {
-        default: "",
+        default: '',
         parseHTML: (element) => {
           return element.innerHTML;
         },
@@ -49,7 +49,7 @@ export const MathBlock = Node.create({
       {
         tag: `div[data-type="${this.name}"]`,
         getAttrs: (node: HTMLElement) => {
-          return node.hasAttribute("data-katex") ? {} : false;
+          return node.hasAttribute('data-katex') ? {} : false;
         },
       },
     ];
@@ -57,8 +57,8 @@ export const MathBlock = Node.create({
 
   renderHTML({ HTMLAttributes }) {
     return [
-      "div",
-      { "data-type": this.name, "data-katex": true },
+      'div',
+      { 'data-type': this.name, 'data-katex': true },
       `${HTMLAttributes.text}`,
     ];
   },
@@ -89,7 +89,7 @@ export const MathBlock = Node.create({
         find: inputRegex,
         type: this.type,
         getAttributes: (match) => ({
-          text: match[1].replaceAll("$", ""),
+          text: match[1].replaceAll('$', ''),
         }),
       }),
     ];

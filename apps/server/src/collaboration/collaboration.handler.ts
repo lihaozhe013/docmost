@@ -3,7 +3,7 @@ import { Hocuspocus, Document } from '@hocuspocus/server';
 import { TiptapTransformer } from '@hocuspocus/transformer';
 import {
   prosemirrorNodeToYElement,
-  tiptapExtensions,
+  tiptapExtensions
 } from './collaboration.util';
 import { setYjsMark, updateYjsMarkAttribute, YjsSelection } from './yjs.util';
 import * as Y from 'yjs';
@@ -35,7 +35,7 @@ export class CollaborationHandler {
           commentId: string;
           resolved: boolean;
           user: User;
-        },
+        }
       ) => {
         const { yjsSelection, commentId, resolved, user } = payload;
         await this.withYdocConnection(
@@ -46,9 +46,9 @@ export class CollaborationHandler {
             const fragment = doc.getXmlFragment('default');
             setYjsMark(doc, fragment, yjsSelection, 'comment', {
               commentId,
-              resolved,
+              resolved
             });
-          },
+          }
         );
       },
       resolveCommentMark: async (
@@ -57,7 +57,7 @@ export class CollaborationHandler {
           commentId: string;
           resolved: boolean;
           user: User;
-        },
+        }
       ) => {
         const { commentId, resolved, user } = payload;
         await this.withYdocConnection(
@@ -70,9 +70,9 @@ export class CollaborationHandler {
               fragment,
               'comment',
               { name: 'commentId', value: commentId },
-              { resolved },
+              { resolved }
             );
-          },
+          }
         );
       },
       updatePageContent: async (
@@ -81,7 +81,7 @@ export class CollaborationHandler {
           prosemirrorJson: any;
           operation: string;
           user: User;
-        },
+        }
       ) => {
         const { prosemirrorJson, operation, user } = payload;
         this.logger.debug('Updating page content via yjs', documentName);
@@ -100,7 +100,7 @@ export class CollaborationHandler {
               const newDoc = TiptapTransformer.toYdoc(
                 prosemirrorJson,
                 'default',
-                tiptapExtensions,
+                tiptapExtensions
               );
               Y.applyUpdate(doc, Y.encodeStateAsUpdate(newDoc));
             } else {
@@ -109,9 +109,9 @@ export class CollaborationHandler {
               const position = operation === 'prepend' ? 0 : fragment.length;
               fragment.insert(position, yElements);
             }
-          },
+          }
         );
-      },
+      }
     };
   }
 
@@ -119,11 +119,11 @@ export class CollaborationHandler {
     hocuspocus: Hocuspocus,
     documentName: string,
     context: any = {},
-    fn: (doc: Document) => void,
+    fn: (doc: Document) => void
   ): Promise<void> {
     const connection = await hocuspocus.openDirectConnection(
       documentName,
-      context,
+      context
     );
     try {
       await connection.transact(fn);

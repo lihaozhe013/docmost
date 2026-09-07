@@ -36,9 +36,7 @@ export const BaseEmbed = Node.create<BaseEmbedOptions>({
   // `disableDropCursor` on this node spec; returning true suppresses
   // the indicator while still letting pragmatic-dnd handle the drag.
   extendNodeSchema(extension) {
-    return extension.name === 'base'
-      ? { disableDropCursor: true }
-      : {};
+    return extension.name === 'base' ? { disableDropCursor: true } : {};
   },
 
   addAttributes() {

@@ -1,9 +1,9 @@
-import { FC } from "react";
-import { Button } from "@mantine/core";
-import { IconSparkles } from "@tabler/icons-react";
-import { useSetAtom } from "jotai";
-import { useTranslation } from "react-i18next";
-import { showAiMenuAtom } from "@/features/editor/atoms/editor-atoms";
+import { FC } from 'react';
+import { Button } from '@mantine/core';
+import { IconSparkles } from '@tabler/icons-react';
+import { useSetAtom } from 'jotai';
+import { useTranslation } from 'react-i18next';
+import { showAiMenuAtom } from '@/features/editor/atoms/editor-atoms';
 
 export const AskAiGroup: FC = () => {
   const { t } = useTranslation();
@@ -17,7 +17,7 @@ export const AskAiGroup: FC = () => {
       leftSection={<IconSparkles size={14} />}
       onClick={() => setShowAiMenu(true)}
     >
-      {t("Ask AI")}
+      {t('Ask AI')}
     </Button>
   );
 };

@@ -1,10 +1,10 @@
-import { Editor, findParentNode, isTextSelection } from "@tiptap/core";
-import { EditorState, Selection, Transaction } from "@tiptap/pm/state";
-import { EditorView } from "@tiptap/pm/view";
-import { CellSelection, TableMap } from "@tiptap/pm/tables";
-import { Node, ResolvedPos } from "@tiptap/pm/model";
-import { sanitizeUrl as braintreeSanitizeUrl } from "@braintree/sanitize-url";
-import { customAlphabet } from "nanoid";
+import { Editor, findParentNode, isTextSelection } from '@tiptap/core';
+import { EditorState, Selection, Transaction } from '@tiptap/pm/state';
+import { EditorView } from '@tiptap/pm/view';
+import { CellSelection, TableMap } from '@tiptap/pm/tables';
+import { Node, ResolvedPos } from '@tiptap/pm/model';
+import { sanitizeUrl as braintreeSanitizeUrl } from '@braintree/sanitize-url';
+import { customAlphabet } from 'nanoid';
 
 export const isRectSelected = (rect: any) => (selection: CellSelection) => {
   const map = TableMap.get(selection.$anchorCell.node(-1));
@@ -28,7 +28,7 @@ export const isRectSelected = (rect: any) => (selection: CellSelection) => {
 
 export const findTable = (selection: Selection) =>
   findParentNode(
-    (node) => node.type.spec.tableRole && node.type.spec.tableRole === "table",
+    (node) => node.type.spec.tableRole && node.type.spec.tableRole === 'table',
   )(selection);
 
 export const isCellSelection = (selection: any) =>
@@ -205,9 +205,9 @@ export const findCellClosestToPos = ($pos: ResolvedPos) => {
 };
 
 const select =
-  (type: "row" | "column") => (index: number) => (tr: Transaction) => {
+  (type: 'row' | 'column') => (index: number) => (tr: Transaction) => {
     const table = findTable(tr.selection);
-    const isRowSelection = type === "row";
+    const isRowSelection = type === 'row';
 
     if (table) {
       const map = TableMap.get(table.node);
@@ -248,9 +248,9 @@ const select =
     return tr;
   };
 
-export const selectColumn = select("column");
+export const selectColumn = select('column');
 
-export const selectRow = select("row");
+export const selectRow = select('row');
 
 export const selectTable = (tr: Transaction) => {
   const table = findTable(tr.selection);
@@ -287,20 +287,20 @@ export const isColumnGripSelected = ({
   const nodeDOM = view.nodeDOM(from) as HTMLElement;
   const node = nodeDOM || domAtPos;
 
-  if (!editor.isActive("table") || !node || isTableSelected(state.selection)) {
+  if (!editor.isActive('table') || !node || isTableSelected(state.selection)) {
     return false;
   }
 
   let container = node;
 
-  while (container && !["TD", "TH"].includes(container.tagName)) {
+  while (container && !['TD', 'TH'].includes(container.tagName)) {
     container = container.parentElement!;
   }
 
   const gripColumn =
     container &&
     container.querySelector &&
-    container.querySelector("a.grip-column.selected");
+    container.querySelector('a.grip-column.selected');
 
   return !!gripColumn;
 };
@@ -320,20 +320,20 @@ export const isRowGripSelected = ({
   const nodeDOM = view.nodeDOM(from) as HTMLElement;
   const node = nodeDOM || domAtPos;
 
-  if (!editor.isActive("table") || !node || isTableSelected(state.selection)) {
+  if (!editor.isActive('table') || !node || isTableSelected(state.selection)) {
     return false;
   }
 
   let container = node;
 
-  while (container && !["TD", "TH"].includes(container.tagName)) {
+  while (container && !['TD', 'TH'].includes(container.tagName)) {
     container = container.parentElement!;
   }
 
   const gripRow =
     container &&
     container.querySelector &&
-    container.querySelector("a.grip-row.selected");
+    container.querySelector('a.grip-row.selected');
 
   return !!gripRow;
 };
@@ -371,7 +371,7 @@ export function setAttributes(
   getPos: (() => number) | boolean,
   attrs: Record<string, any>,
 ) {
-  if (editor.isEditable && typeof getPos === "function") {
+  if (editor.isEditable && typeof getPos === 'function') {
     editor.view.dispatch(
       editor.view.state.tr.setNodeMarkup(getPos(), undefined, attrs),
     );
@@ -383,25 +383,27 @@ export function icon(name: string) {
 }
 
 export function sanitizeUrl(url: string | undefined): string {
-  if (!url) return "";
+  if (!url) return '';
 
   const sanitized = braintreeSanitizeUrl(url);
 
   // Return empty string instead of "about:blank"
-  return sanitized === "about:blank" ? "" : sanitized;
+  return sanitized === 'about:blank' ? '' : sanitized;
 }
 
 export function isInternalFileUrl(url: string | undefined): boolean {
   if (!url) return false;
   const normalized = url.trim();
-  return normalized.startsWith("/api/files/") || normalized.startsWith("/files/");
+  return (
+    normalized.startsWith('/api/files/') || normalized.startsWith('/files/')
+  );
 }
 
-const alphabet = "abcdefghijklmnopqrstuvwxyz";
+const alphabet = 'abcdefghijklmnopqrstuvwxyz';
 export const generateNodeId = customAlphabet(alphabet, 12);
 
 export function copyToClipboard(text: string): void {
-  if ("clipboard" in navigator) {
+  if ('clipboard' in navigator) {
     navigator.clipboard.writeText(text).catch(() => {
       execCommandCopy(text);
     });
@@ -411,13 +413,13 @@ export function copyToClipboard(text: string): void {
 }
 
 export function execCommandCopy(text: string): void {
-  const textarea = document.createElement("textarea");
+  const textarea = document.createElement('textarea');
   textarea.value = text;
-  textarea.style.position = "fixed";
-  textarea.style.left = "-9999px";
-  textarea.style.top = "-9999px";
+  textarea.style.position = 'fixed';
+  textarea.style.left = '-9999px';
+  textarea.style.top = '-9999px';
   document.body.appendChild(textarea);
   textarea.select();
-  document.execCommand("copy");
+  document.execCommand('copy');
   document.body.removeChild(textarea);
 }

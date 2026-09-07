@@ -55,7 +55,9 @@ function listParagraph(turndownService: _TurndownService) {
 function orderedListItem(turndownService: _TurndownService) {
   turndownService.addRule('orderedListItem', {
     filter: function (node: HTMLInputElement) {
-      return node.nodeName === 'LI' && node.getAttribute('data-type') !== 'taskItem';
+      return (
+        node.nodeName === 'LI' && node.getAttribute('data-type') !== 'taskItem'
+      );
     },
     replacement: (content: string, node: HTMLInputElement, options: any) => {
       const parent = node.parentNode as HTMLElement;
@@ -116,9 +118,7 @@ function taskList(turndownService: _TurndownService) {
       const prefix = `- ${isChecked ? '[x]' : '[ ]'} `;
 
       return (
-        prefix +
-        text +
-        (node.nextSibling && !/\n$/.test(text) ? '\n' : '')
+        prefix + text + (node.nextSibling && !/\n$/.test(text) ? '\n' : '')
       );
     },
   });
@@ -237,8 +237,7 @@ function footnotesList(turndownService: _TurndownService) {
       );
       const definitions = items.map((li, index) => {
         const number =
-          (li.getAttribute('id') || '').replace('fn:', '') ||
-          String(index + 1);
+          (li.getAttribute('id') || '').replace('fn:', '') || String(index + 1);
         const markdown = turndownService
           .turndown((li as HTMLElement).innerHTML)
           .trim();
@@ -263,9 +262,7 @@ function video(turndownService: _TurndownService) {
     replacement: function (_content: string, node: HTMLInputElement) {
       const src = node.getAttribute('src') || '';
       const ariaLabel = node.getAttribute('aria-label');
-      const name = sanitizeMdLinkText(
-        ariaLabel || getBasename(src) || src,
-      );
+      const name = sanitizeMdLinkText(ariaLabel || getBasename(src) || src);
       return '[' + name + '](' + src + ')';
     },
   });

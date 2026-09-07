@@ -1,7 +1,7 @@
-import { Stack, Text } from "@mantine/core";
-import { type TablerIcon } from "@tabler/icons-react";
-import { ReactNode } from "react";
-import classes from "./empty-state.module.css";
+import { Stack, Text } from '@mantine/core';
+import { type TablerIcon } from '@tabler/icons-react';
+import { ReactNode } from 'react';
+import classes from './empty-state.module.css';
 
 type EmptyStateProps = {
   icon: TablerIcon;
@@ -10,7 +10,12 @@ type EmptyStateProps = {
   action?: ReactNode;
 };
 
-export function EmptyState({ icon: Icon, title, description, action }: EmptyStateProps) {
+export function EmptyState({
+  icon: Icon,
+  title,
+  description,
+  action
+}: EmptyStateProps) {
   return (
     <div className={classes.root}>
       <Stack align="center" gap="xs">

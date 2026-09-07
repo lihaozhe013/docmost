@@ -3,12 +3,12 @@ import {
   IsIn,
   IsNotEmpty,
   IsOptional,
-  IsString,
+  IsString
 } from 'class-validator';
 
 export enum ExportFormat {
   HTML = 'html',
-  Markdown = 'markdown',
+  Markdown = 'markdown'
 }
 
 export class ExportPageDto {

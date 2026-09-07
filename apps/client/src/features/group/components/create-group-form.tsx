@@ -1,16 +1,16 @@
-import { Group, Box, Button, TextInput, Stack, Textarea } from "@mantine/core";
-import React, { useState } from "react";
-import { useCreateGroupMutation } from "@/features/group/queries/group-query.ts";
-import { useForm } from "@mantine/form";
-import { z } from "zod/v4";
-import { useNavigate } from "react-router-dom";
-import { MultiUserSelect } from "@/features/group/components/multi-user-select.tsx";
-import { useTranslation } from "react-i18next";
+import { Group, Box, Button, TextInput, Stack, Textarea } from '@mantine/core';
+import React, { useState } from 'react';
+import { useCreateGroupMutation } from '@/features/group/queries/group-query.ts';
+import { useForm } from '@mantine/form';
+import { z } from 'zod/v4';
+import { useNavigate } from 'react-router-dom';
+import { MultiUserSelect } from '@/features/group/components/multi-user-select.tsx';
+import { useTranslation } from 'react-i18next';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 
 const formSchema = z.object({
   name: z.string().trim().min(2).max(100),
-  description: z.string().max(500),
+  description: z.string().max(500)
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -24,9 +24,9 @@ export function CreateGroupForm() {
   const form = useForm<FormValues>({
     validate: zod4Resolver(formSchema),
     initialValues: {
-      name: "",
-      description: "",
-    },
+      name: '',
+      description: ''
+    }
   });
 
   const handleMultiSelectChange = (value: string[]) => {
@@ -40,7 +40,7 @@ export function CreateGroupForm() {
     const groupData = {
       name: data.name,
       description: data.description,
-      userIds: userIds,
+      userIds: userIds
     };
 
     const createdGroup = await createGroupMutation.mutateAsync(groupData);
@@ -55,32 +55,32 @@ export function CreateGroupForm() {
             <TextInput
               withAsterisk
               id="name"
-              label={t("Group name")}
-              placeholder={t("e.g Developers")}
+              label={t('Group name')}
+              placeholder={t('e.g Developers')}
               variant="filled"
               data-autofocus
-              {...form.getInputProps("name")}
+              {...form.getInputProps('name')}
             />
 
             <Textarea
               id="description"
-              label={t("Group description")}
-              placeholder={t("e.g Group for developers")}
+              label={t('Group description')}
+              placeholder={t('e.g Group for developers')}
               variant="filled"
               autosize
               minRows={2}
               maxRows={8}
-              {...form.getInputProps("description")}
+              {...form.getInputProps('description')}
             />
 
             <MultiUserSelect
-              label={t("Add group members")}
+              label={t('Add group members')}
               onChange={handleMultiSelectChange}
             />
           </Stack>
 
           <Group justify="flex-end" mt="md">
-            <Button type="submit">{t("Create")}</Button>
+            <Button type="submit">{t('Create')}</Button>
           </Group>
         </form>
       </Box>

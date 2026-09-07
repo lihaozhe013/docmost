@@ -1,26 +1,26 @@
 // adapted from: https://github.com/aguingand/tiptap-markdown/blob/main/src/extensions/tiptap/clipboard.js - MIT
-import { Extension } from "@tiptap/core";
-import { Plugin, PluginKey, TextSelection } from "@tiptap/pm/state";
-import { DOMParser, DOMSerializer, Fragment, Slice } from "@tiptap/pm/model";
-import { find } from "linkifyjs";
-import { markdownToHtml, htmlToMarkdown } from "@docmost/editor-ext";
+import { Extension } from '@tiptap/core';
+import { Plugin, PluginKey, TextSelection } from '@tiptap/pm/state';
+import { DOMParser, DOMSerializer, Fragment, Slice } from '@tiptap/pm/model';
+import { find } from 'linkifyjs';
+import { markdownToHtml, htmlToMarkdown } from '@docmost/editor-ext';
 
 export const MarkdownClipboard = Extension.create({
-  name: "markdownClipboard",
+  name: 'markdownClipboard',
   priority: 101,
 
   addOptions() {
     return {
-      transformPastedText: false,
+      transformPastedText: false
     };
   },
   addProseMirrorPlugins() {
     return [
       new Plugin({
-        key: new PluginKey("markdownClipboard"),
+        key: new PluginKey('markdownClipboard'),
         props: {
           clipboardTextSerializer: (slice) => {
-            const listTypes = ["bulletList", "orderedList", "taskList"];
+            const listTypes = ['bulletList', 'orderedList', 'taskList'];
             let topLevelCount = 0;
             let hasList = false;
             slice.content.forEach((node) => {
@@ -34,7 +34,7 @@ export const MarkdownClipboard = Extension.create({
 
             if (!hasList || topLevelCount < 2) return null;
 
-            const div = document.createElement("div");
+            const div = document.createElement('div');
             const serializer = DOMSerializer.fromSchema(this.editor.schema);
             const fragment = serializer.serializeFragment(slice.content);
             div.appendChild(fragment);
@@ -45,17 +45,17 @@ export const MarkdownClipboard = Extension.create({
               return false;
             }
 
-            if (this.editor.isActive("codeBlock")) {
+            if (this.editor.isActive('codeBlock')) {
               return false;
             }
 
-            const text = event.clipboardData.getData("text/plain");
-            const html = event.clipboardData.getData("text/html");
-            const vscode = event.clipboardData.getData("vscode-editor-data");
+            const text = event.clipboardData.getData('text/plain');
+            const html = event.clipboardData.getData('text/html');
+            const vscode = event.clipboardData.getData('vscode-editor-data');
             const vscodeData = vscode ? JSON.parse(vscode) : undefined;
             const language = vscodeData?.mode;
 
-            const isVscodeMarkdown = language === "markdown";
+            const isVscodeMarkdown = language === 'markdown';
             const isPlainTextOnly = !html && !vscode && !!text;
 
             if (!isVscodeMarkdown && !isPlainTextOnly) {
@@ -63,12 +63,15 @@ export const MarkdownClipboard = Extension.create({
             }
 
             if (isPlainTextOnly) {
-              if ((view as any).input?.shiftKey || !this.options.transformPastedText) {
+              if (
+                (view as any).input?.shiftKey ||
+                !this.options.transformPastedText
+              ) {
                 return false;
               }
 
               const link = find(text, {
-                defaultProtocol: "http",
+                defaultProtocol: 'http'
               }).find((item) => item.isLink && item.value === text);
 
               if (link) {
@@ -79,20 +82,25 @@ export const MarkdownClipboard = Extension.create({
             const { tr } = view.state;
             const { from, to } = view.state.selection;
 
-            const parsed = markdownToHtml(text.replace(/\n+$/, ""));
+            const parsed = markdownToHtml(text.replace(/\n+$/, ''));
             const body = elementFromString(parsed);
             normalizeTableColumnWidths(body);
 
             const contentNodes = DOMParser.fromSchema(
-              this.editor.schema,
+              this.editor.schema
             ).parseSlice(body, {
-              preserveWhitespace: true,
+              preserveWhitespace: true
             });
 
             tr.replaceRange(from, to, contentNodes);
             const insertEnd = tr.mapping.map(from, 1);
-            tr.setSelection(TextSelection.near(tr.doc.resolve(Math.max(from, insertEnd - 2)), -1));
-            tr.setMeta('paste', true)
+            tr.setSelection(
+              TextSelection.near(
+                tr.doc.resolve(Math.max(from, insertEnd - 2)),
+                -1
+              )
+            );
+            tr.setMeta('paste', true);
             view.dispatch(tr);
             return true;
           },
@@ -108,8 +116,8 @@ export const MarkdownClipboard = Extension.create({
             while (content.childCount > 1) {
               const lastChild = content.lastChild;
               if (
-                lastChild?.type.name === "paragraph" &&
-                lastChild.textContent.trim() === ""
+                lastChild?.type.name === 'paragraph' &&
+                lastChild.textContent.trim() === ''
               ) {
                 const children = [];
                 for (let i = 0; i < content.childCount - 1; i++) {
@@ -126,29 +134,29 @@ export const MarkdownClipboard = Extension.create({
             }
 
             return slice;
-          },
-        },
-      }),
+          }
+        }
+      })
     ];
-  },
+  }
 });
 
 function elementFromString(value) {
   // add a wrapper to preserve leading and trailing whitespace
   const wrappedValue = `<body>${value}</body>`;
 
-  return new window.DOMParser().parseFromString(wrappedValue, "text/html").body;
+  return new window.DOMParser().parseFromString(wrappedValue, 'text/html').body;
 }
 
 const DEFAULT_PASTE_COL_WIDTH_PX = 150;
 
 function parsePixelWidth(el: Element): number | null {
-  const attr = el.getAttribute("width");
+  const attr = el.getAttribute('width');
   if (attr) {
     const n = parseInt(attr, 10);
     if (Number.isFinite(n) && n > 0) return n;
   }
-  const style = el.getAttribute("style") || "";
+  const style = el.getAttribute('style') || '';
   const m = style.match(/(?:^|;)\s*width\s*:\s*([\d.]+)\s*px/i);
   if (m) {
     const n = parseInt(m[1], 10);
@@ -158,15 +166,15 @@ function parsePixelWidth(el: Element): number | null {
 }
 
 function getFirstRow(table: Element): Element | null {
-  const tbodyRow = table.querySelector(":scope > tbody > tr");
+  const tbodyRow = table.querySelector(':scope > tbody > tr');
   if (tbodyRow) return tbodyRow;
-  const theadRow = table.querySelector(":scope > thead > tr");
+  const theadRow = table.querySelector(':scope > thead > tr');
   if (theadRow) return theadRow;
-  return table.querySelector(":scope > tr");
+  return table.querySelector(':scope > tr');
 }
 
 function deriveColumnWidths(table: Element): (number | null)[] | null {
-  const cols = table.querySelectorAll(":scope > colgroup > col");
+  const cols = table.querySelectorAll(':scope > colgroup > col');
   if (cols.length > 0) {
     const widths: (number | null)[] = [];
     cols.forEach((col) => widths.push(parsePixelWidth(col)));
@@ -178,9 +186,9 @@ function deriveColumnWidths(table: Element): (number | null)[] | null {
 
   const widths: (number | null)[] = [];
   Array.from(firstRow.children)
-    .filter((c) => c.tagName === "TD" || c.tagName === "TH")
+    .filter((c) => c.tagName === 'TD' || c.tagName === 'TH')
     .forEach((cell) => {
-      const colspan = parseInt(cell.getAttribute("colspan") || "1", 10) || 1;
+      const colspan = parseInt(cell.getAttribute('colspan') || '1', 10) || 1;
       const w = parsePixelWidth(cell);
       for (let i = 0; i < colspan; i++) {
         widths.push(w !== null ? Math.round(w / colspan) : null);
@@ -195,7 +203,7 @@ function deriveColumnWidths(table: Element): (number | null)[] | null {
 // at table-layout:fixed/100% and squashes columns to fit the editor instead of
 // letting .tableWrapper's overflow-x: auto scroll.
 export function normalizeTableColumnWidths(root: Element): void {
-  root.querySelectorAll("table").forEach((table) => {
+  root.querySelectorAll('table').forEach((table) => {
     const firstRow = getFirstRow(table);
     if (!firstRow) return;
 
@@ -203,9 +211,9 @@ export function normalizeTableColumnWidths(root: Element): void {
     if (!colWidths) {
       let count = 0;
       Array.from(firstRow.children)
-        .filter((c) => c.tagName === "TD" || c.tagName === "TH")
+        .filter((c) => c.tagName === 'TD' || c.tagName === 'TH')
         .forEach((cell) => {
-          count += parseInt(cell.getAttribute("colspan") || "1", 10) || 1;
+          count += parseInt(cell.getAttribute('colspan') || '1', 10) || 1;
         });
       if (count === 0) return;
       colWidths = new Array(count).fill(DEFAULT_PASTE_COL_WIDTH_PX);
@@ -213,18 +221,18 @@ export function normalizeTableColumnWidths(root: Element): void {
 
     let col = 0;
     Array.from(firstRow.children)
-      .filter((c) => c.tagName === "TD" || c.tagName === "TH")
+      .filter((c) => c.tagName === 'TD' || c.tagName === 'TH')
       .forEach((cell) => {
-        if (cell.getAttribute("colwidth")) {
-          col += parseInt(cell.getAttribute("colspan") || "1", 10) || 1;
+        if (cell.getAttribute('colwidth')) {
+          col += parseInt(cell.getAttribute('colspan') || '1', 10) || 1;
           return;
         }
-        const colspan = parseInt(cell.getAttribute("colspan") || "1", 10) || 1;
+        const colspan = parseInt(cell.getAttribute('colspan') || '1', 10) || 1;
         const slice = colWidths!.slice(col, col + colspan);
         col += colspan;
         if (slice.length === 0 || slice.every((w) => w === null)) return;
         const values = slice.map((w) => (w == null ? 100 : w));
-        cell.setAttribute("colwidth", values.join(","));
+        cell.setAttribute('colwidth', values.join(','));
       });
   });
 }

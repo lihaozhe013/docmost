@@ -2,7 +2,7 @@ import {
   CallHandler,
   ExecutionContext,
   Injectable,
-  NestInterceptor,
+  NestInterceptor
 } from '@nestjs/common';
 import { map, Observable } from 'rxjs';
 import { Reflector } from '@nestjs/core';
@@ -12,18 +12,19 @@ export interface Response<T> {
 }
 
 @Injectable()
-export class TransformHttpResponseInterceptor<T>
-  implements NestInterceptor<T, Response<T>>
-{
+export class TransformHttpResponseInterceptor<T> implements NestInterceptor<
+  T,
+  Response<T>
+> {
   constructor(private reflector: Reflector) {}
 
   intercept(
     context: ExecutionContext,
-    next: CallHandler<T>,
+    next: CallHandler<T>
   ): Observable<Response<T> | any> {
     const skipTransform = this.reflector.get(
       SKIP_TRANSFORM_KEY,
-      context.getHandler(),
+      context.getHandler()
     );
 
     if (skipTransform) {
@@ -34,7 +35,7 @@ export class TransformHttpResponseInterceptor<T>
       map((data) => {
         const status = context.switchToHttp().getResponse().statusCode;
         return { data, success: true, status };
-      }),
+      })
     );
   }
 }

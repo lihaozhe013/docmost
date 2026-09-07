@@ -1,5 +1,5 @@
-import { ReplaceStep } from "@tiptap/pm/transform";
-import { Node } from "@tiptap/pm/model";
+import { ReplaceStep } from '@tiptap/pm/transform';
+import { Node } from '@tiptap/pm/model';
 
 export function getReplaceStep(fromDoc: Node, toDoc: Node) {
   let start = toDoc.content.findDiffStart(fromDoc.content);

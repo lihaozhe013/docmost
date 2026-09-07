@@ -1,13 +1,13 @@
-import { Group, Text, Switch, MantineSize, Tooltip } from "@mantine/core";
-import { useAtom } from "jotai";
-import { workspaceAtom } from "@/features/user/atoms/current-user-atom.ts";
-import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
-import { updateWorkspace } from "@/features/workspace/services/workspace-service.ts";
-import { notifications } from "@mantine/notifications";
-import { useHasFeature } from "@/ee/hooks/use-feature";
-import { Feature } from "@/ee/features";
-import { useUpgradeLabel } from "@/ee/hooks/use-upgrade-label";
+import { Group, Text, Switch, MantineSize, Tooltip } from '@mantine/core';
+import { useAtom } from 'jotai';
+import { workspaceAtom } from '@/features/user/atoms/current-user-atom.ts';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { updateWorkspace } from '@/features/workspace/services/workspace-service.ts';
+import { notifications } from '@mantine/notifications';
+import { useHasFeature } from '@/ee/hooks/use-feature';
+import { Feature } from '@/ee/features';
+import { useUpgradeLabel } from '@/ee/hooks/use-upgrade-label';
 
 export default function EnableAiSearch() {
   const { t } = useTranslation();
@@ -16,10 +16,10 @@ export default function EnableAiSearch() {
     <>
       <Group justify="space-between" wrap="nowrap" gap="xl">
         <div>
-          <Text size="md">{t("AI-powered search (AI Answers)")}</Text>
+          <Text size="md">{t('AI-powered search (AI Answers)')}</Text>
           <Text size="sm" c="dimmed">
             {t(
-              "AI search uses vector embeddings to provide semantic search capabilities across your workspace content.",
+              'AI search uses vector embeddings to provide semantic search capabilities across your workspace content.'
             )}
           </Text>
         </div>
@@ -50,7 +50,7 @@ export function AiSearchToggle({ size, label }: AiSearchToggleProps) {
     } catch (err) {
       notifications.show({
         message: err?.response?.data?.message,
-        color: "red",
+        color: 'red'
       });
     }
   };
@@ -64,7 +64,7 @@ export function AiSearchToggle({ size, label }: AiSearchToggleProps) {
         defaultChecked={checked}
         onChange={handleChange}
         disabled={!hasAccess}
-        aria-label={t("Toggle AI search")}
+        aria-label={t('Toggle AI search')}
       />
     </Tooltip>
   );

@@ -1,18 +1,18 @@
-import { useEffect, useRef, useCallback, useState } from "react";
-import { ErrorBoundary } from "react-error-boundary";
-import { IconArrowDown, IconAlertTriangle } from "@tabler/icons-react";
-import { useTranslation } from "react-i18next";
-import { VisuallyHidden } from "@mantine/core";
-import type { AiChatMessage, AiChatToolCall } from "../types/ai-chat.types";
-import ChatMessage from "./chat-message";
-import classes from "../styles/ai-chat.module.css";
+import { useEffect, useRef, useCallback, useState } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import { IconArrowDown, IconAlertTriangle } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
+import { VisuallyHidden } from '@mantine/core';
+import type { AiChatMessage, AiChatToolCall } from '../types/ai-chat.types';
+import ChatMessage from './chat-message';
+import classes from '../styles/ai-chat.module.css';
 
 function ChatMessageErrorFallback() {
   const { t } = useTranslation();
   return (
     <div className={classes.messageErrorFallback}>
       <IconAlertTriangle size={14} />
-      <span>{t("Failed to render this message.")}</span>
+      <span>{t('Failed to render this message.')}</span>
     </div>
   );
 }
@@ -32,7 +32,7 @@ export default function ChatMessageList({
   messages,
   isStreaming,
   streamingContent,
-  streamingToolCalls,
+  streamingToolCalls
 }: Props) {
   const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -46,7 +46,7 @@ export default function ChatMessageList({
   // putting aria-live on the whole transcript (which re-fires for every
   // streamed token), announce "AI is thinking…" when streaming starts and
   // the full assistant reply once streaming completes — a single, clean read.
-  const [statusAnnouncement, setStatusAnnouncement] = useState("");
+  const [statusAnnouncement, setStatusAnnouncement] = useState('');
   const wasStreamingRef = useRef(false);
 
   useEffect(() => {
@@ -54,27 +54,27 @@ export default function ChatMessageList({
     const justFinishedStreaming = !isStreaming && wasStreamingRef.current;
 
     if (justStartedStreaming) {
-      setStatusAnnouncement(t("AI is thinking..."));
+      setStatusAnnouncement(t('AI is thinking...'));
     } else if (justFinishedStreaming) {
       const lastMessage = messages[messages.length - 1];
-      if (lastMessage?.role === "assistant" && lastMessage.content) {
+      if (lastMessage?.role === 'assistant' && lastMessage.content) {
         // Strip markdown punctuation so screen readers don't read symbols
         // like # * _ ` ~ aloud. A plain-text version is fine — the styled
         // version stays in the DOM for visual users.
         const plainText = lastMessage.content
-          .replace(/[#*_`~]/g, "")
-          .replace(/\s+/g, " ")
+          .replace(/[#*_`~]/g, '')
+          .replace(/\s+/g, ' ')
           .trim();
         setStatusAnnouncement(plainText);
       } else {
-        setStatusAnnouncement("");
+        setStatusAnnouncement('');
       }
     }
 
     wasStreamingRef.current = isStreaming;
   }, [isStreaming, messages, t]);
 
-  const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = 'smooth') => {
     const container = containerRef.current;
     if (!container) return;
 
@@ -85,7 +85,7 @@ export default function ChatMessageList({
     isAtBottomRef.current = true;
     setShowScrollButton(false);
 
-    if (behavior === "smooth") {
+    if (behavior === 'smooth') {
       setTimeout(() => {
         isAutoScrollingRef.current = false;
         if (containerRef.current) {
@@ -125,14 +125,14 @@ export default function ChatMessageList({
     const container = containerRef.current;
     if (!container) return;
 
-    container.addEventListener("scroll", handleScroll, { passive: true });
-    return () => container.removeEventListener("scroll", handleScroll);
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    return () => container.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
 
   // Instant scroll during streaming to keep up with rapid updates
   useEffect(() => {
     if (isAtBottomRef.current) {
-      scrollToBottom("instant");
+      scrollToBottom('instant');
     }
   }, [streamingContent, streamingToolCalls.length, scrollToBottom]);
 
@@ -141,9 +141,9 @@ export default function ChatMessageList({
   // scrollback.
   useEffect(() => {
     const lastMessage = messages[messages.length - 1];
-    const lastIsUser = lastMessage?.role === "user";
+    const lastIsUser = lastMessage?.role === 'user';
     if (lastIsUser || isAtBottomRef.current) {
-      scrollToBottom("smooth");
+      scrollToBottom('smooth');
       return;
     }
 
@@ -171,13 +171,10 @@ export default function ChatMessageList({
       <div
         ref={containerRef}
         className={classes.messageList}
-        aria-label={t("Chat transcript")}
+        aria-label={t('Chat transcript')}
       >
         {messages.map((msg) => (
-          <ErrorBoundary
-            key={msg.id}
-            fallback={<ChatMessageErrorFallback />}
-          >
+          <ErrorBoundary key={msg.id} fallback={<ChatMessageErrorFallback />}>
             <ChatMessage message={msg} />
           </ErrorBoundary>
         ))}
@@ -188,13 +185,13 @@ export default function ChatMessageList({
           >
             <ChatMessage
               message={{
-                id: "streaming",
-                chatId: "",
-                role: "assistant",
+                id: 'streaming',
+                chatId: '',
+                role: 'assistant',
                 content: null,
                 toolCalls: null,
                 metadata: null,
-                createdAt: new Date().toISOString(),
+                createdAt: new Date().toISOString()
               }}
               isStreaming
               streamingContent={streamingContent}
@@ -207,9 +204,9 @@ export default function ChatMessageList({
       {showScrollButton && (
         <button
           type="button"
-          aria-label={t("Scroll to bottom")}
+          aria-label={t('Scroll to bottom')}
           className={classes.scrollToBottomButton}
-          onClick={() => scrollToBottom("smooth")}
+          onClick={() => scrollToBottom('smooth')}
         >
           <IconArrowDown size={16} stroke={2} />
         </button>

@@ -3,7 +3,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  IsUUID,
+  IsUUID
 } from 'class-validator';
 
 export class CreateShareDto {

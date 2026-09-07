@@ -1,20 +1,20 @@
 import {
   rewriteAttachmentsForUnsync,
-  type AttachmentRewritePlan,
+  type AttachmentRewritePlan
 } from '../utils/transclusion-unsync.util';
 
 describe('rewriteAttachmentsForUnsync', () => {
-  const fixedIds = (() => {
+  const fixedIds = () => {
     let i = 0;
     return () => `new-${++i}`;
-  });
+  };
 
   it('returns content unchanged when no attachment nodes are present', () => {
     const content = {
       type: 'doc',
       content: [
-        { type: 'paragraph', content: [{ type: 'text', text: 'hello' }] },
-      ],
+        { type: 'paragraph', content: [{ type: 'text', text: 'hello' }] }
+      ]
     };
     const r = rewriteAttachmentsForUnsync(content, fixedIds());
     expect(r.content).toEqual(content);
@@ -30,10 +30,10 @@ describe('rewriteAttachmentsForUnsync', () => {
           type: 'image',
           attrs: {
             attachmentId: oldId,
-            src: `/api/files/${oldId}/cat.png`,
-          },
-        },
-      ],
+            src: `/api/files/${oldId}/cat.png`
+          }
+        }
+      ]
     };
     const gen = fixedIds();
     const r = rewriteAttachmentsForUnsync(content, gen);
@@ -56,7 +56,7 @@ describe('rewriteAttachmentsForUnsync', () => {
       'attachment',
       'drawio',
       'excalidraw',
-      'pdf',
+      'pdf'
     ] as const;
     const content = {
       type: 'doc',
@@ -64,15 +64,15 @@ describe('rewriteAttachmentsForUnsync', () => {
         type: t,
         attrs: {
           attachmentId: `old-${i}`,
-          src: `/api/files/old-${i}/file`,
-        },
-      })),
+          src: `/api/files/old-${i}/file`
+        }
+      }))
     };
     const r = rewriteAttachmentsForUnsync(content, fixedIds());
     expect(r.copies).toHaveLength(types.length);
-    expect((r.content as any).content.map((n: any) => n.attrs.attachmentId)).toEqual(
-      Array.from({ length: types.length }, (_, i) => `new-${i + 1}`),
-    );
+    expect(
+      (r.content as any).content.map((n: any) => n.attrs.attachmentId)
+    ).toEqual(Array.from({ length: types.length }, (_, i) => `new-${i + 1}`));
   });
 
   it('reuses one new id per old attachmentId across nodes (dedupe)', () => {
@@ -84,17 +84,17 @@ describe('rewriteAttachmentsForUnsync', () => {
           type: 'image',
           attrs: {
             attachmentId: shared,
-            src: `/api/files/${shared}/a.png`,
-          },
+            src: `/api/files/${shared}/a.png`
+          }
         },
         {
           type: 'image',
           attrs: {
             attachmentId: shared,
-            src: `/api/files/${shared}/a.png`,
-          },
-        },
-      ],
+            src: `/api/files/${shared}/a.png`
+          }
+        }
+      ]
     };
     const r = rewriteAttachmentsForUnsync(content, fixedIds());
     expect(r.copies).toHaveLength(1);
@@ -110,9 +110,9 @@ describe('rewriteAttachmentsForUnsync', () => {
       content: [
         {
           type: 'image',
-          attrs: { attachmentId: 'old-x', src: '/api/files/old-x/x.png' },
-        },
-      ],
+          attrs: { attachmentId: 'old-x', src: '/api/files/old-x/x.png' }
+        }
+      ]
     };
     const snapshot = JSON.parse(JSON.stringify(content));
     rewriteAttachmentsForUnsync(content, fixedIds());
@@ -124,8 +124,8 @@ describe('rewriteAttachmentsForUnsync', () => {
       type: 'doc',
       content: [
         { type: 'image', attrs: {} },
-        { type: 'image', attrs: { attachmentId: '' } },
-      ],
+        { type: 'image', attrs: { attachmentId: '' } }
+      ]
     };
     const r = rewriteAttachmentsForUnsync(content, fixedIds());
     expect(r.copies).toEqual([]);
@@ -144,12 +144,12 @@ describe('rewriteAttachmentsForUnsync', () => {
               type: 'image',
               attrs: {
                 attachmentId: oldId,
-                src: `/api/files/${oldId}/x.png`,
-              },
-            },
-          ],
-        },
-      ],
+                src: `/api/files/${oldId}/x.png`
+              }
+            }
+          ]
+        }
+      ]
     };
     const r = rewriteAttachmentsForUnsync(content, fixedIds());
     expect(r.copies).toHaveLength(1);

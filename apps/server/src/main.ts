@@ -2,7 +2,7 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import {
   FastifyAdapter,
-  NestFastifyApplication,
+  NestFastifyApplication
 } from '@nestjs/platform-fastify';
 import { Logger, NotFoundException, ValidationPipe } from '@nestjs/common';
 import { Logger as PinoLogger } from 'nestjs-pino';
@@ -15,7 +15,7 @@ import { InternalLogFilter } from './common/logger/internal-log-filter';
 import { EnvironmentService } from './integrations/environment/environment.service';
 import {
   resolveFrameHeader,
-  resolveFrameHeadersForPath,
+  resolveFrameHeadersForPath
 } from './common/helpers';
 
 async function bootstrap() {
@@ -26,8 +26,8 @@ async function bootstrap() {
       routerOptions: {
         maxParamLength: 1000,
         ignoreTrailingSlash: true,
-        ignoreDuplicateSlashes: true,
-      },
+        ignoreDuplicateSlashes: true
+      }
     }),
     {
       rawBody: true,
@@ -35,8 +35,8 @@ async function bootstrap() {
       logger: new InternalLogFilter(),
       // bufferLogs must be false else pino will fail
       // to log OnApplicationBootstrap logs
-      bufferLogs: false,
-    },
+      bufferLogs: false
+    }
   );
 
   app.useLogger(app.get(PinoLogger));
@@ -48,8 +48,8 @@ async function bootstrap() {
       'mcp',
       '.well-known/oauth-authorization-server',
       '.well-known/oauth-protected-resource',
-      '.well-known/oauth-protected-resource/mcp',
-    ],
+      '.well-known/oauth-protected-resource/mcp'
+    ]
   });
 
   const reflector = app.get(Reflector);
@@ -65,7 +65,7 @@ async function bootstrap() {
   const environmentService = app.get(EnvironmentService);
   const frameHeader = resolveFrameHeader(
     environmentService.isIframeEmbedAllowed(),
-    environmentService.getIframeAllowedOrigins(),
+    environmentService.getIframeAllowedOrigins()
   );
   // Skipped routes:
   //   /api/files/ - attachment controller sets its own CSP we'd overwrite
@@ -107,7 +107,7 @@ async function bootstrap() {
         } catch (err: any) {
           done(err);
         }
-      },
+      }
     );
 
   app
@@ -128,7 +128,7 @@ async function bootstrap() {
         '/api/sso/google',
         '/api/workspace/create',
         '/api/workspace/joined',
-        '/api/workspace/find-by-email',
+        '/api/workspace/find-by-email'
       ];
 
       if (
@@ -148,8 +148,8 @@ async function bootstrap() {
     new ValidationPipe({
       whitelist: true,
       stopAtFirstError: true,
-      transform: true,
-    }),
+      transform: true
+    })
   );
 
   app.enableCors();
@@ -170,7 +170,7 @@ async function bootstrap() {
   const host = process.env.HOST || '0.0.0.0';
   await app.listen(port, host, () => {
     logger.log(
-      `Listening on http://127.0.0.1:${port} / ${process.env.APP_URL}`,
+      `Listening on http://127.0.0.1:${port} / ${process.env.APP_URL}`
     );
   });
 }

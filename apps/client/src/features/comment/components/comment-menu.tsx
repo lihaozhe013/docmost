@@ -1,13 +1,13 @@
-import { ActionIcon, Menu } from "@mantine/core";
+import { ActionIcon, Menu } from '@mantine/core';
 import {
   IconDots,
   IconEdit,
   IconTrash,
   IconCircleCheck,
-  IconCircleCheckFilled,
-} from "@tabler/icons-react";
-import { modals } from "@mantine/modals";
-import { useTranslation } from "react-i18next";
+  IconCircleCheckFilled
+} from '@tabler/icons-react';
+import { modals } from '@mantine/modals';
+import { useTranslation } from 'react-i18next';
 
 type CommentMenuProps = {
   onEditComment: () => void;
@@ -24,18 +24,18 @@ function CommentMenu({
   onResolveComment,
   canEdit = true,
   isResolved = false,
-  isParentComment = false,
+  isParentComment = false
 }: CommentMenuProps) {
   const { t } = useTranslation();
 
   //@ts-ignore
   const openDeleteModal = () =>
     modals.openConfirmModal({
-      title: t("Are you sure you want to delete this comment?"),
+      title: t('Are you sure you want to delete this comment?'),
       centered: true,
-      labels: { confirm: t("Delete"), cancel: t("Cancel") },
-      confirmProps: { color: "red" },
-      onConfirm: onDeleteComment,
+      labels: { confirm: t('Delete'), cancel: t('Cancel') },
+      confirmProps: { color: 'red' },
+      onConfirm: onDeleteComment
     });
 
   return (
@@ -43,8 +43,8 @@ function CommentMenu({
       <Menu.Target>
         <ActionIcon
           variant="default"
-          style={{ border: "none" }}
-          aria-label={t("Comment menu")}
+          style={{ border: 'none' }}
+          aria-label={t('Comment menu')}
         >
           <IconDots size={20} stroke={2} />
         </ActionIcon>
@@ -56,7 +56,7 @@ function CommentMenu({
             onClick={onEditComment}
             leftSection={<IconEdit size={14} />}
           >
-            {t("Edit comment")}
+            {t('Edit comment')}
           </Menu.Item>
         )}
         {isParentComment && (
@@ -70,14 +70,14 @@ function CommentMenu({
               )
             }
           >
-            {isResolved ? t("Re-open comment") : t("Resolve comment")}
+            {isResolved ? t('Re-open comment') : t('Resolve comment')}
           </Menu.Item>
         )}
         <Menu.Item
           leftSection={<IconTrash size={14} />}
           onClick={openDeleteModal}
         >
-          {t("Delete comment")}
+          {t('Delete comment')}
         </Menu.Item>
       </Menu.Dropdown>
     </Menu>

@@ -1,8 +1,8 @@
 import {
   HocuspocusProviderWebsocket,
-  WebSocketStatus,
-} from "@hocuspocus/provider";
-import { getCollaborationUrl } from "@/lib/config.ts";
+  WebSocketStatus
+} from '@hocuspocus/provider';
+import { getCollaborationUrl } from '@/lib/config.ts';
 
 const RELEASE_GRACE_MS = 5000;
 
@@ -14,7 +14,7 @@ export function getCollabSocket(): HocuspocusProviderWebsocket {
   if (!socket) {
     socket = new HocuspocusProviderWebsocket({
       url: getCollaborationUrl(),
-      autoConnect: false,
+      autoConnect: false
     });
   }
   return socket;

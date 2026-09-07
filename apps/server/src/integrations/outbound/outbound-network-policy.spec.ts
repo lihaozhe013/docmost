@@ -1,6 +1,6 @@
 import {
   parseOutboundNetworkPolicy,
-  policyNamesAddress,
+  policyNamesAddress
 } from './outbound-network-policy';
 
 describe('parseOutboundNetworkPolicy', () => {
@@ -8,12 +8,12 @@ describe('parseOutboundNetworkPolicy', () => {
     expect(parseOutboundNetworkPolicy('all')).toMatchObject({
       mode: 'all',
       entries: [],
-      invalid: false,
+      invalid: false
     });
     expect(parseOutboundNetworkPolicy('none')).toMatchObject({
       mode: 'none',
       entries: [],
-      invalid: false,
+      invalid: false
     });
   });
 
@@ -22,7 +22,7 @@ describe('parseOutboundNetworkPolicy', () => {
       expect(parseOutboundNetworkPolicy(raw)).toMatchObject({
         mode: 'none',
         entries: [],
-        invalid: false,
+        invalid: false
       });
     }
   });
@@ -30,7 +30,7 @@ describe('parseOutboundNetworkPolicy', () => {
   it('ignores case and surrounding whitespace on the mode', () => {
     expect(parseOutboundNetworkPolicy('  ALL ')).toMatchObject({
       mode: 'all',
-      invalid: false,
+      invalid: false
     });
   });
 
@@ -91,12 +91,12 @@ describe('parseOutboundNetworkPolicy', () => {
     '172.16.0.1/12',
     'fc00::1/7',
     '[::1/127]',
-    '2001:db8::1/32:8088',
+    '2001:db8::1/32:8088'
   ])('fails closed on %s', (raw) => {
     expect(parseOutboundNetworkPolicy(raw)).toMatchObject({
       mode: 'none',
       entries: [],
-      invalid: true,
+      invalid: true
     });
   });
 
@@ -107,11 +107,11 @@ describe('parseOutboundNetworkPolicy', () => {
     '192.168.1.20/32',
     'fc00::/7',
     'fe80::/10',
-    '::1/128',
+    '::1/128'
   ])('accepts %s, whose address sits on its prefix boundary', (raw) => {
     expect(parseOutboundNetworkPolicy(raw)).toMatchObject({
       entries: [expect.anything()],
-      invalid: false,
+      invalid: false
     });
   });
 
@@ -122,7 +122,7 @@ describe('parseOutboundNetworkPolicy', () => {
     expect(bracketed).toMatchObject({ mode: 'none', invalid: false });
     for (const port of [80, 443, 8088]) {
       expect(policyNamesAddress(bracketed, '::1', port)).toBe(
-        policyNamesAddress(bare, '::1', port),
+        policyNamesAddress(bare, '::1', port)
       );
       expect(policyNamesAddress(bracketed, '::1', port)).toBe(true);
     }
@@ -132,7 +132,9 @@ describe('parseOutboundNetworkPolicy', () => {
     const policy = parseOutboundNetworkPolicy('all,10.0.0.0/8');
 
     expect(policyNamesAddress(policy, 'siem.internal', 443)).toBe(false);
-    expect(policyNamesAddress(parseOutboundNetworkPolicy('garbage'), '10.1.2.3', 443)).toBe(false);
+    expect(
+      policyNamesAddress(parseOutboundNetworkPolicy('garbage'), '10.1.2.3', 443)
+    ).toBe(false);
   });
 
   it('matches an IPv4-mapped IPv6 address against an IPv4 entry', () => {

@@ -5,10 +5,10 @@ export async function up(db: Kysely<any>): Promise<void> {
     .createTable('siem_destinations')
     .ifNotExists()
     .addColumn('id', 'uuid', (col) =>
-      col.primaryKey().defaultTo(sql`gen_uuid_v7()`),
+      col.primaryKey().defaultTo(sql`gen_uuid_v7()`)
     )
     .addColumn('workspace_id', 'uuid', (col) =>
-      col.notNull().references('workspaces.id').onDelete('cascade'),
+      col.notNull().references('workspaces.id').onDelete('cascade')
     )
     .addColumn('name', 'varchar', (col) => col.notNull())
     .addColumn('type', 'varchar', (col) => col.notNull())
@@ -16,17 +16,17 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('config', 'jsonb', (col) => col.notNull())
     .addColumn('secrets', 'text', (col) => col.notNull())
     .addColumn('cursor_created_at', 'timestamptz', (col) =>
-      col.notNull().defaultTo(sql`now()`),
+      col.notNull().defaultTo(sql`now()`)
     )
     .addColumn('cursor_id', 'uuid', (col) =>
-      col.notNull().defaultTo(sql`gen_uuid_v7()`),
+      col.notNull().defaultTo(sql`gen_uuid_v7()`)
     )
     .addColumn('cursor_snapshot', 'text')
     // Fences cursor writes from stale jobs after configuration changes.
     .addColumn('version', 'integer', (col) => col.notNull().defaultTo(0))
     .addColumn('status', 'varchar', (col) => col.notNull().defaultTo('healthy'))
     .addColumn('consecutive_failures', 'integer', (col) =>
-      col.notNull().defaultTo(0),
+      col.notNull().defaultTo(0)
     )
     .addColumn('next_attempt_at', 'timestamptz')
     .addColumn('last_delivered_at', 'timestamptz')
@@ -34,13 +34,13 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('last_error_at', 'timestamptz')
     .addColumn('failing_since', 'timestamptz')
     .addColumn('creator_id', 'uuid', (col) =>
-      col.references('users.id').onDelete('set null'),
+      col.references('users.id').onDelete('set null')
     )
     .addColumn('created_at', 'timestamptz', (col) =>
-      col.notNull().defaultTo(sql`now()`),
+      col.notNull().defaultTo(sql`now()`)
     )
     .addColumn('updated_at', 'timestamptz', (col) =>
-      col.notNull().defaultTo(sql`now()`),
+      col.notNull().defaultTo(sql`now()`)
     )
     .execute();
 

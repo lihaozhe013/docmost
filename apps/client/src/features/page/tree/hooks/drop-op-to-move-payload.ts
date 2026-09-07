@@ -7,7 +7,7 @@ import { treeModel } from '@/features/page/tree/model/tree-model';
 export function dropOpToMovePayload(
   tree: SpaceTreeNode[],
   sourceId: string,
-  op: DropOp,
+  op: DropOp
 ): IMovePage {
   // Compute the post-move tree so we read source's REAL neighbors at its new
   // position. Reading from the before-tree would mean treating source itself
@@ -18,7 +18,7 @@ export function dropOpToMovePayload(
     return {
       pageId: sourceId,
       parentPageId: null,
-      position: generateJitteredKeyBetween(null, null),
+      position: generateJitteredKeyBetween(null, null)
     };
   }
 
@@ -30,7 +30,7 @@ export function dropOpToMovePayload(
     parentPageId: info.parentId,
     position: generateJitteredKeyBetween(
       prev?.position ?? null,
-      next?.position ?? null,
-    ),
+      next?.position ?? null
+    )
   };
 }

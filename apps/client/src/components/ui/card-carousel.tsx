@@ -1,7 +1,13 @@
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
-import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
-import { useTranslation } from "react-i18next";
-import classes from "./card-carousel.module.css";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode
+} from 'react';
+import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
+import classes from './card-carousel.module.css';
 
 type Props = {
   children: ReactNode;
@@ -39,7 +45,10 @@ export default function CardCarousel({ children, ariaLabel }: Props) {
   const scrollBy = (direction: 1 | -1) => {
     const el = trackRef.current;
     if (!el) return;
-    el.scrollBy({ left: direction * el.clientWidth * 0.85, behavior: "smooth" });
+    el.scrollBy({
+      left: direction * el.clientWidth * 0.85,
+      behavior: 'smooth'
+    });
   };
 
   return (
@@ -48,16 +57,16 @@ export default function CardCarousel({ children, ariaLabel }: Props) {
         ref={trackRef}
         className={classes.track}
         onScroll={updateScrollState}
-        {...(ariaLabel ? { role: "region", "aria-label": ariaLabel } : {})}
+        {...(ariaLabel ? { role: 'region', 'aria-label': ariaLabel } : {})}
       >
         {children}
       </div>
 
       <button
         type="button"
-        className={`${classes.arrow} ${classes.arrowLeft} ${canScrollLeft ? classes.visible : ""}`}
+        className={`${classes.arrow} ${classes.arrowLeft} ${canScrollLeft ? classes.visible : ''}`}
         onClick={() => scrollBy(-1)}
-        aria-label={t("Scroll left")}
+        aria-label={t('Scroll left')}
         tabIndex={canScrollLeft ? 0 : -1}
       >
         <IconChevronLeft size={18} />
@@ -65,9 +74,9 @@ export default function CardCarousel({ children, ariaLabel }: Props) {
 
       <button
         type="button"
-        className={`${classes.arrow} ${classes.arrowRight} ${canScrollRight ? classes.visible : ""}`}
+        className={`${classes.arrow} ${classes.arrowRight} ${canScrollRight ? classes.visible : ''}`}
         onClick={() => scrollBy(1)}
-        aria-label={t("Scroll right")}
+        aria-label={t('Scroll right')}
         tabIndex={canScrollRight ? 0 : -1}
       >
         <IconChevronRight size={18} />

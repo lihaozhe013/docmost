@@ -1,1 +1,1 @@
-export { default as AllSpacesList } from "./all-spaces-list";
+export { default as AllSpacesList } from './all-spaces-list';

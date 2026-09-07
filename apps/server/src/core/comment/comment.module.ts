@@ -7,6 +7,6 @@ import { CollaborationModule } from '../../collaboration/collaboration.module';
   imports: [CollaborationModule],
   controllers: [CommentController],
   providers: [CommentService],
-  exports: [CommentService],
+  exports: [CommentService]
 })
 export class CommentModule {}

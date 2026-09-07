@@ -8,7 +8,7 @@ import {
   Matches,
   MinLength,
   ValidateIf,
-  validateSync,
+  validateSync
 } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
 import { IsISO6391 } from '../../common/validators/is-iso6391';
@@ -19,9 +19,9 @@ export class EnvironmentVariables {
     {
       protocols: ['postgres', 'postgresql'],
       require_tld: false,
-      allow_underscores: true,
+      allow_underscores: true
     },
-    { message: 'DATABASE_URL must be a valid postgres connection string' },
+    { message: 'DATABASE_URL must be a valid postgres connection string' }
   )
   DATABASE_URL: string;
 
@@ -30,9 +30,9 @@ export class EnvironmentVariables {
     {
       protocols: ['redis', 'rediss'],
       require_tld: false,
-      allow_underscores: true,
+      allow_underscores: true
     },
-    { message: 'REDIS_URL must be a valid redis connection string' },
+    { message: 'REDIS_URL must be a valid redis connection string' }
   )
   REDIS_URL: string;
 
@@ -62,8 +62,8 @@ export class EnvironmentVariables {
     { protocols: [], require_tld: true },
     {
       message:
-        'SUBDOMAIN_HOST must be a valid FQDN domain without the http protocol. e.g example.com',
-    },
+        'SUBDOMAIN_HOST must be a valid FQDN domain without the http protocol. e.g example.com'
+    }
   )
   @ValidateIf((obj) => obj.CLOUD === 'true'.toLowerCase())
   SUBDOMAIN_HOST: string;
@@ -78,12 +78,12 @@ export class EnvironmentVariables {
     {
       protocols: ['http', 'https'],
       require_tld: false,
-      allow_underscores: true,
+      allow_underscores: true
     },
     {
       message:
-        'TYPESENSE_URL must be a valid typesense url e.g http://localhost:8108',
-    },
+        'TYPESENSE_URL must be a valid typesense url e.g http://localhost:8108'
+    }
   )
   @ValidateIf((obj) => obj.SEARCH_DRIVER === 'typesense')
   TYPESENSE_URL: string;
@@ -117,18 +117,19 @@ export class EnvironmentVariables {
   TURBOPUFFER_API_KEY: string;
 
   @ValidateIf(
-    (obj) =>
-      obj.AI_VECTOR_DRIVER === 'turbopuffer' && !obj.TURBOPUFFER_BASE_URL,
+    (obj) => obj.AI_VECTOR_DRIVER === 'turbopuffer' && !obj.TURBOPUFFER_BASE_URL
   )
   @IsNotEmpty({
     message:
-      'TURBOPUFFER_REGION is required when AI_VECTOR_DRIVER is turbopuffer, unless TURBOPUFFER_BASE_URL is set',
+      'TURBOPUFFER_REGION is required when AI_VECTOR_DRIVER is turbopuffer, unless TURBOPUFFER_BASE_URL is set'
   })
   @IsString()
   TURBOPUFFER_REGION: string;
 
   @IsOptional()
-  @ValidateIf((obj) => obj.TURBOPUFFER_BASE_URL != '' && obj.TURBOPUFFER_BASE_URL != null)
+  @ValidateIf(
+    (obj) => obj.TURBOPUFFER_BASE_URL != '' && obj.TURBOPUFFER_BASE_URL != null
+  )
   @IsUrl({ protocols: ['http', 'https'], require_tld: false })
   TURBOPUFFER_BASE_URL: string;
 
@@ -136,7 +137,7 @@ export class EnvironmentVariables {
   @IsString()
   @Matches(/^[A-Za-z0-9\-_.]{1,90}$/, {
     message:
-      'TURBOPUFFER_NAMESPACE_PREFIX may only contain letters, digits, dot, dash, underscore (max 90 chars)',
+      'TURBOPUFFER_NAMESPACE_PREFIX may only contain letters, digits, dot, dash, underscore (max 90 chars)'
   })
   TURBOPUFFER_NAMESPACE_PREFIX: string;
 
@@ -163,7 +164,7 @@ export class EnvironmentVariables {
   @IsOptional()
   @ValidateIf(
     (obj) =>
-      obj.AI_DRIVER && ['openai', 'openai-compatible'].includes(obj.AI_DRIVER),
+      obj.AI_DRIVER && ['openai', 'openai-compatible'].includes(obj.AI_DRIVER)
   )
   @IsString()
   @IsNotEmpty()
@@ -173,7 +174,7 @@ export class EnvironmentVariables {
   @ValidateIf(
     (obj) =>
       obj.AI_DRIVER === 'openai-compatible' ||
-      (obj.AI_DRIVER === 'openai' && obj.OPENAI_API_URL),
+      (obj.AI_DRIVER === 'openai' && obj.OPENAI_API_URL)
   )
   @IsUrl({ protocols: ['http', 'https'], require_tld: false })
   OPENAI_API_URL: string;
@@ -198,8 +199,8 @@ export class EnvironmentVariables {
     { protocols: ['http', 'https'], require_tld: false },
     {
       message:
-        'CLICKHOUSE_URL must be a valid URL e.g http://user:password@localhost:8123/docmost',
-    },
+        'CLICKHOUSE_URL must be a valid URL e.g http://user:password@localhost:8123/docmost'
+    }
   )
   CLICKHOUSE_URL: string;
 }
@@ -211,7 +212,7 @@ export function validate(config: Record<string, any>) {
 
   if (errors.length > 0) {
     console.error(
-      'The Environment variables has failed the following validations:',
+      'The Environment variables has failed the following validations:'
     );
 
     errors.map((error) => {
@@ -219,7 +220,7 @@ export function validate(config: Record<string, any>) {
     });
 
     console.error(
-      'Please fix the environment variables and try again. Exiting program...',
+      'Please fix the environment variables and try again. Exiting program...'
     );
     process.exit(1);
   }

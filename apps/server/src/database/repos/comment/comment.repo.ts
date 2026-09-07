@@ -5,7 +5,7 @@ import { dbOrTx } from '../../utils';
 import {
   Comment,
   InsertableComment,
-  UpdatableComment,
+  UpdatableComment
 } from '@docmost/db/types/entity.types';
 import { PaginationOptions } from '@docmost/db/pagination/pagination-options';
 import { executeWithCursorPagination } from '@docmost/db/pagination/cursor-pagination';
@@ -20,7 +20,7 @@ export class CommentRepo {
   // todo, add workspaceId
   async findById(
     commentId: string,
-    opts?: { includeCreator: boolean; includeResolvedBy: boolean },
+    opts?: { includeCreator: boolean; includeResolvedBy: boolean }
   ): Promise<Comment> {
     return await this.db
       .selectFrom('comments')
@@ -44,14 +44,14 @@ export class CommentRepo {
       cursor: pagination.cursor,
       beforeCursor: pagination.beforeCursor,
       fields: [{ expression: 'id', direction: 'asc' }],
-      parseCursor: (cursor) => ({ id: cursor.id }),
+      parseCursor: (cursor) => ({ id: cursor.id })
     });
   }
 
   async updateComment(
     updatableComment: UpdatableComment,
     commentId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ) {
     const db = dbOrTx(this.db, trx);
     await db
@@ -63,7 +63,7 @@ export class CommentRepo {
 
   async insertComment(
     insertableComment: InsertableComment,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<Comment> {
     const db = dbOrTx(this.db, trx);
     return db
@@ -78,7 +78,7 @@ export class CommentRepo {
       eb
         .selectFrom('users')
         .select(['users.id', 'users.name', 'users.avatarUrl'])
-        .whereRef('users.id', '=', 'comments.creatorId'),
+        .whereRef('users.id', '=', 'comments.creatorId')
     ).as('creator');
   }
 
@@ -87,7 +87,7 @@ export class CommentRepo {
       eb
         .selectFrom('users')
         .select(['users.id', 'users.name', 'users.avatarUrl'])
-        .whereRef('users.id', '=', 'comments.resolvedById'),
+        .whereRef('users.id', '=', 'comments.resolvedById')
     ).as('resolvedBy');
   }
 
@@ -105,7 +105,10 @@ export class CommentRepo {
     return Number(result?.count) > 0;
   }
 
-  async hasChildrenFromOtherUsers(commentId: string, userId: string): Promise<boolean> {
+  async hasChildrenFromOtherUsers(
+    commentId: string,
+    userId: string
+  ): Promise<boolean> {
     const result = await this.db
       .selectFrom('comments')
       .select((eb) => eb.fn.count('id').as('count'))

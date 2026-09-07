@@ -4,7 +4,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  IsUUID,
+  IsUUID
 } from 'class-validator';
 import { AttachmentType } from '../attachment.constants';
 
@@ -25,7 +25,7 @@ export class RemoveIconDto {
   @IsIn([
     AttachmentType.Avatar,
     AttachmentType.SpaceIcon,
-    AttachmentType.WorkspaceIcon,
+    AttachmentType.WorkspaceIcon
   ])
   @IsNotEmpty()
   type: AttachmentType;

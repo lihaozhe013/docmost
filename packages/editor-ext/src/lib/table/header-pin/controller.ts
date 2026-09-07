@@ -131,10 +131,14 @@ export class TablePinController {
     if (!headerRow) return;
     const rowHeight = headerRow.getBoundingClientRect().height;
 
-    const active = tableRect.top < pinTop && tableRect.bottom > pinTop + rowHeight;
+    const active =
+      tableRect.top < pinTop && tableRect.bottom > pinTop + rowHeight;
 
     if (active) {
-      const offset = Math.min(pinTop - tableRect.top, tableRect.height - rowHeight);
+      const offset = Math.min(
+        pinTop - tableRect.top,
+        tableRect.height - rowHeight,
+      );
       this.wrapper.style.setProperty(PIN_OFFSET_VAR, `${offset}px`);
     } else {
       this.wrapper.style.removeProperty(PIN_OFFSET_VAR);
@@ -169,7 +173,9 @@ const controllers = new WeakMap<HTMLElement, TablePinController>();
 
 export function attach(wrapper: HTMLElement) {
   if (controllers.has(wrapper)) return;
-  const table = wrapper.querySelector(':scope > table') as HTMLTableElement | null;
+  const table = wrapper.querySelector(
+    ':scope > table',
+  ) as HTMLTableElement | null;
   if (!table) return;
   controllers.set(wrapper, new TablePinController(wrapper, table));
 }
@@ -181,6 +187,8 @@ export function detach(wrapper: HTMLElement) {
   controllers.delete(wrapper);
 }
 
-export function getController(wrapper: HTMLElement): TablePinController | undefined {
+export function getController(
+  wrapper: HTMLElement,
+): TablePinController | undefined {
   return controllers.get(wrapper);
 }

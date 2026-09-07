@@ -2,7 +2,7 @@ import {
   MiddlewareConsumer,
   Module,
   NestModule,
-  RequestMethod,
+  RequestMethod
 } from '@nestjs/common';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
@@ -43,15 +43,15 @@ import { ClsMiddleware } from 'nestjs-cls';
     LabelModule,
     NotificationModule,
     WatcherModule,
-    SessionModule,
-  ],
+    SessionModule
+  ]
 })
 export class CoreModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     const excludedRoutes = [
       { path: 'auth/setup', method: RequestMethod.POST },
       { path: 'health', method: RequestMethod.GET },
-      { path: 'health/live', method: RequestMethod.GET },
+      { path: 'health/live', method: RequestMethod.GET }
     ];
 
     consumer

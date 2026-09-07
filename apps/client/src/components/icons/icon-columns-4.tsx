@@ -1,4 +1,4 @@
-import { rem } from "@mantine/core";
+import { rem } from '@mantine/core';
 
 type Props = {
   size?: number | string;

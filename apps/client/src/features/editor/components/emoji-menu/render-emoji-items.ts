@@ -1,13 +1,13 @@
-import { ReactRenderer } from "@tiptap/react";
-import type { SuggestionProps } from "@tiptap/suggestion";
-import EmojiList from "./emoji-list";
+import { ReactRenderer } from '@tiptap/react';
+import type { SuggestionProps } from '@tiptap/suggestion';
+import EmojiList from './emoji-list';
 import {
   autoUpdate,
   computePosition,
   flip,
   offset,
-  shift,
-} from "@floating-ui/dom";
+  shift
+} from '@floating-ui/dom';
 
 const renderEmojiItems = () => {
   let component: ReactRenderer | null = null;
@@ -36,7 +36,7 @@ const renderEmojiItems = () => {
     onBeforeStart: (props: SuggestionProps) => {
       component = new ReactRenderer(EmojiList, {
         props: { isLoading: true, items: [] },
-        editor: props.editor,
+        editor: props.editor
       });
 
       if (!props.clientRect) {
@@ -44,11 +44,11 @@ const renderEmojiItems = () => {
       }
 
       getReferenceClientRect = props.clientRect;
-      popup = document.createElement("div");
-      popup.style.zIndex = "9999";
-      popup.style.position = "absolute";
-      popup.style.top = "0";
-      popup.style.left = "0";
+      popup = document.createElement('div');
+      popup.style.zIndex = '9999';
+      popup.style.position = 'absolute';
+      popup.style.top = '0';
+      popup.style.left = '0';
       popup.appendChild(component.element);
       document.body.appendChild(popup);
 
@@ -57,20 +57,20 @@ const renderEmojiItems = () => {
           return getReferenceClientRect
             ? getReferenceClientRect()
             : new DOMRect(0, 0, 0, 0);
-        },
+        }
       };
 
       cleanup = autoUpdate(virtualElement, popup, () => {
         if (!popup) return;
 
         computePosition(virtualElement, popup, {
-          placement: "bottom-start",
-          middleware: [offset(10), flip(), shift()],
+          placement: 'bottom-start',
+          middleware: [offset(10), flip(), shift()]
         }).then(({ x, y }) => {
           if (!popup) return;
 
           Object.assign(popup.style, {
-            transform: `translate(${x}px, ${y}px)`,
+            transform: `translate(${x}px, ${y}px)`
           });
         });
       });
@@ -90,7 +90,7 @@ const renderEmojiItems = () => {
       }
     },
     onKeyDown: (props: { event: KeyboardEvent }) => {
-      if (props.event.key === "Escape") {
+      if (props.event.key === 'Escape') {
         destroy();
 
         return true;
@@ -101,7 +101,7 @@ const renderEmojiItems = () => {
     },
     onExit: () => {
       destroy();
-    },
+    }
   };
 };
 

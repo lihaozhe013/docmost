@@ -1,6 +1,6 @@
-import { QueryParams } from "@/lib/types.ts";
+import { QueryParams } from '@/lib/types.ts';
 
-export type LabelType = "page" | "space";
+export type LabelType = 'page' | 'space';
 
 export interface ILabel {
   id: string;

@@ -1,15 +1,15 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import type { Editor } from "@tiptap/react";
-import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
-import { useFloating, offset, autoUpdate, hide } from "@floating-ui/react";
-import { Menu } from "@mantine/core";
-import clsx from "clsx";
-import { useTranslation } from "react-i18next";
-import { useTableHandleDrag } from "./hooks/use-table-handle-drag";
-import { useColumnRowMenuLifecycle } from "./hooks/use-column-row-menu-lifecycle";
-import { ColumnHandleMenu } from "./menus/column-handle-menu";
-import { isEditorReady } from "@docmost/editor-ext";
-import classes from "./handle.module.css";
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import type { Editor } from '@tiptap/react';
+import type { Node as ProseMirrorNode } from '@tiptap/pm/model';
+import { useFloating, offset, autoUpdate, hide } from '@floating-ui/react';
+import { Menu } from '@mantine/core';
+import clsx from 'clsx';
+import { useTranslation } from 'react-i18next';
+import { useTableHandleDrag } from './hooks/use-table-handle-drag';
+import { useColumnRowMenuLifecycle } from './hooks/use-column-row-menu-lifecycle';
+import { ColumnHandleMenu } from './menus/column-handle-menu';
+import { isEditorReady } from '@docmost/editor-ext';
+import classes from './handle.module.css';
 
 interface ColumnHandleProps {
   editor: Editor;
@@ -24,7 +24,7 @@ export const ColumnHandle = React.memo(function ColumnHandle({
   index,
   anchorPos,
   tableNode,
-  tablePos,
+  tablePos
 }: ColumnHandleProps) {
   const { t } = useTranslation();
   // Hold the cell DOM in a ref-backed state so we never unmount the handle
@@ -52,9 +52,9 @@ export const ColumnHandle = React.memo(function ColumnHandle({
   const [handleEl, setHandleEl] = useState<HTMLDivElement | null>(null);
 
   const { refs, floatingStyles, middlewareData } = useFloating({
-    placement: "top",
+    placement: 'top',
     middleware: [offset(-4), hide()],
-    whileElementsMounted: autoUpdate,
+    whileElementsMounted: autoUpdate
   });
   const isReferenceHidden = !!middlewareData.hide?.referenceHidden;
 
@@ -65,18 +65,18 @@ export const ColumnHandle = React.memo(function ColumnHandle({
   // `cellDom` is inside the table, so `closest('.tableWrapper')` finds the
   // wrapper for this drag's auto-scroll. The handle itself lives in a
   // floating layer outside the editor DOM, so we can't walk up from it.
-  const wrapper = cellDom?.closest<HTMLElement>(".tableWrapper") ?? null;
+  const wrapper = cellDom?.closest<HTMLElement>('.tableWrapper') ?? null;
 
   const [menuOpened, setMenuOpened] = useState(false);
   const closeMenu = useCallback(() => setMenuOpened(false), []);
-  useTableHandleDrag(editor, "col", handleEl, wrapper, closeMenu);
+  useTableHandleDrag(editor, 'col', handleEl, wrapper, closeMenu);
 
   const { onOpen, onClose } = useColumnRowMenuLifecycle({
     editor,
-    orientation: "col",
+    orientation: 'col',
     index,
     tableNode,
-    tablePos,
+    tablePos
   });
 
   if (!cellDom) return null;
@@ -99,14 +99,14 @@ export const ColumnHandle = React.memo(function ColumnHandle({
           }}
           style={{
             ...floatingStyles,
-            ...(isReferenceHidden ? { visibility: "hidden" as const } : {}),
+            ...(isReferenceHidden ? { visibility: 'hidden' as const } : {})
           }}
           className={clsx(classes.handle, classes.columnHandle)}
           role="button"
           tabIndex={0}
-          aria-label={t("Column actions")}
+          aria-label={t('Column actions')}
         >
-          <span style={{ pointerEvents: "none", display: "inline-flex" }}>
+          <span style={{ pointerEvents: 'none', display: 'inline-flex' }}>
             <GripIcon />
           </span>
         </div>

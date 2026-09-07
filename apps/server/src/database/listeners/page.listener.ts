@@ -18,7 +18,7 @@ export class PageListener {
   constructor(
     private readonly environmentService: EnvironmentService,
     @InjectQueue(QueueName.SEARCH_QUEUE) private searchQueue: Queue,
-    @InjectQueue(QueueName.AI_QUEUE) private aiQueue: Queue,
+    @InjectQueue(QueueName.AI_QUEUE) private aiQueue: Queue
   ) {}
 
   @OnEvent(EventName.PAGE_CREATED)
@@ -26,7 +26,7 @@ export class PageListener {
     const { pageIds, workspaceId } = event;
     if (this.isTypesense()) {
       await this.searchQueue.add(QueueJob.PAGE_CREATED, {
-        pageIds,
+        pageIds
       });
     }
 
@@ -60,7 +60,7 @@ export class PageListener {
 
     await this.aiQueue.add(QueueJob.PAGE_SOFT_DELETED, {
       pageIds,
-      workspaceId,
+      workspaceId
     });
   }
 

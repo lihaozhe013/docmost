@@ -3,13 +3,13 @@ export enum SpaceCaslAction {
   Create = 'create',
   Read = 'read',
   Edit = 'edit',
-  Delete = 'delete',
+  Delete = 'delete'
 }
 export enum SpaceCaslSubject {
   Settings = 'settings',
   Member = 'member',
   Page = 'page',
-  Share = 'share',
+  Share = 'share'
 }
 
 export type ISpaceAbility =

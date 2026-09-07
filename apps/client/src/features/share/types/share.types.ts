@@ -1,4 +1,4 @@
-import { IPage } from "@/features/page/types/page.types.ts";
+import { IPage } from '@/features/page/types/page.types.ts';
 
 export interface IShare {
   id: string;

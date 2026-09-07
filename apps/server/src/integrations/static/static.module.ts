@@ -9,7 +9,7 @@ import { EnvironmentService } from '../environment/environment.service';
 export class StaticModule implements OnModuleInit {
   constructor(
     private readonly httpAdapterHost: HttpAdapterHost,
-    private readonly environmentService: EnvironmentService,
+    private readonly environmentService: EnvironmentService
   ) {}
 
   public async onModuleInit() {
@@ -22,7 +22,7 @@ export class StaticModule implements OnModuleInit {
       '..',
       '..',
       '..',
-      'client/dist',
+      'client/dist'
     );
 
     const indexFilePath = join(clientDistPath, 'index.html');
@@ -49,7 +49,7 @@ export class StaticModule implements OnModuleInit {
         AI_VECTOR_DRIVER:
           this.environmentService.getAiVectorDriver() === 'turbopuffer'
             ? 'turbopuffer'
-            : undefined,
+            : undefined
       };
 
       const windowScriptContent = `<script>window.CONFIG=${JSON.stringify(configString)};</script>`;
@@ -73,10 +73,10 @@ export class StaticModule implements OnModuleInit {
           if (/[\\/]assets[\\/]/.test(pathName)) {
             reply.header(
               'Cache-Control',
-              'public, max-age=31536000, immutable',
+              'public, max-age=31536000, immutable'
             );
           }
-        },
+        }
       });
 
       app.get(RENDER_PATH, (req: any, res: any) => {

@@ -32,9 +32,9 @@ describe('EncryptionService', () => {
         EncryptionService,
         {
           provide: EnvironmentService,
-          useValue: { getAppSecret: () => APP_SECRET },
-        },
-      ],
+          useValue: { getAppSecret: () => APP_SECRET }
+        }
+      ]
     }).compile();
 
     service = module.get<EncryptionService>(EncryptionService);
@@ -101,7 +101,7 @@ describe('EncryptionService', () => {
       tamperedCipher[0] ^= 0x01;
       const tampered = encodeEnvelope({
         ...env,
-        cipherText: tamperedCipher.toString('base64'),
+        cipherText: tamperedCipher.toString('base64')
       });
       expect(() => service.decrypt(tampered)).toThrow(UnableToDecrypt);
     });
@@ -113,7 +113,7 @@ describe('EncryptionService', () => {
       tamperedTag[0] ^= 0x01;
       const tampered = encodeEnvelope({
         ...env,
-        authTag: tamperedTag.toString('base64'),
+        authTag: tamperedTag.toString('base64')
       });
       expect(() => service.decrypt(tampered)).toThrow(UnableToDecrypt);
     });
@@ -125,7 +125,7 @@ describe('EncryptionService', () => {
       tamperedIV[0] ^= 0x01;
       const tampered = encodeEnvelope({
         ...env,
-        iv: tamperedIV.toString('base64'),
+        iv: tamperedIV.toString('base64')
       });
       expect(() => service.decrypt(tampered)).toThrow(UnableToDecrypt);
     });
@@ -134,7 +134,7 @@ describe('EncryptionService', () => {
   describe('malformed payloads', () => {
     it('rejects non-base64 garbage', () => {
       expect(() => service.decrypt('!!!not-valid-base64!!!')).toThrow(
-        UnableToDecrypt,
+        UnableToDecrypt
       );
     });
 
@@ -146,7 +146,7 @@ describe('EncryptionService', () => {
     it('rejects JSON missing required fields', () => {
       const partial = encodeEnvelope({
         iv: Buffer.alloc(12).toString('base64'),
-        authTag: Buffer.alloc(16).toString('base64'),
+        authTag: Buffer.alloc(16).toString('base64')
       } as never);
       expect(() => service.decrypt(partial)).toThrow(UnableToDecrypt);
     });
@@ -156,7 +156,7 @@ describe('EncryptionService', () => {
       const env = decodeEnvelope(encrypted);
       const bad = encodeEnvelope({
         ...env,
-        iv: Buffer.alloc(8).toString('base64'),
+        iv: Buffer.alloc(8).toString('base64')
       });
       expect(() => service.decrypt(bad)).toThrow(UnableToDecrypt);
     });
@@ -166,7 +166,7 @@ describe('EncryptionService', () => {
       const env = decodeEnvelope(encrypted);
       const bad = encodeEnvelope({
         ...env,
-        authTag: Buffer.alloc(8).toString('base64'),
+        authTag: Buffer.alloc(8).toString('base64')
       });
       expect(() => service.decrypt(bad)).toThrow(UnableToDecrypt);
     });

@@ -9,7 +9,7 @@ import {
   Post,
   Req,
   UseGuards,
-  UseInterceptors,
+  UseInterceptors
 } from '@nestjs/common';
 import SpaceAbilityFactory from '../../core/casl/abilities/space-ability.factory';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -17,7 +17,7 @@ import { AuthUser } from '../../common/decorators/auth-user.decorator';
 import { User, Workspace } from '@docmost/db/types/entity.types';
 import {
   SpaceCaslAction,
-  SpaceCaslSubject,
+  SpaceCaslSubject
 } from '../../core/casl/interfaces/space-ability.type';
 import { FileInterceptor } from '../../common/interceptors/file.interceptor';
 import bytes from 'bytes';
@@ -28,7 +28,7 @@ import { EnvironmentService } from '../environment/environment.service';
 import { AuditEvent, AuditResource } from '../../common/events/audit-events';
 import {
   AUDIT_SERVICE,
-  IAuditService,
+  IAuditService
 } from '../../integrations/audit/audit.service';
 
 @Controller()
@@ -39,7 +39,7 @@ export class ImportController {
     private readonly importService: ImportService,
     private readonly spaceAbility: SpaceAbilityFactory,
     private readonly environmentService: EnvironmentService,
-    @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService,
+    @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService
   ) {}
 
   @UseInterceptors(FileInterceptor)
@@ -49,7 +49,7 @@ export class ImportController {
   async importPage(
     @Req() req: any,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const validFileExtensions = ['.md', '.html', '.docx', '.pdf'];
 
@@ -58,13 +58,13 @@ export class ImportController {
     let file = null;
     try {
       file = await req.file({
-        limits: { fileSize: maxFileSize, fields: 4, files: 1 },
+        limits: { fileSize: maxFileSize, fields: 4, files: 1 }
       });
     } catch (err: any) {
       this.logger.error(err.message);
       if (err?.statusCode === 413) {
         throw new BadRequestException(
-          `File too large. Exceeds the 10mb import limit`,
+          `File too large. Exceeds the 10mb import limit`
         );
       }
     }
@@ -94,7 +94,7 @@ export class ImportController {
       file,
       user.id,
       spaceId,
-      workspace.id,
+      workspace.id
     );
 
     const ext = path.extname(file.filename).toLowerCase();
@@ -102,7 +102,7 @@ export class ImportController {
       '.md': 'markdown',
       '.html': 'html',
       '.docx': 'docx',
-      '.pdf': 'pdf',
+      '.pdf': 'pdf'
     };
 
     if (createdPage) {
@@ -113,8 +113,8 @@ export class ImportController {
         spaceId,
         metadata: {
           source: sourceMap[ext],
-          fileName: file.filename,
-        },
+          fileName: file.filename
+        }
       });
     }
 
@@ -128,7 +128,7 @@ export class ImportController {
   async importZip(
     @Req() req: any,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const validFileExtensions = ['.zip'];
 
@@ -137,13 +137,13 @@ export class ImportController {
     let file = null;
     try {
       file = await req.file({
-        limits: { fileSize: maxFileSize, fields: 3, files: 1 },
+        limits: { fileSize: maxFileSize, fields: 3, files: 1 }
       });
     } catch (err: any) {
       this.logger.error(err.message);
       if (err?.statusCode === 413) {
         throw new BadRequestException(
-          `File too large. Exceeds the ${this.environmentService.getFileImportSizeLimit()} import limit`,
+          `File too large. Exceeds the ${this.environmentService.getFileImportSizeLimit()} import limit`
         );
       }
     }
@@ -164,7 +164,7 @@ export class ImportController {
     const validZipSources = ['generic', 'notion', 'confluence'];
     if (!validZipSources.includes(source)) {
       throw new BadRequestException(
-        'Invalid import source. Import source must either be generic, notion or confluence.',
+        'Invalid import source. Import source must either be generic, notion or confluence.'
       );
     }
 
@@ -185,8 +185,8 @@ export class ImportController {
       metadata: {
         fileName: file.filename,
         source,
-        spaceId,
-      },
+        spaceId
+      }
     });
 
     return this.importService.importZip(
@@ -194,7 +194,7 @@ export class ImportController {
       source,
       user.id,
       spaceId,
-      workspace.id,
+      workspace.id
     );
   }
 }

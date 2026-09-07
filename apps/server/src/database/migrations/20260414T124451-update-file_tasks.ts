@@ -4,7 +4,7 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .alterTable('file_tasks')
     .addColumn('page_id', 'uuid', (col) =>
-      col.references('pages.id').onDelete('set null').ifNotExists(),
+      col.references('pages.id').onDelete('set null').ifNotExists()
     )
     .execute();
 

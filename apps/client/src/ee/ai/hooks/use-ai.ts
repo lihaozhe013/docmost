@@ -1,16 +1,16 @@
-import { useState, useCallback, useRef } from "react";
-import { useAiGenerateStreamMutation } from "@/ee/ai/queries/ai-query.ts";
-import { AiGenerateDto } from "@/ee/ai/types/ai.types.ts";
+import { useState, useCallback, useRef } from 'react';
+import { useAiGenerateStreamMutation } from '@/ee/ai/queries/ai-query.ts';
+import { AiGenerateDto } from '@/ee/ai/types/ai.types.ts';
 
 export function useAiStream() {
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
   const mutation = useAiGenerateStreamMutation();
 
   const startStream = useCallback(
     async (data: AiGenerateDto) => {
-      setContent("");
+      setContent('');
       setIsStreaming(true);
 
       try {
@@ -20,17 +20,17 @@ export function useAiStream() {
             setContent((prev) => prev + chunk.content);
           },
           onError: (error) => {
-            console.error("AI stream error:", error);
+            console.error('AI stream error:', error);
             setIsStreaming(false);
           },
           onComplete: () => {
             setIsStreaming(false);
-          },
+          }
         });
 
         abortControllerRef.current = controller;
       } catch (error) {
-        console.error("Failed to start stream:", error);
+        console.error('Failed to start stream:', error);
         setIsStreaming(false);
       }
     },
@@ -46,7 +46,7 @@ export function useAiStream() {
   }, []);
 
   const resetContent = useCallback(() => {
-    setContent("");
+    setContent('');
   }, []);
 
   return {
@@ -56,6 +56,6 @@ export function useAiStream() {
     stopStream,
     resetContent,
     isLoading: mutation.isPending,
-    error: mutation.error,
+    error: mutation.error
   };
 }

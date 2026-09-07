@@ -13,10 +13,10 @@ import { LicenseCheckService } from './license-check.service';
       isGlobal: true,
       expandVariables: true,
       envFilePath: envPath,
-      validate,
-    }),
+      validate
+    })
   ],
   providers: [EnvironmentService, DomainService, LicenseCheckService],
-  exports: [EnvironmentService, DomainService, LicenseCheckService],
+  exports: [EnvironmentService, DomainService, LicenseCheckService]
 })
 export class EnvironmentModule {}

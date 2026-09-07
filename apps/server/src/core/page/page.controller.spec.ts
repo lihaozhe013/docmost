@@ -8,7 +8,7 @@ describe('PageController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [PageController],
-      providers: [PageService],
+      providers: [PageService]
     }).compile();
 
     controller = module.get<PageController>(PageController);

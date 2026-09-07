@@ -1,57 +1,61 @@
-import { keepPreviousData, useQuery, UseQueryResult } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useQuery,
+  UseQueryResult
+} from '@tanstack/react-query';
 import {
   searchAttachments,
   searchPage,
   searchShare,
-  searchSuggestions,
+  searchSuggestions
 } from '@/features/search/services/search-service';
 import {
   IAttachmentSearch,
   IPageSearch,
   IPageSearchParams,
   ISuggestionResult,
-  SearchSuggestionParams,
+  SearchSuggestionParams
 } from '@/features/search/types/search.types';
 
 export function usePageSearchQuery(
-  params: IPageSearchParams,
+  params: IPageSearchParams
 ): UseQueryResult<IPageSearch[], Error> {
   return useQuery({
-    queryKey: ["page-search", params],
+    queryKey: ['page-search', params],
     queryFn: () => searchPage(params),
-    enabled: !!params.query,
+    enabled: !!params.query
   });
 }
 
 export function useSearchSuggestionsQuery(
-  params: SearchSuggestionParams & { preload?: boolean },
+  params: SearchSuggestionParams & { preload?: boolean }
 ): UseQueryResult<ISuggestionResult, Error> {
   const { preload, ...queryParams } = params;
   return useQuery({
-    queryKey: ["search-suggestion", params.query],
+    queryKey: ['search-suggestion', params.query],
     staleTime: 60 * 1000, // 1min
     queryFn: () => searchSuggestions(queryParams),
     enabled: preload || !!params.query,
-    placeholderData: keepPreviousData,
+    placeholderData: keepPreviousData
   });
 }
 
 export function useShareSearchQuery(
-  params: IPageSearchParams,
+  params: IPageSearchParams
 ): UseQueryResult<IPageSearch[], Error> {
   return useQuery({
-    queryKey: ["share-search", params],
+    queryKey: ['share-search', params],
     queryFn: () => searchShare(params),
-    enabled: !!params.query,
+    enabled: !!params.query
   });
 }
 
 export function useAttachmentSearchQuery(
-  params: IPageSearchParams,
+  params: IPageSearchParams
 ): UseQueryResult<IAttachmentSearch[], Error> {
   return useQuery({
-    queryKey: ["attachment-search", params],
+    queryKey: ['attachment-search', params],
     queryFn: () => searchAttachments(params),
-    enabled: !!params.query,
+    enabled: !!params.query
   });
 }

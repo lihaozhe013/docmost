@@ -1,20 +1,20 @@
-import { FC } from "react";
-import { useAtomValue } from "jotai";
-import type { Editor } from "@tiptap/react";
-import { pageEditorAtom } from "@/features/editor/atoms/editor-atoms";
-import { useToolbarState } from "./use-toolbar-state";
-import { BlockTypeGroup } from "./groups/block-type-group";
-import { InlineMarksGroup } from "./groups/inline-marks-group";
-import { ColorGroup } from "./groups/color-group";
-import { ListsGroup } from "./groups/lists-group";
-import { AlignmentGroup } from "./groups/alignment-group";
-import { MediaGroup } from "./groups/media-group";
-import { QuickInsertsGroup } from "./groups/quick-inserts-group";
-import { MoreInsertsGroup } from "./groups/more-inserts-group";
-import { HistoryGroup } from "./groups/history-group";
-import { AskAiGroup } from "./groups/ask-ai-group";
-import { workspaceAtom } from "@/features/user/atoms/current-user-atom";
-import classes from "./fixed-toolbar.module.css";
+import { FC } from 'react';
+import { useAtomValue } from 'jotai';
+import type { Editor } from '@tiptap/react';
+import { pageEditorAtom } from '@/features/editor/atoms/editor-atoms';
+import { useToolbarState } from './use-toolbar-state';
+import { BlockTypeGroup } from './groups/block-type-group';
+import { InlineMarksGroup } from './groups/inline-marks-group';
+import { ColorGroup } from './groups/color-group';
+import { ListsGroup } from './groups/lists-group';
+import { AlignmentGroup } from './groups/alignment-group';
+import { MediaGroup } from './groups/media-group';
+import { QuickInsertsGroup } from './groups/quick-inserts-group';
+import { MoreInsertsGroup } from './groups/more-inserts-group';
+import { HistoryGroup } from './groups/history-group';
+import { AskAiGroup } from './groups/ask-ai-group';
+import { workspaceAtom } from '@/features/user/atoms/current-user-atom';
+import classes from './fixed-toolbar.module.css';
 
 type FixedToolbarProps = {
   editor?: Editor | null;
@@ -23,7 +23,7 @@ type FixedToolbarProps = {
 
 export const FixedToolbar: FC<FixedToolbarProps> = ({
   editor: editorProp,
-  templateMode = false,
+  templateMode = false
 }) => {
   const editorFromAtom = useAtomValue(pageEditorAtom);
   const editor = editorProp ?? editorFromAtom;

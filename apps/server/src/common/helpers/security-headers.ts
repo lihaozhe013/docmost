@@ -2,7 +2,7 @@ export type SecurityHeader = { name: string; value: string };
 
 export function resolveFrameHeader(
   iframeEmbedAllowed: boolean,
-  allowedOrigins: string[],
+  allowedOrigins: string[]
 ): SecurityHeader | null {
   if (!iframeEmbedAllowed) {
     return { name: 'X-Frame-Options', value: 'SAMEORIGIN' };
@@ -14,7 +14,7 @@ export function resolveFrameHeader(
 
   return {
     name: 'Content-Security-Policy',
-    value: `frame-ancestors 'self' ${allowedOrigins.join(' ')}`,
+    value: `frame-ancestors 'self' ${allowedOrigins.join(' ')}`
   };
 }
 
@@ -23,12 +23,15 @@ export const OAUTH_CONSENT_PATH = '/oauth/consent';
 
 export function resolveFrameHeadersForPath(
   path: string,
-  configuredHeader: SecurityHeader | null,
+  configuredHeader: SecurityHeader | null
 ): SecurityHeader[] {
-  if (path === OAUTH_CONSENT_PATH || path.startsWith(`${OAUTH_CONSENT_PATH}/`)) {
+  if (
+    path === OAUTH_CONSENT_PATH ||
+    path.startsWith(`${OAUTH_CONSENT_PATH}/`)
+  ) {
     return [
       { name: 'X-Frame-Options', value: 'DENY' },
-      { name: 'Content-Security-Policy', value: "frame-ancestors 'none'" },
+      { name: 'Content-Security-Policy', value: "frame-ancestors 'none'" }
     ];
   }
   return configuredHeader ? [configuredHeader] : [];

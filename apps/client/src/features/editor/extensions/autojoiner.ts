@@ -1,10 +1,10 @@
 // https://github.com/NiclasDev63/tiptap-extension-auto-joiner - MIT
-import { Extension } from "@tiptap/core";
-import { Plugin, PluginKey } from "@tiptap/pm/state";
-import { canJoin } from "@tiptap/pm/transform";
-import { getNodeType } from "@tiptap/react";
-import { NodeType } from "@tiptap/pm/model";
-import { Transaction } from "@tiptap/pm/state";
+import { Extension } from '@tiptap/core';
+import { Plugin, PluginKey } from '@tiptap/pm/state';
+import { canJoin } from '@tiptap/pm/transform';
+import { getNodeType } from '@tiptap/react';
+import { NodeType } from '@tiptap/pm/model';
+import { Transaction } from '@tiptap/pm/state';
 
 // https://discuss.prosemirror.net/t/how-to-autojoin-all-the-time/2957/4
 // Adapted from prosemirror-commands wrapDispatchForJoin
@@ -69,11 +69,11 @@ export interface AutoJoinerOptions {
 }
 
 const AutoJoiner = Extension.create<AutoJoinerOptions>({
-  name: "autoJoiner",
+  name: 'autoJoiner',
 
   addOptions() {
     return {
-      elementsToJoin: [],
+      elementsToJoin: []
     };
   },
 
@@ -81,7 +81,7 @@ const AutoJoiner = Extension.create<AutoJoinerOptions>({
     const plugin = new PluginKey(this.name);
     const joinableNodes = [
       this.editor.schema.nodes.bulletList,
-      this.editor.schema.nodes.orderedList,
+      this.editor.schema.nodes.orderedList
     ];
     this.options.elementsToJoin.forEach((element) => {
       const nodeTyp = getNodeType(element, this.editor.schema);
@@ -96,10 +96,10 @@ const AutoJoiner = Extension.create<AutoJoinerOptions>({
           if (autoJoin(transactions, newTr, joinableNodes as NodeType[])) {
             return newTr;
           }
-        },
-      }),
+        }
+      })
     ];
-  },
+  }
 });
 
 export default AutoJoiner;

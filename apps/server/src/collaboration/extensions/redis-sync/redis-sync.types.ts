@@ -78,7 +78,7 @@ export type Pack = (msg: RSAMessage) => string | Buffer<ArrayBufferLike>;
 
 export type Unpack = (
   // @ts-ignore
-  packedMessage: Uint8Array | Buffer<ArrayBufferLike>,
+  packedMessage: Uint8Array | Buffer<ArrayBufferLike>
 ) => RSAMessage;
 
 type ServerId = string;
@@ -114,7 +114,7 @@ export interface Configuration<TCE> {
   // per-document hook like onConnect/onAuthenticate. Runs on the origin server when
   // the socket opens and on the doc owner when the first proxied message arrives.
   deriveContext?: (
-    serializedHTTPRequest: SerializedHTTPRequest,
+    serializedHTTPRequest: SerializedHTTPRequest
   ) => Record<string, any>;
 }
 
@@ -133,6 +133,6 @@ export const toWebRequest = (serializedHTTPRequest: SerializedHTTPRequest) => {
   });
   return new Request(new URL(url, 'http://localhost'), {
     method,
-    headers: webHeaders,
+    headers: webHeaders
   });
 };

@@ -7,13 +7,13 @@ import {
   HttpStatus,
   NotFoundException,
   Post,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { LabelService } from './label.service';
 import {
   FindPagesByLabelDto,
   LabelInfoDto,
-  ListLabelsDto,
+  ListLabelsDto
 } from './dto/label.dto';
 import { AuthUser } from '../../common/decorators/auth-user.decorator';
 import { AuthWorkspace } from '../../common/decorators/auth-workspace.decorator';
@@ -25,7 +25,7 @@ import { emptyCursorPaginationResult } from '@docmost/db/pagination/cursor-pagin
 import SpaceAbilityFactory from '../casl/abilities/space-ability.factory';
 import {
   SpaceCaslAction,
-  SpaceCaslSubject,
+  SpaceCaslSubject
 } from '../casl/interfaces/space-ability.type';
 
 @UseGuards(JwtAuthGuard)
@@ -34,7 +34,7 @@ export class LabelController {
   constructor(
     private readonly labelService: LabelService,
     private readonly labelRepo: LabelRepo,
-    private readonly spaceAbility: SpaceAbilityFactory,
+    private readonly spaceAbility: SpaceAbilityFactory
   ) {}
 
   @HttpCode(HttpStatus.OK)
@@ -43,13 +43,13 @@ export class LabelController {
     @Body() dto: ListLabelsDto,
     @Body() pagination: PaginationOptions,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     return this.labelService.getLabels(
       workspace.id,
       user.id,
       dto.type,
-      pagination,
+      pagination
     );
   }
 
@@ -59,7 +59,7 @@ export class LabelController {
     @Body() dto: FindPagesByLabelDto,
     @Body() pagination: PaginationOptions,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     if (dto.spaceId) {
       await this.assertCanReadSpace(user, dto.spaceId);
@@ -73,7 +73,7 @@ export class LabelController {
       const label = await this.labelRepo.findByNameAndWorkspace(
         dto.name,
         workspace.id,
-        LabelType.PAGE,
+        LabelType.PAGE
       );
       if (!label) {
         return emptyCursorPaginationResult(pagination.limit);
@@ -89,7 +89,7 @@ export class LabelController {
     return this.labelService.findPagesByLabel(labelId, user.id, {
       spaceId: dto.spaceId,
       query: pagination.query,
-      pagination,
+      pagination
     });
   }
 

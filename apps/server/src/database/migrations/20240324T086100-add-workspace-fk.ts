@@ -7,7 +7,7 @@ export async function up(db: Kysely<any>): Promise<void> {
       'workspaces_default_space_id_fkey',
       ['default_space_id'],
       'spaces',
-      ['id'],
+      ['id']
     )
     .onDelete('set null')
     .execute();

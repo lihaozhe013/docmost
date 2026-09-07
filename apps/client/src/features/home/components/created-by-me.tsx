@@ -4,20 +4,20 @@ import {
   UnstyledButton,
   Badge,
   Table,
-  Button,
-} from "@mantine/core";
-import { Link } from "react-router-dom";
-import PageListSkeleton from "@/components/ui/page-list-skeleton";
-import { buildPageUrl, getPageTitle } from "@/features/page/page.utils";
-import { formattedDate } from "@/lib/time";
-import { useCreatedByQuery } from "@/features/page/queries/page-query";
-import { PageListIcon } from "@/components/common/page-list-icon";
-import { IconFiles } from "@tabler/icons-react";
-import { EmptyState } from "@/components/ui/empty-state";
-import { getSpaceUrl } from "@/lib/config";
-import { useTranslation } from "react-i18next";
-import { getInitialsColor } from "@/lib/get-initials-color";
-import rowClasses from "@/components/ui/clickable-table-row.module.css";
+  Button
+} from '@mantine/core';
+import { Link } from 'react-router-dom';
+import PageListSkeleton from '@/components/ui/page-list-skeleton';
+import { buildPageUrl, getPageTitle } from '@/features/page/page.utils';
+import { formattedDate } from '@/lib/time';
+import { useCreatedByQuery } from '@/features/page/queries/page-query';
+import { PageListIcon } from '@/components/common/page-list-icon';
+import { IconFiles } from '@tabler/icons-react';
+import { EmptyState } from '@/components/ui/empty-state';
+import { getSpaceUrl } from '@/lib/config';
+import { useTranslation } from 'react-i18next';
+import { getInitialsColor } from '@/lib/get-initials-color';
+import rowClasses from '@/components/ui/clickable-table-row.module.css';
 
 type Props = {
   spaceId?: string;
@@ -31,7 +31,7 @@ export default function CreatedByMe({ spaceId }: Props) {
     isError,
     hasNextPage,
     fetchNextPage,
-    isFetchingNextPage,
+    isFetchingNextPage
   } = useCreatedByQuery({ spaceId });
 
   const pages = data?.pages.flatMap((p) => p.items) ?? [];
@@ -41,7 +41,7 @@ export default function CreatedByMe({ spaceId }: Props) {
   }
 
   if (isError) {
-    return <Text>{t("Failed to fetch pages")}</Text>;
+    return <Text>{t('Failed to fetch pages')}</Text>;
   }
 
   return pages.length > 0 ? (
@@ -55,11 +55,7 @@ export default function CreatedByMe({ spaceId }: Props) {
                   <UnstyledButton
                     className={rowClasses.link}
                     component={Link}
-                    to={buildPageUrl(
-                      page?.space.slug,
-                      page.slugId,
-                      page.title,
-                    )}
+                    to={buildPageUrl(page?.space.slug, page.slugId, page.title)}
                   >
                     <Group wrap="nowrap">
                       <PageListIcon icon={page.icon} isBase={page.isBase} />
@@ -76,7 +72,7 @@ export default function CreatedByMe({ spaceId }: Props) {
                       variant="light"
                       component={Link}
                       to={getSpaceUrl(page?.space.slug)}
-                      style={{ cursor: "pointer" }}
+                      style={{ cursor: 'pointer' }}
                     >
                       {page?.space.name}
                     </Badge>
@@ -85,7 +81,7 @@ export default function CreatedByMe({ spaceId }: Props) {
                 <Table.Td>
                   <Text
                     c="dimmed"
-                    style={{ whiteSpace: "nowrap" }}
+                    style={{ whiteSpace: 'nowrap' }}
                     size="xs"
                     fw={500}
                   >
@@ -106,15 +102,15 @@ export default function CreatedByMe({ spaceId }: Props) {
           onClick={() => fetchNextPage()}
           loading={isFetchingNextPage}
         >
-          {t("Load more")}
+          {t('Load more')}
         </Button>
       )}
     </>
   ) : (
     <EmptyState
       icon={IconFiles}
-      title={t("No pages yet")}
-      description={t("Pages you create will show up here.")}
+      title={t('No pages yet')}
+      description={t('Pages you create will show up here.')}
     />
   );
 }

@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Editor } from "@tiptap/react";
+import React, { useCallback, useEffect, useState } from 'react';
+import { Editor } from '@tiptap/react';
 import {
   ActionIcon,
   Button,
@@ -7,17 +7,17 @@ import {
   Paper,
   Text,
   Textarea,
-  Tooltip,
-} from "@mantine/core";
-import { IconAlt } from "@tabler/icons-react";
-import { useTranslation } from "react-i18next";
+  Tooltip
+} from '@mantine/core';
+import { IconAlt } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 
 const ALT_MAX_LENGTH = 300;
 
 function sanitizeAlt(value: string): string {
   return value
-    .replace(/[\\\[\]!]/g, "")
-    .replace(/\s+/g, " ")
+    .replace(/[\\\[\]!]/g, '')
+    .replace(/\s+/g, ' ')
     .trim();
 }
 
@@ -30,14 +30,14 @@ type UseAltTextControlArgs = {
 export function useAltTextControl({
   editor,
   nodeName,
-  currentAlt,
+  currentAlt
 }: UseAltTextControlArgs) {
   const { t } = useTranslation();
   const [showInput, setShowInput] = useState(false);
-  const [draft, setDraft] = useState("");
+  const [draft, setDraft] = useState('');
 
   const open = useCallback(() => {
-    setDraft(currentAlt || "");
+    setDraft(currentAlt || '');
     setShowInput(true);
   }, [currentAlt]);
 
@@ -47,9 +47,9 @@ export function useAltTextControl({
         setShowInput(false);
       }
     };
-    editor.on("selectionUpdate", handler);
+    editor.on('selectionUpdate', handler);
     return () => {
-      editor.off("selectionUpdate", handler);
+      editor.off('selectionUpdate', handler);
     };
   }, [editor, nodeName]);
 
@@ -68,23 +68,23 @@ export function useAltTextControl({
 
   const onKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         save();
-      } else if (e.key === "Escape") {
+      } else if (e.key === 'Escape') {
         e.preventDefault();
         cancel();
       }
     },
-    [save, cancel],
+    [save, cancel]
   );
 
   const button = (
-    <Tooltip position="top" label={t("Alt text")} withinPortal={false}>
+    <Tooltip position="top" label={t('Alt text')} withinPortal={false}>
       <ActionIcon
         onClick={open}
         size="lg"
-        aria-label={t("Alt text")}
+        aria-label={t('Alt text')}
         variant="subtle"
       >
         <IconAlt size={18} />
@@ -99,17 +99,17 @@ export function useAltTextControl({
       radius={6}
       p="sm"
       w={320}
-      style={{ position: "relative", zIndex: 100 }}
+      style={{ position: 'relative', zIndex: 100 }}
     >
       <Text size="sm" fw={600} mb={2}>
-        {t("Alt text")}
+        {t('Alt text')}
       </Text>
       <Text size="xs" c="dimmed" mb="xs">
-        {t("Describe this for accessibility.")}
+        {t('Describe this for accessibility.')}
       </Text>
       <Textarea
         size="xs"
-        placeholder={t("Add a description")}
+        placeholder={t('Add a description')}
         value={draft}
         onChange={(e) => setDraft(e.currentTarget.value)}
         onKeyDown={onKeyDown}
@@ -125,10 +125,10 @@ export function useAltTextControl({
         </Text>
         <Group gap="xs">
           <Button size="compact-xs" variant="default" onClick={cancel}>
-            {t("Cancel")}
+            {t('Cancel')}
           </Button>
           <Button size="compact-xs" onClick={save}>
-            {t("Save")}
+            {t('Save')}
           </Button>
         </Group>
       </Group>

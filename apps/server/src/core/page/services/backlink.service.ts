@@ -9,16 +9,16 @@ export type BacklinkDirection = 'incoming' | 'outgoing';
 export class BacklinkService {
   constructor(
     private readonly backlinkRepo: BacklinkRepo,
-    private readonly pagePermissionRepo: PagePermissionRepo,
+    private readonly pagePermissionRepo: PagePermissionRepo
   ) {}
 
   async countByPageId(
     pageId: string,
-    userId: string,
+    userId: string
   ): Promise<{ incoming: number; outgoing: number }> {
     const [incomingIds, outgoingIds] = await Promise.all([
       this.accessibleRelatedIds(pageId, 'incoming', userId),
-      this.accessibleRelatedIds(pageId, 'outgoing', userId),
+      this.accessibleRelatedIds(pageId, 'outgoing', userId)
     ]);
     return { incoming: incomingIds.length, outgoing: outgoingIds.length };
   }
@@ -27,12 +27,12 @@ export class BacklinkService {
     pageId: string,
     direction: BacklinkDirection,
     userId: string,
-    pagination: PaginationOptions,
+    pagination: PaginationOptions
   ) {
     const accessibleIds = await this.accessibleRelatedIds(
       pageId,
       direction,
-      userId,
+      userId
     );
     return this.backlinkRepo.findPagesByIdsPaginated(accessibleIds, pagination);
   }
@@ -40,17 +40,17 @@ export class BacklinkService {
   private async accessibleRelatedIds(
     pageId: string,
     direction: BacklinkDirection,
-    userId: string,
+    userId: string
   ): Promise<string[]> {
     const candidateIds = await this.backlinkRepo.findRelatedPageIds(
       pageId,
       direction,
-      userId,
+      userId
     );
     if (candidateIds.length === 0) return [];
     return this.pagePermissionRepo.filterAccessiblePageIds({
       pageIds: candidateIds,
-      userId,
+      userId
     });
   }
 }

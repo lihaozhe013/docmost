@@ -1,28 +1,28 @@
-import { NodeViewProps, NodeViewWrapper } from "@tiptap/react";
-import { ActionIcon, Menu, Tooltip } from "@mantine/core";
+import { NodeViewProps, NodeViewWrapper } from '@tiptap/react';
+import { ActionIcon, Menu, Tooltip } from '@mantine/core';
 import {
   IconDots,
   IconLinkOff,
   IconPencil,
   IconRefresh,
-  IconTrash,
-} from "@tabler/icons-react";
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { ErrorBoundary } from "react-error-boundary";
-import { useTransclusionLookup } from "./transclusion-lookup-context";
-import TransclusionContent from "./transclusion-content";
-import NoAccessPlaceholder from "./no-access-placeholder";
-import NotFoundPlaceholder from "./not-found-placeholder";
-import ErrorPlaceholder from "./error-placeholder";
-import classes from "./transclusion.module.css";
-import SyncBlockReferencesDropdown from "@/features/transclusion/components/sync-block-references-dropdown";
+  IconTrash
+} from '@tabler/icons-react';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { ErrorBoundary } from 'react-error-boundary';
+import { useTransclusionLookup } from './transclusion-lookup-context';
+import TransclusionContent from './transclusion-content';
+import NoAccessPlaceholder from './no-access-placeholder';
+import NotFoundPlaceholder from './not-found-placeholder';
+import ErrorPlaceholder from './error-placeholder';
+import classes from './transclusion.module.css';
+import SyncBlockReferencesDropdown from '@/features/transclusion/components/sync-block-references-dropdown';
 import {
   useReferencesQuery,
-  useUnsyncReferenceMutation,
-} from "@/features/transclusion/queries/transclusion-query";
-import { buildPageUrl } from "@/features/page/page.utils";
+  useUnsyncReferenceMutation
+} from '@/features/transclusion/queries/transclusion-query';
+import { buildPageUrl } from '@/features/page/page.utils';
 
 export default function TransclusionReferenceView(props: NodeViewProps) {
   const isEditable = props.editor.isEditable;
@@ -35,9 +35,9 @@ export default function TransclusionReferenceView(props: NodeViewProps) {
   return (
     <NodeViewWrapper
       className={classes.includeWrap}
-      data-editable={isEditable ? "true" : "false"}
-      data-focused={isEditable && props.selected ? "true" : "false"}
-      data-menu-open={openMenus > 0 ? "true" : "false"}
+      data-editable={isEditable ? 'true' : 'false'}
+      data-focused={isEditable && props.selected ? 'true' : 'false'}
+      data-menu-open={openMenus > 0 ? 'true' : 'false'}
       contentEditable={false}
     >
       <ErrorBoundary
@@ -55,7 +55,7 @@ function TransclusionReferenceBody({
   node,
   deleteNode,
   getPos,
-  trackOpen,
+  trackOpen
 }: NodeViewProps & { trackOpen: (open: boolean) => void }) {
   const { t } = useTranslation();
   const sourcePageId: string | null = node.attrs.sourcePageId ?? null;
@@ -64,7 +64,7 @@ function TransclusionReferenceBody({
 
   const { result, refresh } = useTransclusionLookup(
     sourcePageId,
-    transclusionId,
+    transclusionId
   );
   const [refreshing, setRefreshing] = useState(false);
   const handleRefresh = async () => {
@@ -84,7 +84,7 @@ function TransclusionReferenceBody({
   const referencesQuery = useReferencesQuery(
     sourcePageId,
     transclusionId,
-    isEditable,
+    isEditable
   );
   const sourcePageHref = (() => {
     const source = referencesQuery.data?.source;
@@ -103,11 +103,11 @@ function TransclusionReferenceBody({
       const { content } = await unsyncMutation.mutateAsync({
         referencePageId: hostPageId,
         sourcePageId,
-        transclusionId,
+        transclusionId
       });
       if (editor.isDestroyed) return;
       const pos = getPos();
-      if (typeof pos !== "number") return;
+      if (typeof pos !== 'number') return;
       const from = pos;
       const to = pos + node.nodeSize;
       editor
@@ -138,7 +138,7 @@ function TransclusionReferenceBody({
             />
           )}
           <span className={classes.controlsDivider} />
-          <Tooltip label={t("Refresh")}>
+          <Tooltip label={t('Refresh')}>
             <ActionIcon
               variant="subtle"
               color="gray"
@@ -151,7 +151,7 @@ function TransclusionReferenceBody({
             </ActionIcon>
           </Tooltip>
           {sourcePageHref && (
-            <Tooltip label={t("Edit source")}>
+            <Tooltip label={t('Edit source')}>
               <ActionIcon
                 component={Link}
                 to={sourcePageHref}
@@ -159,8 +159,8 @@ function TransclusionReferenceBody({
                 color="gray"
                 size="sm"
                 style={{
-                  textDecoration: "none",
-                  borderBottom: "none",
+                  textDecoration: 'none',
+                  borderBottom: 'none'
                 }}
               >
                 <IconPencil size={14} />
@@ -184,14 +184,14 @@ function TransclusionReferenceBody({
                   !transclusionId
                 }
               >
-                {t("Unsync")}
+                {t('Unsync')}
               </Menu.Item>
               <Menu.Item
                 color="red"
                 leftSection={<IconTrash size={14} />}
                 onClick={() => deleteNode()}
               >
-                {t("Remove from page")}
+                {t('Remove from page')}
               </Menu.Item>
             </Menu.Dropdown>
           </Menu>
@@ -202,9 +202,9 @@ function TransclusionReferenceBody({
         <NotFoundPlaceholder />
       ) : !result ? (
         <div style={{ minHeight: 24 }} />
-      ) : !("status" in result) ? (
+      ) : !('status' in result) ? (
         <TransclusionContent content={result.content} />
-      ) : result.status === "no_access" ? (
+      ) : result.status === 'no_access' ? (
         <NoAccessPlaceholder />
       ) : (
         <NotFoundPlaceholder />

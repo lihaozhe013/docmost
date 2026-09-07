@@ -9,7 +9,7 @@ export class CollaborationController {
   async getStats() {
     return {
       connections: this.collaborationGateway.getConnectionCount(),
-      documents: this.collaborationGateway.getDocumentCount(),
+      documents: this.collaborationGateway.getDocumentCount()
     };
   }
 }

@@ -1,10 +1,10 @@
-import { NodePos, useEditor } from "@tiptap/react";
-import { TextSelection } from "@tiptap/pm/state";
-import React, { FC, useEffect, useRef, useState } from "react";
-import classes from "./table-of-contents.module.css";
-import clsx from "clsx";
-import { Box, Text, Title } from "@mantine/core";
-import { useTranslation } from "react-i18next";
+import { NodePos, useEditor } from '@tiptap/react';
+import { TextSelection } from '@tiptap/pm/state';
+import React, { FC, useEffect, useRef, useState } from 'react';
+import classes from './table-of-contents.module.css';
+import clsx from 'clsx';
+import { Box, Text, Title } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 
 type TableOfContentsProps = {
   editor: ReturnType<typeof useEditor>;
@@ -31,13 +31,13 @@ const recalculateLinks = (nodePos: NodePos[]) => {
           level,
           element: item.element,
           //@ts-ignore
-          position: item.resolvedPos.pos,
+          position: item.resolvedPos.pos
         });
         nodes.push(item.element);
       }
       return acc;
     },
-    [],
+    []
   );
   return { links, nodes };
 };
@@ -54,7 +54,7 @@ export const TableOfContents: FC<TableOfContentsProps> = (props) => {
     const { view } = props.editor;
 
     const headerOffset = parseInt(
-      window.getComputedStyle(headerPaddingRef.current).getPropertyValue("top"),
+      window.getComputedStyle(headerPaddingRef.current).getPropertyValue('top')
     );
 
     const { node } = view.domAtPos(position);
@@ -64,7 +64,7 @@ export const TableOfContents: FC<TableOfContentsProps> = (props) => {
 
     window.scrollTo({
       top: scrollPosition,
-      behavior: "smooth",
+      behavior: 'smooth'
     });
 
     const tr = view.state.tr;
@@ -76,7 +76,7 @@ export const TableOfContents: FC<TableOfContentsProps> = (props) => {
   const handleUpdate = () => {
     if (!props.editor || props.editor.isDestroyed) return;
 
-    const result = recalculateLinks(props.editor.$nodes("heading"));
+    const result = recalculateLinks(props.editor.$nodes('heading'));
 
     setLinks(result.links);
     setHeadingDOMNodes(result.nodes);
@@ -84,12 +84,12 @@ export const TableOfContents: FC<TableOfContentsProps> = (props) => {
 
   useEffect(() => {
     // "create" repopulates once the editor view mounts after this component
-    props.editor?.on("create", handleUpdate);
-    props.editor?.on("update", handleUpdate);
+    props.editor?.on('create', handleUpdate);
+    props.editor?.on('update', handleUpdate);
 
     return () => {
-      props.editor?.off("create", handleUpdate);
-      props.editor?.off("update", handleUpdate);
+      props.editor?.off('create', handleUpdate);
+      props.editor?.off('update', handleUpdate);
     };
   }, [props.editor]);
 
@@ -97,7 +97,7 @@ export const TableOfContents: FC<TableOfContentsProps> = (props) => {
     () => {
       handleUpdate();
     },
-    props.isShare ? [props.editor] : [],
+    props.isShare ? [props.editor] : []
   );
 
   useEffect(() => {
@@ -115,17 +115,17 @@ export const TableOfContents: FC<TableOfContentsProps> = (props) => {
         headerOffset = parseInt(
           window
             .getComputedStyle(headerPaddingRef.current)
-            .getPropertyValue("top"),
+            .getPropertyValue('top')
         );
       }
       const observerOptions: IntersectionObserverInit = {
         rootMargin: `-${headerOffset}px 0px -85% 0px`,
         threshold: 0,
-        root: null,
+        root: null
       };
       const observer = new IntersectionObserver(
         observeHandler,
-        observerOptions,
+        observerOptions
       );
 
       headingDOMNodes.forEach((heading) => {
@@ -146,13 +146,13 @@ export const TableOfContents: FC<TableOfContentsProps> = (props) => {
       <>
         {!props.isShare && (
           <Text size="sm">
-            {t("Add headings (H1, H2, H3) to generate a table of contents.")}
+            {t('Add headings (H1, H2, H3) to generate a table of contents.')}
           </Text>
         )}
 
         {props.isShare && (
           <Text size="sm" c="dimmed">
-            {t("No table of contents.")}
+            {t('No table of contents.')}
           </Text>
         )}
       </>
@@ -163,20 +163,20 @@ export const TableOfContents: FC<TableOfContentsProps> = (props) => {
     <>
       {props.isShare && (
         <Title order={2} size="h6" mb="md" fw={500}>
-          {t("Table of contents")}
+          {t('Table of contents')}
         </Title>
       )}
-      <div className={props.isShare ? classes.leftBorder : ""}>
+      <div className={props.isShare ? classes.leftBorder : ''}>
         {links.map((item, idx) => (
-          <Box<"button">
+          <Box<'button'>
             component="button"
             onClick={() => handleScrollToHeading(item.position)}
             key={idx}
             className={clsx(classes.link, {
-              [classes.linkActive]: item.element === activeElement,
+              [classes.linkActive]: item.element === activeElement
             })}
             style={{
-              paddingLeft: `calc(${item.level} * var(--mantine-spacing-md))`,
+              paddingLeft: `calc(${item.level} * var(--mantine-spacing-md))`
             }}
           >
             {item.label}

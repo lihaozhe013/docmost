@@ -4,37 +4,38 @@ import {
   Skeleton,
   Stack,
   Text,
-  UnstyledButton,
-} from "@mantine/core";
-import { IconChevronRight } from "@tabler/icons-react";
-import { useDisclosure } from "@mantine/hooks";
-import { useAtomValue } from "jotai";
-import { useParams } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { extractPageSlugId } from "@/lib";
-import { usePageQuery } from "@/features/page/queries/page-query.ts";
-import { pageEditorAtom } from "@/features/editor/atoms/editor-atoms.ts";
-import { useBacklinksCountQuery } from "@/features/page-details/queries/backlinks-query.ts";
-import { BacklinksModal } from "./backlinks-modal";
-import { formattedDate } from "@/lib/time.ts";
-import { useTimeAgo } from "@/hooks/use-time-ago.tsx";
-import { CustomAvatar } from "@/components/ui/custom-avatar.tsx";
-import { LabelsSection } from "@/features/label/components/labels-section.tsx";
+  UnstyledButton
+} from '@mantine/core';
+import { IconChevronRight } from '@tabler/icons-react';
+import { useDisclosure } from '@mantine/hooks';
+import { useAtomValue } from 'jotai';
+import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { extractPageSlugId } from '@/lib';
+import { usePageQuery } from '@/features/page/queries/page-query.ts';
+import { pageEditorAtom } from '@/features/editor/atoms/editor-atoms.ts';
+import { useBacklinksCountQuery } from '@/features/page-details/queries/backlinks-query.ts';
+import { BacklinksModal } from './backlinks-modal';
+import { formattedDate } from '@/lib/time.ts';
+import { useTimeAgo } from '@/hooks/use-time-ago.tsx';
+import { CustomAvatar } from '@/components/ui/custom-avatar.tsx';
+import { LabelsSection } from '@/features/label/components/labels-section.tsx';
 
 export function PageDetailsAside() {
   const { pageSlug } = useParams();
   const { data: page } = usePageQuery({
-    pageId: extractPageSlugId(pageSlug),
+    pageId: extractPageSlugId(pageSlug)
   });
   const pageEditor = useAtomValue(pageEditorAtom);
-  const { data: counts, isLoading: countsLoading } = useBacklinksCountQuery(page?.id);
+  const { data: counts, isLoading: countsLoading } = useBacklinksCountQuery(
+    page?.id
+  );
   const [modalOpened, { open: openModal, close: closeModal }] =
     useDisclosure(false);
 
   if (!page) return null;
 
-  const wordCount: number =
-    pageEditor?.storage?.characterCount?.words?.() ?? 0;
+  const wordCount: number = pageEditor?.storage?.characterCount?.words?.() ?? 0;
   const characterCount: number =
     pageEditor?.storage?.characterCount?.characters?.() ?? 0;
 
@@ -81,7 +82,7 @@ export function PageDetailsAside() {
 
 function PeopleSection({
   creator,
-  lastUpdatedBy,
+  lastUpdatedBy
 }: {
   creator: { id: string; name: string; avatarUrl: string } | null;
   lastUpdatedBy: { id: string; name: string; avatarUrl: string } | null;
@@ -89,15 +90,15 @@ function PeopleSection({
   const { t } = useTranslation();
   return (
     <Stack gap="xs">
-      <PersonRow label={t("Created by")} person={creator} />
-      <PersonRow label={t("Last updated by")} person={lastUpdatedBy} />
+      <PersonRow label={t('Created by')} person={creator} />
+      <PersonRow label={t('Last updated by')} person={lastUpdatedBy} />
     </Stack>
   );
 }
 
 function PersonRow({
   label,
-  person,
+  person
 }: {
   label: string;
   person: { id: string; name: string; avatarUrl: string } | null;
@@ -132,7 +133,7 @@ function StatsSection({
   wordCount,
   characterCount,
   createdAt,
-  updatedAt,
+  updatedAt
 }: {
   wordCount: number;
   characterCount: number;
@@ -144,15 +145,15 @@ function StatsSection({
   return (
     <Stack gap="xs">
       <Text size="xs" fw={500} c="dimmed">
-        {t("Stats")}
+        {t('Stats')}
       </Text>
-      <StatRow label={t("Word count")} value={String(wordCount)} />
-      <StatRow label={t("Characters")} value={String(characterCount)} />
+      <StatRow label={t('Word count')} value={String(wordCount)} />
+      <StatRow label={t('Characters')} value={String(characterCount)} />
       <StatRow
-        label={t("Created")}
+        label={t('Created')}
         value={formattedDate(new Date(createdAt))}
       />
-      <StatRow label={t("Last updated")} value={lastUpdated} />
+      <StatRow label={t('Last updated')} value={lastUpdated} />
     </Stack>
   );
 }
@@ -172,7 +173,7 @@ function BacklinksSection({
   incomingCount,
   outgoingCount,
   isLoading,
-  onClick,
+  onClick
 }: {
   incomingCount: number;
   outgoingCount: number;
@@ -183,16 +184,16 @@ function BacklinksSection({
   return (
     <Stack gap="xs">
       <Text size="xs" fw={500} c="dimmed">
-        {t("Backlinks")}
+        {t('Backlinks')}
       </Text>
       <BacklinksRow
-        label={t("Incoming links")}
+        label={t('Incoming links')}
         count={incomingCount}
         isLoading={isLoading}
         onClick={onClick}
       />
       <BacklinksRow
-        label={t("Outgoing links")}
+        label={t('Outgoing links')}
         count={outgoingCount}
         isLoading={isLoading}
         onClick={onClick}
@@ -205,7 +206,7 @@ function BacklinksRow({
   label,
   count,
   isLoading,
-  onClick,
+  onClick
 }: {
   label: string;
   count: number;
@@ -216,8 +217,8 @@ function BacklinksRow({
     <UnstyledButton
       onClick={onClick}
       style={{
-        padding: "4px 4px",
-        borderRadius: 4,
+        padding: '4px 4px',
+        borderRadius: 4
       }}
     >
       <Group justify="space-between" wrap="nowrap">
@@ -230,7 +231,11 @@ function BacklinksRow({
           ) : (
             <Text size="sm">{count}</Text>
           )}
-          <IconChevronRight size={16} stroke={2} color="var(--mantine-color-dimmed)" />
+          <IconChevronRight
+            size={16}
+            stroke={2}
+            color="var(--mantine-color-dimmed)"
+          />
         </Group>
       </Group>
     </UnstyledButton>

@@ -3,7 +3,7 @@ import { S3ClientConfig } from '@aws-sdk/client-s3';
 export enum StorageOption {
   LOCAL = 'local',
   S3 = 's3',
-  AZURE = 'azure',
+  AZURE = 'azure'
 }
 
 export type StorageConfig =
@@ -15,8 +15,10 @@ export interface LocalStorageConfig {
   storagePath: string;
 }
 
-export interface S3StorageConfig
-  extends Omit<S3ClientConfig, 'endpoint' | 'bucket'> {
+export interface S3StorageConfig extends Omit<
+  S3ClientConfig,
+  'endpoint' | 'bucket'
+> {
   endpoint: string; // Enforce endpoint
   bucket: string; // Enforce bucket
   baseUrl?: string; // Optional CDN URL for assets

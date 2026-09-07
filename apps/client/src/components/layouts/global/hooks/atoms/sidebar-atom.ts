@@ -1,11 +1,11 @@
-import { atomWithWebStorage } from "@/lib/jotai-helper.ts";
-import { atom } from "jotai";
+import { atomWithWebStorage } from '@/lib/jotai-helper.ts';
+import { atom } from 'jotai';
 
 export const mobileSidebarAtom = atom<boolean>(false);
 
 export const desktopSidebarAtom = atomWithWebStorage<boolean>(
-  "showSidebar",
-  true,
+  'showSidebar',
+  true
 );
 
 export const desktopAsideAtom = atom<boolean>(false);
@@ -17,8 +17,8 @@ type AsideStateType = {
 };
 
 export const asideStateAtom = atom<AsideStateType>({
-  tab: "",
-  isAsideOpen: false,
+  tab: '',
+  isAsideOpen: false
 });
 
 export const sidebarWidthAtom = atomWithWebStorage<number>('sidebarWidth', 300);

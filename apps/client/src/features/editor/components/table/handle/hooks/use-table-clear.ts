@@ -1,19 +1,19 @@
-import { useCallback } from "react";
-import type { Editor } from "@tiptap/react";
-import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
-import { TableMap } from "@tiptap/pm/tables";
-import { isEditorReady } from "@docmost/editor-ext";
+import { useCallback } from 'react';
+import type { Editor } from '@tiptap/react';
+import type { Node as ProseMirrorNode } from '@tiptap/pm/model';
+import { TableMap } from '@tiptap/pm/tables';
+import { isEditorReady } from '@docmost/editor-ext';
 
 type Scope =
-  | { kind: "col"; index: number }
-  | { kind: "row"; index: number }
-  | { kind: "cell"; cellPos: number };
+  | { kind: 'col'; index: number }
+  | { kind: 'row'; index: number }
+  | { kind: 'cell'; cellPos: number };
 
 export function useTableClear(
   editor: Editor,
   tableNode: ProseMirrorNode,
   tablePos: number,
-  scope: Scope,
+  scope: Scope
 ) {
   return useCallback(() => {
     if (!isEditorReady(editor)) return;
@@ -25,18 +25,18 @@ export function useTableClear(
 
     const cellOffsets: number[] = [];
 
-    if (scope.kind === "col") {
+    if (scope.kind === 'col') {
       for (let row = 0; row < map.height; row++) {
         cellOffsets.push(map.map[row * map.width + scope.index]);
       }
-    } else if (scope.kind === "row") {
+    } else if (scope.kind === 'row') {
       for (let col = 0; col < map.width; col++) {
         cellOffsets.push(map.map[scope.index * map.width + col]);
       }
     }
 
     const targets =
-      scope.kind === "cell"
+      scope.kind === 'cell'
         ? [scope.cellPos]
         : Array.from(new Set(cellOffsets)).map((o) => tableStart + o);
 

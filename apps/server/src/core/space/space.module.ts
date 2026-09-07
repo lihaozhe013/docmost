@@ -7,6 +7,6 @@ import { SpaceMemberService } from './services/space-member.service';
   imports: [],
   controllers: [SpaceController],
   providers: [SpaceService, SpaceMemberService],
-  exports: [SpaceService, SpaceMemberService],
+  exports: [SpaceService, SpaceMemberService]
 })
 export class SpaceModule {}

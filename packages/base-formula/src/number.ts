@@ -4,7 +4,7 @@ export function snapNumber(n: number): number {
 }
 
 export function valueToString(v: unknown): string {
-  if (v == null) return "";
-  if (typeof v === "number") return String(snapNumber(v));
+  if (v == null) return '';
+  if (typeof v === 'number') return String(snapNumber(v));
   return String(v);
 }

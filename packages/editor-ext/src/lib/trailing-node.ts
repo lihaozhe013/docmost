@@ -1,23 +1,25 @@
-import { Extension } from '@tiptap/core'
+import { Extension } from '@tiptap/core';
 import { PluginKey, Plugin } from '@tiptap/pm/state';
 
 export interface TrailingNodeExtensionOptions {
-  node: string,
-  notAfter: string[],
+  node: string;
+  notAfter: string[];
 }
 
-function nodeEqualsType({ types, node }: { types: any, node: any }) {
-  if (!node) return false
-  return (Array.isArray(types) && types.includes(node.type)) || node.type === types
+function nodeEqualsType({ types, node }: { types: any; node: any }) {
+  if (!node) return false;
+  return (
+    (Array.isArray(types) && types.includes(node.type)) || node.type === types
+  );
 }
 
 // footnotes must stay the last doc child, so the trailing node goes before it
 function lastNodeBeforeFootnotes(doc: any) {
-  const lastChild = doc.lastChild
+  const lastChild = doc.lastChild;
   if (lastChild?.type.name === 'footnotes') {
-    return doc.childCount > 1 ? doc.child(doc.childCount - 2) : null
+    return doc.childCount > 1 ? doc.child(doc.childCount - 2) : null;
   }
-  return lastChild
+  return lastChild;
 }
 
 // @ts-ignore
@@ -32,17 +34,15 @@ export const TrailingNode = Extension.create<TrailingNodeExtensionOptions>({
   addOptions() {
     return {
       node: 'paragraph',
-      notAfter: [
-        'paragraph',
-      ],
+      notAfter: ['paragraph'],
     };
   },
 
   addProseMirrorPlugins() {
-    const plugin = new PluginKey(this.name)
+    const plugin = new PluginKey(this.name);
     const disabledNodes = Object.entries(this.editor.schema.nodes)
       .map(([, value]) => value)
-      .filter(node => this.options.notAfter.includes(node.name))
+      .filter((node) => this.options.notAfter.includes(node.name));
 
     return [
       new Plugin({
@@ -50,45 +50,46 @@ export const TrailingNode = Extension.create<TrailingNodeExtensionOptions>({
         appendTransaction: (_, __, state) => {
           const { doc, tr, schema } = state;
           const shouldInsertNodeAtEnd = plugin.getState(state);
-          const type = schema.nodes[this.options.node]
+          const type = schema.nodes[this.options.node];
 
           if (!shouldInsertNodeAtEnd) {
             return;
           }
 
-          const lastChild = doc.lastChild
-          const endPosition = lastChild?.type.name === 'footnotes'
-            ? doc.content.size - lastChild.nodeSize
-            : doc.content.size
+          const lastChild = doc.lastChild;
+          const endPosition =
+            lastChild?.type.name === 'footnotes'
+              ? doc.content.size - lastChild.nodeSize
+              : doc.content.size;
 
           return tr.insert(endPosition, type.create());
         },
         state: {
           init: (_, state) => {
             try {
-              const lastNode = lastNodeBeforeFootnotes(state.tr.doc)
-              return !nodeEqualsType({ node: lastNode, types: disabledNodes })
-            } catch (err){
-              console.log(err)
+              const lastNode = lastNodeBeforeFootnotes(state.tr.doc);
+              return !nodeEqualsType({ node: lastNode, types: disabledNodes });
+            } catch (err) {
+              console.log(err);
             }
             return true;
           },
           apply: (tr, value) => {
             if (!tr.docChanged) {
-              return value
+              return value;
             }
 
             // Ignore transactions from UniqueID extension to prevent infinite loops
             // when UniqueID adds IDs to newly inserted trailing nodes
             if (tr.getMeta('__uniqueIDTransaction')) {
-              return value
+              return value;
             }
 
-            const lastNode = lastNodeBeforeFootnotes(tr.doc)
-            return !nodeEqualsType({ node: lastNode, types: disabledNodes })
+            const lastNode = lastNodeBeforeFootnotes(tr.doc);
+            return !nodeEqualsType({ node: lastNode, types: disabledNodes });
           },
         },
       }),
-    ]
-  }
-})
+    ];
+  },
+});

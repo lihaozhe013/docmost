@@ -1,12 +1,12 @@
-import { Extension } from "@tiptap/core";
+import { Extension } from '@tiptap/core';
 import {
   NodeSelection,
   Plugin,
   PluginKey,
-  TextSelection,
-} from "@tiptap/pm/state";
-import { Fragment, Slice, Node } from "@tiptap/pm/model";
-import { EditorView } from "@tiptap/pm/view";
+  TextSelection
+} from '@tiptap/pm/state';
+import { Fragment, Slice, Node } from '@tiptap/pm/model';
+import { EditorView } from '@tiptap/pm/view';
 
 export interface GlobalDragHandleOptions {
   /**
@@ -41,26 +41,26 @@ function absoluteRect(node: Element) {
   const data = node.getBoundingClientRect();
   const modal = node.closest('[role="dialog"]');
 
-  if (modal && window.getComputedStyle(modal).transform !== "none") {
+  if (modal && window.getComputedStyle(modal).transform !== 'none') {
     const modalRect = modal.getBoundingClientRect();
 
     return {
       top: data.top - modalRect.top,
       left: data.left - modalRect.left,
-      width: data.width,
+      width: data.width
     };
   }
   return {
     top: data.top,
     left: data.left,
-    width: data.width,
+    width: data.width
   };
 }
 
 function nodeDOMAtCoords(
   coords: { x: number; y: number },
   options: GlobalDragHandleOptions,
-  view: EditorView,
+  view: EditorView
 ) {
   // Custom nodes (transclusion, …) render via tiptap's React node-view
   // renderer, which emits `class="react-renderer node-${name}"` on the
@@ -72,51 +72,50 @@ function nodeDOMAtCoords(
   // through to the wrapper.
   const customSelectors = options.customNodes.flatMap((node) => [
     `[data-type=${node}]`,
-    `.node-${node}`,
+    `.node-${node}`
   ]);
   const customParagraphSelectors = options.customNodes.flatMap((node) => [
     `[data-type=${node}] p`,
-    `.node-${node} p`,
+    `.node-${node} p`
   ]);
   const atomSelectors = options.atomNodes.flatMap((node) => [
     `[data-type=${node}]`,
-    `.node-${node}`,
+    `.node-${node}`
   ]);
 
   const selectors = [
-    "li",
-    "p:not(:first-child)",
-    "pre",
-    "blockquote",
-    "h1",
-    "h2",
-    "h3",
-    "h4",
-    "h5",
-    "h6",
+    'li',
+    'p:not(:first-child)',
+    'pre',
+    'blockquote',
+    'h1',
+    'h2',
+    'h3',
+    'h4',
+    'h5',
+    'h6',
     // Tables nested in another block (toggle, transclusion, …) have a
     // wrapper that isn't a direct child of .ProseMirror, so the
     // parent-check below skips it. Match the wrapper explicitly so the
     // handle shows up even with empty cells.
-    ".tableWrapper",
+    '.tableWrapper',
     ...customParagraphSelectors,
     ...customSelectors,
-    ...atomSelectors,
-  ].join(", ");
+    ...atomSelectors
+  ].join(', ');
   const found = document
     .elementsFromPoint(coords.x, coords.y)
     .find((elem: Element) => {
       // Skip elements that belong to a nested editor (e.g. transclusion
       // references render their own ProseMirror instance). Only consider
       // elements whose closest editor is this host view.
-      if (elem.closest(".ProseMirror") !== view.dom) return false;
+      if (elem.closest('.ProseMirror') !== view.dom) return false;
       return (
-        elem.parentElement?.matches?.(".ProseMirror") ||
-        elem.matches(selectors)
+        elem.parentElement?.matches?.('.ProseMirror') || elem.matches(selectors)
       );
     });
   if (found && atomSelectors.length > 0) {
-    const atomWrapper = found.closest(atomSelectors.join(", "));
+    const atomWrapper = found.closest(atomSelectors.join(', '));
     if (atomWrapper) return atomWrapper;
   }
   return found;
@@ -124,24 +123,24 @@ function nodeDOMAtCoords(
 function nodePosAtDOM(
   node: Element,
   view: EditorView,
-  options: GlobalDragHandleOptions,
+  options: GlobalDragHandleOptions
 ) {
   const boundingRect = node.getBoundingClientRect();
 
   return view.posAtCoords({
     left: boundingRect.left + 50 + options.dragHandleWidth,
-    top: boundingRect.top + 1,
+    top: boundingRect.top + 1
   })?.inside;
 }
 
 function isCustomNodeDOM(
   elem: Element | null | undefined,
-  options: GlobalDragHandleOptions,
+  options: GlobalDragHandleOptions
 ): boolean {
   if (!elem) return false;
   for (const name of [...options.customNodes, ...options.atomNodes]) {
     if (
-      elem.getAttribute("data-type") === name ||
+      elem.getAttribute('data-type') === name ||
       elem.classList.contains(`node-${name}`)
     ) {
       return true;
@@ -157,9 +156,9 @@ function calcNodePos(pos: number, view: EditorView) {
 }
 
 export function DragHandlePlugin(
-  options: GlobalDragHandleOptions & { pluginKey: string },
+  options: GlobalDragHandleOptions & { pluginKey: string }
 ) {
-  let listType = "";
+  let listType = '';
   function handleDragStart(event: DragEvent, view: EditorView) {
     view.focus();
 
@@ -168,10 +167,10 @@ export function DragHandlePlugin(
     const node = nodeDOMAtCoords(
       {
         x: event.clientX + 50 + options.dragHandleWidth,
-        y: event.clientY,
+        y: event.clientY
       },
       options,
-      view,
+      view
     );
 
     if (!(node instanceof Element)) return;
@@ -188,11 +187,11 @@ export function DragHandlePlugin(
 
     const nodePos = view.state.doc.resolve(fromSelectionPos);
 
-    if (nodePos.node().type.name === "doc") differentNodeSelected = true;
+    if (nodePos.node().type.name === 'doc') differentNodeSelected = true;
     else {
       const nodeSelection = NodeSelection.create(
         view.state.doc,
-        nodePos.before(),
+        nodePos.before()
       );
 
       // Check if the node where the drag event started is part of the current selection
@@ -211,7 +210,7 @@ export function DragHandlePlugin(
       selection = TextSelection.create(
         view.state.doc,
         draggedNodePos,
-        endSelection.$to.pos,
+        endSelection.$to.pos
       );
     } else {
       selection = NodeSelection.create(view.state.doc, draggedNodePos);
@@ -224,14 +223,11 @@ export function DragHandlePlugin(
         // container, not whatever inner element the click landed on.
         const customTypes = new Set([
           ...options.customNodes,
-          ...options.atomNodes,
+          ...options.atomNodes
         ]);
         for (let d = $sel.depth; d > 0; d--) {
           if (customTypes.has($sel.node(d).type.name)) {
-            selection = NodeSelection.create(
-              view.state.doc,
-              $sel.before(d),
-            );
+            selection = NodeSelection.create(view.state.doc, $sel.before(d));
             break;
           }
         }
@@ -245,7 +241,7 @@ export function DragHandlePlugin(
         // never fired.
         let tableDepth = -1;
         for (let d = $sel.depth; d > 0; d--) {
-          if ($sel.node(d).type.name === "table") {
+          if ($sel.node(d).type.name === 'table') {
             tableDepth = d;
             break;
           }
@@ -253,7 +249,7 @@ export function DragHandlePlugin(
         if (tableDepth > 0) {
           selection = NodeSelection.create(
             view.state.doc,
-            $sel.before(tableDepth),
+            $sel.before(tableDepth)
           );
         } else if ((selection as NodeSelection).node.type.isInline) {
           // Inline node (e.g. mention): walk up to the parent block.
@@ -266,7 +262,7 @@ export function DragHandlePlugin(
     // If the selected node is a list item, we need to save the type of the wrapping list e.g. OL or UL
     if (
       view.state.selection instanceof NodeSelection &&
-      view.state.selection.node.type.name === "listItem"
+      view.state.selection.node.type.name === 'listItem'
     ) {
       listType = node.parentElement!.tagName;
     }
@@ -275,23 +271,24 @@ export function DragHandlePlugin(
     const { dom, text } = view.serializeForClipboard(slice);
 
     event.dataTransfer.clearData();
-    event.dataTransfer.setData("text/html", dom.innerHTML);
-    event.dataTransfer.setData("text/plain", text);
-    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData('text/html', dom.innerHTML);
+    event.dataTransfer.setData('text/plain', text);
+    event.dataTransfer.effectAllowed = 'move';
 
-    const previewTemplate =
-      node.querySelector<HTMLElement>("[data-drag-preview]");
+    const previewTemplate = node.querySelector<HTMLElement>(
+      '[data-drag-preview]'
+    );
     if (previewTemplate) {
       const preview = previewTemplate.cloneNode(true) as HTMLElement;
-      preview.removeAttribute("hidden");
-      preview.style.position = "fixed";
-      preview.style.top = "0";
-      preview.style.left = "-10000px";
-      preview.style.pointerEvents = "none";
+      preview.removeAttribute('hidden');
+      preview.style.position = 'fixed';
+      preview.style.top = '0';
+      preview.style.left = '-10000px';
+      preview.style.pointerEvents = 'none';
       document.body.appendChild(preview);
       event.dataTransfer.setDragImage(preview, 0, 0);
-      document.addEventListener("dragend", () => preview.remove(), {
-        once: true,
+      document.addEventListener('dragend', () => preview.remove(), {
+        once: true
       });
     } else {
       event.dataTransfer.setDragImage(node, 0, 0);
@@ -304,13 +301,13 @@ export function DragHandlePlugin(
 
   function hideDragHandle() {
     if (dragHandleElement) {
-      dragHandleElement.classList.add("hide");
+      dragHandleElement.classList.add('hide');
     }
   }
 
   function showDragHandle() {
     if (dragHandleElement) {
-      dragHandleElement.classList.remove("hide");
+      dragHandleElement.classList.remove('hide');
     }
   }
 
@@ -319,8 +316,8 @@ export function DragHandlePlugin(
       // Check if the relatedTarget class is still inside the editor
       const relatedTarget = event.relatedTarget as HTMLElement;
       const isInsideEditor =
-        relatedTarget?.classList.contains("tiptap") ||
-        relatedTarget?.classList.contains("drag-handle");
+        relatedTarget?.classList.contains('tiptap') ||
+        relatedTarget?.classList.contains('drag-handle');
 
       if (isInsideEditor) return;
     }
@@ -333,28 +330,28 @@ export function DragHandlePlugin(
       const handleBySelector = options.dragHandleSelector
         ? document.querySelector<HTMLElement>(options.dragHandleSelector)
         : null;
-      dragHandleElement = handleBySelector ?? document.createElement("div");
+      dragHandleElement = handleBySelector ?? document.createElement('div');
       dragHandleElement.draggable = true;
-      dragHandleElement.dataset.dragHandle = "";
-      dragHandleElement.classList.add("drag-handle");
+      dragHandleElement.dataset.dragHandle = '';
+      dragHandleElement.classList.add('drag-handle');
 
       function onDragHandleDragStart(e: DragEvent) {
         handleDragStart(e, view);
       }
 
-      dragHandleElement.addEventListener("dragstart", onDragHandleDragStart);
+      dragHandleElement.addEventListener('dragstart', onDragHandleDragStart);
 
       function onDragHandleDrag(e: DragEvent) {
         hideDragHandle();
         let scrollY = window.scrollY;
         if (e.clientY < options.scrollThreshold) {
-          window.scrollTo({ top: scrollY - 30, behavior: "smooth" });
+          window.scrollTo({ top: scrollY - 30, behavior: 'smooth' });
         } else if (window.innerHeight - e.clientY < options.scrollThreshold) {
-          window.scrollTo({ top: scrollY + 30, behavior: "smooth" });
+          window.scrollTo({ top: scrollY + 30, behavior: 'smooth' });
         }
       }
 
-      dragHandleElement.addEventListener("drag", onDragHandleDrag);
+      dragHandleElement.addEventListener('drag', onDragHandleDrag);
 
       hideDragHandle();
 
@@ -362,8 +359,8 @@ export function DragHandlePlugin(
         view?.dom?.parentElement?.appendChild(dragHandleElement);
       }
       view?.dom?.parentElement?.addEventListener(
-        "mouseout",
-        hideHandleOnEditorOut,
+        'mouseout',
+        hideHandleOnEditorOut
       );
 
       return {
@@ -371,17 +368,17 @@ export function DragHandlePlugin(
           if (!handleBySelector) {
             dragHandleElement?.remove?.();
           }
-          dragHandleElement?.removeEventListener("drag", onDragHandleDrag);
+          dragHandleElement?.removeEventListener('drag', onDragHandleDrag);
           dragHandleElement?.removeEventListener(
-            "dragstart",
-            onDragHandleDragStart,
+            'dragstart',
+            onDragHandleDragStart
           );
           dragHandleElement = null;
           view?.dom?.parentElement?.removeEventListener(
-            "mouseout",
-            hideHandleOnEditorOut,
+            'mouseout',
+            hideHandleOnEditorOut
           );
-        },
+        }
       };
     },
     props: {
@@ -394,16 +391,16 @@ export function DragHandlePlugin(
           const node = nodeDOMAtCoords(
             {
               x: event.clientX + 50 + options.dragHandleWidth,
-              y: event.clientY,
+              y: event.clientY
             },
             options,
-            view,
+            view
           );
 
-          const notDragging = node?.closest(".not-draggable");
+          const notDragging = node?.closest('.not-draggable');
           const excludedTagList = options.excludedTags
-            .concat(["ol", "ul"])
-            .join(", ");
+            .concat(['ol', 'ul'])
+            .join(', ');
 
           if (
             !(node instanceof Element) ||
@@ -423,7 +420,7 @@ export function DragHandlePlugin(
             // child is the visible NodeViewWrapper; walk to that outer first since
             // `node` may be either the outer or an inner element with data-type.
             const rendererOuter =
-              (node.closest(".react-renderer") as HTMLElement | null) ?? node;
+              (node.closest('.react-renderer') as HTMLElement | null) ?? node;
             const inner =
               (rendererOuter.firstElementChild as HTMLElement | null) ??
               rendererOuter;
@@ -447,14 +444,14 @@ export function DragHandlePlugin(
           rect.top += (lineHeight - 24) / 2;
           rect.top += paddingTop;
           // Li markers
-          if (node.matches("ul:not([data-type=taskList]) li, ol li")) {
+          if (node.matches('ul:not([data-type=taskList]) li, ol li')) {
             rect.left -= options.dragHandleWidth;
           }
           // Tables: clear the table's own row-drag handle so the two
           // grips don't stack on each other. `nodeDOMAtCoords` returns
           // the wrapper for top-level hovers (wrapper is direct child of
           // .ProseMirror) and a descendant for deeper hovers — cover both.
-          if (node.closest(".tableWrapper")) {
+          if (node.closest('.tableWrapper')) {
             rect.left -= options.dragHandleWidth;
           }
           rect.width = options.dragHandleWidth;
@@ -473,15 +470,15 @@ export function DragHandlePlugin(
         },
         // dragging class is used for CSS
         dragstart: (view) => {
-          view.dom.classList.add("dragging");
+          view.dom.classList.add('dragging');
         },
         drop: (view, event) => {
-          view.dom.classList.remove("dragging");
+          view.dom.classList.remove('dragging');
           hideDragHandle();
           let droppedNode: Node | null = null;
           const dropPos = view.posAtCoords({
             left: event.clientX,
-            top: event.clientY,
+            top: event.clientY
           });
 
           if (!dropPos) return;
@@ -494,33 +491,33 @@ export function DragHandlePlugin(
           const resolvedPos = view.state.doc.resolve(dropPos.pos);
 
           const isDroppedInsideList =
-            resolvedPos.parent.type.name === "listItem";
+            resolvedPos.parent.type.name === 'listItem';
 
           // If the selected node is a list item and is not dropped inside a list, we need to wrap it inside <ol> tag otherwise ol list items will be transformed into ul list item when dropped
           if (
             view.state.selection instanceof NodeSelection &&
-            view.state.selection.node.type.name === "listItem" &&
+            view.state.selection.node.type.name === 'listItem' &&
             !isDroppedInsideList &&
-            listType == "OL"
+            listType == 'OL'
           ) {
             const newList = view.state.schema.nodes.orderedList?.createAndFill(
               null,
-              droppedNode,
+              droppedNode
             );
             const slice = new Slice(Fragment.from(newList), 0, 0);
             view.dragging = { slice, move: event.ctrlKey };
           }
         },
         dragend: (view) => {
-          view.dom.classList.remove("dragging");
-        },
-      },
-    },
+          view.dom.classList.remove('dragging');
+        }
+      }
+    }
   });
 }
 
 const GlobalDragHandle = Extension.create({
-  name: "globalDragHandle",
+  name: 'globalDragHandle',
 
   addOptions() {
     return {
@@ -529,23 +526,23 @@ const GlobalDragHandle = Extension.create({
       dragHandleSelector: undefined,
       excludedTags: [],
       customNodes: [],
-      atomNodes: [],
+      atomNodes: []
     };
   },
 
   addProseMirrorPlugins() {
     return [
       DragHandlePlugin({
-        pluginKey: "globalDragHandle",
+        pluginKey: 'globalDragHandle',
         dragHandleWidth: this.options.dragHandleWidth,
         scrollThreshold: this.options.scrollThreshold,
         dragHandleSelector: this.options.dragHandleSelector,
         excludedTags: this.options.excludedTags,
         customNodes: this.options.customNodes,
-        atomNodes: this.options.atomNodes,
-      }),
+        atomNodes: this.options.atomNodes
+      })
     ];
-  },
+  }
 });
 
 export default GlobalDragHandle;

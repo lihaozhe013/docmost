@@ -1,13 +1,17 @@
-import { useState } from "react";
-import { login, logout, setupWorkspace } from "@/features/auth/services/auth-service";
-import { useNavigate } from "react-router-dom";
-import { useAtom } from "jotai";
-import { currentUserAtom } from "@/features/user/atoms/current-user-atom";
-import { ILogin, ISetupWorkspace } from "@/features/auth/types/auth.types";
-import { notifications } from "@mantine/notifications";
-import APP_ROUTE, { getPostLoginRedirect } from "@/lib/app-route.ts";
-import { RESET } from "jotai/utils";
-import { useTranslation } from "react-i18next";
+import { useState } from 'react';
+import {
+  login,
+  logout,
+  setupWorkspace
+} from '@/features/auth/services/auth-service';
+import { useNavigate } from 'react-router-dom';
+import { useAtom } from 'jotai';
+import { currentUserAtom } from '@/features/user/atoms/current-user-atom';
+import { ILogin, ISetupWorkspace } from '@/features/auth/types/auth.types';
+import { notifications } from '@mantine/notifications';
+import APP_ROUTE, { getPostLoginRedirect } from '@/lib/app-route.ts';
+import { RESET } from 'jotai/utils';
+import { useTranslation } from 'react-i18next';
 
 export default function useAuth() {
   const { t } = useTranslation();
@@ -37,7 +41,7 @@ export default function useAuth() {
 
       notifications.show({
         message,
-        color: "red",
+        color: 'red'
       });
     }
   };
@@ -53,7 +57,7 @@ export default function useAuth() {
       setIsLoading(false);
       notifications.show({
         message: err.response?.data.message,
-        color: "red",
+        color: 'red'
       });
     }
   };
@@ -68,6 +72,6 @@ export default function useAuth() {
     signIn: handleSignIn,
     setupWorkspace: handleSetupWorkspace,
     logout: handleLogout,
-    isLoading,
+    isLoading
   };
 }

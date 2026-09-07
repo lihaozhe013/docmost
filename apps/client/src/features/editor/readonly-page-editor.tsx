@@ -1,27 +1,27 @@
-import "@/features/editor/styles/index.css";
+import '@/features/editor/styles/index.css';
 import React, {
   useCallback,
   useEffect,
   useMemo,
   useRef,
-  useState,
-} from "react";
-import { Editor, EditorProvider } from "@tiptap/react";
-import { mainExtensions } from "@/features/editor/extensions/extensions";
-import { Document } from "@tiptap/extension-document";
-import { Heading, UniqueID } from "@docmost/editor-ext";
-import { Text } from "@tiptap/extension-text";
-import { Placeholder } from "@tiptap/extension-placeholder";
-import { useAtom } from "jotai";
+  useState
+} from 'react';
+import { Editor, EditorProvider } from '@tiptap/react';
+import { mainExtensions } from '@/features/editor/extensions/extensions';
+import { Document } from '@tiptap/extension-document';
+import { Heading, UniqueID } from '@docmost/editor-ext';
+import { Text } from '@tiptap/extension-text';
+import { Placeholder } from '@tiptap/extension-placeholder';
+import { useAtom } from 'jotai';
 import {
   lightboxRequestAtom,
-  readOnlyEditorAtom,
-} from "@/features/editor/atoms/editor-atoms.ts";
-import { useEditorScroll } from "./hooks/use-editor-scroll";
-import { TransclusionLookupProvider } from "@/features/editor/components/transclusion/transclusion-lookup-context";
+  readOnlyEditorAtom
+} from '@/features/editor/atoms/editor-atoms.ts';
+import { useEditorScroll } from './hooks/use-editor-scroll';
+import { TransclusionLookupProvider } from '@/features/editor/components/transclusion/transclusion-lookup-context';
 import LightboxView, {
-  getLightboxClickRequest,
-} from "@/features/editor/components/common/lightbox-view";
+  getLightboxClickRequest
+} from '@/features/editor/components/common/lightbox-view';
 
 interface PageEditorProps {
   title: string;
@@ -42,7 +42,7 @@ export default function ReadonlyPageEditor({
   content,
   pageId,
   printMode = false,
-  shareId,
+  shareId
 }: PageEditorProps) {
   const [, setReadOnlyEditor] = useAtom(readOnlyEditorAtom);
   const [lightboxRequest, setLightboxRequest] = useAtom(lightboxRequestAtom);
@@ -52,11 +52,11 @@ export default function ReadonlyPageEditor({
 
   const canScroll = useCallback(
     () => isComponentMounted.current && editorCreated.current,
-    [isComponentMounted, editorCreated],
+    [isComponentMounted, editorCreated]
   );
   const initialScrollTo = window.location.hash
     ? window.location.hash.slice(1)
-    : "";
+    : '';
   const { handleScrollTo } = useEditorScroll({ canScroll, initialScrollTo });
 
   useEffect(() => {
@@ -70,32 +70,32 @@ export default function ReadonlyPageEditor({
 
   const extensions = useMemo(() => {
     const excludedExtensions = new Set([
-      "uniqueID",
-      ...(printMode ? ["tableHeaderPin", "tableReadonlySort"] : []),
+      'uniqueID',
+      ...(printMode ? ['tableHeaderPin', 'tableReadonlySort'] : [])
     ]);
     const filteredExtensions = mainExtensions.filter(
-      (ext) => !excludedExtensions.has(ext.name),
+      (ext) => !excludedExtensions.has(ext.name)
     );
 
     return [
       ...filteredExtensions,
       UniqueID.configure({
-        types: ["heading", "paragraph"],
-        updateDocument: false,
-      }),
+        types: ['heading', 'paragraph'],
+        updateDocument: false
+      })
     ];
   }, [printMode]);
 
   const titleExtensions = [
     Document.extend({
-      content: "heading",
+      content: 'heading'
     }),
     Heading,
     Text,
     Placeholder.configure({
-      placeholder: "Untitled",
-      showOnlyWhenEditable: false,
-    }),
+      placeholder: 'Untitled',
+      showOnlyWhenEditable: false
+    })
   ];
 
   return (
@@ -125,7 +125,7 @@ export default function ReadonlyPageEditor({
 
                   setLightboxRequest(request);
                   return true;
-                },
+                }
               }
             : undefined
         }
@@ -148,12 +148,12 @@ export default function ReadonlyPageEditor({
         <LightboxView
           editor={contentEditor}
           open={!!lightboxRequest}
-          src={lightboxRequest?.src ?? ""}
-          type={lightboxRequest?.type ?? "image"}
+          src={lightboxRequest?.src ?? ''}
+          type={lightboxRequest?.type ?? 'image'}
           onClose={() => setLightboxRequest(null)}
         />
       )}
-      <div style={{ paddingBottom: "20vh" }}></div>
+      <div style={{ paddingBottom: '20vh' }}></div>
     </TransclusionLookupProvider>
   );
 }

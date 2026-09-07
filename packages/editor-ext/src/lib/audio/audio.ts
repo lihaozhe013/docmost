@@ -1,7 +1,7 @@
-import { Node, mergeAttributes } from "@tiptap/core";
-import { ReactNodeViewRenderer } from "@tiptap/react";
-import { normalizeFileUrl } from "../media-utils";
-import { sanitizeUrl, isInternalFileUrl } from "../utils";
+import { Node, mergeAttributes } from '@tiptap/core';
+import { ReactNodeViewRenderer } from '@tiptap/react';
+import { normalizeFileUrl } from '../media-utils';
+import { sanitizeUrl, isInternalFileUrl } from '../utils';
 
 export interface AudioOptions {
   view: any;
@@ -18,7 +18,7 @@ export interface AudioAttributes {
   };
 }
 
-declare module "@tiptap/core" {
+declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     audioBlock: {
       setAudio: (attributes: AudioAttributes) => ReturnType;
@@ -27,9 +27,9 @@ declare module "@tiptap/core" {
 }
 
 export const TiptapAudio = Node.create<AudioOptions>({
-  name: "audio",
+  name: 'audio',
 
-  group: "block",
+  group: 'block',
   isolating: true,
   atom: true,
   defining: true,
@@ -45,30 +45,30 @@ export const TiptapAudio = Node.create<AudioOptions>({
   addAttributes() {
     return {
       src: {
-        default: "",
+        default: '',
         parseHTML: (element) => {
-          const src = element.getAttribute("src");
+          const src = element.getAttribute('src');
           const sanitized = sanitizeUrl(src);
-          return isInternalFileUrl(sanitized) ? sanitized : "";
+          return isInternalFileUrl(sanitized) ? sanitized : '';
         },
         renderHTML: (attributes) => ({
           src: isInternalFileUrl(attributes.src)
             ? sanitizeUrl(attributes.src)
-            : "",
+            : '',
         }),
       },
       attachmentId: {
         default: undefined,
-        parseHTML: (element) => element.getAttribute("data-attachment-id"),
+        parseHTML: (element) => element.getAttribute('data-attachment-id'),
         renderHTML: (attributes: AudioAttributes) => ({
-          "data-attachment-id": attributes.attachmentId,
+          'data-attachment-id': attributes.attachmentId,
         }),
       },
       size: {
         default: null,
-        parseHTML: (element) => element.getAttribute("data-size"),
+        parseHTML: (element) => element.getAttribute('data-size'),
         renderHTML: (attributes: AudioAttributes) => ({
-          "data-size": attributes.size,
+          'data-size': attributes.size,
         }),
       },
       placeholder: {
@@ -81,20 +81,20 @@ export const TiptapAudio = Node.create<AudioOptions>({
   parseHTML() {
     return [
       {
-        tag: "audio",
+        tag: 'audio',
       },
     ];
   },
 
   renderHTML({ HTMLAttributes }) {
     return [
-      "audio",
+      'audio',
       mergeAttributes(
-        { controls: "true", preload: "metadata" },
+        { controls: 'true', preload: 'metadata' },
         this.options.HTMLAttributes,
         HTMLAttributes,
       ),
-      ["source", { src: HTMLAttributes.src }],
+      ['source', { src: HTMLAttributes.src }],
     ];
   },
 
@@ -104,7 +104,7 @@ export const TiptapAudio = Node.create<AudioOptions>({
         (attrs: AudioAttributes) =>
         ({ commands }) => {
           return commands.insertContent({
-            type: "audio",
+            type: 'audio',
             attrs: attrs,
           });
         },
@@ -118,15 +118,15 @@ export const TiptapAudio = Node.create<AudioOptions>({
     }
 
     return ({ node, HTMLAttributes }) => {
-      const dom = document.createElement("div");
-      const audio = document.createElement("audio");
+      const dom = document.createElement('div');
+      const audio = document.createElement('audio');
       const src = node.attrs.src;
       if (src && isInternalFileUrl(src)) {
         audio.src = normalizeFileUrl(src);
       }
       audio.controls = true;
-      audio.preload = "metadata";
-      audio.style.width = "100%";
+      audio.preload = 'metadata';
+      audio.style.width = '100%';
       dom.append(audio);
       return { dom };
     };

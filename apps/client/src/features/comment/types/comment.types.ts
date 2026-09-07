@@ -1,5 +1,5 @@
-import { IUser } from "@/features/user/types/user.types";
-import { QueryParams } from "@/lib/types.ts";
+import { IUser } from '@/features/user/types/user.types';
+import { QueryParams } from '@/lib/types.ts';
 
 export interface IComment {
   id: string;

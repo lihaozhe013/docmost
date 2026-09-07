@@ -1,5 +1,5 @@
-import slugify from "@sindresorhus/slugify";
-import type { TFunction } from "i18next";
+import slugify from '@sindresorhus/slugify';
+import type { TFunction } from 'i18next';
 
 /**
  * Display title for a page, with a base-aware empty-title fallback: bases
@@ -9,17 +9,17 @@ import type { TFunction } from "i18next";
 export function getPageTitle(
   title: string | null | undefined,
   isBase: boolean | undefined,
-  t: TFunction,
+  t: TFunction
 ): string {
-  return title || (isBase ? t("Untitled base") : t("Untitled"));
+  return title || (isBase ? t('Untitled base') : t('Untitled'));
 }
 
 const buildPageSlug = (pageSlugId: string, pageTitle?: string): string => {
-  const titleSlug = slugify(pageTitle?.substring(0, 70) || "untitled", {
+  const titleSlug = slugify(pageTitle?.substring(0, 70) || 'untitled', {
     customReplacements: [
-      ["♥", ""],
-      ["🦄", ""],
-    ],
+      ['♥', ''],
+      ['🦄', '']
+    ]
   });
 
   return `${titleSlug}-${pageSlugId}`;
@@ -29,7 +29,7 @@ export const buildPageUrl = (
   spaceName: string,
   pageSlugId: string,
   pageTitle?: string,
-  anchorId?: string,
+  anchorId?: string
 ): string => {
   let url: string;
   if (spaceName === undefined) {

@@ -7,7 +7,7 @@ import {
   HttpStatus,
   NotFoundException,
   Post,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { FavoriteService } from './services/favorite.service';
 import { AddFavoriteDto, RemoveFavoriteDto } from './dto/favorite.dto';
@@ -34,7 +34,7 @@ export class FavoriteController {
     private readonly spaceRepo: SpaceRepo,
     private readonly spaceMemberRepo: SpaceMemberRepo,
     private readonly pageAccessService: PageAccessService,
-    private readonly templateRepo: TemplateRepo,
+    private readonly templateRepo: TemplateRepo
   ) {}
 
   @HttpCode(HttpStatus.OK)
@@ -42,7 +42,7 @@ export class FavoriteController {
   async addFavorite(
     @Body() dto: AddFavoriteDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const resolved = await this.resolveAndValidate(dto, user, workspace.id);
 
@@ -50,7 +50,7 @@ export class FavoriteController {
       type: dto.type,
       pageId: dto.pageId,
       spaceId: dto.type === 'space' ? resolved.spaceId : undefined,
-      templateId: dto.templateId,
+      templateId: dto.templateId
     });
   }
 
@@ -59,7 +59,7 @@ export class FavoriteController {
   async removeFavorite(
     @Body() dto: RemoveFavoriteDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     await this.resolveAndValidate(dto, user, workspace.id);
 
@@ -67,7 +67,7 @@ export class FavoriteController {
       type: dto.type,
       pageId: dto.pageId,
       spaceId: dto.spaceId,
-      templateId: dto.templateId,
+      templateId: dto.templateId
     });
   }
 
@@ -76,13 +76,13 @@ export class FavoriteController {
   async getFavoriteIds(
     @Body() dto: FavoriteIdsDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     return this.favoriteService.getFavoriteIds(
       user.id,
       workspace.id,
       dto.type as FavoriteType,
-      dto.spaceId,
+      dto.spaceId
     );
   }
 
@@ -92,21 +92,21 @@ export class FavoriteController {
     @Body() dto: ListFavoritesDto,
     @Body() pagination: PaginationOptions,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     return this.favoriteService.getUserFavorites(
       user.id,
       workspace.id,
       pagination,
       dto.type as FavoriteType | undefined,
-      dto.spaceId,
+      dto.spaceId
     );
   }
 
   private async resolveAndValidate(
     dto: AddFavoriteDto | RemoveFavoriteDto,
     user: User,
-    workspaceId: string,
+    workspaceId: string
   ): Promise<{ spaceId: string; page?: Page }> {
     if (dto.type === 'page') {
       if (!dto.pageId) throw new BadRequestException('pageId is required');
@@ -129,7 +129,7 @@ export class FavoriteController {
         throw new BadRequestException('templateId is required');
       const template = await this.templateRepo.findById(
         dto.templateId,
-        workspaceId,
+        workspaceId
       );
       if (!template) throw new NotFoundException('Template not found');
       if (template.spaceId) {
@@ -143,7 +143,7 @@ export class FavoriteController {
 
   private async validateSpaceAccess(
     userId: string,
-    spaceId: string,
+    spaceId: string
   ): Promise<void> {
     const userSpaceIds = await this.spaceMemberRepo.getUserSpaceIds(userId);
     if (!userSpaceIds.includes(spaceId)) {

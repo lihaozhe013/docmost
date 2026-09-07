@@ -1,13 +1,13 @@
-import { Extension } from "@tiptap/core";
+import { Extension } from '@tiptap/core';
 
-declare module "@tiptap/core" {
+declare module '@tiptap/core' {
   interface Storage {
     shared: Record<string, any>;
   }
 }
 
 const SharedStorage = Extension.create({
-  name: "shared",
+  name: 'shared',
 
   addStorage() {
     return {};

@@ -1,5 +1,5 @@
-import { Transform, ReplaceStep, Step } from "@tiptap/pm/transform";
-import { getReplaceStep } from "./getReplaceStep";
+import { Transform, ReplaceStep, Step } from '@tiptap/pm/transform';
+import { getReplaceStep } from './getReplaceStep';
 
 // join adjacent ReplaceSteps
 export function simplifyTransform(tr: Transform) {

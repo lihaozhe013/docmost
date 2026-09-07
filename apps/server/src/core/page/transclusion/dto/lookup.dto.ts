@@ -5,7 +5,7 @@ import {
   IsString,
   IsUUID,
   MaxLength,
-  ValidateNested,
+  ValidateNested
 } from 'class-validator';
 
 export class LookupReferenceDto {

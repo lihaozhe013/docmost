@@ -1,7 +1,7 @@
 import {
   BadRequestException,
   createParamDecorator,
-  ExecutionContext,
+  ExecutionContext
 } from '@nestjs/common';
 
 export const AuthWorkspace = createParamDecorator(
@@ -14,5 +14,5 @@ export const AuthWorkspace = createParamDecorator(
     }
 
     return workspace;
-  },
+  }
 );

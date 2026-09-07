@@ -1,55 +1,55 @@
-import api from "@/lib/api-client";
-import loadImage from "blueimp-load-image";
+import api from '@/lib/api-client';
+import loadImage from 'blueimp-load-image';
 import {
   AvatarIconType,
   IAttachment,
-  IPageAttachment,
-} from "@/features/attachments/types/attachment.types.ts";
-import { IPagination, QueryParams } from "@/lib/types.ts";
+  IPageAttachment
+} from '@/features/attachments/types/attachment.types.ts';
+import { IPagination, QueryParams } from '@/lib/types.ts';
 
 export async function getPageAttachments(
   pageId: string,
-  params?: QueryParams,
+  params?: QueryParams
 ): Promise<IPagination<IPageAttachment>> {
-  const req = await api.post("/pages/attachments", { pageId, ...params });
+  const req = await api.post('/pages/attachments', { pageId, ...params });
   return req.data;
 }
 
 async function compressAndResizeIcon(
   file: File,
-  type: AvatarIconType,
+  type: AvatarIconType
 ): Promise<File> {
-  const isPng = file.type === "image/png";
+  const isPng = file.type === 'image/png';
 
   const { image: canvas } = await loadImage(file, {
     maxWidth: 300,
     maxHeight: 300,
     canvas: true,
     orientation: true,
-    imageSmoothingQuality: "high",
+    imageSmoothingQuality: 'high'
   });
 
   if (type === AvatarIconType.AVATAR || !isPng) {
-    const ctx = (canvas as HTMLCanvasElement).getContext("2d")!;
-    ctx.globalCompositeOperation = "destination-over";
-    ctx.fillStyle = "#ffffff";
+    const ctx = (canvas as HTMLCanvasElement).getContext('2d')!;
+    ctx.globalCompositeOperation = 'destination-over';
+    ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.globalCompositeOperation = "source-over";
+    ctx.globalCompositeOperation = 'source-over';
   }
 
-  const outputType = isPng ? "image/png" : "image/jpeg";
+  const outputType = isPng ? 'image/png' : 'image/jpeg';
 
   return new Promise<File>((resolve, reject) => {
     (canvas as HTMLCanvasElement).toBlob(
       (blob) => {
         if (!blob) {
-          reject(new Error("Failed to compress image"));
+          reject(new Error('Failed to compress image'));
           return;
         }
         resolve(new File([blob], file.name, { type: outputType }));
       },
       outputType,
-      isPng ? undefined : 0.85,
+      isPng ? undefined : 0.85
     );
   });
 }
@@ -57,21 +57,21 @@ async function compressAndResizeIcon(
 export async function uploadIcon(
   file: File,
   type: AvatarIconType,
-  spaceId?: string,
+  spaceId?: string
 ): Promise<IAttachment> {
   const processed = await compressAndResizeIcon(file, type);
 
   const formData = new FormData();
-  formData.append("type", type);
+  formData.append('type', type);
   if (spaceId) {
-    formData.append("spaceId", spaceId);
+    formData.append('spaceId', spaceId);
   }
-  formData.append("image", processed);
+  formData.append('image', processed);
 
-  return await api.post("/attachments/upload-image", formData, {
+  return await api.post('/attachments/upload-image', formData, {
     headers: {
-      "Content-Type": "multipart/form-data",
-    },
+      'Content-Type': 'multipart/form-data'
+    }
   });
 }
 
@@ -81,7 +81,7 @@ export async function uploadUserAvatar(file: File): Promise<IAttachment> {
 
 export async function uploadSpaceIcon(
   file: File,
-  spaceId: string,
+  spaceId: string
 ): Promise<IAttachment> {
   return uploadIcon(file, AvatarIconType.SPACE_ICON, spaceId);
 }
@@ -92,7 +92,7 @@ export async function uploadWorkspaceIcon(file: File): Promise<IAttachment> {
 
 async function removeIcon(
   type: AvatarIconType,
-  spaceId?: string,
+  spaceId?: string
 ): Promise<void> {
   const payload: { spaceId?: string; type: string } = { type };
 
@@ -100,7 +100,7 @@ async function removeIcon(
     payload.spaceId = spaceId;
   }
 
-  await api.post("/attachments/remove-icon", payload);
+  await api.post('/attachments/remove-icon', payload);
 }
 
 export async function removeAvatar(): Promise<void> {

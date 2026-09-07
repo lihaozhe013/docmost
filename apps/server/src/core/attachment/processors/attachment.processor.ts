@@ -10,7 +10,7 @@ export class AttachmentProcessor extends WorkerHost implements OnModuleDestroy {
   private readonly logger = new Logger(AttachmentProcessor.name);
   constructor(
     private readonly attachmentService: AttachmentService,
-    private moduleRef: ModuleRef,
+    private moduleRef: ModuleRef
   ) {
     super();
   }
@@ -25,12 +25,12 @@ export class AttachmentProcessor extends WorkerHost implements OnModuleDestroy {
       }
       if (job.name === QueueJob.DELETE_PAGE_ATTACHMENTS) {
         await this.attachmentService.handleDeletePageAttachments(
-          job.data.pageId,
+          job.data.pageId
         );
       }
       if (job.name === QueueJob.DELETE_AI_CHAT_ATTACHMENTS) {
         await this.attachmentService.handleDeleteAiChatAttachments(
-          job.data.aiChatId,
+          job.data.aiChatId
         );
       }
       if (
@@ -43,21 +43,19 @@ export class AttachmentProcessor extends WorkerHost implements OnModuleDestroy {
           AttachmentEeModule = require('./../../../ee/attachments-ee/attachment-ee.service');
         } catch (err) {
           this.logger.debug(
-            'Attachment enterprise module requested but EE module not bundled in this build',
+            'Attachment enterprise module requested but EE module not bundled in this build'
           );
           return;
         }
         const attachmentEeService = this.moduleRef.get(
           AttachmentEeModule.AttachmentEeService,
-          { strict: false },
+          { strict: false }
         );
 
         if (job.name === QueueJob.ATTACHMENT_INDEX_CONTENT) {
           await attachmentEeService.indexAttachment(job.data.attachmentId);
         } else if (job.name === QueueJob.ATTACHMENT_INDEXING) {
-          await attachmentEeService.indexAttachments(
-            job.data.workspaceId,
-          );
+          await attachmentEeService.indexAttachments(job.data.workspaceId);
         }
       }
     } catch (err) {
@@ -74,11 +72,11 @@ export class AttachmentProcessor extends WorkerHost implements OnModuleDestroy {
   onError(job: Job) {
     if (job.name === QueueJob.ATTACHMENT_INDEX_CONTENT) {
       this.logger.debug(
-        `Error processing ${job.name} job for attachment ${job.data?.attachmentId}. Reason: ${job.failedReason}`,
+        `Error processing ${job.name} job for attachment ${job.data?.attachmentId}. Reason: ${job.failedReason}`
       );
     } else {
       this.logger.error(
-        `Error processing ${job.name} job. Reason: ${job.failedReason}`,
+        `Error processing ${job.name} job. Reason: ${job.failedReason}`
       );
     }
   }

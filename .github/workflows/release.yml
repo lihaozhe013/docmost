@@ -45,7 +45,9 @@ jobs:
         with:
           context: .
           platforms: ${{ matrix.platform }}
-          outputs: type=image,name=${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
+          outputs:
+            type=image,name=${{ env.IMAGE_NAME
+            }},push-by-digest=true,name-canonical=true,push=true
           cache-from: type=gha,scope=${{ matrix.suffix }}
           cache-to: type=gha,scope=${{ matrix.suffix }},mode=max
 
@@ -71,7 +73,9 @@ jobs:
 
       - name: Get version
         id: version
-        run: echo "value=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+        run:
+          echo "value=$(node -p "require('./package.json').version")" >>
+          "$GITHUB_OUTPUT"
 
       - name: Download digests
         uses: actions/download-artifact@v4

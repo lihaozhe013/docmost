@@ -15,7 +15,7 @@ import { UserRole } from '../../../common/helpers/types/permission';
 import { AuditEvent, AuditResource } from '../../../common/events/audit-events';
 import {
   AUDIT_SERVICE,
-  IAuditService,
+  IAuditService
 } from '../../../integrations/audit/audit.service';
 
 @Injectable()
@@ -26,22 +26,22 @@ export class SignupService {
     private workspaceService: WorkspaceService,
     private groupUserRepo: GroupUserRepo,
     @InjectKysely() private readonly db: KyselyDB,
-    @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService,
+    @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService
   ) {}
 
   async signup(
     createUserDto: CreateUserDto,
     workspaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<User> {
     const userCheck = await this.userRepo.findByEmail(
       createUserDto.email,
-      workspaceId,
+      workspaceId
     );
 
     if (userCheck) {
       throw new BadRequestException(
-        'An account with this email already exists in this workspace',
+        'An account with this email already exists in this workspace'
       );
     }
 
@@ -50,15 +50,15 @@ export class SignupService {
       async (trx) => {
         // create user
         const workspace = await this.workspaceRepo.findById(workspaceId, {
-          trx,
+          trx
         });
         const user = await this.userRepo.insertUser(
           {
             ...createUserDto,
-            workspaceId: workspaceId,
+            workspaceId: workspaceId
           },
           trx,
-          { pageEditMode: getWorkspaceDefaultPageEditMode(workspace) },
+          { pageEditMode: getWorkspaceDefaultPageEditMode(workspace) }
         );
 
         // add user to workspace
@@ -66,18 +66,18 @@ export class SignupService {
           user.id,
           workspaceId,
           undefined,
-          trx,
+          trx
         );
 
         // add user to default group
         await this.groupUserRepo.addUserToDefaultGroup(
           user.id,
           workspaceId,
-          trx,
+          trx
         );
         return user;
       },
-      trx,
+      trx
     );
 
     this.auditService.log({
@@ -88,12 +88,12 @@ export class SignupService {
         after: {
           name: user.name,
           email: user.email,
-          role: user.role,
-        },
+          role: user.role
+        }
       },
       metadata: {
-        source: 'signup',
-      },
+        source: 'signup'
+      }
     });
 
     return user;
@@ -101,7 +101,7 @@ export class SignupService {
 
   async initialSetup(
     createAdminUserDto: CreateAdminUserDto,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ) {
     let user: User,
       workspace: Workspace = null;
@@ -116,27 +116,27 @@ export class SignupService {
             email: createAdminUserDto.email,
             password: createAdminUserDto.password,
             role: UserRole.OWNER,
-            emailVerifiedAt: new Date(),
+            emailVerifiedAt: new Date()
           },
-          trx,
+          trx
         );
 
         // create workspace with full setup
         const workspaceData: CreateWorkspaceDto = {
           name: createAdminUserDto.workspaceName || 'My workspace',
-          hostname: createAdminUserDto.hostname,
+          hostname: createAdminUserDto.hostname
         };
 
         workspace = await this.workspaceService.create(
           user,
           workspaceData,
-          trx,
+          trx
         );
 
         user.workspaceId = workspace.id;
         return user;
       },
-      trx,
+      trx
     );
 
     return { user, workspace };

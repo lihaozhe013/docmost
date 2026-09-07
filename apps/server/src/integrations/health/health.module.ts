@@ -8,6 +8,6 @@ import { RedisHealthIndicator } from './redis.health';
 @Module({
   controllers: [HealthController],
   providers: [PostgresHealthIndicator, RedisHealthIndicator],
-  imports: [TerminusModule],
+  imports: [TerminusModule]
 })
 export class HealthModule {}

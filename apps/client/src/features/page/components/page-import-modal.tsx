@@ -5,8 +5,8 @@ import {
   FileButton,
   Group,
   Text,
-  Tooltip,
-} from "@mantine/core";
+  Tooltip
+} from '@mantine/core';
 import {
   IconBrandNotion,
   IconCheck,
@@ -15,29 +15,29 @@ import {
   IconFileTypePdf,
   IconFileTypeZip,
   IconMarkdown,
-  IconX,
-} from "@tabler/icons-react";
+  IconX
+} from '@tabler/icons-react';
 import {
   importPage,
-  importZip,
-} from "@/features/page/services/page-service.ts";
-import { notifications } from "@mantine/notifications";
-import { treeDataAtom } from "@/features/page/tree/atoms/tree-data-atom.ts";
-import { useAtom } from "jotai";
-import { buildTree } from "@/features/page/tree/utils";
-import { IPage } from "@/features/page/types/page.types.ts";
-import React, { useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { ConfluenceIcon } from "@/components/icons/confluence-icon.tsx";
-import { getFileImportSizeLimit } from "@/lib/config.ts";
-import { formatBytes } from "@/lib";
-import { useHasFeature } from "@/ee/hooks/use-feature";
-import { Feature } from "@/ee/features";
-import { useUpgradeLabel } from "@/ee/hooks/use-upgrade-label";
-import { getFileTaskById } from "@/features/file-task/services/file-task-service.ts";
-import { queryClient } from "@/main.tsx";
-import { useQueryEmit } from "@/features/websocket/use-query-emit.ts";
-import bytes from "bytes";
+  importZip
+} from '@/features/page/services/page-service.ts';
+import { notifications } from '@mantine/notifications';
+import { treeDataAtom } from '@/features/page/tree/atoms/tree-data-atom.ts';
+import { useAtom } from 'jotai';
+import { buildTree } from '@/features/page/tree/utils';
+import { IPage } from '@/features/page/types/page.types.ts';
+import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { ConfluenceIcon } from '@/components/icons/confluence-icon.tsx';
+import { getFileImportSizeLimit } from '@/lib/config.ts';
+import { formatBytes } from '@/lib';
+import { useHasFeature } from '@/ee/hooks/use-feature';
+import { Feature } from '@/ee/features';
+import { useUpgradeLabel } from '@/ee/hooks/use-upgrade-label';
+import { getFileTaskById } from '@/features/file-task/services/file-task-service.ts';
+import { queryClient } from '@/main.tsx';
+import { useQueryEmit } from '@/features/websocket/use-query-emit.ts';
+import bytes from 'bytes';
 
 interface PageImportModalProps {
   spaceId: string;
@@ -48,7 +48,7 @@ interface PageImportModalProps {
 export default function PageImportModal({
   spaceId,
   open,
-  onClose,
+  onClose
 }: PageImportModalProps) {
   const { t } = useTranslation();
   return (
@@ -64,10 +64,10 @@ export default function PageImportModal({
         keepMounted={true}
       >
         <Modal.Overlay />
-        <Modal.Content style={{ overflow: "hidden" }}>
+        <Modal.Content style={{ overflow: 'hidden' }}>
           <Modal.Header py={0}>
-            <Modal.Title fw={500}>{t("Import pages")}</Modal.Title>
-            <Modal.CloseButton aria-label={t("Close")} />
+            <Modal.Title fw={500}>{t('Import pages')}</Modal.Title>
+            <Modal.CloseButton aria-label={t('Close')} />
           </Modal.Header>
           <Modal.Body>
             <ImportFormatSelection spaceId={spaceId} onClose={onClose} />
@@ -109,10 +109,10 @@ function ImportFormatSelection({ spaceId, onClose }: ImportFormatSelection) {
     const maxSize = getFileImportSizeLimit();
     if (selectedFile.size > maxSize) {
       notifications.show({
-        color: "red",
-        message: t("File exceeds the {{limit}} import limit", {
-          limit: formatBytes(maxSize),
-        }),
+        color: 'red',
+        message: t('File exceeds the {{limit}} import limit', {
+          limit: formatBytes(maxSize)
+        })
       });
       return;
     }
@@ -121,47 +121,47 @@ function ImportFormatSelection({ spaceId, onClose }: ImportFormatSelection) {
       onClose();
 
       notifications.show({
-        id: "import",
-        title: t("Uploading import file"),
+        id: 'import',
+        title: t('Uploading import file'),
         message: t("Please don't close this tab."),
         loading: true,
         withCloseButton: false,
-        autoClose: false,
+        autoClose: false
       });
 
       const importTask = await importZip(selectedFile, spaceId, source);
       notifications.update({
-        id: "import",
-        title: t("Importing pages"),
+        id: 'import',
+        title: t('Importing pages'),
         message: t(
-          "Page import is in progress. You can check back later if this takes longer.",
+          'Page import is in progress. You can check back later if this takes longer.'
         ),
         loading: true,
         withCloseButton: true,
-        autoClose: false,
+        autoClose: false
       });
 
       setFileTaskId(importTask.id);
 
       // Reset file input after successful upload
-      if (source === "notion" && notionFileRef.current) {
+      if (source === 'notion' && notionFileRef.current) {
         notionFileRef.current();
-      } else if (source === "confluence" && confluenceFileRef.current) {
+      } else if (source === 'confluence' && confluenceFileRef.current) {
         confluenceFileRef.current();
-      } else if (source === "generic" && zipFileRef.current) {
+      } else if (source === 'generic' && zipFileRef.current) {
         zipFileRef.current();
       }
     } catch (err) {
-      console.log("Failed to upload import file", err);
+      console.log('Failed to upload import file', err);
       notifications.update({
-        id: "import",
-        color: "red",
-        title: t("Failed to upload import file"),
+        id: 'import',
+        color: 'red',
+        title: t('Failed to upload import file'),
         message: err?.response.data.message,
         icon: <IconX size={18} />,
         loading: false,
         withCloseButton: true,
-        autoClose: false,
+        autoClose: false
       });
     }
   };
@@ -174,51 +174,51 @@ function ImportFormatSelection({ spaceId, onClose }: ImportFormatSelection) {
         const fileTask = await getFileTaskById(fileTaskId);
         const status = fileTask.status;
 
-        if (status === "success") {
+        if (status === 'success') {
           notifications.update({
-            id: "import",
-            color: "teal",
-            title: t("Import complete"),
-            message: t("Your pages were successfully imported."),
+            id: 'import',
+            color: 'teal',
+            title: t('Import complete'),
+            message: t('Your pages were successfully imported.'),
             icon: <IconCheck size={18} />,
             loading: false,
             withCloseButton: true,
-            autoClose: false,
+            autoClose: false
           });
           clearInterval(intervalId);
           setFileTaskId(null);
 
           await queryClient.refetchQueries({
-            queryKey: ["root-sidebar-pages", fileTask.spaceId],
+            queryKey: ['root-sidebar-pages', fileTask.spaceId]
           });
 
           await queryClient.invalidateQueries({
-            queryKey: ["recent-changes", fileTask.spaceId],
+            queryKey: ['recent-changes', fileTask.spaceId]
           });
 
           setTimeout(() => {
             emit({
-              operation: "refetchRootTreeNodeEvent",
-              spaceId: spaceId,
+              operation: 'refetchRootTreeNodeEvent',
+              spaceId: spaceId
             });
           }, 50);
         }
 
-        if (status === "failed") {
+        if (status === 'failed') {
           notifications.update({
-            id: "import",
-            color: "red",
-            title: t("Page import failed"),
+            id: 'import',
+            color: 'red',
+            title: t('Page import failed'),
             message: t(
-              "Something went wrong while importing pages: {{reason}}.",
+              'Something went wrong while importing pages: {{reason}}.',
               {
-                reason: fileTask.errorMessage,
-              },
+                reason: fileTask.errorMessage
+              }
             ),
             icon: <IconX size={18} />,
             loading: false,
             withCloseButton: true,
-            autoClose: false,
+            autoClose: false
           });
           clearInterval(intervalId);
           setFileTaskId(null);
@@ -226,28 +226,28 @@ function ImportFormatSelection({ spaceId, onClose }: ImportFormatSelection) {
         }
       } catch (err) {
         notifications.update({
-          id: "import",
-          color: "red",
-          title: t("Import failed"),
+          id: 'import',
+          color: 'red',
+          title: t('Import failed'),
           message: t(
-            "Something went wrong while importing pages: {{reason}}.",
+            'Something went wrong while importing pages: {{reason}}.',
             {
-              reason: err.response?.data.message,
-            },
+              reason: err.response?.data.message
+            }
           ),
           icon: <IconX size={18} />,
           loading: false,
           withCloseButton: true,
-          autoClose: false,
+          autoClose: false
         });
         clearInterval(intervalId);
         setFileTaskId(null);
-        console.error("Failed to fetch import status", err);
+        console.error('Failed to fetch import status', err);
       }
     }, 3000);
   }, [fileTaskId]);
 
-  const maxSingleFileSize = bytes("30mb");
+  const maxSingleFileSize = bytes('30mb');
 
   const handleFileUpload = async (selectedFiles: File[]) => {
     if (!selectedFiles) {
@@ -255,14 +255,14 @@ function ImportFormatSelection({ spaceId, onClose }: ImportFormatSelection) {
     }
 
     const oversizedFiles = selectedFiles.filter(
-      (f) => f.size > maxSingleFileSize,
+      (f) => f.size > maxSingleFileSize
     );
     if (oversizedFiles.length > 0) {
       notifications.show({
-        color: "red",
-        message: t("File exceeds the {{limit}} import limit", {
-          limit: formatBytes(maxSingleFileSize),
-        }),
+        color: 'red',
+        message: t('File exceeds the {{limit}} import limit', {
+          limit: formatBytes(maxSingleFileSize)
+        })
       });
       return;
     }
@@ -270,10 +270,10 @@ function ImportFormatSelection({ spaceId, onClose }: ImportFormatSelection) {
     onClose();
 
     const alert = notifications.show({
-      title: t("Importing pages"),
-      message: t("Page import is in progress. Please do not close this tab."),
+      title: t('Importing pages'),
+      message: t('Page import is in progress. Please do not close this tab.'),
       loading: true,
-      autoClose: false,
+      autoClose: false
     });
 
     const pages: IPage[] = [];
@@ -285,7 +285,7 @@ function ImportFormatSelection({ spaceId, onClose }: ImportFormatSelection) {
         pages.push(page);
         pageCount += 1;
       } catch (err) {
-        console.log("Failed to import page", err);
+        console.log('Failed to import page', err);
       }
     }
 
@@ -304,26 +304,26 @@ function ImportFormatSelection({ spaceId, onClose }: ImportFormatSelection) {
       if (pdfFileRef.current) pdfFileRef.current();
 
       const pageCountText =
-        pageCount === 1 ? `1 ${t("page")}` : `${pageCount} ${t("pages")}`;
+        pageCount === 1 ? `1 ${t('page')}` : `${pageCount} ${t('pages')}`;
 
       notifications.update({
         id: alert,
-        color: "teal",
-        title: `${t("Successfully imported")} ${pageCountText}`,
-        message: t("Your import is complete."),
+        color: 'teal',
+        title: `${t('Successfully imported')} ${pageCountText}`,
+        message: t('Your import is complete.'),
         icon: <IconCheck size={18} />,
         loading: false,
-        autoClose: 5000,
+        autoClose: 5000
       });
     } else {
       notifications.update({
         id: alert,
-        color: "red",
-        title: t("Failed to import pages"),
-        message: t("Unable to import pages. Please try again."),
+        color: 'red',
+        title: t('Failed to import pages'),
+        message: t('Unable to import pages. Please try again.'),
         icon: <IconX size={18} />,
         loading: false,
-        autoClose: 5000,
+        autoClose: 5000
       });
     }
   };
@@ -338,7 +338,7 @@ function ImportFormatSelection({ spaceId, onClose }: ImportFormatSelection) {
           multiple
           resetRef={markdownFileRef}
           inputProps={{
-            "aria-label": t("Choose {{format}} file", { format: "Markdown" }),
+            'aria-label': t('Choose {{format}} file', { format: 'Markdown' })
           }}
         >
           {(props) => (
@@ -359,7 +359,7 @@ function ImportFormatSelection({ spaceId, onClose }: ImportFormatSelection) {
           multiple
           resetRef={htmlFileRef}
           inputProps={{
-            "aria-label": t("Choose {{format}} file", { format: "HTML" }),
+            'aria-label': t('Choose {{format}} file', { format: 'HTML' })
           }}
         >
           {(props) => (
@@ -380,14 +380,11 @@ function ImportFormatSelection({ spaceId, onClose }: ImportFormatSelection) {
           multiple
           resetRef={docxFileRef}
           inputProps={{
-            "aria-label": t("Choose {{format}} file", { format: "Word (DOCX)" }),
+            'aria-label': t('Choose {{format}} file', { format: 'Word (DOCX)' })
           }}
         >
           {(props) => (
-            <Tooltip
-              label={upgradeLabel}
-              disabled={canUseDocx}
-            >
+            <Tooltip label={upgradeLabel} disabled={canUseDocx}>
               <Button
                 disabled={!canUseDocx}
                 justify="start"
@@ -407,14 +404,11 @@ function ImportFormatSelection({ spaceId, onClose }: ImportFormatSelection) {
           multiple
           resetRef={pdfFileRef}
           inputProps={{
-            "aria-label": t("Choose {{format}} file", { format: "PDF" }),
+            'aria-label': t('Choose {{format}} file', { format: 'PDF' })
           }}
         >
           {(props) => (
-            <Tooltip
-              label={upgradeLabel}
-              disabled={canUsePdf}
-            >
+            <Tooltip label={upgradeLabel} disabled={canUsePdf}>
               <Button
                 disabled={!canUsePdf}
                 justify="start"
@@ -429,11 +423,11 @@ function ImportFormatSelection({ spaceId, onClose }: ImportFormatSelection) {
         </FileButton>
 
         <FileButton
-          onChange={(file) => handleZipUpload(file, "notion")}
+          onChange={(file) => handleZipUpload(file, 'notion')}
           accept="application/zip"
           resetRef={notionFileRef}
           inputProps={{
-            "aria-label": t("Choose {{format}} file", { format: "Notion" }),
+            'aria-label': t('Choose {{format}} file', { format: 'Notion' })
           }}
         >
           {(props) => (
@@ -448,18 +442,15 @@ function ImportFormatSelection({ spaceId, onClose }: ImportFormatSelection) {
           )}
         </FileButton>
         <FileButton
-          onChange={(file) => handleZipUpload(file, "confluence")}
+          onChange={(file) => handleZipUpload(file, 'confluence')}
           accept="application/zip"
           resetRef={confluenceFileRef}
           inputProps={{
-            "aria-label": t("Choose {{format}} file", { format: "Confluence" }),
+            'aria-label': t('Choose {{format}} file', { format: 'Confluence' })
           }}
         >
           {(props) => (
-            <Tooltip
-              label={upgradeLabel}
-              disabled={canUseConfluence}
-            >
+            <Tooltip label={upgradeLabel} disabled={canUseConfluence}>
               <Button
                 disabled={!canUseConfluence}
                 justify="start"
@@ -483,16 +474,16 @@ function ImportFormatSelection({ spaceId, onClose }: ImportFormatSelection) {
             {t(
               `Upload zip file containing Markdown and HTML files. Max: {{sizeLimit}}`,
               {
-                sizeLimit: formatBytes(getFileImportSizeLimit()),
-              },
+                sizeLimit: formatBytes(getFileImportSizeLimit())
+              }
             )}
           </Text>
           <FileButton
-            onChange={(file) => handleZipUpload(file, "generic")}
+            onChange={(file) => handleZipUpload(file, 'generic')}
             accept="application/zip"
             resetRef={zipFileRef}
             inputProps={{
-              "aria-label": t("Choose {{format}} file", { format: "ZIP" }),
+              'aria-label': t('Choose {{format}} file', { format: 'ZIP' })
             }}
           >
             {(props) => (
@@ -502,7 +493,7 @@ function ImportFormatSelection({ spaceId, onClose }: ImportFormatSelection) {
                   leftSection={<IconFileTypeZip size={18} />}
                   {...props}
                 >
-                  {t("Upload file")}
+                  {t('Upload file')}
                 </Button>
               </Group>
             )}

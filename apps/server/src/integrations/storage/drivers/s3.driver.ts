@@ -6,7 +6,7 @@ import {
   HeadObjectCommand,
   NoSuchKey,
   PutObjectCommand,
-  S3Client,
+  S3Client
 } from '@aws-sdk/client-s3';
 import { streamToBuffer } from '../storage.utils';
 import { Readable } from 'stream';
@@ -26,8 +26,8 @@ export class S3Driver implements StorageDriver {
       ...config,
       requestHandler: {
         httpAgent: { maxSockets: S3_MAX_SOCKETS },
-        httpsAgent: { maxSockets: S3_MAX_SOCKETS },
-      },
+        httpsAgent: { maxSockets: S3_MAX_SOCKETS }
+      }
     };
     this.s3Client = new S3Client(this.config as any);
   }
@@ -42,8 +42,8 @@ export class S3Driver implements StorageDriver {
           Bucket: this.config.bucket,
           Key: filePath,
           Body: file,
-          ContentType: contentType,
-        },
+          ContentType: contentType
+        }
       });
 
       await upload.done();
@@ -56,7 +56,7 @@ export class S3Driver implements StorageDriver {
   async uploadStream(
     filePath: string,
     file: Readable,
-    options?: { recreateClient?: boolean },
+    options?: { recreateClient?: boolean }
   ): Promise<void> {
     let clientToUse = this.s3Client;
     let shouldDestroyClient = false;
@@ -77,8 +77,8 @@ export class S3Driver implements StorageDriver {
           Bucket: this.config.bucket,
           Key: filePath,
           Body: file,
-          ContentType: contentType,
-        },
+          ContentType: contentType
+        }
       });
 
       await upload.done();
@@ -99,8 +99,8 @@ export class S3Driver implements StorageDriver {
           new CopyObjectCommand({
             Bucket: this.config.bucket,
             CopySource: `${this.config.bucket}/${fromFilePath}`,
-            Key: toFilePath,
-          }),
+            Key: toFilePath
+          })
         );
       }
     } catch (err) {
@@ -112,7 +112,7 @@ export class S3Driver implements StorageDriver {
     try {
       const command = new GetObjectCommand({
         Bucket: this.config.bucket,
-        Key: filePath,
+        Key: filePath
       });
 
       const response = await this.s3Client.send(command);
@@ -127,7 +127,7 @@ export class S3Driver implements StorageDriver {
     try {
       const command = new GetObjectCommand({
         Bucket: this.config.bucket,
-        Key: filePath,
+        Key: filePath
       });
 
       const response = await this.s3Client.send(command);
@@ -140,13 +140,13 @@ export class S3Driver implements StorageDriver {
 
   async readRangeStream(
     filePath: string,
-    range: { start: number; end: number },
+    range: { start: number; end: number }
   ): Promise<Readable> {
     try {
       const command = new GetObjectCommand({
         Bucket: this.config.bucket,
         Key: filePath,
-        Range: `bytes=${range.start}-${range.end}`,
+        Range: `bytes=${range.start}-${range.end}`
       });
 
       const response = await this.s3Client.send(command);
@@ -161,7 +161,7 @@ export class S3Driver implements StorageDriver {
     try {
       const command = new HeadObjectCommand({
         Bucket: this.config.bucket,
-        Key: filePath,
+        Key: filePath
       });
 
       await this.s3Client.send(command);
@@ -180,7 +180,7 @@ export class S3Driver implements StorageDriver {
   async getSignedUrl(filePath: string, expiresIn: number): Promise<string> {
     const command = new GetObjectCommand({
       Bucket: this.config.bucket,
-      Key: filePath,
+      Key: filePath
     });
     return await getSignedUrl(this.s3Client, command, { expiresIn });
   }
@@ -189,13 +189,13 @@ export class S3Driver implements StorageDriver {
     try {
       const command = new DeleteObjectCommand({
         Bucket: this.config.bucket,
-        Key: filePath,
+        Key: filePath
       });
 
       await this.s3Client.send(command);
     } catch (err) {
       throw new Error(
-        `Error deleting file ${filePath} from S3. ${(err as Error).message}`,
+        `Error deleting file ${filePath} from S3. ${(err as Error).message}`
       );
     }
   }

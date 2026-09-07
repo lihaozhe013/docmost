@@ -5,7 +5,7 @@ import { dbOrTx } from '@docmost/db/utils';
 import {
   Group,
   InsertableGroup,
-  UpdatableGroup,
+  UpdatableGroup
 } from '@docmost/db/types/entity.types';
 import { ExpressionBuilder, sql } from 'kysely';
 import { PaginationOptions } from '../../pagination/pagination-options';
@@ -27,7 +27,7 @@ export class GroupRepo {
     'workspaceId',
     'createdAt',
     'updatedAt',
-    'deletedAt',
+    'deletedAt'
   ];
 
   async findById(
@@ -37,7 +37,7 @@ export class GroupRepo {
       includeMemberCount?: boolean;
       includeScimExternalId?: boolean;
       trx?: KyselyTransaction;
-    },
+    }
   ): Promise<Group> {
     const db = dbOrTx(this.db, opts?.trx);
     return db
@@ -57,7 +57,7 @@ export class GroupRepo {
       includeMemberCount?: boolean;
       includeScimExternalId?: boolean;
       trx?: KyselyTransaction;
-    },
+    }
   ): Promise<Group> {
     const db = dbOrTx(this.db, opts?.trx);
     return db
@@ -74,7 +74,7 @@ export class GroupRepo {
     updatableGroup: UpdatableGroup,
     groupId: string,
     workspaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<void> {
     const db = dbOrTx(this.db, trx);
 
@@ -88,7 +88,7 @@ export class GroupRepo {
 
   async insertGroup(
     insertableGroup: InsertableGroup,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<Group> {
     const db = dbOrTx(this.db, trx);
     return db
@@ -100,7 +100,7 @@ export class GroupRepo {
 
   async getDefaultGroup(
     workspaceId: string,
-    trx: KyselyTransaction,
+    trx: KyselyTransaction
   ): Promise<Group> {
     const db = dbOrTx(this.db, trx);
     return (
@@ -116,14 +116,14 @@ export class GroupRepo {
 
   async createDefaultGroup(
     workspaceId: string,
-    opts?: { userId?: string; trx?: KyselyTransaction },
+    opts?: { userId?: string; trx?: KyselyTransaction }
   ): Promise<Group> {
     const { userId, trx } = opts;
     const insertableGroup: InsertableGroup = {
       name: DefaultGroup.EVERYONE,
       isDefault: true,
       creatorId: userId,
-      workspaceId: workspaceId,
+      workspaceId: workspaceId
     };
 
     return this.insertGroup(insertableGroup, trx);
@@ -141,12 +141,12 @@ export class GroupRepo {
         eb(
           sql`f_unaccent(name)`,
           'ilike',
-          sql`f_unaccent(${'%' + pagination.query + '%'})`,
+          sql`f_unaccent(${'%' + pagination.query + '%'})`
         ).or(
           sql`f_unaccent(description)`,
           'ilike',
-          sql`f_unaccent(${'%' + pagination.query + '%'})`,
-        ),
+          sql`f_unaccent(${'%' + pagination.query + '%'})`
+        )
       );
     }
 
@@ -159,16 +159,16 @@ export class GroupRepo {
         {
           expression: 'sub.memberCount',
           direction: 'desc',
-          key: 'memberCount',
+          key: 'memberCount'
         },
         { expression: 'sub.name', direction: 'asc', key: 'name' },
-        { expression: 'sub.id', direction: 'asc', key: 'id' },
+        { expression: 'sub.id', direction: 'asc', key: 'id' }
       ],
       parseCursor: (cursor) => ({
         memberCount: parseInt(cursor.memberCount, 10),
         name: cursor.name,
-        id: cursor.id,
-      }),
+        id: cursor.id
+      })
     });
   }
 
@@ -183,7 +183,7 @@ export class GroupRepo {
   async delete(
     groupId: string,
     workspaceId: string,
-    opts?: { trx?: KyselyTransaction },
+    opts?: { trx?: KyselyTransaction }
   ): Promise<void> {
     const { trx } = opts;
     const db = dbOrTx(this.db, trx);

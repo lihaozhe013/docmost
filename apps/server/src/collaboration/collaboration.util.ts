@@ -48,13 +48,13 @@ import {
   BaseEmbed,
   Footnotes,
   Footnote,
-  FootnoteReference,
+  FootnoteReference
 } from '@docmost/editor-ext';
 import {
   extensions as coreExtensions,
   generateText,
   getSchema,
-  JSONContent,
+  JSONContent
 } from '@tiptap/core';
 import { generateHTML, generateJSON } from '../common/helpers/prosemirror/html';
 import { collapseBlankLines } from '../common/helpers';
@@ -73,21 +73,21 @@ export const tiptapExtensions = [
     codeBlock: false,
     link: false,
     trailingNode: false,
-    heading: false,
+    heading: false
   }),
   Document.extend({
-    content: 'block+ footnotes?',
+    content: 'block+ footnotes?'
   }),
   Heading,
   UniqueID.configure({
-    types: ['heading', 'paragraph', 'transclusionSource'],
+    types: ['heading', 'paragraph', 'transclusionSource']
   }),
   Comment,
   TextAlign.configure({ types: ['heading', 'paragraph'] }),
   Indent,
   TaskList,
   TaskItem.configure({
-    nested: true,
+    nested: true
   }),
   LinkExtension,
   Superscript,
@@ -128,7 +128,7 @@ export const tiptapExtensions = [
   BaseEmbed,
   Footnotes,
   Footnote,
-  FootnoteReference,
+  FootnoteReference
 ] as any;
 
 export function jsonToHtml(tiptapJson: any) {
@@ -185,7 +185,7 @@ export function isEmptyParagraphDoc(tiptapJson: JSONContent): boolean {
 
 function stripUnknownNodes(
   json: JSONContent,
-  schema: Schema,
+  schema: Schema
 ): JSONContent | null {
   if (!json || typeof json !== 'object') return json;
 

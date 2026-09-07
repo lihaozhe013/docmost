@@ -1,20 +1,20 @@
-import { useParams } from "react-router-dom";
-import { usePageQuery } from "@/features/page/queries/page-query";
-import { FullEditor } from "@/features/editor/full-editor";
-import { TitleEditor } from "@/features/editor/title-editor";
-import HistoryModal from "@/features/page-history/components/history-modal";
-import PageHeader from "@/features/page/components/header/page-header.tsx";
-import { extractPageSlugId } from "@/lib";
-import { useGetSpaceBySlugQuery } from "@/features/space/queries/space-query.ts";
-import { useTranslation } from "react-i18next";
-import React from "react";
-import { EmptyState } from "@/components/ui/empty-state.tsx";
-import { IconAlertTriangle, IconFileOff } from "@tabler/icons-react";
-import { Button } from "@mantine/core";
-import { Link } from "react-router-dom";
-import { ErrorBoundary } from "react-error-boundary";
-import { getPageTitle } from "@/features/page/page.utils";
-import { DocumentTitle } from "@/components/ui/document-title.tsx";
+import { useParams } from 'react-router-dom';
+import { usePageQuery } from '@/features/page/queries/page-query';
+import { FullEditor } from '@/features/editor/full-editor';
+import { TitleEditor } from '@/features/editor/title-editor';
+import HistoryModal from '@/features/page-history/components/history-modal';
+import PageHeader from '@/features/page/components/header/page-header.tsx';
+import { extractPageSlugId } from '@/lib';
+import { useGetSpaceBySlugQuery } from '@/features/space/queries/space-query.ts';
+import { useTranslation } from 'react-i18next';
+import React from 'react';
+import { EmptyState } from '@/components/ui/empty-state.tsx';
+import { IconAlertTriangle, IconFileOff } from '@tabler/icons-react';
+import { Button } from '@mantine/core';
+import { Link } from 'react-router-dom';
+import { ErrorBoundary } from 'react-error-boundary';
+import { getPageTitle } from '@/features/page/page.utils';
+import { DocumentTitle } from '@/components/ui/document-title.tsx';
 const MemoizedFullEditor = React.memo(FullEditor);
 const MemoizedTitleEditor = React.memo(TitleEditor);
 const MemoizedPageHeader = React.memo(PageHeader);
@@ -30,10 +30,15 @@ export default function Page() {
       fallbackRender={({ resetErrorBoundary }) => (
         <EmptyState
           icon={IconAlertTriangle}
-          title={t("Failed to load page. An error occurred.")}
+          title={t('Failed to load page. An error occurred.')}
           action={
-            <Button variant="default" size="sm" mt="xs" onClick={resetErrorBoundary}>
-              {t("Try again")}
+            <Button
+              variant="default"
+              size="sm"
+              mt="xs"
+              onClick={resetErrorBoundary}
+            >
+              {t('Try again')}
             </Button>
           }
         />
@@ -51,41 +56,43 @@ function PageContent({ pageSlug }: { pageSlug: string | undefined }) {
     data: page,
     isLoading,
     isError,
-    error,
+    error
   } = usePageQuery({ pageId: extractPageSlugId(pageSlug) });
   const { data: space } = useGetSpaceBySlugQuery(page?.space?.slug);
 
   const canEdit = !page?.deletedAt && (page?.permissions?.canEdit ?? false);
   const canComment =
-    canEdit ||
-    (space?.settings?.comments?.allowViewerComments === true);
+    canEdit || space?.settings?.comments?.allowViewerComments === true;
 
   if (isLoading) {
     return <></>;
   }
 
   if (isError || !page) {
-    if ([401, 403, 404].includes(error?.["status"])) {
+    if ([401, 403, 404].includes(error?.['status'])) {
       return (
         <EmptyState
           icon={IconFileOff}
-          title={t("Page not found")}
+          title={t('Page not found')}
           description={t(
-            "This page may have been deleted, moved, or you may not have access.",
+            'This page may have been deleted, moved, or you may not have access.'
           )}
           action={
-            <Button component={Link} to="/home" variant="default" size="sm" mt="xs">
-              {t("Go to homepage")}
+            <Button
+              component={Link}
+              to="/home"
+              variant="default"
+              size="sm"
+              mt="xs"
+            >
+              {t('Go to homepage')}
             </Button>
           }
         />
       );
     }
     return (
-      <EmptyState
-        icon={IconFileOff}
-        title={t("Error fetching page data.")}
-      />
+      <EmptyState icon={IconFileOff} title={t('Error fetching page data.')} />
     );
   }
 
@@ -97,9 +104,9 @@ function PageContent({ pageSlug }: { pageSlug: string | undefined }) {
     return (
       <EmptyState
         icon={IconFileOff}
-        title={t("Page type unavailable")}
+        title={t('Page type unavailable')}
         description={t(
-          "This page uses bases, which are not supported in this edition.",
+          'This page uses bases, which are not supported in this edition.'
         )}
       />
     );
@@ -109,7 +116,7 @@ function PageContent({ pageSlug }: { pageSlug: string | undefined }) {
     page && (
       <div>
         <DocumentTitle
-          title={`${page?.icon || ""}  ${getPageTitle(page?.title, page?.isBase, t)}`}
+          title={`${page?.icon || ''}  ${getPageTitle(page?.title, page?.isBase, t)}`}
           withAppName={false}
         />
 

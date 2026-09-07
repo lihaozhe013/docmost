@@ -1,6 +1,6 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback } from 'react';
 
-export function usePaginateAndSearch(initialQuery: string = "") {
+export function usePaginateAndSearch(initialQuery: string = '') {
   const [search, setSearch] = useState(initialQuery);
   const [cursor, setCursor] = useState<string | undefined>(undefined);
   const [cursorStack, setCursorStack] = useState<(string | undefined)[]>([]);
@@ -15,12 +15,15 @@ export function usePaginateAndSearch(initialQuery: string = "") {
     }
   }, []);
 
-  const goNext = useCallback((nextCursor: string | null | undefined) => {
-    if (nextCursor) {
-      setCursorStack((prev) => [...prev, cursor]);
-      setCursor(nextCursor);
-    }
-  }, [cursor]);
+  const goNext = useCallback(
+    (nextCursor: string | null | undefined) => {
+      if (nextCursor) {
+        setCursorStack((prev) => [...prev, cursor]);
+        setCursor(nextCursor);
+      }
+    },
+    [cursor]
+  );
 
   const goPrev = useCallback(() => {
     setCursorStack((prev) => {

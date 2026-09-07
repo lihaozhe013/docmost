@@ -2,19 +2,19 @@ import {
   useMutation,
   UseMutationResult,
   useQuery,
-  UseQueryResult,
-} from "@tanstack/react-query";
+  UseQueryResult
+} from '@tanstack/react-query';
 import {
   generateAiContent,
-  generateAiContentStream,
-} from "@/ee/ai/services/ai-service.ts";
+  generateAiContentStream
+} from '@/ee/ai/services/ai-service.ts';
 import {
   AiConfigResponse,
   AiContentResponse,
   AiGenerateDto,
   AiStreamChunk,
-  AiStreamError,
-} from "@/ee/ai/types/ai.types.ts";
+  AiStreamError
+} from '@/ee/ai/types/ai.types.ts';
 
 export function useAiGenerateMutation(): UseMutationResult<
   AiContentResponse,
@@ -22,7 +22,7 @@ export function useAiGenerateMutation(): UseMutationResult<
   AiGenerateDto
 > {
   return useMutation({
-    mutationFn: (data: AiGenerateDto) => generateAiContent(data),
+    mutationFn: (data: AiGenerateDto) => generateAiContent(data)
   });
 }
 
@@ -39,6 +39,6 @@ export function useAiGenerateStreamMutation(): UseMutationResult<
 > {
   return useMutation({
     mutationFn: ({ onChunk, onError, onComplete, ...data }) =>
-      generateAiContentStream(data, onChunk, onError, onComplete),
+      generateAiContentStream(data, onChunk, onError, onComplete)
   });
 }

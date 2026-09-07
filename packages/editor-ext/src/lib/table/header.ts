@@ -1,9 +1,9 @@
-import { TableHeader as TiptapTableHeader } from "@tiptap/extension-table";
+import { TableHeader as TiptapTableHeader } from '@tiptap/extension-table';
 
 export const TableHeader = TiptapTableHeader.extend({
-  name: "tableHeader",
+  name: 'tableHeader',
   content:
-    "(paragraph | heading | bulletList | orderedList | taskList | blockquote | callout | image | video | audio | subpages | attachment | mathBlock | details | codeBlock)+",
+    '(paragraph | heading | bulletList | orderedList | taskList | blockquote | callout | image | video | audio | subpages | attachment | mathBlock | details | codeBlock)+',
 
   addAttributes() {
     return {
@@ -12,7 +12,7 @@ export const TableHeader = TiptapTableHeader.extend({
         default: null,
         parseHTML: (element) =>
           element.style.backgroundColor ||
-          element.getAttribute("data-background-color") ||
+          element.getAttribute('data-background-color') ||
           null,
         renderHTML: (attributes) => {
           if (!attributes.backgroundColor) {
@@ -20,20 +20,20 @@ export const TableHeader = TiptapTableHeader.extend({
           }
           return {
             style: `background-color: ${attributes.backgroundColor}`,
-            "data-background-color": attributes.backgroundColor,
+            'data-background-color': attributes.backgroundColor,
           };
         },
       },
       backgroundColorName: {
         default: null,
         parseHTML: (element) =>
-          element.getAttribute("data-background-color-name") || null,
+          element.getAttribute('data-background-color-name') || null,
         renderHTML: (attributes) => {
           if (!attributes.backgroundColorName) {
             return {};
           }
           return {
-            "data-background-color-name":
+            'data-background-color-name':
               attributes.backgroundColorName.toLowerCase(),
           };
         },

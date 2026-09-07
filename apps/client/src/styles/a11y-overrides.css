@@ -22,7 +22,7 @@
  * overriding the variable globally, because the same variable backs Card
  * borders, dividers, and other subtle outlines we want to keep airy.
  */
-.mantine-Input-input[data-variant="default"] {
+.mantine-Input-input[data-variant='default'] {
   border-color: var(--mantine-color-gray-6);
 }
 

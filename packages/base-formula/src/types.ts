@@ -1,11 +1,11 @@
-import type { FormulaAST } from "./ast";
+import type { FormulaAST } from './ast';
 
 export type FormulaResultType =
-  | "number"
-  | "string"
-  | "boolean"
-  | "date"
-  | "null";
+  | 'number'
+  | 'string'
+  | 'boolean'
+  | 'date'
+  | 'null';
 
 export type FormulaTypeOptions = {
   source: string;
@@ -32,12 +32,12 @@ export type ErrorCell = {
 };
 
 export type ErrorCode =
-  | "MISSING_PROP"
-  | "TYPE_MISMATCH"
-  | "DIV_BY_ZERO"
-  | "DATE_INVALID"
-  | "DEPTH_EXCEEDED"
-  | "DEPENDENCY_ERROR";
+  | 'MISSING_PROP'
+  | 'TYPE_MISMATCH'
+  | 'DIV_BY_ZERO'
+  | 'DATE_INVALID'
+  | 'DEPTH_EXCEEDED'
+  | 'DEPENDENCY_ERROR';
 
 /*
  * EvalContext carries everything the evaluator needs that isn't in the AST:
@@ -45,7 +45,7 @@ export type ErrorCode =
  * nodes to their formula ASTs when nested, and the current recursion depth.
  */
 export type EvalContext = {
-  registry: ReadonlyMap<string, import("./functions/registry").FormulaFn>;
+  registry: ReadonlyMap<string, import('./functions/registry').FormulaFn>;
   properties: ReadonlyMap<string, PropertyLookup>;
   depth: number;
   maxDepth: number;

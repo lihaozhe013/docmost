@@ -13,7 +13,10 @@ export function createShortId() {
   return Math.random().toString(36).slice(2, 11);
 }
 
-export function buildDoc(state: SerializationState, opts?: IPropertiesOptions): Document {
+export function buildDoc(
+  state: SerializationState,
+  opts?: IPropertiesOptions,
+): Document {
   let sections = state?.sections?.length
     ? state.sections.map((section) => ({
         properties: section.config.properties || {

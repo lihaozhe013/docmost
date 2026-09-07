@@ -14,8 +14,8 @@ import { VerificationNotificationService } from './services/verification.notific
     NotificationProcessor,
     CommentNotificationService,
     PageNotificationService,
-    VerificationNotificationService,
+    VerificationNotificationService
   ],
-  exports: [NotificationService],
+  exports: [NotificationService]
 })
 export class NotificationModule {}

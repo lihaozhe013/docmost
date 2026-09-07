@@ -13,9 +13,9 @@ export class WsTreeService {
       payload: {
         node: {
           id: page.id,
-          slugId: page.slugId,
-        },
-      },
+          slugId: page.slugId
+        }
+      }
     });
   }
 
@@ -39,9 +39,9 @@ export class WsTreeService {
           parentPageId: page.parentPageId,
           creatorId: page.creatorId,
           hasChildren: false,
-          children: [],
-        },
-      },
+          children: []
+        }
+      }
     });
   }
 }

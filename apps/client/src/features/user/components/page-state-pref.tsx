@@ -1,12 +1,16 @@
-import { Text, MantineSize, SegmentedControl } from "@mantine/core";
-import { useAtom } from "jotai";
-import { userAtom } from "@/features/user/atoms/current-user-atom.ts";
-import { updateUser } from "@/features/user/services/user-service.ts";
-import React, { useCallback, useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { PageEditMode } from "@/features/user/types/user.types.ts";
-import { ResponsiveSettingsRow, ResponsiveSettingsContent, ResponsiveSettingsControl } from "@/components/ui/responsive-settings-row";
-import { currentPageEditModeAtom } from "@/features/editor/atoms/editor-atoms.ts";
+import { Text, MantineSize, SegmentedControl } from '@mantine/core';
+import { useAtom } from 'jotai';
+import { userAtom } from '@/features/user/atoms/current-user-atom.ts';
+import { updateUser } from '@/features/user/services/user-service.ts';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { PageEditMode } from '@/features/user/types/user.types.ts';
+import {
+  ResponsiveSettingsRow,
+  ResponsiveSettingsContent,
+  ResponsiveSettingsControl
+} from '@/components/ui/responsive-settings-row';
+import { currentPageEditModeAtom } from '@/features/editor/atoms/editor-atoms.ts';
 
 export default function PageStatePref() {
   const { t } = useTranslation();
@@ -14,9 +18,9 @@ export default function PageStatePref() {
   return (
     <ResponsiveSettingsRow>
       <ResponsiveSettingsContent>
-        <Text size="md">{t("Default page edit mode")}</Text>
+        <Text size="md">{t('Default page edit mode')}</Text>
         <Text size="sm" c="dimmed">
-          {t("Choose your preferred page edit mode. Avoid accidental edits.")}
+          {t('Choose your preferred page edit mode. Avoid accidental edits.')}
         </Text>
       </ResponsiveSettingsContent>
 
@@ -32,7 +36,7 @@ interface PageStateSegmentedControlProps {
 }
 
 export function PageStateSegmentedControl({
-  size,
+  size
 }: PageStateSegmentedControlProps) {
   const { t } = useTranslation();
   const [user, setUser] = useAtom(userAtom);
@@ -51,7 +55,7 @@ export function PageStateSegmentedControl({
         setValue(prevValue);
       }
     },
-    [value, setUser],
+    [value, setUser]
   );
 
   useEffect(() => {
@@ -66,8 +70,8 @@ export function PageStateSegmentedControl({
       value={value}
       onChange={handleChange}
       data={[
-        { label: t("Edit"), value: PageEditMode.Edit },
-        { label: t("Read"), value: PageEditMode.Read },
+        { label: t('Edit'), value: PageEditMode.Edit },
+        { label: t('Read'), value: PageEditMode.Read }
       ]}
     />
   );
@@ -78,7 +82,7 @@ export function PageStateSegmentedControl({
 export function PageEditModeToggle({ size }: { size?: MantineSize }) {
   const { t } = useTranslation();
   const [currentPageEditMode, setCurrentPageEditMode] = useAtom(
-    currentPageEditModeAtom,
+    currentPageEditModeAtom
   );
 
   return (
@@ -87,8 +91,8 @@ export function PageEditModeToggle({ size }: { size?: MantineSize }) {
       value={currentPageEditMode}
       onChange={(v) => setCurrentPageEditMode(v as PageEditMode)}
       data={[
-        { label: t("Edit"), value: PageEditMode.Edit },
-        { label: t("Read"), value: PageEditMode.Read },
+        { label: t('Edit'), value: PageEditMode.Edit },
+        { label: t('Read'), value: PageEditMode.Read }
       ]}
     />
   );

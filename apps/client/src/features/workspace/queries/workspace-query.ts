@@ -3,8 +3,8 @@ import {
   useMutation,
   useQuery,
   useQueryClient,
-  UseQueryResult,
-} from "@tanstack/react-query";
+  UseQueryResult
+} from '@tanstack/react-query';
 import {
   changeMemberRole,
   getWorkspaceMembers,
@@ -15,23 +15,23 @@ import {
   deactivateWorkspaceMember,
   activateWorkspaceMember,
   createWorkspaceMember,
-  resetWorkspaceMemberPassword,
-} from "@/features/workspace/services/workspace-service";
-import { IPagination, QueryParams } from "@/lib/types.ts";
-import { notifications } from "@mantine/notifications";
+  resetWorkspaceMemberPassword
+} from '@/features/workspace/services/workspace-service';
+import { IPagination, QueryParams } from '@/lib/types.ts';
+import { notifications } from '@mantine/notifications';
 import {
   ICreateWorkspaceUser,
   IPublicWorkspace,
   IVersion,
-  IWorkspace,
-} from "@/features/workspace/types/workspace.types.ts";
-import { IUser } from "@/features/user/types/user.types.ts";
-import { useTranslation } from "react-i18next";
+  IWorkspace
+} from '@/features/workspace/types/workspace.types.ts';
+import { IUser } from '@/features/user/types/user.types.ts';
+import { useTranslation } from 'react-i18next';
 
 export function useWorkspaceQuery(): UseQueryResult<IWorkspace, Error> {
   return useQuery({
-    queryKey: ["workspace"],
-    queryFn: () => getWorkspace(),
+    queryKey: ['workspace'],
+    queryFn: () => getWorkspace()
   });
 }
 
@@ -40,18 +40,18 @@ export function useWorkspacePublicDataQuery(): UseQueryResult<
   Error
 > {
   return useQuery({
-    queryKey: ["workspace-public"],
-    queryFn: () => getWorkspacePublicData(),
+    queryKey: ['workspace-public'],
+    queryFn: () => getWorkspacePublicData()
   });
 }
 
 export function useWorkspaceMembersQuery(
-  params?: QueryParams,
+  params?: QueryParams
 ): UseQueryResult<IPagination<IUser>, Error> {
   return useQuery({
-    queryKey: ["workspaceMembers", params],
+    queryKey: ['workspaceMembers', params],
     queryFn: () => getWorkspaceMembers(params),
-    placeholderData: keepPreviousData,
+    placeholderData: keepPreviousData
   });
 }
 
@@ -67,15 +67,15 @@ export function useDeleteWorkspaceMemberMutation() {
   >({
     mutationFn: (data) => deleteWorkspaceMember(data),
     onSuccess: (data, variables) => {
-      notifications.show({ message: "Member deleted successfully" });
+      notifications.show({ message: 'Member deleted successfully' });
       queryClient.invalidateQueries({
-        queryKey: ["workspaceMembers"],
+        queryKey: ['workspaceMembers']
       });
     },
     onError: (error) => {
-      const errorMessage = error["response"]?.data?.message;
-      notifications.show({ message: errorMessage, color: "red" });
-    },
+      const errorMessage = error['response']?.data?.message;
+      notifications.show({ message: errorMessage, color: 'red' });
+    }
   });
 }
 
@@ -92,13 +92,13 @@ export function useDeactivateWorkspaceMemberMutation() {
     mutationFn: (data) => deactivateWorkspaceMember(data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["workspaceMembers"],
+        queryKey: ['workspaceMembers']
       });
     },
     onError: (error) => {
-      const errorMessage = error["response"]?.data?.message;
-      notifications.show({ message: errorMessage, color: "red" });
-    },
+      const errorMessage = error['response']?.data?.message;
+      notifications.show({ message: errorMessage, color: 'red' });
+    }
   });
 }
 
@@ -115,13 +115,13 @@ export function useActivateWorkspaceMemberMutation() {
     mutationFn: (data) => activateWorkspaceMember(data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["workspaceMembers"],
+        queryKey: ['workspaceMembers']
       });
     },
     onError: (error) => {
-      const errorMessage = error["response"]?.data?.message;
-      notifications.show({ message: errorMessage, color: "red" });
-    },
+      const errorMessage = error['response']?.data?.message;
+      notifications.show({ message: errorMessage, color: 'red' });
+    }
   });
 }
 
@@ -131,15 +131,15 @@ export function useChangeMemberRoleMutation() {
   return useMutation<any, Error, any>({
     mutationFn: (data) => changeMemberRole(data),
     onSuccess: (data, variables) => {
-      notifications.show({ message: "Member role updated successfully" });
+      notifications.show({ message: 'Member role updated successfully' });
       queryClient.refetchQueries({
-        queryKey: ["workspaceMembers"],
+        queryKey: ['workspaceMembers']
       });
     },
     onError: (error) => {
-      const errorMessage = error["response"]?.data?.message;
-      notifications.show({ message: errorMessage, color: "red" });
-    },
+      const errorMessage = error['response']?.data?.message;
+      notifications.show({ message: errorMessage, color: 'red' });
+    }
   });
 }
 
@@ -154,13 +154,13 @@ export function useCreateWorkspaceMemberMutation() {
     mutationFn: (data) => createWorkspaceMember(data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["workspaceMembers"],
+        queryKey: ['workspaceMembers']
       });
     },
     onError: (error) => {
-      const errorMessage = error["response"]?.data?.message;
-      notifications.show({ message: errorMessage, color: "red" });
-    },
+      const errorMessage = error['response']?.data?.message;
+      notifications.show({ message: errorMessage, color: 'red' });
+    }
   });
 }
 
@@ -176,24 +176,24 @@ export function useResetWorkspaceMemberPasswordMutation() {
     mutationFn: (data) => resetWorkspaceMemberPassword(data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["workspaceMembers"],
+        queryKey: ['workspaceMembers']
       });
     },
     onError: (error) => {
-      const errorMessage = error["response"]?.data?.message;
-      notifications.show({ message: errorMessage, color: "red" });
-    },
+      const errorMessage = error['response']?.data?.message;
+      notifications.show({ message: errorMessage, color: 'red' });
+    }
   });
 }
 
 export function useAppVersion(
-  isEnabled: boolean,
+  isEnabled: boolean
 ): UseQueryResult<IVersion, Error> {
   return useQuery({
-    queryKey: ["version"],
+    queryKey: ['version'],
     queryFn: () => getAppVersion(),
     staleTime: 60 * 60 * 1000, // 1 hr
     enabled: isEnabled,
-    refetchOnMount: true,
+    refetchOnMount: true
   });
 }

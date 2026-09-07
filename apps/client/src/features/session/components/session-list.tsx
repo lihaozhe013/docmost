@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Button,
   Divider,
@@ -7,16 +7,16 @@ import {
   Stack,
   Table,
   Text,
-  VisuallyHidden,
-} from "@mantine/core";
-import { IconDevices } from "@tabler/icons-react";
-import { useTranslation } from "react-i18next";
+  VisuallyHidden
+} from '@mantine/core';
+import { IconDevices } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 import {
   useGetSessionsQuery,
   useRevokeSessionMutation,
-  useRevokeAllSessionsMutation,
-} from "@/features/session/queries/session-query";
-import { formattedDate } from "@/lib/time";
+  useRevokeAllSessionsMutation
+} from '@/features/session/queries/session-query';
+import { formattedDate } from '@/lib/time';
 
 const PAGE_SIZE = 5;
 
@@ -35,14 +35,14 @@ export default function SessionList() {
     return (
       <Table verticalSpacing="md">
         <Table.Caption>
-          <VisuallyHidden>{t("Active sessions")}</VisuallyHidden>
+          <VisuallyHidden>{t('Active sessions')}</VisuallyHidden>
         </Table.Caption>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th>{t("Device Name")}</Table.Th>
-            <Table.Th>{t("Last Active")}</Table.Th>
+            <Table.Th>{t('Device Name')}</Table.Th>
+            <Table.Th>{t('Last Active')}</Table.Th>
             <Table.Th>
-              <VisuallyHidden>{t("Action")}</VisuallyHidden>
+              <VisuallyHidden>{t('Action')}</VisuallyHidden>
             </Table.Th>
           </Table.Tr>
         </Table.Thead>
@@ -73,12 +73,10 @@ export default function SessionList() {
       {otherSessions.length > 0 && (
         <>
           <div>
-            <Text fw={500}>{t("Log out of all devices")}</Text>
+            <Text fw={500}>{t('Log out of all devices')}</Text>
             <Group justify="space-between" align="center" mt={4}>
               <Text size="sm" c="dimmed">
-                {t(
-                  "Log out of all sessions except this device",
-                )}
+                {t('Log out of all sessions except this device')}
               </Text>
               <Button
                 variant="outline"
@@ -87,7 +85,7 @@ export default function SessionList() {
                 loading={revokeAllSessionsMutation.isPending}
                 onClick={() => revokeAllSessionsMutation.mutate()}
               >
-                {t("Log out of all devices")}
+                {t('Log out of all devices')}
               </Button>
             </Group>
           </div>
@@ -97,15 +95,15 @@ export default function SessionList() {
 
       <Table verticalSpacing="md">
         <Table.Caption>
-          <VisuallyHidden>{t("Active sessions")}</VisuallyHidden>
+          <VisuallyHidden>{t('Active sessions')}</VisuallyHidden>
         </Table.Caption>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th>{t("Device Name")}</Table.Th>
-            <Table.Th>{t("Last Active")}</Table.Th>
+            <Table.Th>{t('Device Name')}</Table.Th>
+            <Table.Th>{t('Last Active')}</Table.Th>
             {otherSessions.length > 0 && (
               <Table.Th>
-                <VisuallyHidden>{t("Action")}</VisuallyHidden>
+                <VisuallyHidden>{t('Action')}</VisuallyHidden>
               </Table.Th>
             )}
           </Table.Tr>
@@ -118,11 +116,11 @@ export default function SessionList() {
                   <IconDevices size={18} stroke={1.5} />
                   <div>
                     <Text size="sm">
-                      {session.deviceName || t("Unknown device")}
+                      {session.deviceName || t('Unknown device')}
                     </Text>
                     {session?.isCurrentDevice && (
                       <Text size="xs" c="blue">
-                        {t("This Device")}
+                        {t('This Device')}
                       </Text>
                     )}
                   </div>
@@ -131,7 +129,7 @@ export default function SessionList() {
               <Table.Td>
                 <Text size="sm">
                   {session?.isCurrentDevice
-                    ? t("Now")
+                    ? t('Now')
                     : formattedDate(new Date(session.lastActiveAt))}
                 </Text>
               </Table.Td>
@@ -144,11 +142,11 @@ export default function SessionList() {
                       loading={revokeSessionMutation.isPending}
                       onClick={() =>
                         revokeSessionMutation.mutate({
-                          sessionId: session.id,
+                          sessionId: session.id
                         })
                       }
                     >
-                      {t("Log out")}
+                      {t('Log out')}
                     </Button>
                   )}
                 </Table.Td>
@@ -164,13 +162,13 @@ export default function SessionList() {
           size="xs"
           onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
         >
-          {t("Load more")}
+          {t('Load more')}
         </Button>
       )}
 
       {(!sessions || sessions.length === 0) && (
         <Text size="sm" c="dimmed" ta="center">
-          {t("No active sessions")}
+          {t('No active sessions')}
         </Text>
       )}
     </Stack>

@@ -72,10 +72,7 @@ export const CustomCodeBlock = CodeBlock.extend<CodeBlockLowlightOptions>({
           });
         }
 
-        if (
-          nodeAfter?.type.spec.isolating &&
-          !nodeAfter.type.spec.atom
-        ) {
+        if (nodeAfter?.type.spec.isolating && !nodeAfter.type.spec.atom) {
           return editor.commands.command(({ tr }) => {
             tr.setSelection(new GapCursor(tr.doc.resolve(after)));
             return true;
@@ -109,10 +106,7 @@ export const CustomCodeBlock = CodeBlock.extend<CodeBlockLowlightOptions>({
           });
         }
 
-        if (
-          nodeBefore?.type.spec.isolating &&
-          !nodeBefore.type.spec.atom
-        ) {
+        if (nodeBefore?.type.spec.isolating && !nodeBefore.type.spec.atom) {
           return editor.commands.command(({ tr }) => {
             tr.setSelection(new GapCursor(tr.doc.resolve(before)));
             return true;
@@ -187,10 +181,7 @@ export const CustomCodeBlock = CodeBlock.extend<CodeBlockLowlightOptions>({
             }
             const { state } = view;
             const { selection } = state;
-            if (
-              !selection.empty ||
-              !(selection instanceof TextSelection)
-            ) {
+            if (!selection.empty || !(selection instanceof TextSelection)) {
               return false;
             }
             const { $from } = selection;
@@ -210,9 +201,7 @@ export const CustomCodeBlock = CodeBlock.extend<CodeBlockLowlightOptions>({
               if (!isMermaid(prev)) return false;
               const endPos = beforePos - 1;
               view.dispatch(
-                state.tr.setSelection(
-                  TextSelection.create(state.doc, endPos),
-                ),
+                state.tr.setSelection(TextSelection.create(state.doc, endPos)),
               );
               return true;
             }
@@ -222,9 +211,7 @@ export const CustomCodeBlock = CodeBlock.extend<CodeBlockLowlightOptions>({
             if (!isMermaid(next)) return false;
             const startPos = afterPos + 1;
             view.dispatch(
-              state.tr.setSelection(
-                TextSelection.create(state.doc, startPos),
-              ),
+              state.tr.setSelection(TextSelection.create(state.doc, startPos)),
             );
             return true;
           },

@@ -1,6 +1,6 @@
-import { ThemeIcon } from "@mantine/core";
-import React from "react";
-import { IconUsersGroup } from "@tabler/icons-react";
+import { ThemeIcon } from '@mantine/core';
+import React from 'react';
+import { IconUsersGroup } from '@tabler/icons-react';
 
 export function IconGroupCircle() {
   return (

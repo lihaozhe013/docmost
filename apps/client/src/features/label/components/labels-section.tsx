@@ -1,16 +1,16 @@
-import { useState } from "react";
-import clsx from "clsx";
-import { Divider, Popover, Stack, Text } from "@mantine/core";
-import { IconPlus } from "@tabler/icons-react";
-import { useTranslation } from "react-i18next";
-import { LabelChip } from "@/features/label/components/label-chip.tsx";
-import { LabelPicker } from "@/features/label/components/label-picker.tsx";
+import { useState } from 'react';
+import clsx from 'clsx';
+import { Divider, Popover, Stack, Text } from '@mantine/core';
+import { IconPlus } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
+import { LabelChip } from '@/features/label/components/label-chip.tsx';
+import { LabelPicker } from '@/features/label/components/label-picker.tsx';
 import {
   useAddLabelsMutation,
   usePageLabelsQuery,
-  useRemoveLabelMutation,
-} from "@/features/label/queries/label-query.ts";
-import classes from "@/features/label/label.module.css";
+  useRemoveLabelMutation
+} from '@/features/label/queries/label-query.ts';
+import classes from '@/features/label/label.module.css';
 
 type LabelsSectionProps = {
   pageId: string;
@@ -44,7 +44,7 @@ export function LabelsSection({ pageId, canEdit }: LabelsSectionProps) {
       <Divider />
       <Stack gap="xs">
         <Text size="xs" fw={500} c="dimmed">
-          {t("Labels")}
+          {t('Labels')}
         </Text>
         <div className={classes.labelsWrap}>
           {labels.map((label) => (
@@ -71,9 +71,7 @@ export function LabelsSection({ pageId, canEdit }: LabelsSectionProps) {
                   onClick={() => setOpen((v) => !v)}
                 >
                   <IconPlus size={12} stroke={2} />
-                  <span>
-                    {labels.length === 0 ? t("Add label") : t("Add")}
-                  </span>
+                  <span>{labels.length === 0 ? t('Add label') : t('Add')}</span>
                 </button>
               </Popover.Target>
               <Popover.Dropdown p={0} className={classes.popover}>

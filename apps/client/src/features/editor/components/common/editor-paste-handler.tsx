@@ -1,23 +1,23 @@
-import { uploadImageAction } from "@/features/editor/components/image/upload-image-action.tsx";
-import { uploadVideoAction } from "@/features/editor/components/video/upload-video-action.tsx";
-import { uploadAttachmentAction } from "../attachment/upload-attachment-action";
-import { uploadPdfAction } from "../pdf/upload-pdf-action";
-import { createMentionAction } from "@/features/editor/components/link/internal-link-paste.ts";
-import { INTERNAL_LINK_REGEX } from "@/lib/constants.ts";
-import { Editor } from "@tiptap/core";
+import { uploadImageAction } from '@/features/editor/components/image/upload-image-action.tsx';
+import { uploadVideoAction } from '@/features/editor/components/video/upload-video-action.tsx';
+import { uploadAttachmentAction } from '../attachment/upload-attachment-action';
+import { uploadPdfAction } from '../pdf/upload-pdf-action';
+import { createMentionAction } from '@/features/editor/components/link/internal-link-paste.ts';
+import { INTERNAL_LINK_REGEX } from '@/lib/constants.ts';
+import { Editor } from '@tiptap/core';
 import {
   getAttachmentInfo,
-  uploadFile,
-} from "@/features/page/services/page-service.ts";
+  uploadFile
+} from '@/features/page/services/page-service.ts';
 
 const ATTACHMENT_NODE_TYPES = [
-  "image",
-  "video",
-  "audio",
-  "pdf",
-  "attachment",
-  "excalidraw",
-  "drawio",
+  'image',
+  'video',
+  'audio',
+  'pdf',
+  'attachment',
+  'excalidraw',
+  'drawio'
 ];
 
 const ATTACHMENT_URL_RE = /\/api\/files\/([0-9a-f-]+)\//;
@@ -26,9 +26,9 @@ export const handlePaste = (
   editor: Editor,
   event: ClipboardEvent,
   pageId: string,
-  creatorId?: string,
+  creatorId?: string
 ) => {
-  const clipboardData = event.clipboardData.getData("text/plain");
+  const clipboardData = event.clipboardData.getData('text/plain');
 
   if (INTERNAL_LINK_REGEX.test(clipboardData)) {
     // we have to do this validation here to allow the default link extension to takeover if needs be
@@ -43,21 +43,21 @@ export const handlePaste = (
       return false;
     }
 
-    const anchorId = match[6] ? match[6].split("#")[0] : undefined;
+    const anchorId = match[6] ? match[6].split('#')[0] : undefined;
     const urlWithoutAnchor = anchorId
-      ? url.substring(0, url.indexOf("#"))
+      ? url.substring(0, url.indexOf('#'))
       : url;
     createMentionAction(
       urlWithoutAnchor,
       editor.view,
       pos,
       creatorId,
-      anchorId,
+      anchorId
     );
     return true;
   }
 
-  const htmlData = event.clipboardData?.getData("text/html");
+  const htmlData = event.clipboardData?.getData('text/html');
   const hasHtmlTable = htmlData && /<table[\s>]/i.test(htmlData);
 
   if (event.clipboardData?.files.length && !hasHtmlTable) {
@@ -85,7 +85,7 @@ export const handlePaste = (
 async function reuploadPastedAttachments(
   editor: Editor,
   pageId: string,
-  pasteFrom: number,
+  pasteFrom: number
 ) {
   const pasteEnd = editor.state.selection.from;
   if (pasteEnd <= pasteFrom) return;
@@ -107,13 +107,12 @@ async function reuploadPastedAttachments(
     const attachmentId = node.attrs.attachmentId;
     if (!attachmentId) return;
 
-    const src = node.attrs.src || node.attrs.url || "";
+    const src = node.attrs.src || node.attrs.url || '';
     const match = ATTACHMENT_URL_RE.exec(src);
     if (!match) return;
 
-    const cleanSrc = src.split("?")[0];
-    const fileName =
-      node.attrs.name || cleanSrc.split("/").pop() || "file";
+    const cleanSrc = src.split('?')[0];
+    const fileName = node.attrs.name || cleanSrc.split('/').pop() || 'file';
 
     pastedNodes.push({
       pos,
@@ -121,7 +120,7 @@ async function reuploadPastedAttachments(
       nodeTypeName: node.type.name,
       src: node.attrs.src,
       url: node.attrs.url,
-      fileName,
+      fileName
     });
     seenAttachmentIds.add(attachmentId);
   });
@@ -137,7 +136,7 @@ async function reuploadPastedAttachments(
       } catch {
         attachmentPageMap.set(id, null);
       }
-    }),
+    })
   );
 
   const nodesToReupload = pastedNodes.filter((n) => {
@@ -165,7 +164,7 @@ async function reuploadPastedAttachments(
       if (!fileUrl) return;
 
       try {
-        const response = await fetch(fileUrl, { credentials: "include" });
+        const response = await fetch(fileUrl, { credentials: 'include' });
         if (!response.ok) return;
         const blob = await response.blob();
         const file = new File([blob], node.fileName, { type: blob.type });
@@ -174,55 +173,58 @@ async function reuploadPastedAttachments(
           id: newAttachment.id,
           fileName: newAttachment.fileName,
           fileSize: newAttachment.fileSize,
-          mimeType: newAttachment.mimeType,
+          mimeType: newAttachment.mimeType
         });
       } catch {
         // keep original reference on failure
       }
-    }),
+    })
   );
 
   if (reuploadResults.size === 0) return;
   if (editor.isDestroyed) return;
 
-  editor.chain().command(({ tr }) => {
-    const sorted = [...nodesToReupload].sort((a, b) => b.pos - a.pos);
+  editor
+    .chain()
+    .command(({ tr }) => {
+      const sorted = [...nodesToReupload].sort((a, b) => b.pos - a.pos);
 
-    for (const pastedNode of sorted) {
-      const result = reuploadResults.get(pastedNode.attachmentId);
-      if (!result) continue;
+      for (const pastedNode of sorted) {
+        const result = reuploadResults.get(pastedNode.attachmentId);
+        if (!result) continue;
 
-      const node = tr.doc.nodeAt(pastedNode.pos);
-      if (!node || node.attrs.attachmentId !== pastedNode.attachmentId)
-        continue;
+        const node = tr.doc.nodeAt(pastedNode.pos);
+        if (!node || node.attrs.attachmentId !== pastedNode.attachmentId)
+          continue;
 
-      const newAttrs = { ...node.attrs };
-      newAttrs.attachmentId = result.id;
+        const newAttrs = { ...node.attrs };
+        newAttrs.attachmentId = result.id;
 
-      if (newAttrs.src) {
-        newAttrs.src = `/api/files/${result.id}/${result.fileName}`;
+        if (newAttrs.src) {
+          newAttrs.src = `/api/files/${result.id}/${result.fileName}`;
+        }
+        if (newAttrs.url) {
+          newAttrs.url = `/api/files/${result.id}/${result.fileName}`;
+        }
+        if (pastedNode.nodeTypeName === 'attachment') {
+          newAttrs.name = result.fileName;
+          newAttrs.mime = result.mimeType;
+          newAttrs.size = result.fileSize;
+        }
+
+        tr.setNodeMarkup(pastedNode.pos, undefined, newAttrs);
       }
-      if (newAttrs.url) {
-        newAttrs.url = `/api/files/${result.id}/${result.fileName}`;
-      }
-      if (pastedNode.nodeTypeName === "attachment") {
-        newAttrs.name = result.fileName;
-        newAttrs.mime = result.mimeType;
-        newAttrs.size = result.fileSize;
-      }
 
-      tr.setNodeMarkup(pastedNode.pos, undefined, newAttrs);
-    }
-
-    return true;
-  }).run();
+      return true;
+    })
+    .run();
 }
 
 export const handleFileDrop = (
   editor: Editor,
   event: DragEvent,
   moved: boolean,
-  pageId: string,
+  pageId: string
 ) => {
   if (!moved && event.dataTransfer?.files.length) {
     event.preventDefault();
@@ -230,7 +232,7 @@ export const handleFileDrop = (
     for (const file of event.dataTransfer.files) {
       const coordinates = editor.view.posAtCoords({
         left: event.clientX,
-        top: event.clientY,
+        top: event.clientY
       });
 
       uploadImageAction(file, editor, coordinates?.pos ?? 0 - 1, pageId);

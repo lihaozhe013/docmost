@@ -14,7 +14,7 @@ export class NotificationService {
     private readonly notificationRepo: NotificationRepo,
     private readonly pagePermissionRepo: PagePermissionRepo,
     private readonly wsGateway: WsGateway,
-    @InjectKysely() private readonly db: KyselyDB,
+    @InjectKysely() private readonly db: KyselyDB
   ) {}
 
   async create(data: InsertableNotification) {
@@ -40,28 +40,26 @@ export class NotificationService {
   async findByUserId(
     userId: string,
     pagination: PaginationOptions,
-    type: NotificationTab = 'all',
+    type: NotificationTab = 'all'
   ) {
     const result = await this.notificationRepo.findByUserId(
       userId,
       pagination,
-      type,
+      type
     );
 
-    const pageIds = result.items
-      .map((n: any) => n.pageId)
-      .filter(Boolean);
+    const pageIds = result.items.map((n: any) => n.pageId).filter(Boolean);
 
     if (pageIds.length > 0) {
       const accessiblePageIds =
         await this.pagePermissionRepo.filterAccessiblePageIds({
           pageIds,
-          userId,
+          userId
         });
       const accessibleSet = new Set(accessiblePageIds);
 
       result.items = result.items.filter(
-        (n: any) => !n.pageId || accessibleSet.has(n.pageId),
+        (n: any) => !n.pageId || accessibleSet.has(n.pageId)
       );
     }
 

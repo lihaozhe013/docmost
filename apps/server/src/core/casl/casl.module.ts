@@ -5,6 +5,6 @@ import WorkspaceAbilityFactory from './abilities/workspace-ability.factory';
 @Global()
 @Module({
   providers: [WorkspaceAbilityFactory, SpaceAbilityFactory],
-  exports: [WorkspaceAbilityFactory, SpaceAbilityFactory],
+  exports: [WorkspaceAbilityFactory, SpaceAbilityFactory]
 })
 export class CaslModule {}

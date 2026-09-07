@@ -1,6 +1,6 @@
-import { IconAlertTriangle } from "@tabler/icons-react";
-import { useTranslation } from "react-i18next";
-import classes from "./transclusion.module.css";
+import { IconAlertTriangle } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
+import classes from './transclusion.module.css';
 
 export default function ErrorPlaceholder() {
   const { t } = useTranslation();
@@ -11,7 +11,7 @@ export default function ErrorPlaceholder() {
         stroke={1.6}
         className={classes.placeholderIcon}
       />
-      <span>{t("Failed to load this synced block")}</span>
+      <span>{t('Failed to load this synced block')}</span>
     </div>
   );
 }

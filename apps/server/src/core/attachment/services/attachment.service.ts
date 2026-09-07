@@ -2,7 +2,7 @@ import {
   BadRequestException,
   Injectable,
   Logger,
-  NotFoundException,
+  NotFoundException
 } from '@nestjs/common';
 import { Readable } from 'stream';
 import { StorageService } from '../../../integrations/storage/storage.service';
@@ -11,7 +11,7 @@ import {
   getAttachmentFolderPath,
   PreparedFile,
   prepareFile,
-  validateFileType,
+  validateFileType
 } from '../attachment.utils';
 import { v4 as uuid4, v7 as uuid7 } from 'uuid';
 import { AttachmentRepo } from '@docmost/db/repos/attachment/attachment.repo';
@@ -38,7 +38,7 @@ export class AttachmentService {
     private readonly workspaceRepo: WorkspaceRepo,
     private readonly spaceRepo: SpaceRepo,
     @InjectKysely() private readonly db: KyselyDB,
-    @InjectQueue(QueueName.ATTACHMENT_QUEUE) private attachmentQueue: Queue,
+    @InjectQueue(QueueName.ATTACHMENT_QUEUE) private attachmentQueue: Queue
   ) {}
 
   async uploadFile(opts: {
@@ -51,7 +51,7 @@ export class AttachmentService {
   }) {
     const { filePromise, pageId, spaceId, userId, workspaceId } = opts;
     const preparedFile: PreparedFile = await prepareFile(filePromise, {
-      skipBuffer: true,
+      skipBuffer: true
     });
 
     let isUpdate = false;
@@ -61,11 +61,11 @@ export class AttachmentService {
     // instead of creating new files for each save
     if (opts?.attachmentId) {
       const existingAttachment = await this.attachmentRepo.findById(
-        opts.attachmentId,
+        opts.attachmentId
       );
       if (!existingAttachment) {
         throw new NotFoundException(
-          'Existing attachment to overwrite not found',
+          'Existing attachment to overwrite not found'
         );
       }
 
@@ -85,7 +85,7 @@ export class AttachmentService {
     const filePath = `${getAttachmentFolderPath(AttachmentType.File, workspaceId)}/${attachmentId}/${preparedFile.fileName}`;
 
     const { stream, getBytesRead } = createByteCountingStream(
-      preparedFile.multiPartFile.file,
+      preparedFile.multiPartFile.file
     );
 
     await this.uploadToDrive(filePath, stream);
@@ -99,9 +99,9 @@ export class AttachmentService {
         attachment = await this.attachmentRepo.updateAttachment(
           {
             fileSize: preparedFile.fileSize,
-            updatedAt: new Date(),
+            updatedAt: new Date()
           },
-          attachmentId,
+          attachmentId
         );
       } else {
         attachment = await this.saveAttachment({
@@ -112,24 +112,26 @@ export class AttachmentService {
           userId,
           spaceId,
           workspaceId,
-          pageId,
+          pageId
         });
       }
 
       // Only index PDF, DOCX and TXT files
-      if (['.pdf', '.docx', '.txt'].includes(attachment.fileExt.toLowerCase())) {
+      if (
+        ['.pdf', '.docx', '.txt'].includes(attachment.fileExt.toLowerCase())
+      ) {
         await this.attachmentQueue.add(
           QueueJob.ATTACHMENT_INDEX_CONTENT,
           {
-            attachmentId: attachmentId,
+            attachmentId: attachmentId
           },
           {
             attempts: 2,
             backoff: {
               type: 'exponential',
-              delay: 10000,
-            },
-          },
+              delay: 10000
+            }
+          }
         );
       }
     } catch (err) {
@@ -148,7 +150,7 @@ export class AttachmentService {
       | AttachmentType.SpaceIcon,
     userId: string,
     workspaceId: string,
-    spaceId?: string,
+    spaceId?: string
   ) {
     const preparedFile: PreparedFile = await prepareFile(filePromise);
     validateFileType(preparedFile.fileExtension, validImageExtensions);
@@ -170,12 +172,12 @@ export class AttachmentService {
           type,
           userId,
           workspaceId,
-          trx,
+          trx
         });
 
         if (type === AttachmentType.Avatar) {
           const user = await this.userRepo.findById(userId, workspaceId, {
-            trx,
+            trx
           });
 
           oldFileName = user.avatarUrl;
@@ -184,11 +186,11 @@ export class AttachmentService {
             { avatarUrl: preparedFile.fileName },
             userId,
             workspaceId,
-            trx,
+            trx
           );
         } else if (type === AttachmentType.WorkspaceIcon) {
           const workspace = await this.workspaceRepo.findById(workspaceId, {
-            trx,
+            trx
           });
 
           oldFileName = workspace.logo;
@@ -196,11 +198,11 @@ export class AttachmentService {
           await this.workspaceRepo.updateWorkspace(
             { logo: preparedFile.fileName },
             workspaceId,
-            trx,
+            trx
           );
         } else if (type === AttachmentType.SpaceIcon && spaceId) {
           const space = await this.spaceRepo.findById(spaceId, workspaceId, {
-            trx,
+            trx
           });
 
           oldFileName = space.logo;
@@ -209,7 +211,7 @@ export class AttachmentService {
             { logo: preparedFile.fileName },
             spaceId,
             workspaceId,
-            trx,
+            trx
           );
         } else {
           throw new BadRequestException(`Image upload aborted.`);
@@ -269,7 +271,7 @@ export class AttachmentService {
       workspaceId,
       pageId,
       spaceId,
-      trx,
+      trx
     } = opts;
     return this.attachmentRepo.insertAttachment(
       {
@@ -283,9 +285,9 @@ export class AttachmentService {
         creatorId: userId,
         workspaceId: workspaceId,
         pageId: pageId,
-        spaceId: spaceId,
+        spaceId: spaceId
       },
-      trx,
+      trx
     );
   }
 
@@ -304,10 +306,10 @@ export class AttachmentService {
           } catch (err) {
             this.logger.log(
               `DeleteAiChatAttachments: failed to delete attachment ${attachment.id}:`,
-              err,
+              err
             );
           }
-        }),
+        })
       );
     } catch (err) {
       throw err;
@@ -332,15 +334,15 @@ export class AttachmentService {
             failedDeletions.push(attachment.id);
             this.logger.log(
               `DeleteSpaceAttachments: failed to delete attachment ${attachment.id}:`,
-              err,
+              err
             );
           }
-        }),
+        })
       );
 
       if (failedDeletions.length === attachments.length) {
         throw new Error(
-          `Failed to delete any attachments for spaceId: ${spaceId}`,
+          `Failed to delete any attachments for spaceId: ${spaceId}`
         );
       }
     } catch (err) {
@@ -369,10 +371,10 @@ export class AttachmentService {
           } catch (err) {
             this.logger.log(
               `DeleteUserAvatar: failed to delete user avatar ${attachment.id}:`,
-              err,
+              err
             );
           }
-        }),
+        })
       );
     } catch (err) {
       throw err;
@@ -405,21 +407,21 @@ export class AttachmentService {
             failedDeletions.push(attachment.id);
             this.logger.error(
               `Failed to delete attachment ${attachment.id} for page ${pageId}:`,
-              err,
+              err
             );
           }
-        }),
+        })
       );
 
       if (failedDeletions.length > 0) {
         this.logger.warn(
-          `Failed to delete ${failedDeletions.length} attachments for page ${pageId}`,
+          `Failed to delete ${failedDeletions.length} attachments for page ${pageId}`
         );
       }
     } catch (err) {
       this.logger.error(
         `Error in handleDeletePageAttachments for page ${pageId}:`,
-        err,
+        err
       );
       throw err;
     }
@@ -434,7 +436,7 @@ export class AttachmentService {
     await this.userRepo.updateUser(
       { avatarUrl: null },
       user.id,
-      user.workspaceId,
+      user.workspaceId
     );
   }
 

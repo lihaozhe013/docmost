@@ -1,8 +1,8 @@
-import { useEffect } from "react";
-import { useAtom } from "jotai";
-import { useQueryClient } from "@tanstack/react-query";
-import { socketAtom } from "@/features/websocket/atoms/socket-atom";
-import { NOTIFICATION_KEY } from "../queries/notification-query";
+import { useEffect } from 'react';
+import { useAtom } from 'jotai';
+import { useQueryClient } from '@tanstack/react-query';
+import { socketAtom } from '@/features/websocket/atoms/socket-atom';
+import { NOTIFICATION_KEY } from '../queries/notification-query';
 
 export function useNotificationSocket() {
   const queryClient = useQueryClient();
@@ -15,9 +15,9 @@ export function useNotificationSocket() {
       queryClient.invalidateQueries({ queryKey: NOTIFICATION_KEY });
     };
 
-    socket.on("notification", handler);
+    socket.on('notification', handler);
     return () => {
-      socket.off("notification", handler);
+      socket.off('notification', handler);
     };
   }, [socket, queryClient]);
 }

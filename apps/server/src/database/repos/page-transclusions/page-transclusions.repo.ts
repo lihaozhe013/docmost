@@ -5,7 +5,7 @@ import { dbOrTx } from '@docmost/db/utils';
 import {
   InsertablePageTransclusion,
   PageTransclusion,
-  UpdatablePageTransclusion,
+  UpdatablePageTransclusion
 } from '@docmost/db/types/entity.types';
 
 @Injectable()
@@ -14,7 +14,7 @@ export class PageTransclusionsRepo {
 
   async findByPageId(
     pageId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<PageTransclusion[]> {
     return dbOrTx(this.db, trx)
       .selectFrom('pageTransclusions')
@@ -27,7 +27,7 @@ export class PageTransclusionsRepo {
   async findByPageAndTransclusion(
     pageId: string,
     transclusionId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<PageTransclusion | undefined> {
     return dbOrTx(this.db, trx)
       .selectFrom('pageTransclusions')
@@ -40,7 +40,7 @@ export class PageTransclusionsRepo {
   async findManyByPageAndTransclusion(
     keys: Array<{ pageId: string; transclusionId: string }>,
     workspaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<PageTransclusion[]> {
     if (keys.length === 0) return [];
     return dbOrTx(this.db, trx)
@@ -52,17 +52,17 @@ export class PageTransclusionsRepo {
           keys.map((k) =>
             eb.and([
               eb('pageId', '=', k.pageId),
-              eb('transclusionId', '=', k.transclusionId),
-            ]),
-          ),
-        ),
+              eb('transclusionId', '=', k.transclusionId)
+            ])
+          )
+        )
       )
       .execute();
   }
 
   async insert(
     data: InsertablePageTransclusion,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<PageTransclusion> {
     return dbOrTx(this.db, trx)
       .insertInto('pageTransclusions')
@@ -73,7 +73,7 @@ export class PageTransclusionsRepo {
 
   async insertMany(
     data: InsertablePageTransclusion[],
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<void> {
     if (data.length === 0) return;
     await dbOrTx(this.db, trx)
@@ -86,7 +86,7 @@ export class PageTransclusionsRepo {
     pageId: string,
     transclusionId: string,
     data: UpdatablePageTransclusion,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<void> {
     await dbOrTx(this.db, trx)
       .updateTable('pageTransclusions')
@@ -99,7 +99,7 @@ export class PageTransclusionsRepo {
   async deleteByPageAndTransclusionIds(
     pageId: string,
     transclusionIds: string[],
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<void> {
     if (transclusionIds.length === 0) return;
     await dbOrTx(this.db, trx)
@@ -108,5 +108,4 @@ export class PageTransclusionsRepo {
       .where('transclusionId', 'in', transclusionIds)
       .execute();
   }
-
 }

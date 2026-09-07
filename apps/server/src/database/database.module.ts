@@ -50,11 +50,11 @@ import { normalizePostgresUrl } from '../common/helpers';
                   to: 20,
                   from: [20, 1700],
                   serialize: (value: number) => value.toString(),
-                  parse: (value: string) => Number.parseInt(value),
-                },
-              },
-            },
-          ),
+                  parse: (value: string) => Number.parseInt(value)
+                }
+              }
+            }
+          )
         }),
         plugins: [new CamelCasePlugin()],
         log: (event: LogEvent) => {
@@ -64,9 +64,9 @@ import { normalizePostgresUrl } from '../common/helpers';
             logger.debug(event.query.sql);
             logger.debug('query time: ' + event.queryDurationMillis + ' ms');
           }
-        },
-      }),
-    }),
+        }
+      })
+    })
   ],
   providers: [
     MigrationService,
@@ -92,7 +92,7 @@ import { normalizePostgresUrl } from '../common/helpers';
     WatcherRepo,
     LabelRepo,
     TemplateRepo,
-    PageListener,
+    PageListener
   ],
   exports: [
     WorkspaceRepo,
@@ -116,8 +116,8 @@ import { normalizePostgresUrl } from '../common/helpers';
     NotificationRepo,
     WatcherRepo,
     LabelRepo,
-    TemplateRepo,
-  ],
+    TemplateRepo
+  ]
 })
 export class DatabaseModule implements OnApplicationBootstrap {
   private readonly logger = new Logger(DatabaseModule.name);
@@ -125,7 +125,7 @@ export class DatabaseModule implements OnApplicationBootstrap {
   constructor(
     @InjectKysely() private readonly db: KyselyDB,
     private readonly migrationService: MigrationService,
-    private readonly environmentService: EnvironmentService,
+    private readonly environmentService: EnvironmentService
   ) {}
 
   async onApplicationBootstrap() {
@@ -155,12 +155,12 @@ export class DatabaseModule implements OnApplicationBootstrap {
 
         if (i < retryAttempts - 1) {
           this.logger.log(
-            `Retrying [${i + 1}/${retryAttempts}] in ${retryDelay / 1000} seconds`,
+            `Retrying [${i + 1}/${retryAttempts}] in ${retryDelay / 1000} seconds`
           );
           await new Promise((resolve) => setTimeout(resolve, retryDelay));
         } else {
           this.logger.error(
-            `Failed to connect to database after ${retryAttempts} attempts. Exiting...`,
+            `Failed to connect to database after ${retryAttempts} attempts. Exiting...`
           );
           process.exit(1);
         }

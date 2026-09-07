@@ -5,7 +5,7 @@ import { dbOrTx } from '../../utils';
 import {
   InsertablePageHistory,
   Page,
-  PageHistory,
+  PageHistory
 } from '@docmost/db/types/entity.types';
 import { PaginationOptions } from '@docmost/db/pagination/pagination-options';
 import { executeWithCursorPagination } from '@docmost/db/pagination/cursor-pagination';
@@ -28,7 +28,7 @@ export class PageHistoryRepo {
     'contributorIds',
     'spaceId',
     'workspaceId',
-    'createdAt',
+    'createdAt'
   ];
 
   async findById(
@@ -36,7 +36,7 @@ export class PageHistoryRepo {
     opts?: {
       includeContent?: boolean;
       trx?: KyselyTransaction;
-    },
+    }
   ): Promise<PageHistory> {
     const db = dbOrTx(this.db, opts?.trx);
 
@@ -52,7 +52,7 @@ export class PageHistoryRepo {
 
   async insertPageHistory(
     insertablePageHistory: InsertablePageHistory,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<PageHistory> {
     const db = dbOrTx(this.db, trx);
     return db
@@ -64,7 +64,7 @@ export class PageHistoryRepo {
 
   async saveHistory(
     page: Page,
-    opts?: { contributorIds?: string[]; trx?: KyselyTransaction },
+    opts?: { contributorIds?: string[]; trx?: KyselyTransaction }
   ): Promise<void> {
     await this.insertPageHistory(
       {
@@ -77,9 +77,9 @@ export class PageHistoryRepo {
         lastUpdatedById: page.lastUpdatedById ?? page.creatorId,
         contributorIds: opts?.contributorIds,
         spaceId: page.spaceId,
-        workspaceId: page.workspaceId,
+        workspaceId: page.workspaceId
       },
-      opts?.trx,
+      opts?.trx
     );
   }
 
@@ -96,7 +96,7 @@ export class PageHistoryRepo {
       cursor: pagination.cursor,
       beforeCursor: pagination.beforeCursor,
       fields: [{ expression: 'id', direction: 'desc' }],
-      parseCursor: (cursor) => ({ id: cursor.id }),
+      parseCursor: (cursor) => ({ id: cursor.id })
     });
   }
 
@@ -105,7 +105,7 @@ export class PageHistoryRepo {
     opts?: {
       includeContent?: boolean;
       trx?: KyselyTransaction;
-    },
+    }
   ) {
     const db = dbOrTx(this.db, opts?.trx);
 
@@ -124,7 +124,7 @@ export class PageHistoryRepo {
       eb
         .selectFrom('users')
         .select(['users.id', 'users.name', 'users.avatarUrl'])
-        .whereRef('users.id', '=', 'pageHistory.lastUpdatedById'),
+        .whereRef('users.id', '=', 'pageHistory.lastUpdatedById')
     ).as('lastUpdatedBy');
   }
 
@@ -136,8 +136,8 @@ export class PageHistoryRepo {
         .whereRef(
           'users.id',
           '=',
-          sql`ANY(${eb.ref('pageHistory.contributorIds')})`,
-        ),
+          sql`ANY(${eb.ref('pageHistory.contributorIds')})`
+        )
     ).as('contributors');
   }
 }

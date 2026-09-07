@@ -6,7 +6,7 @@ export class InternalLogFilter extends ConsoleLogger {
     'InstanceLoader',
     'RoutesResolver',
     'RouterExplorer',
-    'WebSocketsController',
+    'WebSocketsController'
   ];
 
   private allowedLogLevels: string[];
@@ -14,7 +14,7 @@ export class InternalLogFilter extends ConsoleLogger {
   constructor() {
     const isProduction = process.env.NODE_ENV === 'production';
     super({
-      json: isProduction,
+      json: isProduction
     });
     const isDebugMode = process.env.DEBUG_MODE === 'true';
 
@@ -27,7 +27,7 @@ export class InternalLogFilter extends ConsoleLogger {
         'verbose',
         'warn',
         'error',
-        'fatal',
+        'fatal'
       ];
     }
   }
@@ -74,7 +74,7 @@ export class InternalLogFilter extends ConsoleLogger {
     context?: string,
     logLevel?: LogLevel,
     writeStreamType?: 'stdout' | 'stderr',
-    errorStack?: unknown,
+    errorStack?: unknown
   ): void {
     const level = logLevel === 'log' ? ('info' as LogLevel) : logLevel;
     super.printMessages(messages, context, level, writeStreamType, errorStack);

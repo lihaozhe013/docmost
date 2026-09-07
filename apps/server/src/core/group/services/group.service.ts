@@ -3,7 +3,7 @@ import {
   forwardRef,
   Inject,
   Injectable,
-  NotFoundException,
+  NotFoundException
 } from '@nestjs/common';
 import { CreateGroupDto, DefaultGroup } from '../dto/create-group.dto';
 import { PaginationOptions } from '@docmost/db/pagination/pagination-options';
@@ -23,7 +23,7 @@ import { AuditEvent, AuditResource } from '../../../common/events/audit-events';
 import { diffAuditTrackedFields } from '../../../common/helpers';
 import {
   AUDIT_SERVICE,
-  IAuditService,
+  IAuditService
 } from '../../../integrations/audit/audit.service';
 
 @Injectable()
@@ -37,12 +37,12 @@ export class GroupService {
     private readonly watcherRepo: WatcherRepo,
     private readonly favoriteRepo: FavoriteRepo,
     @InjectKysely() private readonly db: KyselyDB,
-    @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService,
+    @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService
   ) {}
 
   async getGroupInfo(groupId: string, workspaceId: string): Promise<Group> {
     const group = await this.groupRepo.findById(groupId, workspaceId, {
-      includeMemberCount: true,
+      includeMemberCount: true
     });
 
     if (!group) {
@@ -56,11 +56,11 @@ export class GroupService {
     authUser: User,
     workspaceId: string,
     createGroupDto: CreateGroupDto,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<Group> {
     const groupExists = await this.groupRepo.findByName(
       createGroupDto.name,
-      workspaceId,
+      workspaceId
     );
     if (groupExists) {
       throw new BadRequestException('Group name already exists');
@@ -70,7 +70,7 @@ export class GroupService {
       description: createGroupDto.description,
       isDefault: false,
       creatorId: authUser.id,
-      workspaceId: workspaceId,
+      workspaceId: workspaceId
     };
 
     const createdGroup = await this.groupRepo.insertGroup(insertableGroup, trx);
@@ -79,7 +79,7 @@ export class GroupService {
       await this.groupUserService.addUsersToGroupBatch(
         createGroupDto.userIds,
         createdGroup.id,
-        workspaceId,
+        workspaceId
       );
     }
 
@@ -90,9 +90,9 @@ export class GroupService {
       changes: {
         after: {
           name: createdGroup.name,
-          description: createdGroup.description,
-        },
-      },
+          description: createdGroup.description
+        }
+      }
     });
 
     return createdGroup;
@@ -100,12 +100,12 @@ export class GroupService {
 
   async updateGroup(
     workspaceId: string,
-    updateGroupDto: UpdateGroupDto,
+    updateGroupDto: UpdateGroupDto
   ): Promise<Group> {
     const group = await this.groupRepo.findById(
       updateGroupDto.groupId,
       workspaceId,
-      { includeMemberCount: true },
+      { includeMemberCount: true }
     );
 
     if (!group) {
@@ -121,7 +121,7 @@ export class GroupService {
     if (updateGroupDto.name) {
       const existingGroup = await this.groupRepo.findByName(
         updateGroupDto.name,
-        workspaceId,
+        workspaceId
       );
 
       if (existingGroup && group.name !== existingGroup.name) {
@@ -138,17 +138,17 @@ export class GroupService {
     await this.groupRepo.update(
       {
         name: updateGroupDto.name,
-        description: updateGroupDto.description,
+        description: updateGroupDto.description
       },
       group.id,
-      workspaceId,
+      workspaceId
     );
 
     const changes = diffAuditTrackedFields(
       ['name', 'description'],
       updateGroupDto,
       groupBefore,
-      group,
+      group
     );
 
     if (changes) {
@@ -156,7 +156,7 @@ export class GroupService {
         event: AuditEvent.GROUP_UPDATED,
         resourceType: AuditResource.GROUP,
         resourceId: group.id,
-        changes,
+        changes
       });
     }
 
@@ -165,7 +165,7 @@ export class GroupService {
 
   async getWorkspaceGroups(
     workspaceId: string,
-    paginationOptions: PaginationOptions,
+    paginationOptions: PaginationOptions
   ): Promise<CursorPaginationResult<Group>> {
     return this.groupRepo.getGroupsPaginated(workspaceId, paginationOptions);
   }
@@ -178,7 +178,7 @@ export class GroupService {
 
     const [userIds, spaceIds] = await Promise.all([
       this.groupUserRepo.getUserIdsByGroupId(groupId),
-      this.spaceMemberRepo.getSpaceIdsByGroupId(groupId),
+      this.spaceMemberRepo.getSpaceIdsByGroupId(groupId)
     ]);
 
     // TODO: use queue instead
@@ -189,13 +189,13 @@ export class GroupService {
         await this.watcherRepo.deleteByUsersWithoutSpaceAccess(
           userIds,
           spaceId,
-          { trx },
+          { trx }
         );
 
         await this.favoriteRepo.deleteByUsersWithoutSpaceAccess(
           userIds,
           spaceId,
-          { trx },
+          { trx }
         );
       }
     });
@@ -207,19 +207,19 @@ export class GroupService {
       changes: {
         before: {
           name: group.name,
-          description: group.description,
-        },
-      },
+          description: group.description
+        }
+      }
     });
   }
 
   async findAndValidateGroup(
     groupId: string,
     workspaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<Group> {
     const group = await this.groupRepo.findById(groupId, workspaceId, {
-      trx,
+      trx
     });
     if (!group) {
       throw new NotFoundException('Group not found');

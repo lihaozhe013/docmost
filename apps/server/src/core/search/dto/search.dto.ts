@@ -5,7 +5,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
-  IsUUID,
+  IsUUID
 } from 'class-validator';
 
 export class SearchDTO {

@@ -1,18 +1,17 @@
 //Source MIT - https://github.com/buttondown/tiptap-footnotes
-import { mergeAttributes, Node } from "@tiptap/core";
+import { mergeAttributes, Node } from '@tiptap/core';
 import {
   Fragment as PMFragment,
   Node as PMNode,
   Slice,
-} from "@tiptap/pm/model";
-import { NodeSelection, Plugin, PluginKey } from "@tiptap/pm/state";
-import { generateNodeId } from "../utils";
+} from '@tiptap/pm/model';
+import { NodeSelection, Plugin, PluginKey } from '@tiptap/pm/state';
+import { generateNodeId } from '../utils';
 
+const REFNUM_ATTR = 'data-reference-number';
+const REF_CLASS = 'footnote-ref';
 
-const REFNUM_ATTR = "data-reference-number";
-const REF_CLASS = "footnote-ref";
-
-declare module "@tiptap/core" {
+declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     footnoteReference: {
       /**
@@ -25,10 +24,10 @@ declare module "@tiptap/core" {
 }
 
 const FootnoteReference = Node.create({
-  name: "footnoteReference",
+  name: 'footnoteReference',
   inline: true,
-  content: "text*",
-  group: "inline",
+  content: 'text*',
+  group: 'inline',
   atom: true,
   draggable: true,
 
@@ -39,18 +38,18 @@ const FootnoteReference = Node.create({
         priority: 1000,
         getAttrs(node) {
           const anchor = node.querySelector<HTMLAnchorElement>(
-            `a.${REF_CLASS}:first-child`
+            `a.${REF_CLASS}:first-child`,
           );
 
           if (!anchor) {
             return false;
           }
 
-          const id = anchor.getAttribute("data-id");
+          const id = anchor.getAttribute('data-id');
           const ref = anchor.getAttribute(REFNUM_ATTR);
 
           return {
-            "data-id": id ?? generateNodeId(),
+            'data-id': id ?? generateNodeId(),
             referenceNumber: ref ?? anchor.innerText,
           };
         },
@@ -66,10 +65,10 @@ const FootnoteReference = Node.create({
       class: {
         default: REF_CLASS,
       },
-      "data-id": {
+      'data-id': {
         renderHTML(attributes) {
           return {
-            "data-id": attributes["data-id"] || generateNodeId(),
+            'data-id': attributes['data-id'] || generateNodeId(),
           };
         },
       },
@@ -78,7 +77,7 @@ const FootnoteReference = Node.create({
       href: {
         renderHTML(attributes) {
           return {
-            href: `#fn:${attributes["referenceNumber"]}`,
+            href: `#fn:${attributes['referenceNumber']}`,
           };
         },
       },
@@ -91,9 +90,9 @@ const FootnoteReference = Node.create({
     attrs[REFNUM_ATTR] = referenceNumber;
 
     return [
-      "sup",
+      'sup',
       { id: `fnref:${referenceNumber}` },
-      ["a", attrs, HTMLAttributes.referenceNumber],
+      ['a', attrs, HTMLAttributes.referenceNumber],
     ];
   },
 
@@ -103,7 +102,7 @@ const FootnoteReference = Node.create({
     // Ensures pasted footnote references get unique IDs.
     const mapNode = (node: PMNode): PMNode => {
       if (node.type.name === this.name) {
-        const newAttrs = { ...node.attrs, "data-id": generateNodeId() };
+        const newAttrs = { ...node.attrs, 'data-id': generateNodeId() };
         return node.type.create(newAttrs, node.content, node.marks);
       }
 
@@ -130,7 +129,7 @@ const FootnoteReference = Node.create({
 
     return [
       new Plugin({
-        key: new PluginKey("footnotePasteHandler"),
+        key: new PluginKey('footnotePasteHandler'),
         props: {
           transformPasted(slice) {
             const mappedNodes: PMNode[] = [];
@@ -151,29 +150,29 @@ const FootnoteReference = Node.create({
             return new Slice(
               PMFragment.from(mappedNodes),
               slice.openStart,
-              slice.openEnd
+              slice.openEnd,
             );
           },
         },
       }),
       new Plugin({
-        key: new PluginKey("footnoteRefClick"),
+        key: new PluginKey('footnoteRefClick'),
 
         props: {
           // on double-click, focus on the footnote
           handleDoubleClickOn(view, pos, node, nodePos, event) {
-            if (node.type.name != "footnoteReference") return false;
+            if (node.type.name != 'footnoteReference') return false;
             event.preventDefault();
-            const id = node.attrs["data-id"];
+            const id = node.attrs['data-id'];
             return editor.commands.focusFootnote(id);
           },
           // click the footnote reference once to get focus, click twice to scroll to the footnote
           handleClickOn(view, pos, node, nodePos, event) {
-            if (node.type.name != "footnoteReference") return false;
+            if (node.type.name != 'footnoteReference') return false;
             event.preventDefault();
             const { selection } = editor.state.tr;
             if (selection instanceof NodeSelection && selection.node.eq(node)) {
-              const id = node.attrs["data-id"];
+              const id = node.attrs['data-id'];
               return editor.commands.focusFootnote(id);
             } else {
               editor.chain().setNodeSelection(nodePos).run();
@@ -191,7 +190,7 @@ const FootnoteReference = Node.create({
         () =>
         ({ state, tr }) => {
           const node = this.type.create({
-            "data-id": generateNodeId(),
+            'data-id': generateNodeId(),
           });
           tr.insert(state.selection.anchor, node);
           return true;

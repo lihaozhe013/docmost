@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Group, Text, ScrollArea, ActionIcon } from "@mantine/core";
+import React, { useEffect, useState } from 'react';
+import { Group, Text, ScrollArea, ActionIcon } from '@mantine/core';
 import {
   IconUser,
   IconSettings,
@@ -9,24 +9,29 @@ import {
   IconSpaces,
   IconBrush,
   IconWorld,
-  IconSparkles,
-} from "@tabler/icons-react";
-import { Link, useLocation } from "react-router-dom";
-import classes from "./settings.module.css";
-import { useTranslation } from "react-i18next";
-import useUserRole from "@/hooks/use-user-role.tsx";
-import { prefetchGroups, prefetchShares, prefetchSpaces, prefetchWorkspaceMembers } from "@/components/settings/settings-queries.tsx";
-import AppVersion from "@/components/settings/app-version.tsx";
-import { mobileSidebarAtom } from "@/components/layouts/global/hooks/atoms/sidebar-atom.ts";
-import { useToggleSidebar } from "@/components/layouts/global/hooks/hooks/use-toggle-sidebar.ts";
-import { useSettingsNavigation } from "@/hooks/use-settings-navigation";
-import { useAtom } from "jotai";
+  IconSparkles
+} from '@tabler/icons-react';
+import { Link, useLocation } from 'react-router-dom';
+import classes from './settings.module.css';
+import { useTranslation } from 'react-i18next';
+import useUserRole from '@/hooks/use-user-role.tsx';
+import {
+  prefetchGroups,
+  prefetchShares,
+  prefetchSpaces,
+  prefetchWorkspaceMembers
+} from '@/components/settings/settings-queries.tsx';
+import AppVersion from '@/components/settings/app-version.tsx';
+import { mobileSidebarAtom } from '@/components/layouts/global/hooks/atoms/sidebar-atom.ts';
+import { useToggleSidebar } from '@/components/layouts/global/hooks/hooks/use-toggle-sidebar.ts';
+import { useSettingsNavigation } from '@/hooks/use-settings-navigation';
+import { useAtom } from 'jotai';
 
 type DataItem = {
   label: string;
   icon: React.ElementType;
   path: string;
-  role?: "admin" | "owner";
+  role?: 'admin' | 'owner';
 };
 
 type DataGroup = {
@@ -36,32 +41,32 @@ type DataGroup = {
 
 const groupedData: DataGroup[] = [
   {
-    heading: "Account",
+    heading: 'Account',
     items: [
-      { label: "Profile", icon: IconUser, path: "/settings/account/profile" },
+      { label: 'Profile', icon: IconUser, path: '/settings/account/profile' },
       {
-        label: "Preferences",
+        label: 'Preferences',
         icon: IconBrush,
-        path: "/settings/account/preferences",
-      },
-    ],
+        path: '/settings/account/preferences'
+      }
+    ]
   },
   {
-    heading: "Workspace",
+    heading: 'Workspace',
     items: [
-      { label: "General", icon: IconSettings, path: "/settings/workspace" },
-      { label: "Members", icon: IconUsers, path: "/settings/members" },
-      { label: "Groups", icon: IconUsersGroup, path: "/settings/groups" },
-      { label: "Spaces", icon: IconSpaces, path: "/settings/spaces" },
-      { label: "Public sharing", icon: IconWorld, path: "/settings/sharing" },
+      { label: 'General', icon: IconSettings, path: '/settings/workspace' },
+      { label: 'Members', icon: IconUsers, path: '/settings/members' },
+      { label: 'Groups', icon: IconUsersGroup, path: '/settings/groups' },
+      { label: 'Spaces', icon: IconSpaces, path: '/settings/spaces' },
+      { label: 'Public sharing', icon: IconWorld, path: '/settings/sharing' },
       {
-        label: "AI settings",
+        label: 'AI settings',
         icon: IconSparkles,
-        path: "/settings/ai",
-        role: "admin",
-      },
-    ],
-  },
+        path: '/settings/ai',
+        role: 'admin'
+      }
+    ]
+  }
 ];
 
 export default function SettingsSidebar() {
@@ -78,7 +83,7 @@ export default function SettingsSidebar() {
   }, [location.pathname]);
 
   const canShowItem = (item: DataItem) => {
-    if (item.role === "admin" && !isAdmin) return false;
+    if (item.role === 'admin' && !isAdmin) return false;
     return true;
   };
 
@@ -95,16 +100,16 @@ export default function SettingsSidebar() {
 
           let prefetchHandler: any;
           switch (item.label) {
-            case "Members":
+            case 'Members':
               prefetchHandler = prefetchWorkspaceMembers;
               break;
-            case "Spaces":
+            case 'Spaces':
               prefetchHandler = prefetchSpaces;
               break;
-            case "Groups":
+            case 'Groups':
               prefetchHandler = prefetchGroups;
               break;
-            case "Public sharing":
+            case 'Public sharing':
               prefetchHandler = prefetchShares;
               break;
             default:
@@ -145,11 +150,11 @@ export default function SettingsSidebar() {
           }}
           variant="transparent"
           c="gray"
-          aria-label={t("Back")}
+          aria-label={t('Back')}
         >
           <IconArrowLeft stroke={2} />
         </ActionIcon>
-        <Text fw={500}>{t("Settings")}</Text>
+        <Text fw={500}>{t('Settings')}</Text>
       </Group>
 
       <ScrollArea w="100%">{menuItems}</ScrollArea>

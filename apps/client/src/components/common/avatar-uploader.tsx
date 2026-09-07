@@ -1,10 +1,10 @@
-import React, { useRef } from "react";
-import { Menu, Box, Loader } from "@mantine/core";
-import { useTranslation } from "react-i18next";
-import { IconTrash, IconUpload } from "@tabler/icons-react";
-import { CustomAvatar } from "@/components/ui/custom-avatar.tsx";
-import { AvatarIconType } from "@/features/attachments/types/attachment.types.ts";
-import { notifications } from "@mantine/notifications";
+import React, { useRef } from 'react';
+import { Menu, Box, Loader } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
+import { IconTrash, IconUpload } from '@tabler/icons-react';
+import { CustomAvatar } from '@/components/ui/custom-avatar.tsx';
+import { AvatarIconType } from '@/features/attachments/types/attachment.types.ts';
+import { notifications } from '@mantine/notifications';
 
 interface AvatarUploaderProps {
   currentImageUrl?: string | null;
@@ -29,13 +29,13 @@ export default function AvatarUploader({
   onUpload,
   onRemove,
   isLoading = false,
-  disabled = false,
+  disabled = false
 }: AvatarUploaderProps) {
   const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileInputChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
+    event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0];
     if (!file || disabled) {
@@ -46,12 +46,12 @@ export default function AvatarUploader({
     const maxSizeInBytes = 10 * 1024 * 1024;
     if (file.size > maxSizeInBytes) {
       notifications.show({
-        message: t("Image exceeds 10MB limit."),
-        color: "red",
+        message: t('Image exceeds 10MB limit.'),
+        color: 'red'
       });
       // Reset the input
       if (fileInputRef.current) {
-        fileInputRef.current.value = "";
+        fileInputRef.current.value = '';
       }
       return;
     }
@@ -61,14 +61,14 @@ export default function AvatarUploader({
     } catch (error) {
       console.error(error);
       notifications.show({
-        message: t("Failed to upload image"),
-        color: "red",
+        message: t('Failed to upload image'),
+        color: 'red'
       });
     }
 
     // Reset the input so the same file can be selected again
     if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+      fileInputRef.current.value = '';
     }
   };
 
@@ -76,14 +76,14 @@ export default function AvatarUploader({
     if (fileInputRef.current) {
       fileInputRef.current.click();
     } else {
-      console.error("File input ref is null!");
+      console.error('File input ref is null!');
     }
   };
 
   const actionLabel = {
-    [AvatarIconType.AVATAR]: t("Change avatar"),
-    [AvatarIconType.SPACE_ICON]: t("Change space icon"),
-    [AvatarIconType.WORKSPACE_ICON]: t("Change workspace icon"),
+    [AvatarIconType.AVATAR]: t('Change avatar'),
+    [AvatarIconType.SPACE_ICON]: t('Change space icon'),
+    [AvatarIconType.WORKSPACE_ICON]: t('Change workspace icon')
   }[type];
 
   // Per WCAG 2.5.3 (Label in Name), the accessible name must include the
@@ -100,13 +100,13 @@ export default function AvatarUploader({
     try {
       await onRemove();
       notifications.show({
-        message: t("Image removed successfully"),
+        message: t('Image removed successfully')
       });
     } catch (error) {
       console.error(error);
       notifications.show({
-        message: t("Failed to remove image"),
-        color: "red",
+        message: t('Failed to remove image'),
+        color: 'red'
       });
     }
   };
@@ -120,12 +120,12 @@ export default function AvatarUploader({
         accept="image/png,image/jpeg,image/jpg"
         aria-label={ariaLabel}
         tabIndex={-1}
-        style={{ display: "none" }}
+        style={{ display: 'none' }}
       />
 
       <Menu shadow="md" width={200} withArrow disabled={disabled || isLoading}>
         <Menu.Target>
-          <Box style={{ position: "relative", display: "inline-block" }}>
+          <Box style={{ position: 'relative', display: 'inline-block' }}>
             <CustomAvatar
               component="button"
               size={size}
@@ -134,8 +134,8 @@ export default function AvatarUploader({
               aria-label={ariaLabel}
               aria-haspopup="menu"
               style={{
-                cursor: disabled || isLoading ? "default" : "pointer",
-                opacity: isLoading ? 0.6 : 1,
+                cursor: disabled || isLoading ? 'default' : 'pointer',
+                opacity: isLoading ? 0.6 : 1
               }}
               radius={radius}
               variant={variant}
@@ -144,11 +144,11 @@ export default function AvatarUploader({
             {isLoading && (
               <Box
                 style={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  zIndex: 200,
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  zIndex: 200
                 }}
               >
                 <Loader size="sm" />
@@ -163,7 +163,7 @@ export default function AvatarUploader({
             disabled={isLoading || disabled}
             onClick={handleUploadClick}
           >
-            {t("Upload image")}
+            {t('Upload image')}
           </Menu.Item>
 
           {currentImageUrl && (
@@ -173,7 +173,7 @@ export default function AvatarUploader({
               onClick={handleRemove}
               disabled={isLoading || disabled}
             >
-              {t("Remove image")}
+              {t('Remove image')}
             </Menu.Item>
           )}
         </Menu.Dropdown>

@@ -1,13 +1,13 @@
-import { useAtom } from "jotai";
-import { useEffect } from "react";
+import { useAtom } from 'jotai';
+import { useEffect } from 'react';
 import {
   activeHistoryIdAtom,
   activeHistoryPrevIdAtom,
   compareModeAtom,
   comparePairAtom,
   compareSelectionAtom,
-  diffCountsAtom,
-} from "@/features/page-history/atoms/history-atoms";
+  diffCountsAtom
+} from '@/features/page-history/atoms/history-atoms';
 
 /**
  * Resets history state when pageId changes.
@@ -29,8 +29,8 @@ export function useHistoryReset(pageId: string) {
       setComparePair(null);
     };
 
-    setActiveHistoryId("");
-    setActiveHistoryPrevId("");
+    setActiveHistoryId('');
+    setActiveHistoryPrevId('');
     setDiffCounts(null);
     resetCompare();
 
@@ -42,6 +42,6 @@ export function useHistoryReset(pageId: string) {
     setDiffCounts,
     setCompareMode,
     setCompareSelection,
-    setComparePair,
+    setComparePair
   ]);
 }

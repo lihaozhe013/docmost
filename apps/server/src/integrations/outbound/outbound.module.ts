@@ -5,6 +5,6 @@ import { OutboundUrlGuard } from './outbound-url.guard';
 @Global()
 @Module({
   providers: [OutboundUrlGuard, OutboundAgentFactory],
-  exports: [OutboundUrlGuard, OutboundAgentFactory],
+  exports: [OutboundUrlGuard, OutboundAgentFactory]
 })
 export class OutboundModule {}

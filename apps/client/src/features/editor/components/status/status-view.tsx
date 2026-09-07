@@ -1,19 +1,19 @@
-import { useState, useRef, useEffect } from "react";
-import { NodeViewProps, NodeViewWrapper } from "@tiptap/react";
-import { Popover, TextInput, Group, Box } from "@mantine/core";
-import { useDebouncedCallback } from "@mantine/hooks";
-import { IconCheck } from "@tabler/icons-react";
-import clsx from "clsx";
-import classes from "./status.module.css";
-import type { StatusColor } from "@docmost/editor-ext";
+import { useState, useRef, useEffect } from 'react';
+import { NodeViewProps, NodeViewWrapper } from '@tiptap/react';
+import { Popover, TextInput, Group, Box } from '@mantine/core';
+import { useDebouncedCallback } from '@mantine/hooks';
+import { IconCheck } from '@tabler/icons-react';
+import clsx from 'clsx';
+import classes from './status.module.css';
+import type { StatusColor } from '@docmost/editor-ext';
 
 const STATUS_COLORS: { name: StatusColor; bg: string }[] = [
-  { name: "gray", bg: "var(--mantine-color-gray-4)" },
-  { name: "blue", bg: "var(--mantine-color-blue-4)" },
-  { name: "green", bg: "var(--mantine-color-green-4)" },
-  { name: "yellow", bg: "var(--mantine-color-yellow-4)" },
-  { name: "red", bg: "var(--mantine-color-red-4)" },
-  { name: "purple", bg: "var(--mantine-color-violet-4)" },
+  { name: 'gray', bg: 'var(--mantine-color-gray-4)' },
+  { name: 'blue', bg: 'var(--mantine-color-blue-4)' },
+  { name: 'green', bg: 'var(--mantine-color-green-4)' },
+  { name: 'yellow', bg: 'var(--mantine-color-yellow-4)' },
+  { name: 'red', bg: 'var(--mantine-color-red-4)' },
+  { name: 'purple', bg: 'var(--mantine-color-violet-4)' }
 ];
 
 const colorClassMap: Record<StatusColor, string> = {
@@ -22,7 +22,7 @@ const colorClassMap: Record<StatusColor, string> = {
   green: classes.colorGreen,
   yellow: classes.colorYellow,
   red: classes.colorRed,
-  purple: classes.colorPurple,
+  purple: classes.colorPurple
 };
 
 export default function StatusView(props: NodeViewProps) {
@@ -53,7 +53,7 @@ export default function StatusView(props: NodeViewProps) {
 
   const debouncedUpdateAttributes = useDebouncedCallback(
     (val: string) => updateAttributes({ text: val }),
-    100,
+    100
   );
 
   const handleTextChange = (val: string) => {
@@ -68,7 +68,7 @@ export default function StatusView(props: NodeViewProps) {
   const isEditable = editor.isEditable;
 
   return (
-    <NodeViewWrapper style={{ display: "inline" }} data-drag-handle>
+    <NodeViewWrapper style={{ display: 'inline' }} data-drag-handle>
       <Popover
         opened={opened}
         onChange={(open) => {
@@ -87,24 +87,24 @@ export default function StatusView(props: NodeViewProps) {
         <Popover.Target>
           <span
             className={clsx(
-              "status-badge",
+              'status-badge',
               classes.status,
-              colorClassMap[color],
+              colorClassMap[color]
             )}
             onClick={() => isEditable && setOpened(true)}
             onKeyDown={(e) => {
-              if (isEditable && (e.key === "Enter" || e.key === " ")) {
+              if (isEditable && (e.key === 'Enter' || e.key === ' ')) {
                 e.preventDefault();
                 setOpened(true);
               }
             }}
             role="button"
             tabIndex={0}
-            aria-label={text || "SET STATUS"}
+            aria-label={text || 'SET STATUS'}
             aria-haspopup="dialog"
             aria-expanded={opened}
           >
-            {text || "SET STATUS"}
+            {text || 'SET STATUS'}
           </span>
         </Popover.Target>
 
@@ -116,7 +116,7 @@ export default function StatusView(props: NodeViewProps) {
               handleTextChange(e.currentTarget.value.toUpperCase())
             }
             onKeyDown={(e) => {
-              if (e.key === "Enter") {
+              if (e.key === 'Enter') {
                 setOpened(false);
                 editor.commands.focus(getPos() + node.nodeSize);
               }
@@ -132,12 +132,12 @@ export default function StatusView(props: NodeViewProps) {
                 key={name}
                 className={clsx(
                   classes.swatch,
-                  color === name && classes.swatchActive,
+                  color === name && classes.swatchActive
                 )}
                 style={{ backgroundColor: bg }}
                 onClick={() => handleColorChange(name)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
+                  if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
                     handleColorChange(name);
                   }

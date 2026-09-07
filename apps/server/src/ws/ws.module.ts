@@ -9,6 +9,6 @@ import { BaseRealtimeBridge } from './base-realtime.bridge';
 @Module({
   imports: [TokenModule],
   providers: [WsGateway, WsService, WsTreeService, BaseRealtimeBridge],
-  exports: [WsGateway, WsService, WsTreeService],
+  exports: [WsGateway, WsService, WsTreeService]
 })
 export class WsModule {}

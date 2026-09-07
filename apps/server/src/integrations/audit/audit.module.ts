@@ -6,9 +6,9 @@ import { AUDIT_SERVICE, NoopAuditService } from './audit.service';
   providers: [
     {
       provide: AUDIT_SERVICE,
-      useClass: NoopAuditService,
-    },
+      useClass: NoopAuditService
+    }
   ],
-  exports: [AUDIT_SERVICE],
+  exports: [AUDIT_SERVICE]
 })
 export class NoopAuditModule {}

@@ -1,14 +1,14 @@
-import { KeyboardEvent, useState } from "react";
-import { ActionIcon, Tooltip } from "@mantine/core";
-import { IconChevronRight, IconLock } from "@tabler/icons-react";
-import { useTranslation } from "react-i18next";
-import { ISpace } from "@/features/space/types/space.types";
-import { IPage } from "@/features/page/types/page.types";
-import { SpaceRole } from "@/lib/types";
-import { CustomAvatar } from "@/components/ui/custom-avatar";
-import { AvatarIconType } from "@/features/attachments/types/attachment.types";
-import { PageChildren } from "./page-children";
-import classes from "./destination-picker.module.css";
+import { KeyboardEvent, useState } from 'react';
+import { ActionIcon, Tooltip } from '@mantine/core';
+import { IconChevronRight, IconLock } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
+import { ISpace } from '@/features/space/types/space.types';
+import { IPage } from '@/features/page/types/page.types';
+import { SpaceRole } from '@/lib/types';
+import { CustomAvatar } from '@/components/ui/custom-avatar';
+import { AvatarIconType } from '@/features/attachments/types/attachment.types';
+import { PageChildren } from './page-children';
+import classes from './destination-picker.module.css';
 
 type SpaceRowProps = {
   space: ISpace;
@@ -25,7 +25,7 @@ export function SpaceRow({
   selectedId,
   excludePageId,
   onSelectSpace,
-  onSelectPage,
+  onSelectPage
 }: SpaceRowProps) {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
@@ -37,10 +37,10 @@ export function SpaceRow({
   const rowClasses = [
     classes.spaceRow,
     isSelected && classes.selected,
-    !writable && classes.disabled,
+    !writable && classes.disabled
   ]
     .filter(Boolean)
-    .join(" ");
+    .join(' ');
 
   const handleSelect = () => {
     if (writable) onSelectSpace(space);
@@ -48,7 +48,7 @@ export function SpaceRow({
 
   const handleRowKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.target !== e.currentTarget) return;
-    if (e.key === "Enter" || e.key === " ") {
+    if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       handleSelect();
     }
@@ -66,11 +66,11 @@ export function SpaceRow({
     >
       {writable ? (
         <ActionIcon
-          className={`${classes.chevron} ${expanded ? classes.chevronExpanded : ""}`}
+          className={`${classes.chevron} ${expanded ? classes.chevronExpanded : ''}`}
           variant="subtle"
           color="gray"
           size="sm"
-          aria-label={expanded ? t("Collapse") : t("Expand")}
+          aria-label={expanded ? t('Collapse') : t('Expand')}
           aria-expanded={expanded}
           onClick={(e) => {
             e.stopPropagation();
@@ -92,12 +92,7 @@ export function SpaceRow({
 
       <div className={classes.pageTitle}>{space.name}</div>
 
-      {!writable && (
-        <IconLock
-          size={14}
-          color="var(--mantine-color-gray-5)"
-        />
-      )}
+      {!writable && <IconLock size={14} color="var(--mantine-color-gray-5)" />}
     </div>
   );
 

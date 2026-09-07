@@ -1,19 +1,19 @@
-import { FC } from "react";
-import type { Editor } from "@tiptap/react";
-import { ActionIcon, Menu, Tooltip } from "@mantine/core";
+import { FC } from 'react';
+import type { Editor } from '@tiptap/react';
+import { ActionIcon, Menu, Tooltip } from '@mantine/core';
 import {
   IconFileTypePdf,
   IconMovie,
   IconMusic,
   IconPaperclip,
-  IconPhoto,
-} from "@tabler/icons-react";
-import { useTranslation } from "react-i18next";
-import { uploadImageAction } from "@/features/editor/components/image/upload-image-action";
-import { uploadVideoAction } from "@/features/editor/components/video/upload-video-action";
-import { uploadAudioAction } from "@/features/editor/components/audio/upload-audio-action";
-import { uploadAttachmentAction } from "@/features/editor/components/attachment/upload-attachment-action";
-import { uploadPdfAction } from "@/features/editor/components/pdf/upload-pdf-action";
+  IconPhoto
+} from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
+import { uploadImageAction } from '@/features/editor/components/image/upload-image-action';
+import { uploadVideoAction } from '@/features/editor/components/video/upload-video-action';
+import { uploadAudioAction } from '@/features/editor/components/audio/upload-audio-action';
+import { uploadAttachmentAction } from '@/features/editor/components/attachment/upload-attachment-action';
+import { uploadPdfAction } from '@/features/editor/components/pdf/upload-pdf-action';
 
 interface Props {
   editor: Editor;
@@ -33,17 +33,17 @@ function pickFile(
   accept: string,
   multiple: boolean,
   upload: UploadFn,
-  extra?: boolean,
+  extra?: boolean
 ) {
   // @ts-ignore — editor.storage.pageId is set by PageEditor.onCreate
   const pageId = editor.storage?.pageId as string | undefined;
   if (!pageId) return;
 
-  const input = document.createElement("input");
-  input.type = "file";
+  const input = document.createElement('input');
+  input.type = 'file';
   input.accept = accept;
   input.multiple = multiple;
-  input.style.display = "none";
+  input.style.display = 'none';
   document.body.appendChild(input);
   input.onchange = () => {
     if (input.files?.length) {
@@ -67,12 +67,12 @@ export const MediaGroup: FC<Props> = ({ editor, templateMode }) => {
   return (
     <Menu shadow="md" position="bottom-start" withArrow={false}>
       <Menu.Target>
-        <Tooltip label={t("Insert media")} withArrow>
+        <Tooltip label={t('Insert media')} withArrow>
           <ActionIcon
             variant="subtle"
             color="dark"
             size="md"
-            aria-label={t("Insert media")}
+            aria-label={t('Insert media')}
           >
             <IconPhoto size={16} />
           </ActionIcon>
@@ -82,31 +82,31 @@ export const MediaGroup: FC<Props> = ({ editor, templateMode }) => {
         {!templateMode && (
           <Menu.Item
             leftSection={<IconPhoto size={16} />}
-            onClick={() => pickFile(editor, "image/*", true, uploadImageAction)}
+            onClick={() => pickFile(editor, 'image/*', true, uploadImageAction)}
           >
-            {t("Image")}
+            {t('Image')}
           </Menu.Item>
         )}
         {!templateMode && (
           <Menu.Item
             leftSection={<IconMovie size={16} />}
-            onClick={() => pickFile(editor, "video/*", true, uploadVideoAction)}
+            onClick={() => pickFile(editor, 'video/*', true, uploadVideoAction)}
           >
-            {t("Video")}
+            {t('Video')}
           </Menu.Item>
         )}
         {!templateMode && (
           <Menu.Item
             leftSection={<IconMusic size={16} />}
-            onClick={() => pickFile(editor, "audio/*", true, uploadAudioAction)}
+            onClick={() => pickFile(editor, 'audio/*', true, uploadAudioAction)}
           >
-            {t("Audio")}
+            {t('Audio')}
           </Menu.Item>
         )}
         <Menu.Item
           leftSection={<IconFileTypePdf size={16} />}
           onClick={() =>
-            pickFile(editor, "application/pdf", false, uploadPdfAction)
+            pickFile(editor, 'application/pdf', false, uploadPdfAction)
           }
         >
           PDF
@@ -115,10 +115,10 @@ export const MediaGroup: FC<Props> = ({ editor, templateMode }) => {
           <Menu.Item
             leftSection={<IconPaperclip size={16} />}
             onClick={() =>
-              pickFile(editor, "", true, uploadAttachmentAction, true)
+              pickFile(editor, '', true, uploadAttachmentAction, true)
             }
           >
-            {t("File attachment")}
+            {t('File attachment')}
           </Menu.Item>
         )}
       </Menu.Dropdown>

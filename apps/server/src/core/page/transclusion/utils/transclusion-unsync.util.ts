@@ -20,7 +20,7 @@ export type RewriteResult = {
  */
 export function rewriteAttachmentsForUnsync(
   content: unknown,
-  generateId: () => string,
+  generateId: () => string
 ): RewriteResult {
   const cloned = content ? JSON.parse(JSON.stringify(content)) : content;
   const idMap = new Map<string, string>();
@@ -41,7 +41,10 @@ export function rewriteAttachmentsForUnsync(
           idMap.set(oldId, newId);
         }
         node.attrs.attachmentId = newId;
-        if (typeof node.attrs.src === 'string' && node.attrs.src.includes(oldId)) {
+        if (
+          typeof node.attrs.src === 'string' &&
+          node.attrs.src.includes(oldId)
+        ) {
           node.attrs.src = node.attrs.src.split(oldId).join(newId);
         }
       }
@@ -57,8 +60,8 @@ export function rewriteAttachmentsForUnsync(
   const copies: AttachmentRewritePlan[] = Array.from(idMap.entries()).map(
     ([oldAttachmentId, newAttachmentId]) => ({
       oldAttachmentId,
-      newAttachmentId,
-    }),
+      newAttachmentId
+    })
   );
 
   return { content: cloned, copies };

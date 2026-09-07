@@ -1,5 +1,5 @@
-import { timeAgo } from "@/lib/time.ts";
-import { useMemo, useSyncExternalStore } from "react";
+import { timeAgo } from '@/lib/time.ts';
+import { useMemo, useSyncExternalStore } from 'react';
 
 let tick = 0;
 let intervalId: ReturnType<typeof setInterval> | null = null;
@@ -28,5 +28,8 @@ function getSnapshot() {
 
 export function useTimeAgo(date: Date | string | undefined) {
   const currentTick = useSyncExternalStore(subscribe, getSnapshot);
-  return useMemo(() => (date ? timeAgo(new Date(date)) : ""), [date, currentTick]);
+  return useMemo(
+    () => (date ? timeAgo(new Date(date)) : ''),
+    [date, currentTick]
+  );
 }

@@ -5,7 +5,7 @@ import { dbOrTx } from '@docmost/db/utils';
 import {
   InsertableSpace,
   Space,
-  UpdatableSpace,
+  UpdatableSpace
 } from '@docmost/db/types/entity.types';
 import { ExpressionBuilder, sql } from 'kysely';
 import { PaginationOptions } from '../../pagination/pagination-options';
@@ -19,13 +19,13 @@ import { EventName } from '../../../common/events/event.contants';
 export class SpaceRepo {
   constructor(
     @InjectKysely() private readonly db: KyselyDB,
-    private eventEmitter: EventEmitter2,
+    private eventEmitter: EventEmitter2
   ) {}
 
   async findById(
     spaceId: string,
     workspaceId: string,
-    opts?: { includeMemberCount?: boolean; trx?: KyselyTransaction },
+    opts?: { includeMemberCount?: boolean; trx?: KyselyTransaction }
   ): Promise<Space> {
     const db = dbOrTx(this.db, opts?.trx);
 
@@ -46,7 +46,7 @@ export class SpaceRepo {
   async findBySlug(
     slug: string,
     workspaceId: string,
-    opts?: { includeMemberCount: boolean },
+    opts?: { includeMemberCount: boolean }
   ): Promise<Space> {
     return await this.db
       .selectFrom('spaces')
@@ -60,7 +60,7 @@ export class SpaceRepo {
   async findPersonalSpace(
     userId: string,
     workspaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<Space | undefined> {
     const db = dbOrTx(this.db, trx);
     return db
@@ -76,7 +76,7 @@ export class SpaceRepo {
   async slugExists(
     slug: string,
     workspaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<boolean> {
     const db = dbOrTx(this.db, trx);
     let { count } = await db
@@ -93,7 +93,7 @@ export class SpaceRepo {
     updatableSpace: UpdatableSpace,
     spaceId: string,
     workspaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ) {
     const db = dbOrTx(this.db, trx);
     return db
@@ -110,7 +110,7 @@ export class SpaceRepo {
     workspaceId: string,
     prefKey: string,
     prefValue: string | boolean,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ) {
     const db = dbOrTx(this.db, trx);
     return db
@@ -119,7 +119,7 @@ export class SpaceRepo {
         settings: sql`COALESCE(settings, '{}'::jsonb)
           || jsonb_build_object('sharing', COALESCE(settings->'sharing', '{}'::jsonb)
           || jsonb_build_object('${sql.raw(prefKey)}', ${sql.lit(prefValue)}))`,
-        updatedAt: new Date(),
+        updatedAt: new Date()
       })
       .where('id', '=', spaceId)
       .where('workspaceId', '=', workspaceId)
@@ -132,7 +132,7 @@ export class SpaceRepo {
     workspaceId: string,
     prefKey: string,
     prefValue: string | boolean,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ) {
     const db = dbOrTx(this.db, trx);
     return db
@@ -141,7 +141,7 @@ export class SpaceRepo {
         settings: sql`COALESCE(settings, '{}'::jsonb)
           || jsonb_build_object('comments', COALESCE(settings->'comments', '{}'::jsonb)
           || jsonb_build_object('${sql.raw(prefKey)}', ${sql.lit(prefValue)}))`,
-        updatedAt: new Date(),
+        updatedAt: new Date()
       })
       .where('id', '=', spaceId)
       .where('workspaceId', '=', workspaceId)
@@ -151,7 +151,7 @@ export class SpaceRepo {
 
   async insertSpace(
     insertableSpace: InsertableSpace,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<Space> {
     const db = dbOrTx(this.db, trx);
     return db
@@ -163,7 +163,7 @@ export class SpaceRepo {
 
   async getSpacesInWorkspace(
     workspaceId: string,
-    pagination: PaginationOptions,
+    pagination: PaginationOptions
   ) {
     // todo: show spaces user have access based on visibility and memberships
     let query = this.db
@@ -177,12 +177,12 @@ export class SpaceRepo {
         eb(
           sql`f_unaccent(name)`,
           'ilike',
-          sql`f_unaccent(${'%' + pagination.query + '%'})`,
+          sql`f_unaccent(${'%' + pagination.query + '%'})`
         ).or(
           sql`f_unaccent(description)`,
           'ilike',
-          sql`f_unaccent(${'%' + pagination.query + '%'})`,
-        ),
+          sql`f_unaccent(${'%' + pagination.query + '%'})`
+        )
       );
     }
 
@@ -192,9 +192,9 @@ export class SpaceRepo {
       beforeCursor: pagination.beforeCursor,
       fields: [
         { expression: 'name', direction: 'asc' },
-        { expression: 'id', direction: 'asc' },
+        { expression: 'id', direction: 'asc' }
       ],
-      parseCursor: (cursor) => ({ name: cursor.name, id: cursor.id }),
+      parseCursor: (cursor) => ({ name: cursor.name, id: cursor.id })
     });
   }
 
@@ -211,7 +211,7 @@ export class SpaceRepo {
           .leftJoin('groups', 'groups.id', 'spaceMembers.groupId')
           .leftJoin('groupUsers', 'groupUsers.groupId', 'groups.id')
           .select('groupUsers.userId')
-          .whereRef('spaceMembers.spaceId', '=', 'spaces.id'),
+          .whereRef('spaceMembers.spaceId', '=', 'spaces.id')
       )
       .as('userId');
 
@@ -230,7 +230,7 @@ export class SpaceRepo {
 
     this.eventEmitter.emit(EventName.SPACE_DELETED, {
       spaceId,
-      workspaceId,
+      workspaceId
     });
   }
 }

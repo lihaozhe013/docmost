@@ -4,10 +4,10 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .alterTable('pages')
     .addColumn('is_base', 'boolean', (col) =>
-      col.ifNotExists().notNull().defaultTo(false),
+      col.ifNotExists().notNull().defaultTo(false)
     )
     .addColumn('base_schema_version', 'integer', (col) =>
-      col.ifNotExists().notNull().defaultTo(0),
+      col.ifNotExists().notNull().defaultTo(0)
     )
     .execute();
 
@@ -22,7 +22,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .ifNotExists()
     .addColumn('id', 'varchar', (col) => col.notNull())
     .addColumn('page_id', 'uuid', (col) =>
-      col.references('pages.id').onDelete('cascade').notNull(),
+      col.references('pages.id').onDelete('cascade').notNull()
     )
     .addColumn('name', 'varchar', (col) => col.notNull())
     .addColumn('type', 'varchar', (col) => col.notNull())
@@ -34,20 +34,20 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('is_primary', 'boolean', (col) => col.notNull().defaultTo(false))
     .addColumn('schema_version', 'integer', (col) => col.notNull().defaultTo(1))
     .addColumn('workspace_id', 'uuid', (col) =>
-      col.references('workspaces.id').onDelete('cascade').notNull(),
+      col.references('workspaces.id').onDelete('cascade').notNull()
     )
     .addColumn('created_at', 'timestamptz', (col) =>
-      col.notNull().defaultTo(sql`now()`),
+      col.notNull().defaultTo(sql`now()`)
     )
     .addColumn('updated_at', 'timestamptz', (col) =>
-      col.notNull().defaultTo(sql`now()`),
+      col.notNull().defaultTo(sql`now()`)
     )
     .addColumn('deleted_at', 'timestamptz')
     .addPrimaryKeyConstraint('base_properties_pkey', ['page_id', 'id'])
     .execute();
 
   await sql`CREATE INDEX IF NOT EXISTS idx_base_properties_page_id ON base_properties (page_id)`.execute(
-    db,
+    db
   );
 
   await sql`
@@ -69,29 +69,29 @@ export async function up(db: Kysely<any>): Promise<void> {
     .createTable('base_rows')
     .ifNotExists()
     .addColumn('id', 'uuid', (col) =>
-      col.primaryKey().defaultTo(sql`gen_uuid_v7()`),
+      col.primaryKey().defaultTo(sql`gen_uuid_v7()`)
     )
     .addColumn('page_id', 'uuid', (col) =>
-      col.references('pages.id').onDelete('cascade').notNull(),
+      col.references('pages.id').onDelete('cascade').notNull()
     )
     .addColumn('cells', 'jsonb', (col) =>
-      col.notNull().defaultTo(sql`'{}'::jsonb`),
+      col.notNull().defaultTo(sql`'{}'::jsonb`)
     )
     .addColumn('position', 'varchar', (col) => col.notNull())
     .addColumn('creator_id', 'uuid', (col) =>
-      col.references('users.id').onDelete('set null'),
+      col.references('users.id').onDelete('set null')
     )
     .addColumn('last_updated_by_id', 'uuid', (col) =>
-      col.references('users.id').onDelete('set null'),
+      col.references('users.id').onDelete('set null')
     )
     .addColumn('workspace_id', 'uuid', (col) =>
-      col.references('workspaces.id').onDelete('cascade').notNull(),
+      col.references('workspaces.id').onDelete('cascade').notNull()
     )
     .addColumn('created_at', 'timestamptz', (col) =>
-      col.notNull().defaultTo(sql`now()`),
+      col.notNull().defaultTo(sql`now()`)
     )
     .addColumn('updated_at', 'timestamptz', (col) =>
-      col.notNull().defaultTo(sql`now()`),
+      col.notNull().defaultTo(sql`now()`)
     )
     .addColumn('deleted_at', 'timestamptz')
     .execute();
@@ -118,33 +118,33 @@ export async function up(db: Kysely<any>): Promise<void> {
     .createTable('base_views')
     .ifNotExists()
     .addColumn('id', 'uuid', (col) =>
-      col.primaryKey().defaultTo(sql`gen_uuid_v7()`),
+      col.primaryKey().defaultTo(sql`gen_uuid_v7()`)
     )
     .addColumn('page_id', 'uuid', (col) =>
-      col.references('pages.id').onDelete('cascade').notNull(),
+      col.references('pages.id').onDelete('cascade').notNull()
     )
     .addColumn('name', 'varchar', (col) => col.notNull())
     .addColumn('type', 'varchar', (col) => col.notNull().defaultTo('table'))
     .addColumn('position', 'varchar', (col) => col.notNull())
     .addColumn('config', 'jsonb', (col) =>
-      col.notNull().defaultTo(sql`'{}'::jsonb`),
+      col.notNull().defaultTo(sql`'{}'::jsonb`)
     )
     .addColumn('workspace_id', 'uuid', (col) =>
-      col.references('workspaces.id').onDelete('cascade').notNull(),
+      col.references('workspaces.id').onDelete('cascade').notNull()
     )
     .addColumn('creator_id', 'uuid', (col) =>
-      col.references('users.id').onDelete('set null'),
+      col.references('users.id').onDelete('set null')
     )
     .addColumn('created_at', 'timestamptz', (col) =>
-      col.notNull().defaultTo(sql`now()`),
+      col.notNull().defaultTo(sql`now()`)
     )
     .addColumn('updated_at', 'timestamptz', (col) =>
-      col.notNull().defaultTo(sql`now()`),
+      col.notNull().defaultTo(sql`now()`)
     )
     .execute();
 
   await sql`CREATE INDEX IF NOT EXISTS idx_base_views_page_id ON base_views (page_id)`.execute(
-    db,
+    db
   );
 
   // Cell extraction helpers for filters and sorts. Return NULL for absent or

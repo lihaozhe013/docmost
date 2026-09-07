@@ -1,38 +1,37 @@
-import api from "@/lib/api-client";
+import api from '@/lib/api-client';
 import {
   IChangePassword,
   ICollabToken,
   ILogin,
   ILoginResponse,
-  ISetupWorkspace,
-} from "@/features/auth/types/auth.types";
-import { IWorkspace } from "@/features/workspace/types/workspace.types.ts";
+  ISetupWorkspace
+} from '@/features/auth/types/auth.types';
+import { IWorkspace } from '@/features/workspace/types/workspace.types.ts';
 
 export async function login(data: ILogin): Promise<ILoginResponse> {
-  const response = await api.post<ILoginResponse>("/auth/login", data);
+  const response = await api.post<ILoginResponse>('/auth/login', data);
   return response.data;
 }
 
 export async function logout(): Promise<void> {
-  await api.post<void>("/auth/logout");
+  await api.post<void>('/auth/logout');
 }
 
 export async function changePassword(
-  data: IChangePassword,
+  data: IChangePassword
 ): Promise<IChangePassword> {
-  const req = await api.post<IChangePassword>("/auth/change-password", data);
+  const req = await api.post<IChangePassword>('/auth/change-password', data);
   return req.data;
 }
 
 export async function setupWorkspace(
-  data: ISetupWorkspace,
+  data: ISetupWorkspace
 ): Promise<IWorkspace> {
-  const req = await api.post<IWorkspace>("/auth/setup", data);
+  const req = await api.post<IWorkspace>('/auth/setup', data);
   return req.data;
 }
 
 export async function getCollabToken(): Promise<ICollabToken> {
-  const req = await api.post<ICollabToken>("/auth/collab-token");
+  const req = await api.post<ICollabToken>('/auth/collab-token');
   return req.data;
 }
-

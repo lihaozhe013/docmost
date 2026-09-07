@@ -7,7 +7,7 @@ import { dbOrTx } from '@docmost/db/utils';
 import {
   InsertableUser,
   UpdatableUser,
-  User,
+  User
 } from '@docmost/db/types/entity.types';
 import { PaginationOptions } from '../../pagination/pagination-options';
 import { executeWithCursorPagination } from '@docmost/db/pagination/cursor-pagination';
@@ -35,7 +35,7 @@ export class UserRepo {
     'createdAt',
     'updatedAt',
     'deletedAt',
-    'hasGeneratedPassword',
+    'hasGeneratedPassword'
   ];
 
   async findById(
@@ -46,7 +46,7 @@ export class UserRepo {
       includeUserMfa?: boolean;
       includeScimExternalId?: boolean;
       trx?: KyselyTransaction;
-    },
+    }
   ): Promise<User> {
     const db = dbOrTx(this.db, opts?.trx);
     return db
@@ -68,7 +68,7 @@ export class UserRepo {
       includeUserMfa?: boolean;
       includeScimExternalId?: boolean;
       trx?: KyselyTransaction;
-    },
+    }
   ): Promise<User> {
     const db = dbOrTx(this.db, opts?.trx);
     return db
@@ -86,7 +86,7 @@ export class UserRepo {
     updatableUser: UpdatableUser,
     userId: string,
     workspaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ) {
     const db = dbOrTx(this.db, trx);
 
@@ -102,7 +102,7 @@ export class UserRepo {
     return await this.db
       .updateTable('users')
       .set({
-        lastLoginAt: new Date(),
+        lastLoginAt: new Date()
       })
       .where('id', '=', userId)
       .where('workspaceId', '=', workspaceId)
@@ -112,7 +112,7 @@ export class UserRepo {
   async insertUser(
     insertableUser: InsertableUser,
     trx?: KyselyTransaction,
-    opts?: { pageEditMode?: string },
+    opts?: { pageEditMode?: string }
   ): Promise<User> {
     const user: InsertableUser = {
       name:
@@ -121,7 +121,7 @@ export class UserRepo {
       password: await hashPassword(insertableUser.password),
       locale: 'en-US',
       role: insertableUser?.role,
-      lastLoginAt: new Date(),
+      lastLoginAt: new Date()
     };
 
     const db = dbOrTx(this.db, trx);
@@ -133,10 +133,10 @@ export class UserRepo {
         ...(opts?.pageEditMode
           ? {
               settings: sql`${JSON.stringify({
-                preferences: { pageEditMode: opts.pageEditMode },
-              })}::text::jsonb`,
+                preferences: { pageEditMode: opts.pageEditMode }
+              })}::text::jsonb`
             }
-          : {}),
+          : {})
       })
       .returning(this.baseFields)
       .executeTakeFirst();
@@ -144,7 +144,7 @@ export class UserRepo {
 
   async roleCountByWorkspaceId(
     role: string,
-    workspaceId: string,
+    workspaceId: string
   ): Promise<number> {
     const { count } = await this.db
       .selectFrom('users')
@@ -168,12 +168,12 @@ export class UserRepo {
         eb(
           sql`f_unaccent(users.name)`,
           'ilike',
-          sql`f_unaccent(${'%' + pagination.query + '%'})`,
+          sql`f_unaccent(${'%' + pagination.query + '%'})`
         ).or(
           sql`users.email`,
           'ilike',
-          sql`f_unaccent(${'%' + pagination.query + '%'})`,
-        ),
+          sql`f_unaccent(${'%' + pagination.query + '%'})`
+        )
       );
     }
 
@@ -183,16 +183,16 @@ export class UserRepo {
       beforeCursor: pagination.beforeCursor,
       fields: [
         { expression: 'name', direction: 'asc' },
-        { expression: 'id', direction: 'asc' },
+        { expression: 'id', direction: 'asc' }
       ],
-      parseCursor: (cursor) => ({ name: cursor.name, id: cursor.id }),
+      parseCursor: (cursor) => ({ name: cursor.name, id: cursor.id })
     });
   }
 
   async updatePreference(
     userId: string,
     prefKey: string,
-    prefValue: string | boolean,
+    prefValue: string | boolean
   ) {
     return await this.db
       .updateTable('users')
@@ -200,7 +200,7 @@ export class UserRepo {
         settings: sql`COALESCE(settings, '{}'::jsonb)
                 || jsonb_build_object('preferences', COALESCE(settings->'preferences', '{}'::jsonb) 
                 || jsonb_build_object('${sql.raw(prefKey)}', ${sql.lit(prefValue)}))`,
-        updatedAt: new Date(),
+        updatedAt: new Date()
       })
       .where('id', '=', userId)
       .returning(this.baseFields)
@@ -210,7 +210,7 @@ export class UserRepo {
   async updateNotificationSetting(
     userId: string,
     settingKey: NotificationSettingKey,
-    settingValue: boolean,
+    settingValue: boolean
   ) {
     return await this.db
       .updateTable('users')
@@ -218,7 +218,7 @@ export class UserRepo {
         settings: sql`COALESCE(settings, '{}'::jsonb)
                 || jsonb_build_object('notifications', COALESCE(settings->'notifications', '{}'::jsonb)
                 || jsonb_build_object(${sql.lit(settingKey)}, ${sql.lit(settingValue)}))`,
-        updatedAt: new Date(),
+        updatedAt: new Date()
       })
       .where('id', '=', userId)
       .returning(this.baseFields)
@@ -233,9 +233,9 @@ export class UserRepo {
           'userMfa.id',
           'userMfa.method',
           'userMfa.isEnabled',
-          'userMfa.createdAt',
+          'userMfa.createdAt'
         ])
-        .whereRef('userMfa.userId', '=', 'users.id'),
+        .whereRef('userMfa.userId', '=', 'users.id')
     ).as('mfa');
   }
 }

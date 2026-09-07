@@ -1,5 +1,5 @@
-import { Button, Group, Tooltip } from "@mantine/core";
-import { useTranslation } from "react-i18next";
+import { Button, Group, Tooltip } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 
 type CommentActionsProps = {
   onSave: () => void;
@@ -12,7 +12,7 @@ function CommentActions({
   onSave,
   isLoading,
   onCancel,
-  isCommentEditor,
+  isCommentEditor
 }: CommentActionsProps) {
   const { t } = useTranslation();
 
@@ -20,7 +20,7 @@ function CommentActions({
     <Group justify="flex-end" pt="sm" wrap="nowrap">
       {isCommentEditor && (
         <Button size="compact-sm" variant="default" onClick={onCancel}>
-          {t("Cancel")}
+          {t('Cancel')}
         </Button>
       )}
 
@@ -30,7 +30,7 @@ function CommentActions({
         onClick={onSave}
         onMouseDown={(e) => e.preventDefault()}
       >
-        {t("Save")}
+        {t('Save')}
       </Button>
     </Group>
   );

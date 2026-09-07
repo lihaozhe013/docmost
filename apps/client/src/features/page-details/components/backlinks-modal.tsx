@@ -1,7 +1,7 @@
-import { Modal, Stack, Text } from "@mantine/core";
-import { useTranslation } from "react-i18next";
-import { useBacklinksCountQuery } from "@/features/page-details/queries/backlinks-query.ts";
-import { BacklinksList } from "./backlinks-list";
+import { Modal, Stack, Text } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
+import { useBacklinksCountQuery } from '@/features/page-details/queries/backlinks-query.ts';
+import { BacklinksList } from './backlinks-list';
 
 interface BacklinksModalProps {
   pageId: string;
@@ -12,7 +12,7 @@ interface BacklinksModalProps {
 export function BacklinksModal({
   pageId,
   opened,
-  onClose,
+  onClose
 }: BacklinksModalProps) {
   const { t } = useTranslation();
   const { data: counts } = useBacklinksCountQuery(pageId);
@@ -22,15 +22,15 @@ export function BacklinksModal({
       <Modal.Overlay />
       <Modal.Content>
         <Modal.Header>
-          <Modal.Title fw={500}>{t("Backlinks")}</Modal.Title>
-          <Modal.CloseButton aria-label={t("Close")} />
+          <Modal.Title fw={500}>{t('Backlinks')}</Modal.Title>
+          <Modal.CloseButton aria-label={t('Close')} />
         </Modal.Header>
         <Modal.Body>
           <Stack gap="lg">
             <Stack gap="xs">
               <Text size="sm" fw={500} c="dimmed">
-                {t("Incoming links ({{count}})", {
-                  count: counts?.incoming ?? 0,
+                {t('Incoming links ({{count}})', {
+                  count: counts?.incoming ?? 0
                 })}
               </Text>
               <BacklinksList
@@ -43,8 +43,8 @@ export function BacklinksModal({
 
             <Stack gap="xs">
               <Text size="sm" fw={500} c="dimmed">
-                {t("Outgoing links ({{count}})", {
-                  count: counts?.outgoing ?? 0,
+                {t('Outgoing links ({{count}})', {
+                  count: counts?.outgoing ?? 0
                 })}
               </Text>
               <BacklinksList

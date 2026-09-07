@@ -1,5 +1,5 @@
-import api from "@/lib/api-client.ts";
-import { IPageSearchParams } from "@/features/search/types/search.types.ts";
+import api from '@/lib/api-client.ts';
+import { IPageSearchParams } from '@/features/search/types/search.types.ts';
 
 export interface IAiSearchResponse {
   answer: string;
@@ -17,7 +17,7 @@ export interface IAiSearchResponse {
 
 export async function hintVectorCache(): Promise<void> {
   try {
-    await api.post("/ai/vector-cache-hint");
+    await api.post('/ai/vector-cache-hint');
   } catch {
     // best-effort cache hint
   }
@@ -25,15 +25,15 @@ export async function hintVectorCache(): Promise<void> {
 
 export async function aiAnswers(
   params: IPageSearchParams,
-  onChunk?: (chunk: { content?: string; sources?: any[] }) => void,
+  onChunk?: (chunk: { content?: string; sources?: any[] }) => void
 ): Promise<IAiSearchResponse> {
-  const response = await fetch("/api/ai/answers", {
-    method: "POST",
+  const response = await fetch('/api/ai/answers', {
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json'
     },
-    credentials: "include",
-    body: JSON.stringify(params),
+    credentials: 'include',
+    body: JSON.stringify(params)
   });
 
   if (!response.ok) {
@@ -43,9 +43,9 @@ export async function aiAnswers(
   const reader = response.body?.getReader();
   const decoder = new TextDecoder();
 
-  let answer = "";
+  let answer = '';
   let sources: any[] = [];
-  let buffer = "";
+  let buffer = '';
 
   if (reader) {
     while (true) {
@@ -53,15 +53,15 @@ export async function aiAnswers(
       if (done) break;
 
       buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split("\n");
+      const lines = buffer.split('\n');
 
       // Keep the last incomplete line in the buffer
-      buffer = lines.pop() || "";
+      buffer = lines.pop() || '';
 
       for (const line of lines) {
-        if (line.startsWith("data: ")) {
+        if (line.startsWith('data: ')) {
           const data = line.slice(6);
-          if (data === "[DONE]") break;
+          if (data === '[DONE]') break;
 
           try {
             const parsed = JSON.parse(data);

@@ -1,14 +1,14 @@
-import { ActionIcon, Tooltip } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
-import { IconStar, IconStarFilled } from "@tabler/icons-react";
+import { ActionIcon, Tooltip } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
+import { IconStar, IconStarFilled } from '@tabler/icons-react';
 import {
   useFavoriteIds,
   useAddFavoriteMutation,
-  useRemoveFavoriteMutation,
-} from "../queries/favorite-query";
-import { FavoriteType } from "../types/favorite.types";
-import { ToggleFavoriteParams } from "../services/favorite-service";
-import { useTranslation } from "react-i18next";
+  useRemoveFavoriteMutation
+} from '../queries/favorite-query';
+import { FavoriteType } from '../types/favorite.types';
+import { ToggleFavoriteParams } from '../services/favorite-service';
+import { useTranslation } from 'react-i18next';
 
 type StarButtonProps = {
   type: FavoriteType;
@@ -21,9 +21,9 @@ type StarButtonProps = {
 };
 
 function getEntityId(props: StarButtonProps): string | undefined {
-  if (props.type === "page") return props.pageId;
-  if (props.type === "space") return props.spaceId;
-  if (props.type === "template") return props.templateId;
+  if (props.type === 'page') return props.pageId;
+  if (props.type === 'space') return props.spaceId;
+  if (props.type === 'template') return props.templateId;
   return undefined;
 }
 
@@ -46,7 +46,7 @@ export default function StarButton(props: StarButtonProps) {
       type,
       pageId: props.pageId,
       spaceId: props.spaceId,
-      templateId: props.templateId,
+      templateId: props.templateId
     };
 
     if (isFavorited) {
@@ -54,20 +54,20 @@ export default function StarButton(props: StarButtonProps) {
         onSuccess: () => {
           notifications.show({
             message: name
-              ? t("Removed {{name}} from favorites", { name })
-              : t("Removed from favorites"),
+              ? t('Removed {{name}} from favorites', { name })
+              : t('Removed from favorites')
           });
-        },
+        }
       });
     } else {
       addMutation.mutate(params, {
         onSuccess: () => {
           notifications.show({
             message: name
-              ? t("Added {{name}} to favorites", { name })
-              : t("Added to favorites"),
+              ? t('Added {{name}} to favorites', { name })
+              : t('Added to favorites')
           });
-        },
+        }
       });
     }
   };
@@ -75,20 +75,20 @@ export default function StarButton(props: StarButtonProps) {
   // Tooltip label stays short. Accessible name expands to include the item
   // so screen reader users can distinguish stars on different rows.
   const tooltipLabel = isFavorited
-    ? t("Remove from favorites")
-    : t("Add to favorites");
+    ? t('Remove from favorites')
+    : t('Add to favorites');
 
   const ariaLabel = name
     ? isFavorited
-      ? t("Remove {{name}} from favorites", { name })
-      : t("Add {{name}} to favorites", { name })
+      ? t('Remove {{name}} from favorites', { name })
+      : t('Add {{name}} to favorites', { name })
     : tooltipLabel;
 
   return (
     <Tooltip label={tooltipLabel} openDelay={250} withArrow>
       <ActionIcon
         variant="subtle"
-        color={isFavorited ? "yellow" : "gray"}
+        color={isFavorited ? 'yellow' : 'gray'}
         aria-label={ariaLabel}
         aria-pressed={isFavorited}
         onClick={handleToggle}

@@ -4,6 +4,7 @@
   "version": "0.95.0",
   "private": true,
   "scripts": {
+    "format": "prettier . --write",
     "build": "nx run-many -t build",
     "start": "pnpm --filter ./apps/server run start:prod",
     "collab": "pnpm --filter ./apps/server run collab:prod",

@@ -3,7 +3,7 @@ import { StorageModuleOptions } from './interfaces';
 import { StorageService } from './storage.service';
 import {
   storageDriverConfigProvider,
-  storageDriverProvider,
+  storageDriverProvider
 } from './providers/storage.provider';
 
 @Global()
@@ -16,9 +16,9 @@ export class StorageModule {
       providers: [
         storageDriverConfigProvider,
         storageDriverProvider,
-        StorageService,
+        StorageService
       ],
-      exports: [StorageService],
+      exports: [StorageService]
     };
   }
 }

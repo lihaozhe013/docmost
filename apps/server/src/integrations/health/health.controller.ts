@@ -9,7 +9,7 @@ export class HealthController {
   constructor(
     private health: HealthCheckService,
     private postgres: PostgresHealthIndicator,
-    private redis: RedisHealthIndicator,
+    private redis: RedisHealthIndicator
   ) {}
 
   @SkipTransform()
@@ -18,7 +18,7 @@ export class HealthController {
   async check() {
     return this.health.check([
       () => this.postgres.pingCheck('database'),
-      () => this.redis.pingCheck('redis'),
+      () => this.redis.pingCheck('redis')
     ]);
   }
 

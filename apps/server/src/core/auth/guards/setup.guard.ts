@@ -6,7 +6,7 @@ import { EnvironmentService } from '../../../integrations/environment/environmen
 export class SetupGuard implements CanActivate {
   constructor(
     private workspaceRepo: WorkspaceRepo,
-    private environmentService: EnvironmentService,
+    private environmentService: EnvironmentService
   ) {}
 
   async canActivate(): Promise<boolean> {

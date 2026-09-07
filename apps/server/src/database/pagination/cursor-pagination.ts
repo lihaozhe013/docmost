@@ -4,7 +4,7 @@ import {
   OrderByModifiers,
   ReferenceExpression,
   SelectQueryBuilder,
-  StringReference,
+  StringReference
 } from 'kysely';
 
 type SortField<DB, TB extends keyof DB, O> =
@@ -29,7 +29,7 @@ type ExtractSortFieldKey<
   DB,
   TB extends keyof DB,
   O,
-  T extends SortField<DB, TB, O>,
+  T extends SortField<DB, TB, O>
 > = T['key'] extends keyof O & string
   ? T['key']
   : T['expression'] extends keyof O & string
@@ -52,11 +52,11 @@ type EncodeCursorValues<
   DB,
   TB extends keyof DB,
   O,
-  T extends Fields<DB, TB, O>,
+  T extends Fields<DB, TB, O>
 > = {
   [TIndex in keyof T]: [
     ExtractSortFieldKey<DB, TB, O, T[TIndex]>,
-    O[ExtractSortFieldKey<DB, TB, O, T[TIndex]>],
+    O[ExtractSortFieldKey<DB, TB, O, T[TIndex]>]
   ];
 };
 
@@ -64,7 +64,7 @@ export type CursorEncoder<
   DB,
   TB extends keyof DB,
   O,
-  T extends Fields<DB, TB, O>,
+  T extends Fields<DB, TB, O>
 > = (values: EncodeCursorValues<DB, TB, O, T>) => string;
 
 type DecodedCursor<DB, TB extends keyof DB, O, T extends Fields<DB, TB, O>> = {
@@ -75,17 +75,17 @@ export type CursorDecoder<
   DB,
   TB extends keyof DB,
   O,
-  T extends Fields<DB, TB, O>,
+  T extends Fields<DB, TB, O>
 > = (
   cursor: string,
-  fields: FieldNames<DB, TB, O, T>,
+  fields: FieldNames<DB, TB, O, T>
 ) => DecodedCursor<DB, TB, O, T>;
 
 type ParsedCursorValues<
   DB,
   TB extends keyof DB,
   O,
-  T extends Fields<DB, TB, O>,
+  T extends Fields<DB, TB, O>
 > = {
   [TField in ExtractSortFieldKey<DB, TB, O, T[number]>]: O[TField];
 };
@@ -94,12 +94,12 @@ export type CursorParser<
   DB,
   TB extends keyof DB,
   O,
-  T extends Fields<DB, TB, O>,
+  T extends Fields<DB, TB, O>
 > = (cursor: DecodedCursor<DB, TB, O, T>) => ParsedCursorValues<DB, TB, O, T>;
 
 type CursorPaginationResultRow<
   TRow,
-  TCursorKey extends string | boolean | undefined,
+  TCursorKey extends string | boolean | undefined
 > = TRow & {
   [K in TCursorKey extends undefined
     ? never
@@ -120,7 +120,7 @@ type CursorPaginationMeta = {
 
 export type CursorPaginationResult<
   TRow,
-  TCursorKey extends string | boolean | undefined = undefined,
+  TCursorKey extends string | boolean | undefined = undefined
 > = {
   meta: CursorPaginationMeta;
   items: CursorPaginationResultRow<TRow, TCursorKey>[];
@@ -131,7 +131,7 @@ export async function executeWithCursorPagination<
   TB extends keyof DB,
   O,
   const TFields extends Fields<DB, TB, O>,
-  TCursorKey extends string | boolean | undefined = undefined,
+  TCursorKey extends string | boolean | undefined = undefined
 >(
   qb: SelectQueryBuilder<DB, TB, O>,
   opts: {
@@ -145,7 +145,7 @@ export async function executeWithCursorPagination<
     parseCursor:
       | CursorParser<DB, TB, O, TFields>
       | { parse: CursorParser<DB, TB, O, TFields> };
-  },
+  }
 ): Promise<CursorPaginationResult<O, TCursorKey>> {
   const encodeCursor = opts.encodeCursor ?? defaultEncodeCursor;
   const decodeCursor = opts.decodeCursor ?? defaultDecodeCursor;
@@ -174,7 +174,7 @@ export async function executeWithCursorPagination<
   function generateCursor(row: O): string {
     const cursorFieldValues = fields.map(({ key }) => [
       key,
-      row[key],
+      row[key]
     ]) as EncodeCursorValues<DB, TB, O, TFields>;
 
     return encodeCursor(cursorFieldValues);
@@ -190,7 +190,7 @@ export async function executeWithCursorPagination<
   function applyCursor(
     qb: SelectQueryBuilder<DB, TB, O>,
     encoded: string,
-    defaultDirection: OrderByDirection,
+    defaultDirection: OrderByDirection
   ) {
     const decoded = decodeCursor(encoded, fieldNames);
     const cursor = parseCursor(decoded);
@@ -199,7 +199,6 @@ export async function executeWithCursorPagination<
       let expression;
 
       for (let i = fields.length - 1; i >= 0; --i) {
-         
         const field = fields[i]!;
 
         const comparison = field.direction === defaultDirection ? '>' : '<';
@@ -232,7 +231,7 @@ export async function executeWithCursorPagination<
     qb = qb.orderBy(
       expression,
       orderModifier ??
-        (reversed ? (direction === 'asc' ? 'desc' : 'asc') : direction),
+        (reversed ? (direction === 'asc' ? 'desc' : 'asc') : direction)
     );
   }
 
@@ -269,8 +268,8 @@ export async function executeWithCursorPagination<
       hasNextPage,
       hasPrevPage,
       nextCursor,
-      prevCursor,
-    },
+      prevCursor
+    }
   };
 }
 
@@ -278,7 +277,7 @@ export function defaultEncodeCursor<
   DB,
   TB extends keyof DB,
   O,
-  T extends Fields<DB, TB, O>,
+  T extends Fields<DB, TB, O>
 >(values: EncodeCursorValues<DB, TB, O, T>) {
   const cursor = new URLSearchParams();
 
@@ -310,7 +309,7 @@ export function defaultEncodeCursor<
 }
 
 export function emptyCursorPaginationResult<T>(
-  limit: number,
+  limit: number
 ): CursorPaginationResult<T> {
   return {
     items: [],
@@ -319,8 +318,8 @@ export function emptyCursorPaginationResult<T>(
       hasNextPage: false,
       hasPrevPage: false,
       nextCursor: null,
-      prevCursor: null,
-    },
+      prevCursor: null
+    }
   };
 }
 
@@ -328,18 +327,18 @@ export function defaultDecodeCursor<
   DB,
   TB extends keyof DB,
   O,
-  T extends Fields<DB, TB, O>,
+  T extends Fields<DB, TB, O>
 >(
   cursor: string,
-  fields: FieldNames<DB, TB, O, T>,
+  fields: FieldNames<DB, TB, O, T>
 ): DecodedCursor<DB, TB, O, T> {
   let parsed;
 
   try {
     parsed = [
       ...new URLSearchParams(
-        Buffer.from(cursor, 'base64url').toString('utf8'),
-      ).entries(),
+        Buffer.from(cursor, 'base64url').toString('utf8')
+      ).entries()
     ];
   } catch {
     throw new Error('Unparsable cursor');

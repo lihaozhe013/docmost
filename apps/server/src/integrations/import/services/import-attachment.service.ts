@@ -43,7 +43,7 @@ export class ImportAttachmentService {
   constructor(
     private readonly storageService: StorageService,
     @InjectKysely() private readonly db: KyselyDB,
-    @InjectQueue(QueueName.ATTACHMENT_QUEUE) private attachmentQueue: Queue,
+    @InjectQueue(QueueName.ATTACHMENT_QUEUE) private attachmentQueue: Queue
   ) {}
 
   async processAttachments(opts: {
@@ -64,7 +64,7 @@ export class ImportAttachmentService {
       fileTask,
       attachmentCandidates,
       pageAttachments = [],
-      isConfluenceImport,
+      isConfluenceImport
     } = opts;
 
     const attachmentTasks: (() => Promise<void>)[] = [];
@@ -73,7 +73,7 @@ export class ImportAttachmentService {
       total: 0,
       completed: 0,
       failed: 0,
-      failedFiles: [] as string[],
+      failedFiles: [] as string[]
     };
 
     /**
@@ -95,7 +95,7 @@ export class ImportAttachmentService {
     // Analyze attachments to identify Draw.io pairs
     const { drawioPairs, skipFiles } = this.analyzeAttachments(
       pageAttachments,
-      isConfluenceImport,
+      isConfluenceImport
     );
 
     // Map to store processed Draw.io SVGs
@@ -130,7 +130,7 @@ export class ImportAttachmentService {
         const fileName = 'diagram.drawio.svg';
         const storageFilePath = `${getAttachmentFolderPath(
           AttachmentType.File,
-          fileTask.workspaceId,
+          fileTask.workspaceId
         )}/${attachmentId}/${fileName}`;
         const apiFilePath = `/api/files/${attachmentId}/${fileName}`;
 
@@ -141,7 +141,7 @@ export class ImportAttachmentService {
 
             // Upload to storage
             await this.storageService.uploadStream(storageFilePath, stream, {
-              recreateClient: true,
+              recreateClient: true
             });
 
             // Insert into database
@@ -158,7 +158,7 @@ export class ImportAttachmentService {
                 creatorId: fileTask.creatorId,
                 workspaceId: fileTask.workspaceId,
                 pageId,
-                spaceId: fileTask.spaceId,
+                spaceId: fileTask.spaceId
               })
               .execute();
 
@@ -168,7 +168,7 @@ export class ImportAttachmentService {
             uploadStats.failedFiles.push(fileName);
             this.logger.error(
               `Failed to upload Draw.io SVG ${fileName}:`,
-              error,
+              error
             );
           }
         });
@@ -179,13 +179,13 @@ export class ImportAttachmentService {
           drawioSvgMap.set(pair.pngFile.href, {
             attachmentId,
             apiFilePath,
-            fileName,
+            fileName
           });
         }
       } catch (error) {
         this.logger.error(
           `Failed to process Draw.io pair ${pair.baseName}:`,
-          error,
+          error
         );
       }
     }
@@ -201,7 +201,7 @@ export class ImportAttachmentService {
       const relPath = resolveRelativeAttachmentPath(
         attachment.href,
         pageDir,
-        attachmentCandidates,
+        attachmentCandidates
       );
       if (relPath && attachment.fileName) {
         attachmentNameByRelPath.set(relPath, attachment.fileName);
@@ -209,7 +209,10 @@ export class ImportAttachmentService {
         const dir = path.posix.dirname(relPath);
         const aliasKey = `${dir}/${attachment.fileName}`;
         if (!attachmentCandidates.has(aliasKey)) {
-          attachmentCandidates.set(aliasKey, attachmentCandidates.get(relPath)!);
+          attachmentCandidates.set(
+            aliasKey,
+            attachmentCandidates.get(relPath)!
+          );
           attachmentNameByRelPath.set(aliasKey, attachment.fileName);
         }
       }
@@ -228,7 +231,7 @@ export class ImportAttachmentService {
 
       const storageFilePath = `${getAttachmentFolderPath(
         AttachmentType.File,
-        fileTask.workspaceId,
+        fileTask.workspaceId
       )}/${attachmentId}/${fileNameWithExt}`;
 
       const apiFilePath = `/api/files/${attachmentId}/${fileNameWithExt}`;
@@ -242,8 +245,8 @@ export class ImportAttachmentService {
           ext,
           pageId,
           fileTask,
-          uploadStats,
-        }),
+          uploadStats
+        })
       );
 
       return {
@@ -251,7 +254,7 @@ export class ImportAttachmentService {
         storageFilePath,
         apiFilePath,
         fileNameWithExt,
-        abs,
+        abs
       };
     };
 
@@ -279,7 +282,7 @@ export class ImportAttachmentService {
       const relPath = resolveRelativeAttachmentPath(
         src,
         pageDir,
-        attachmentCandidates,
+        attachmentCandidates
       );
       if (!relPath) continue;
 
@@ -312,7 +315,7 @@ export class ImportAttachmentService {
           if (natural) {
             width = height
               ? String(
-                  Math.round((natural.width / natural.height) * Number(height)),
+                  Math.round((natural.width / natural.height) * Number(height))
                 )
               : String(natural.width);
           }
@@ -344,7 +347,7 @@ export class ImportAttachmentService {
       const relPath = resolveRelativeAttachmentPath(
         src,
         pageDir,
-        attachmentCandidates,
+        attachmentCandidates
       );
       if (!relPath) continue;
 
@@ -371,15 +374,13 @@ export class ImportAttachmentService {
       const relPath = resolveRelativeAttachmentPath(
         src,
         pageDir,
-        attachmentCandidates,
+        attachmentCandidates
       );
       if (!relPath) continue;
 
       const { attachmentId, apiFilePath } = processFile(relPath);
 
-      $aud
-        .attr('src', apiFilePath)
-        .attr('data-attachment-id', attachmentId);
+      $aud.attr('src', apiFilePath).attr('data-attachment-id', attachmentId);
 
       unwrapFromParagraph($, $aud);
     }
@@ -393,7 +394,7 @@ export class ImportAttachmentService {
       const relPath = resolveRelativeAttachmentPath(
         rawUrl,
         pageDir,
-        attachmentCandidates,
+        attachmentCandidates
       );
       if (!relPath) continue;
 
@@ -421,7 +422,7 @@ export class ImportAttachmentService {
       const relPath = resolveRelativeAttachmentPath(
         href,
         pageDir,
-        attachmentCandidates,
+        attachmentCandidates
       );
       if (!relPath) continue;
 
@@ -450,7 +451,15 @@ export class ImportAttachmentService {
       const { attachmentId, apiFilePath, abs } = processFile(relPath);
       const ext = path.extname(relPath).toLowerCase();
 
-      const audioExtensions = new Set(['.mp3', '.wav', '.ogg', '.m4a', '.webm', '.flac', '.aac']);
+      const audioExtensions = new Set([
+        '.mp3',
+        '.wav',
+        '.ogg',
+        '.m4a',
+        '.webm',
+        '.flac',
+        '.aac'
+      ]);
 
       if (ext === '.pdf') {
         const $pdf = $('<div>')
@@ -502,7 +511,7 @@ export class ImportAttachmentService {
         const relPath = resolveRelativeAttachmentPath(
           rawSrc,
           pageDir,
-          attachmentCandidates,
+          attachmentCandidates
         );
         if (!relPath) continue;
 
@@ -575,7 +584,7 @@ export class ImportAttachmentService {
       const resolvedHref = resolveRelativeAttachmentPath(
         href,
         pageDir,
-        attachmentCandidates,
+        attachmentCandidates
       );
       if (!resolvedHref) continue;
 
@@ -588,7 +597,7 @@ export class ImportAttachmentService {
         processed.has(resolvedHref) ||
         (absPath &&
           Array.from(processed.values()).some(
-            (entry) => entry.abs === absPath,
+            (entry) => entry.abs === absPath
           ));
       if (alreadyProcessed) {
         continue;
@@ -620,13 +629,13 @@ export class ImportAttachmentService {
       }
 
       this.logger.debug(
-        `Upload completed: ${uploadStats.completed}/${uploadStats.total} successful, ${uploadStats.failed} failed`,
+        `Upload completed: ${uploadStats.completed}/${uploadStats.total} successful, ${uploadStats.failed} failed`
       );
 
       if (uploadStats.failed > 0) {
         this.logger.warn(
           `Failed to upload ${uploadStats.failed} files:`,
-          uploadStats.failedFiles,
+          uploadStats.failedFiles
         );
       }
     }
@@ -634,7 +643,7 @@ export class ImportAttachmentService {
     // Post-process DOM elements to add file sizes after uploads complete
     // This avoids blocking file operations during initial DOM processing
     const elementsNeedingSize = $(
-      '[data-attachment-id]:not([data-attachment-size]):not([data-size])',
+      '[data-attachment-id]:not([data-attachment-size]):not([data-size])'
     );
     for (const element of elementsNeedingSize.toArray()) {
       const $el = $(element);
@@ -643,7 +652,7 @@ export class ImportAttachmentService {
 
       // Find the corresponding processed file info
       const processedEntry = Array.from(processed.values()).find(
-        (entry) => entry.attachmentId === attachmentId,
+        (entry) => entry.attachmentId === attachmentId
       );
 
       if (processedEntry) {
@@ -660,7 +669,7 @@ export class ImportAttachmentService {
         } catch (error) {
           this.logger.debug(
             `Could not get size for ${processedEntry.abs}:`,
-            error,
+            error
           );
         }
       }
@@ -671,7 +680,7 @@ export class ImportAttachmentService {
 
   private analyzeAttachments(
     attachments: AttachmentInfo[],
-    isConfluenceImport?: boolean,
+    isConfluenceImport?: boolean
   ): {
     drawioPairs: Map<string, DrawioPair>;
     skipFiles: Set<string>;
@@ -702,7 +711,7 @@ export class ImportAttachmentService {
       '.csv',
       '.zip',
       '.tar',
-      '.gz',
+      '.gz'
     ]);
 
     // Single pass through attachments
@@ -812,7 +821,7 @@ export class ImportAttachmentService {
 
       if (matchingPng) {
         this.logger.debug(
-          `Found Draw.io pair: ${drawio.fileName} -> ${matchingPng.fileName}`,
+          `Found Draw.io pair: ${drawio.fileName} -> ${matchingPng.fileName}`
         );
       } else {
         this.logger.debug(`No PNG found for Draw.io file: ${drawio.fileName}`);
@@ -821,7 +830,7 @@ export class ImportAttachmentService {
       const pair: DrawioPair = {
         drawioFile: drawio,
         pngFile: matchingPng,
-        baseName,
+        baseName
       };
 
       drawioPairs.set(drawio.href, pair);
@@ -845,7 +854,7 @@ export class ImportAttachmentService {
 
   private async createDrawioSvg(
     drawioPath: string,
-    pngPath?: string,
+    pngPath?: string
   ): Promise<Buffer> {
     try {
       const drawioContent = await fs.readFile(drawioPath, 'utf-8');
@@ -862,7 +871,7 @@ export class ImportAttachmentService {
         } catch (error) {
           this.logger.warn(
             `Could not read PNG file for Draw.io diagram: ${pngPath}`,
-            error,
+            error
           );
         }
       }
@@ -907,7 +916,7 @@ export class ImportAttachmentService {
       ext,
       pageId,
       fileTask,
-      uploadStats,
+      uploadStats
     } = opts;
 
     let lastError: Error;
@@ -916,7 +925,7 @@ export class ImportAttachmentService {
       try {
         const fileStream = createReadStream(abs);
         await this.storageService.uploadStream(storageFilePath, fileStream, {
-          recreateClient: true,
+          recreateClient: true
         });
 
         const stat = await fs.stat(abs);
@@ -934,7 +943,7 @@ export class ImportAttachmentService {
             creatorId: fileTask.creatorId,
             workspaceId: fileTask.workspaceId,
             pageId,
-            spaceId: fileTask.spaceId,
+            spaceId: fileTask.spaceId
           })
           .execute();
 
@@ -949,21 +958,21 @@ export class ImportAttachmentService {
                 attempts: 1,
                 backoff: {
                   type: 'exponential',
-                  delay: 3 * 60 * 1000,
+                  delay: 3 * 60 * 1000
                 },
                 deduplication: {
-                  id: attachmentId,
+                  id: attachmentId
                 },
                 removeOnComplete: true,
-                removeOnFail: false,
-              },
+                removeOnFail: false
+              }
             );
             this.logger.debug(
-              `Queued ${fileNameWithExt} for indexing (attachment ID: ${attachmentId})`,
+              `Queued ${fileNameWithExt} for indexing (attachment ID: ${attachmentId})`
             );
           } catch (err) {
             this.logger.error(
-              `Failed to queue indexing for imported attachment ${attachmentId}: ${err}`,
+              `Failed to queue indexing for imported attachment ${attachmentId}: ${err}`
             );
           }
         }
@@ -972,7 +981,7 @@ export class ImportAttachmentService {
 
         if (uploadStats.completed % 10 === 0) {
           this.logger.debug(
-            `Upload progress: ${uploadStats.completed}/${uploadStats.total}`,
+            `Upload progress: ${uploadStats.completed}/${uploadStats.total}`
           );
         }
 
@@ -980,12 +989,12 @@ export class ImportAttachmentService {
       } catch (error) {
         lastError = error as Error;
         this.logger.warn(
-          `Upload attempt ${attempt}/${this.MAX_RETRIES} failed for ${fileNameWithExt}: ${error instanceof Error ? error.message : String(error)}`,
+          `Upload attempt ${attempt}/${this.MAX_RETRIES} failed for ${fileNameWithExt}: ${error instanceof Error ? error.message : String(error)}`
         );
 
         if (attempt < this.MAX_RETRIES) {
           await new Promise((resolve) =>
-            setTimeout(resolve, this.RETRY_DELAY * attempt),
+            setTimeout(resolve, this.RETRY_DELAY * attempt)
           );
         }
       }
@@ -995,7 +1004,7 @@ export class ImportAttachmentService {
     uploadStats.failedFiles.push(fileNameWithExt);
     this.logger.error(
       `Failed to upload ${fileNameWithExt} after ${this.MAX_RETRIES} attempts:`,
-      lastError,
+      lastError
     );
   }
 }

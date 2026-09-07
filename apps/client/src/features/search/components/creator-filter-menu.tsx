@@ -1,14 +1,21 @@
-import { ReactNode, useMemo, useState } from "react";
-import { Divider, Group, Menu, ScrollArea, Text, TextInput } from "@mantine/core";
-import { useDebouncedValue } from "@mantine/hooks";
-import { IconCheck, IconSearch } from "@tabler/icons-react";
-import { useTranslation } from "react-i18next";
-import { useSearchSuggestionsQuery } from "@/features/search/queries/search-query";
-import { RadioMenuItem } from "@/components/ui/radio-menu-item";
-import { CustomAvatar } from "@/components/ui/custom-avatar.tsx";
-import { IUser } from "@/features/user/types/user.types.ts";
-import { useAtomValue } from "jotai";
-import { userAtom } from "@/features/user/atoms/current-user-atom.ts";
+import { ReactNode, useMemo, useState } from 'react';
+import {
+  Divider,
+  Group,
+  Menu,
+  ScrollArea,
+  Text,
+  TextInput
+} from '@mantine/core';
+import { useDebouncedValue } from '@mantine/hooks';
+import { IconCheck, IconSearch } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
+import { useSearchSuggestionsQuery } from '@/features/search/queries/search-query';
+import { RadioMenuItem } from '@/components/ui/radio-menu-item';
+import { CustomAvatar } from '@/components/ui/custom-avatar.tsx';
+import { IUser } from '@/features/user/types/user.types.ts';
+import { useAtomValue } from 'jotai';
+import { userAtom } from '@/features/user/atoms/current-user-atom.ts';
 
 type CreatorFilterMenuProps = {
   value: string | null;
@@ -16,12 +23,12 @@ type CreatorFilterMenuProps = {
   children: ReactNode;
   width?: number;
   position?:
-    | "bottom-start"
-    | "bottom-end"
-    | "bottom"
-    | "top-start"
-    | "top-end"
-    | "top";
+    | 'bottom-start'
+    | 'bottom-end'
+    | 'bottom'
+    | 'top-start'
+    | 'top-end'
+    | 'top';
   zIndex?: number;
   opened?: boolean;
   onOpenChange?: (opened: boolean) => void;
@@ -32,13 +39,13 @@ export function CreatorFilterMenu({
   onChange,
   children,
   width = 280,
-  position = "bottom-end",
+  position = 'bottom-end',
   zIndex,
   opened,
-  onOpenChange,
+  onOpenChange
 }: CreatorFilterMenuProps) {
   const { t } = useTranslation();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery] = useDebouncedValue(searchQuery, 300);
 
   const { data: suggestion, isLoading } = useSearchSuggestionsQuery({
@@ -46,7 +53,7 @@ export function CreatorFilterMenu({
     includeUsers: true,
     includeGroups: false,
     includePages: false,
-    preload: true,
+    preload: true
   });
 
   const users: IUser[] = (suggestion?.users as IUser[]) ?? [];
@@ -76,7 +83,7 @@ export function CreatorFilterMenu({
       <Menu.Target>{children}</Menu.Target>
       <Menu.Dropdown>
         <TextInput
-          placeholder={t("Find a user")}
+          placeholder={t('Find a user')}
           data-autofocus
           autoFocus
           leftSection={<IconSearch size={16} />}
@@ -97,7 +104,7 @@ export function CreatorFilterMenu({
             <Group flex="1" gap="xs">
               <div style={{ flex: 1 }}>
                 <Text size="sm" fw={500}>
-                  {t("Anyone")}
+                  {t('Anyone')}
                 </Text>
               </div>
               {!value && <IconCheck size={20} aria-hidden />}
@@ -108,7 +115,7 @@ export function CreatorFilterMenu({
 
           {displayUsers.length === 0 && (
             <Text size="xs" c="dimmed" px="xs" py="sm">
-              {isLoading ? t("Loading...") : t("No users found")}
+              {isLoading ? t('Loading...') : t('No users found')}
             </Text>
           )}
 
@@ -130,8 +137,8 @@ export function CreatorFilterMenu({
                     {user.name}
                     {user.id === currentUser?.id && (
                       <Text span size="sm" c="dimmed" fw={400}>
-                        {" "}
-                        ({t("you")})
+                        {' '}
+                        ({t('you')})
                       </Text>
                     )}
                   </Text>

@@ -1,10 +1,10 @@
-import { useState } from "react";
-import { TextInput, Loader, Text, ScrollArea } from "@mantine/core";
-import { IconSearch } from "@tabler/icons-react";
-import { useChatsQuery, useSearchChatsQuery } from "../queries/ai-chat-query";
-import { useDebouncedValue } from "@mantine/hooks";
-import { useTranslation } from "react-i18next";
-import classes from "../styles/aside-chat-panel.module.css";
+import { useState } from 'react';
+import { TextInput, Loader, Text, ScrollArea } from '@mantine/core';
+import { IconSearch } from '@tabler/icons-react';
+import { useChatsQuery, useSearchChatsQuery } from '../queries/ai-chat-query';
+import { useDebouncedValue } from '@mantine/hooks';
+import { useTranslation } from 'react-i18next';
+import classes from '../styles/aside-chat-panel.module.css';
 
 type Props = {
   activeChatId: string | undefined;
@@ -13,7 +13,7 @@ type Props = {
 
 export default function AsideChatHistory({ activeChatId, onSelect }: Props) {
   const { t } = useTranslation();
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState('');
   const [debouncedSearch] = useDebouncedValue(searchValue, 300);
 
   const chatsQuery = useChatsQuery();
@@ -28,7 +28,7 @@ export default function AsideChatHistory({ activeChatId, onSelect }: Props) {
   return (
     <div>
       <TextInput
-        placeholder={t("Search chats...")}
+        placeholder={t('Search chats...')}
         leftSection={<IconSearch size={14} />}
         size="xs"
         mb="xs"
@@ -37,12 +37,12 @@ export default function AsideChatHistory({ activeChatId, onSelect }: Props) {
       />
 
       {isLoading ? (
-        <div style={{ display: "flex", justifyContent: "center", padding: 16 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', padding: 16 }}>
           <Loader size="sm" />
         </div>
       ) : chats.length === 0 ? (
         <Text size="sm" c="dimmed" ta="center" py="md">
-          {isSearching ? t("No chats found") : t("No chat history")}
+          {isSearching ? t('No chats found') : t('No chat history')}
         </Text>
       ) : (
         <ScrollArea.Autosize mah={300} scrollbars="y">
@@ -55,7 +55,7 @@ export default function AsideChatHistory({ activeChatId, onSelect }: Props) {
                 onClick={() => onSelect(chat.id)}
               >
                 <span className={classes.historyItemTitle}>
-                  {chat.title || t("Untitled chat")}
+                  {chat.title || t('Untitled chat')}
                 </span>
               </div>
             ))}

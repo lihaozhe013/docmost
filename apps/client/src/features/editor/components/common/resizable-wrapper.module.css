@@ -31,7 +31,7 @@
 
   &::before,
   &::after {
-    content: "";
+    content: '';
     position: absolute;
     border-radius: 1px;
     background-color: light-dark(

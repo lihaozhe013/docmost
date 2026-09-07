@@ -7,7 +7,7 @@ import { User } from '@docmost/db/types/entity.types';
 import { ClsService } from 'nestjs-cls';
 import {
   AuditContext,
-  AUDIT_CONTEXT_KEY,
+  AUDIT_CONTEXT_KEY
 } from '../../common/middlewares/audit-context.middleware';
 import * as Bowser from 'bowser';
 
@@ -22,7 +22,7 @@ export class SessionService {
     private readonly tokenService: TokenService,
     private readonly userSessionRepo: UserSessionRepo,
     private readonly environmentService: EnvironmentService,
-    private readonly cls: ClsService,
+    private readonly cls: ClsService
   ) {}
 
   @Interval('session-cleanup', 24 * 60 * 60 * 1000)
@@ -49,7 +49,7 @@ export class SessionService {
       workspaceId: user.workspaceId,
       deviceName,
       ipAddress,
-      expiresAt,
+      expiresAt
     });
 
     return this.tokenService.generateAccessToken(user, session.id);
@@ -58,11 +58,11 @@ export class SessionService {
   async getActiveSessions(
     userId: string,
     workspaceId: string,
-    currentSessionId: string | null,
+    currentSessionId: string | null
   ) {
     const sessions = await this.userSessionRepo.findActiveByUser(
       userId,
-      workspaceId,
+      workspaceId
     );
 
     const mapped = sessions.map((s) => ({
@@ -71,7 +71,7 @@ export class SessionService {
       geoLocation: s.geoLocation,
       lastActiveAt: s.lastActiveAt,
       createdAt: s.createdAt,
-      isCurrentDevice: s.id === currentSessionId,
+      isCurrentDevice: s.id === currentSessionId
     }));
 
     return mapped.sort((a, b) => {
@@ -84,7 +84,7 @@ export class SessionService {
   async revokeSession(
     sessionId: string,
     userId: string,
-    workspaceId: string,
+    workspaceId: string
   ): Promise<void> {
     await this.userSessionRepo.revokeById(sessionId, userId, workspaceId);
   }
@@ -92,12 +92,12 @@ export class SessionService {
   async revokeAllOtherSessions(
     currentSessionId: string,
     userId: string,
-    workspaceId: string,
+    workspaceId: string
   ): Promise<void> {
     await this.userSessionRepo.revokeAllExceptCurrent(
       currentSessionId,
       userId,
-      workspaceId,
+      workspaceId
     );
   }
 

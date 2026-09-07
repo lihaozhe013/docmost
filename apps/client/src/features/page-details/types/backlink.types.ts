@@ -1,4 +1,4 @@
-export type BacklinkDirection = "incoming" | "outgoing";
+export type BacklinkDirection = 'incoming' | 'outgoing';
 
 export interface IBacklinkCount {
   incoming: number;

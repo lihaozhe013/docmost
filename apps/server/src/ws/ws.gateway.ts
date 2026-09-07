@@ -5,7 +5,7 @@ import {
   OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
-  WebSocketServer,
+  WebSocketServer
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { TokenService } from '../core/auth/services/token.service';
@@ -19,7 +19,7 @@ import * as cookie from 'cookie';
 
 @WebSocketGateway({
   cors: { origin: '*' },
-  transports: ['websocket'],
+  transports: ['websocket']
 })
 export class WsGateway
   implements
@@ -35,7 +35,7 @@ export class WsGateway
     private tokenService: TokenService,
     private spaceMemberRepo: SpaceMemberRepo,
     private wsService: WsService,
-    private baseRealtime: BaseRealtimeBridge,
+    private baseRealtime: BaseRealtimeBridge
   ) {}
 
   afterInit(server: Server): void {
@@ -48,7 +48,7 @@ export class WsGateway
       const cookies = cookie.parse(client.handshake.headers.cookie);
       const token: JwtPayload = await this.tokenService.verifyJwt(
         cookies['authToken'],
-        JwtType.ACCESS,
+        JwtType.ACCESS
       );
 
       const userId = token.sub;

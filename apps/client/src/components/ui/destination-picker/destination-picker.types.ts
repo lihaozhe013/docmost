@@ -1,10 +1,10 @@
-import { ISpace } from "@/features/space/types/space.types";
-import { IPage } from "@/features/page/types/page.types";
+import { ISpace } from '@/features/space/types/space.types';
+import { IPage } from '@/features/page/types/page.types';
 
 export type DestinationSelection =
-  | { type: "space"; spaceId: string; space: ISpace }
+  | { type: 'space'; spaceId: string; space: ISpace }
   | {
-      type: "page";
+      type: 'page';
       spaceId: string;
       pageId: string;
       page: Partial<IPage>;

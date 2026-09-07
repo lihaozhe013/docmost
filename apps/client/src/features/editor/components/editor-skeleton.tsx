@@ -32,7 +32,6 @@ function EditorSkeleton() {
       <Skeleton height={12} mt={6} radius="xl" />
       <Skeleton height={12} mt={6} radius="xl" />
     </>
-
   );
 }
 

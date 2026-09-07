@@ -17,7 +17,7 @@ export class WorkspaceListener {
   constructor(
     private readonly environmentService: EnvironmentService,
     @InjectQueue(QueueName.SEARCH_QUEUE) private searchQueue: Queue,
-    @InjectQueue(QueueName.AI_QUEUE) private aiQueue: Queue,
+    @InjectQueue(QueueName.AI_QUEUE) private aiQueue: Queue
   ) {}
 
   @OnEvent(EventName.WORKSPACE_DELETED)

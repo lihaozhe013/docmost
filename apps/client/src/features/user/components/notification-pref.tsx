@@ -1,17 +1,17 @@
-import { userAtom } from "@/features/user/atoms/current-user-atom.ts";
-import { updateUser } from "@/features/user/services/user-service.ts";
-import { IUser, IUserSettings } from "@/features/user/types/user.types.ts";
-import { Switch, Text, Title, Stack } from "@mantine/core";
-import { useAtom } from "jotai";
-import React, { useId, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { userAtom } from '@/features/user/atoms/current-user-atom.ts';
+import { updateUser } from '@/features/user/services/user-service.ts';
+import { IUser, IUserSettings } from '@/features/user/types/user.types.ts';
+import { Switch, Text, Title, Stack } from '@mantine/core';
+import { useAtom } from 'jotai';
+import React, { useId, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   ResponsiveSettingsRow,
   ResponsiveSettingsContent,
-  ResponsiveSettingsControl,
-} from "@/components/ui/responsive-settings-row";
+  ResponsiveSettingsControl
+} from '@/components/ui/responsive-settings-row';
 
-type NotificationKey = keyof NonNullable<IUserSettings["notifications"]>;
+type NotificationKey = keyof NonNullable<IUserSettings['notifications']>;
 
 const notificationItems: {
   key: NotificationKey;
@@ -20,43 +20,43 @@ const notificationItems: {
   description: string;
 }[] = [
   {
-    key: "page.updated",
-    dtoField: "notificationPageUpdates",
-    label: "Page updates",
-    description: "Get notified when pages you watch are updated.",
+    key: 'page.updated',
+    dtoField: 'notificationPageUpdates',
+    label: 'Page updates',
+    description: 'Get notified when pages you watch are updated.'
   },
   {
-    key: "page.userMention",
-    dtoField: "notificationPageUserMention",
-    label: "Page mentions",
-    description: "Get notified when someone mentions you on a page.",
+    key: 'page.userMention',
+    dtoField: 'notificationPageUserMention',
+    label: 'Page mentions',
+    description: 'Get notified when someone mentions you on a page.'
   },
   {
-    key: "comment.userMention",
-    dtoField: "notificationCommentUserMention",
-    label: "Comment mentions",
-    description: "Get notified when someone mentions you in a comment.",
+    key: 'comment.userMention',
+    dtoField: 'notificationCommentUserMention',
+    label: 'Comment mentions',
+    description: 'Get notified when someone mentions you in a comment.'
   },
   {
-    key: "comment.created",
-    dtoField: "notificationCommentCreated",
-    label: "New comments",
+    key: 'comment.created',
+    dtoField: 'notificationCommentCreated',
+    label: 'New comments',
     description:
-      "Get notified about new comments on threads you participate in.",
+      'Get notified about new comments on threads you participate in.'
   },
   {
-    key: "comment.resolved",
-    dtoField: "notificationCommentResolved",
-    label: "Resolved comments",
-    description: "Get notified when your comment is resolved.",
-  },
+    key: 'comment.resolved',
+    dtoField: 'notificationCommentResolved',
+    label: 'Resolved comments',
+    description: 'Get notified when your comment is resolved.'
+  }
 ];
 
 function NotificationToggle({
   settingKey,
   dtoField,
   label,
-  description,
+  description
 }: {
   settingKey: NotificationKey;
   dtoField: keyof IUser;
@@ -68,7 +68,7 @@ function NotificationToggle({
   const descriptionId = useId();
   const [user, setUser] = useAtom(userAtom);
   const [checked, setChecked] = useState(
-    user.settings?.notifications?.[settingKey] !== false,
+    user.settings?.notifications?.[settingKey] !== false
   );
 
   const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -85,7 +85,12 @@ function NotificationToggle({
   return (
     <ResponsiveSettingsRow>
       <ResponsiveSettingsContent>
-        <Text component="label" htmlFor={switchId} size="md" style={{ cursor: "pointer" }}>
+        <Text
+          component="label"
+          htmlFor={switchId}
+          size="md"
+          style={{ cursor: 'pointer' }}
+        >
           {t(label)}
         </Text>
         <Text id={descriptionId} size="sm" c="dimmed">
@@ -110,7 +115,9 @@ export default function NotificationPref() {
 
   return (
     <Stack gap="xs">
-      <Title order={2} size="h5">{t("Email notifications")}</Title>
+      <Title order={2} size="h5">
+        {t('Email notifications')}
+      </Title>
 
       {notificationItems.map((item) => (
         <NotificationToggle

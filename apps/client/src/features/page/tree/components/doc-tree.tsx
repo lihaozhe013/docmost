@@ -7,7 +7,7 @@ import {
   useRef,
   useState,
   type ReactNode,
-  type Ref,
+  type Ref
 } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { autoScrollForElements } from '@atlaskit/pragmatic-drag-and-drop-auto-scroll/element';
@@ -77,7 +77,7 @@ export type DocTreeProps<T extends object> = {
 export type DocTreeApi = {
   select: (
     id: string,
-    opts?: { scrollIntoView?: boolean; focus?: boolean },
+    opts?: { scrollIntoView?: boolean; focus?: boolean }
   ) => void;
   scrollTo: (id: string) => void;
   focus: (id: string) => void;
@@ -94,7 +94,7 @@ type FlatRow<T extends object> = {
 // the precomputed `level` and `isLastSibling` it needs.
 function flattenVisible<T extends object>(
   data: TreeNode<T>[],
-  openIds: ReadonlySet<string>,
+  openIds: ReadonlySet<string>
 ): FlatRow<T>[] {
   const out: FlatRow<T>[] = [];
   const walk = (nodes: TreeNode<T>[], level: number) => {
@@ -114,7 +114,7 @@ type RowElementMap = Map<string, HTMLElement>;
 
 function DocTreeInner<T extends object>(
   props: DocTreeProps<T>,
-  ref: Ref<DocTreeApi>,
+  ref: Ref<DocTreeApi>
 ) {
   const {
     data,
@@ -132,7 +132,7 @@ function DocTreeInner<T extends object>(
     getDragLabel,
     uniqueContextId,
     emptyState,
-    'aria-label': ariaLabel,
+    'aria-label': ariaLabel
   } = props;
 
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -150,7 +150,7 @@ function DocTreeInner<T extends object>(
   const [activeId, setActiveId] = useState<string | undefined>(undefined);
   const contextId = useMemo(
     () => uniqueContextId ?? Symbol('doc-tree'),
-    [uniqueContextId],
+    [uniqueContextId]
   );
 
   const registerRowElement = useCallback(
@@ -167,7 +167,7 @@ function DocTreeInner<T extends object>(
         rowElementsRef.current.delete(id);
       }
     },
-    [],
+    []
   );
 
   // Stable live tree accessor — keeps the row useEffect deps stable across
@@ -178,10 +178,7 @@ function DocTreeInner<T extends object>(
 
   // Flat visible list drives virtualization. Re-flattens on data or openIds
   // change — cheap O(N) walk of the loaded tree.
-  const flat = useMemo(
-    () => flattenVisible(data, openIds),
-    [data, openIds],
-  );
+  const flat = useMemo(() => flattenVisible(data, openIds), [data, openIds]);
 
   // Membership lookup for the flat list. Used to validate activeId/selectedId
   // before promoting them to the effective active row.
@@ -201,7 +198,7 @@ function DocTreeInner<T extends object>(
     count: flat.length,
     getScrollElement: () => scrollRef.current,
     estimateSize: () => rowHeight,
-    overscan: 10,
+    overscan: 10
   });
 
   useImperativeHandle(
@@ -221,9 +218,9 @@ function DocTreeInner<T extends object>(
       },
       focus: (id) => {
         rowElementsRef.current.get(id)?.focus();
-      },
+      }
     }),
-    [onSelect, flat, virtualizer],
+    [onSelect, flat, virtualizer]
   );
 
   // Auto-scroll the container during drag so users can target rows currently
@@ -234,8 +231,7 @@ function DocTreeInner<T extends object>(
     if (!el) return;
     return autoScrollForElements({
       element: el,
-      canScroll: ({ source }) =>
-        source.data.uniqueContextId === contextId,
+      canScroll: ({ source }) => source.data.uniqueContextId === contextId
     });
   }, [contextId]);
 
@@ -257,9 +253,7 @@ function DocTreeInner<T extends object>(
 
     const containerHeight = scrollRef.current?.clientHeight ?? 0;
     const scrollOffset = virtualizer.scrollOffset ?? 0;
-    const item = virtualizer
-      .getVirtualItems()
-      .find((v) => v.index === idx);
+    const item = virtualizer.getVirtualItems().find((v) => v.index === idx);
     const isFullyVisible =
       !!item &&
       item.start >= scrollOffset &&
@@ -446,7 +440,7 @@ function DocTreeInner<T extends object>(
           break;
       }
     },
-    [flat, openIds, onToggle, virtualizer, getDragLabel],
+    [flat, openIds, onToggle, virtualizer, getDragLabel]
   );
 
   // Clear the typeahead timer if the component unmounts mid-buffer.
@@ -454,21 +448,18 @@ function DocTreeInner<T extends object>(
     () => () => {
       if (typeaheadTimerRef.current) clearTimeout(typeaheadTimerRef.current);
     },
-    [],
+    []
   );
 
   // Event-delegated focus tracking — when any descendant (a row's Link, or an
   // inner action button) gains focus, mark the enclosing row as active. Keeps
   // tabIndex aligned with the user's current position whether they got there
   // by click, arrow nav, or focusByIndex's programmatic .focus() call.
-  const handleFocusIn = useCallback(
-    (e: React.FocusEvent<HTMLUListElement>) => {
-      const rowEl = (e.target as HTMLElement).closest('[data-row-id]');
-      const id = rowEl?.getAttribute('data-row-id');
-      if (id) setActiveId(id);
-    },
-    [],
-  );
+  const handleFocusIn = useCallback((e: React.FocusEvent<HTMLUListElement>) => {
+    const rowEl = (e.target as HTMLElement).closest('[data-row-id]');
+    const id = rowEl?.getAttribute('data-row-id');
+    if (id) setActiveId(id);
+  }, []);
 
   if (data.length === 0 && emptyState) {
     return <div className={styles.treeContainer}>{emptyState}</div>;
@@ -489,7 +480,7 @@ function DocTreeInner<T extends object>(
           height: totalSize,
           margin: 0,
           padding: 0,
-          listStyle: 'none',
+          listStyle: 'none'
         }}
       >
         {virtualItems.map((virtualItem) => {
@@ -506,7 +497,7 @@ function DocTreeInner<T extends object>(
                 top: 0,
                 left: 0,
                 width: '100%',
-                transform: `translateY(${virtualItem.start}px)`,
+                transform: `translateY(${virtualItem.start}px)`
               }}
             >
               <DocTreeRow
@@ -537,5 +528,5 @@ function DocTreeInner<T extends object>(
 }
 
 export const DocTree = forwardRef(DocTreeInner) as <T extends object>(
-  props: DocTreeProps<T> & { ref?: Ref<DocTreeApi> },
+  props: DocTreeProps<T> & { ref?: Ref<DocTreeApi> }
 ) => ReturnType<typeof DocTreeInner>;

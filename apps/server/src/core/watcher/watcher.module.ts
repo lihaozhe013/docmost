@@ -8,6 +8,6 @@ import { PageAccessModule } from '../page/page-access/page-access.module';
   imports: [PageAccessModule],
   controllers: [WatcherController, SpaceWatcherController],
   providers: [WatcherService],
-  exports: [WatcherService],
+  exports: [WatcherService]
 })
 export class WatcherModule {}

@@ -1,4 +1,4 @@
 export enum ImportFormat {
   HTML = 'html',
-  Markdown = 'markdown',
+  Markdown = 'markdown'
 }

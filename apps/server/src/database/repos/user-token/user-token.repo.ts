@@ -1,7 +1,7 @@
 import {
   InsertableUserToken,
   UpdatableUserToken,
-  UserToken,
+  UserToken
 } from '@docmost/db/types/entity.types';
 import { KyselyDB, KyselyTransaction } from '@docmost/db/types/kysely.types';
 import { dbOrTx } from '@docmost/db/utils';
@@ -15,7 +15,7 @@ export class UserTokenRepo {
   async findById(
     token: string,
     workspaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<UserToken> {
     const db = dbOrTx(this.db, trx);
 
@@ -29,7 +29,7 @@ export class UserTokenRepo {
         'type',
         'expiresAt',
         'usedAt',
-        'createdAt',
+        'createdAt'
       ])
       .where('token', '=', token)
       .where('workspaceId', '=', workspaceId)
@@ -38,7 +38,7 @@ export class UserTokenRepo {
 
   async insertUserToken(
     insertableUserToken: InsertableUserToken,
-    opts?: { trx?: KyselyTransaction },
+    opts?: { trx?: KyselyTransaction }
   ) {
     const db = dbOrTx(this.db, opts?.trx);
     return db
@@ -52,7 +52,7 @@ export class UserTokenRepo {
     userId: string,
     workspaceId: string,
     tokenType: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<UserToken[]> {
     const db = dbOrTx(this.db, trx);
     return db
@@ -65,7 +65,7 @@ export class UserTokenRepo {
         'type',
         'expiresAt',
         'usedAt',
-        'createdAt',
+        'createdAt'
       ])
       .where('userId', '=', userId)
       .where('workspaceId', '=', workspaceId)
@@ -77,7 +77,7 @@ export class UserTokenRepo {
   async updateUserToken(
     updatableUserToken: UpdatableUserToken,
     userTokenId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ) {
     const db = dbOrTx(this.db, trx);
     return db

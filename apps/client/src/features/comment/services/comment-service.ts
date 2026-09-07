@@ -1,15 +1,15 @@
-import api from "@/lib/api-client";
+import api from '@/lib/api-client';
 import {
   ICommentParams,
   IComment,
-  IResolveComment,
-} from "@/features/comment/types/comment.types";
-import { IPagination } from "@/lib/types.ts";
+  IResolveComment
+} from '@/features/comment/types/comment.types';
+import { IPagination } from '@/lib/types.ts';
 
 export async function createComment(
-  data: Partial<IComment>,
+  data: Partial<IComment>
 ): Promise<IComment> {
-  const req = await api.post<IComment>("/comments/create", data);
+  const req = await api.post<IComment>('/comments/create', data);
   return req.data;
 }
 
@@ -19,24 +19,24 @@ export async function resolveComment(data: IResolveComment): Promise<IComment> {
 }
 
 export async function updateComment(
-  data: Partial<IComment>,
+  data: Partial<IComment>
 ): Promise<IComment> {
   const req = await api.post<IComment>(`/comments/update`, data);
   return req.data;
 }
 
 export async function getCommentById(commentId: string): Promise<IComment> {
-  const req = await api.post<IComment>("/comments/info", { commentId });
+  const req = await api.post<IComment>('/comments/info', { commentId });
   return req.data;
 }
 
 export async function getPageComments(
-  data: ICommentParams,
+  data: ICommentParams
 ): Promise<IPagination<IComment>> {
-  const req = await api.post("/comments", data);
+  const req = await api.post('/comments', data);
   return req.data;
 }
 
 export async function deleteComment(commentId: string): Promise<void> {
-  await api.post("/comments/delete", { commentId });
+  await api.post('/comments/delete', { commentId });
 }

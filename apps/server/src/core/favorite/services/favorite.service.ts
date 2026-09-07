@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import {
   FavoriteRepo,
-  FavoriteType,
+  FavoriteType
 } from '@docmost/db/repos/favorite/favorite.repo';
 import { PaginationOptions } from '@docmost/db/pagination/pagination-options';
 import { InsertableFavorite } from '@docmost/db/types/entity.types';
@@ -13,20 +13,20 @@ export class FavoriteService {
   constructor(
     private readonly favoriteRepo: FavoriteRepo,
     private readonly pagePermissionRepo: PagePermissionRepo,
-    private readonly spaceMemberRepo: SpaceMemberRepo,
+    private readonly spaceMemberRepo: SpaceMemberRepo
   ) {}
 
   async getFavoriteIds(
     userId: string,
     workspaceId: string,
     type: FavoriteType,
-    spaceId?: string,
+    spaceId?: string
   ) {
     const result = await this.favoriteRepo.getFavoriteIds(
       userId,
       workspaceId,
       type,
-      spaceId,
+      spaceId
     );
 
     if (result.items.length === 0) {
@@ -37,7 +37,7 @@ export class FavoriteService {
       const accessibleIds =
         await this.pagePermissionRepo.filterAccessiblePageIds({
           pageIds: result.items,
-          userId,
+          userId
         });
       const accessibleSet = new Set(accessibleIds);
       result.items = result.items.filter((id) => accessibleSet.has(id));
@@ -60,7 +60,7 @@ export class FavoriteService {
       pageId?: string;
       spaceId?: string;
       templateId?: string;
-    },
+    }
   ): Promise<void> {
     const favorite: InsertableFavorite = {
       userId,
@@ -68,7 +68,7 @@ export class FavoriteService {
       spaceId: opts.spaceId ?? null,
       templateId: opts.templateId ?? null,
       type: opts.type,
-      workspaceId,
+      workspaceId
     };
 
     await this.favoriteRepo.insert(favorite);
@@ -81,7 +81,7 @@ export class FavoriteService {
       pageId?: string;
       spaceId?: string;
       templateId?: string;
-    },
+    }
   ): Promise<void> {
     if (opts.type === FavoriteType.PAGE && opts.pageId) {
       await this.favoriteRepo.deleteByUserAndPage(userId, opts.pageId);
@@ -97,14 +97,14 @@ export class FavoriteService {
     workspaceId: string,
     pagination: PaginationOptions,
     type?: FavoriteType,
-    spaceId?: string,
+    spaceId?: string
   ) {
     const result = await this.favoriteRepo.findUserFavorites(
       userId,
       workspaceId,
       pagination,
       type,
-      spaceId,
+      spaceId
     );
 
     if (result.items.length === 0) {
@@ -115,7 +115,7 @@ export class FavoriteService {
     const spaceSet = new Set(userSpaceIds);
 
     const pageFavorites = result.items.filter(
-      (f) => f.type === FavoriteType.PAGE && f.pageId,
+      (f) => f.type === FavoriteType.PAGE && f.pageId
     );
 
     let accessiblePageSet: Set<string> | undefined;
@@ -124,7 +124,7 @@ export class FavoriteService {
       const accessibleIds =
         await this.pagePermissionRepo.filterAccessiblePageIds({
           pageIds,
-          userId,
+          userId
         });
       accessiblePageSet = new Set(accessibleIds);
     }

@@ -1,5 +1,5 @@
-import { IPage } from "@/features/page/types/page.types.ts";
-import { SpaceTreeNode } from "@/features/page/tree/types.ts";
+import { IPage } from '@/features/page/types/page.types.ts';
+import { SpaceTreeNode } from '@/features/page/tree/types.ts';
 
 export function sortPositionKeys(keys: any[]) {
   return keys.sort((a, b) => {
@@ -26,7 +26,7 @@ export function buildTree(pages: IPage[]): SpaceTreeNode[] {
       parentPageId: page.parentPageId,
       isBase: page.isBase,
       canEdit: page.canEdit ?? page.permissions?.canEdit,
-      children: [],
+      children: []
     };
   });
 
@@ -40,7 +40,7 @@ export function buildTree(pages: IPage[]): SpaceTreeNode[] {
 export function findBreadcrumbPath(
   tree: SpaceTreeNode[],
   pageId: string,
-  path: SpaceTreeNode[] = [],
+  path: SpaceTreeNode[] = []
 ): SpaceTreeNode[] | null {
   for (const node of tree) {
     if (node.id === pageId) {
@@ -50,7 +50,7 @@ export function findBreadcrumbPath(
     if (node.children) {
       const newPath = findBreadcrumbPath(node.children, pageId, [
         ...path,
-        node,
+        node
       ]);
       if (newPath) {
         return newPath;
@@ -63,7 +63,7 @@ export function findBreadcrumbPath(
 export const updateTreeNodeName = (
   nodes: SpaceTreeNode[],
   nodeId: string,
-  newName: string,
+  newName: string
 ): SpaceTreeNode[] => {
   return nodes.map((node) => {
     if (node.id === nodeId) {
@@ -72,7 +72,7 @@ export const updateTreeNodeName = (
     if (node.children && node.children.length > 0) {
       return {
         ...node,
-        children: updateTreeNodeName(node.children, nodeId, newName),
+        children: updateTreeNodeName(node.children, nodeId, newName)
       };
     }
     return node;
@@ -82,7 +82,7 @@ export const updateTreeNodeName = (
 export const updateTreeNodeIcon = (
   nodes: SpaceTreeNode[],
   nodeId: string,
-  newIcon: string,
+  newIcon: string
 ): SpaceTreeNode[] => {
   return nodes.map((node) => {
     if (node.id === nodeId) {
@@ -91,7 +91,7 @@ export const updateTreeNodeIcon = (
     if (node.children && node.children.length > 0) {
       return {
         ...node,
-        children: updateTreeNodeIcon(node.children, nodeId, newIcon),
+        children: updateTreeNodeIcon(node.children, nodeId, newIcon)
       };
     }
     return node;
@@ -100,7 +100,7 @@ export const updateTreeNodeIcon = (
 
 export const deleteTreeNode = (
   nodes: SpaceTreeNode[],
-  nodeId: string,
+  nodeId: string
 ): SpaceTreeNode[] => {
   return nodes
     .map((node) => {
@@ -111,7 +111,7 @@ export const deleteTreeNode = (
       if (node.children && node.children.length > 0) {
         return {
           ...node,
-          children: deleteTreeNode(node.children, nodeId),
+          children: deleteTreeNode(node.children, nodeId)
         };
       }
       return node;
@@ -159,7 +159,7 @@ export function buildTreeWithChildren(items: SpaceTreeNode[]): SpaceTreeNode[] {
 export function appendNodeChildren(
   treeItems: SpaceTreeNode[],
   nodeId: string,
-  children: SpaceTreeNode[],
+  children: SpaceTreeNode[]
 ) {
   // Preserve deeper children if they exist and remove node if deleted
   return treeItems.map((node) => {
@@ -169,7 +169,7 @@ export function appendNodeChildren(
       const existingMap = new Map(
         (node.children ?? [])
           .filter((c) => newIds.has(c.id))
-          .map((c) => [c.id, c]),
+          .map((c) => [c.id, c])
       );
 
       const merged = children.map((newChild) => {
@@ -181,14 +181,14 @@ export function appendNodeChildren(
 
       return {
         ...node,
-        children: merged,
+        children: merged
       };
     }
 
     if (node.children) {
       return {
         ...node,
-        children: appendNodeChildren(node.children, nodeId, children),
+        children: appendNodeChildren(node.children, nodeId, children)
       };
     }
 
@@ -201,7 +201,7 @@ export function appendNodeChildren(
  */
 export function mergeRootTrees(
   prevRoots: SpaceTreeNode[],
-  incomingRoots: SpaceTreeNode[],
+  incomingRoots: SpaceTreeNode[]
 ): SpaceTreeNode[] {
   const seen = new Set<string>();
   const collect = (nodes: SpaceTreeNode[]) => {

@@ -5,7 +5,7 @@ import { createHmac } from 'node:crypto';
 export function computeEmailSignature(
   email: string,
   workspaceId: string,
-  appSecret: string,
+  appSecret: string
 ): string {
   return createHmac('sha256', appSecret)
     .update(`${email.toLowerCase()}:${workspaceId}`)
@@ -24,12 +24,12 @@ export function throwIfEmailNotVerified(opts: {
   const emailSignature = computeEmailSignature(
     opts.email,
     opts.workspaceId,
-    opts.appSecret,
+    opts.appSecret
   );
   throw new BadRequestException({
     message:
       'Please verify your email address. Check your inbox for the verification link.',
-    emailSignature,
+    emailSignature
   });
 }
 

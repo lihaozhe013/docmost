@@ -1,7 +1,7 @@
-import { Divider, Modal } from "@mantine/core";
-import { EditGroupForm } from "@/features/group/components/edit-group-form.tsx";
-import { useTranslation } from "react-i18next";
-import { IGroup } from "@/features/group/types/group.types.ts";
+import { Divider, Modal } from '@mantine/core';
+import { EditGroupForm } from '@/features/group/components/edit-group-form.tsx';
+import { useTranslation } from 'react-i18next';
+import { IGroup } from '@/features/group/types/group.types.ts';
 
 interface EditGroupModalProps {
   opened: boolean;
@@ -12,7 +12,7 @@ interface EditGroupModalProps {
 export default function EditGroupModal({
   opened,
   onClose,
-  group,
+  group
 }: EditGroupModalProps) {
   const { t } = useTranslation();
 
@@ -21,8 +21,8 @@ export default function EditGroupModal({
       <Modal
         opened={opened}
         onClose={onClose}
-        title={t("Edit group")}
-        closeButtonProps={{ "aria-label": t("Close") }}
+        title={t('Edit group')}
+        closeButtonProps={{ 'aria-label': t('Close') }}
       >
         <Divider size="xs" mb="xs" />
         <EditGroupForm onClose={onClose} group={group} />

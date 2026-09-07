@@ -1,32 +1,32 @@
-import { ISharedPageTree } from "@/features/share/types/share.types.ts";
+import { ISharedPageTree } from '@/features/share/types/share.types.ts';
 import {
   buildSharedPageTree,
-  SharedPageTreeNode,
-} from "@/features/share/utils.ts";
-import { useCallback, useEffect, useMemo, useRef } from "react";
-import { Link, useParams } from "react-router-dom";
-import { useAtom } from "jotai";
-import { useTranslation } from "react-i18next";
-import { buildSharedPageUrl } from "@/features/page/page.utils.ts";
-import clsx from "clsx";
+  SharedPageTreeNode
+} from '@/features/share/utils.ts';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { useAtom } from 'jotai';
+import { useTranslation } from 'react-i18next';
+import { buildSharedPageUrl } from '@/features/page/page.utils.ts';
+import clsx from 'clsx';
 import {
   IconChevronDown,
   IconChevronRight,
   IconFileDescription,
-  IconPointFilled,
-} from "@tabler/icons-react";
-import { ActionIcon, Box } from "@mantine/core";
-import { extractPageSlugId } from "@/lib";
-import classes from "@/features/page/tree/styles/tree.module.css";
-import styles from "./share.module.css";
-import { mobileSidebarAtom } from "@/components/layouts/global/hooks/atoms/sidebar-atom.ts";
-import EmojiPicker from "@/components/ui/emoji-picker.tsx";
+  IconPointFilled
+} from '@tabler/icons-react';
+import { ActionIcon, Box } from '@mantine/core';
+import { extractPageSlugId } from '@/lib';
+import classes from '@/features/page/tree/styles/tree.module.css';
+import styles from './share.module.css';
+import { mobileSidebarAtom } from '@/components/layouts/global/hooks/atoms/sidebar-atom.ts';
+import EmojiPicker from '@/components/ui/emoji-picker.tsx';
 import {
   DocTree,
   type DocTreeApi,
-  type RenderRowProps,
-} from "@/features/page/tree/components/doc-tree";
-import { openSharedTreeNodesAtom } from "@/features/share/atoms/open-shared-tree-nodes-atom";
+  type RenderRowProps
+} from '@/features/page/tree/components/doc-tree';
+import { openSharedTreeNodesAtom } from '@/features/share/atoms/open-shared-tree-nodes-atom';
 
 interface SharedTreeProps {
   sharedPageTree: ISharedPageTree;
@@ -46,11 +46,8 @@ export default function SharedTree({ sharedPageTree }: SharedTreeProps) {
   }, [sharedPageTree?.pageTree]);
 
   const openIds = useMemo(
-    () =>
-      new Set(
-        Object.keys(openTreeNodes).filter((k) => openTreeNodes[k]),
-      ),
-    [openTreeNodes],
+    () => new Set(Object.keys(openTreeNodes).filter((k) => openTreeNodes[k])),
+    [openTreeNodes]
   );
 
   useEffect(() => {
@@ -78,11 +75,11 @@ export default function SharedTree({ sharedPageTree }: SharedTreeProps) {
   const handleToggle = useCallback(
     (id: string, isOpen: boolean) =>
       setOpenTreeNodes((prev) => ({ ...prev, [id]: isOpen })),
-    [setOpenTreeNodes],
+    [setOpenTreeNodes]
   );
   const getDragLabel = useCallback(
-    (n: SharedPageTreeNode) => n.name || "untitled",
-    [],
+    (n: SharedPageTreeNode) => n.name || 'untitled',
+    []
   );
 
   if (!sharedPageTree || !sharedPageTree?.pageTree) {
@@ -101,7 +98,7 @@ export default function SharedTree({ sharedPageTree }: SharedTreeProps) {
         onMove={noopMove}
         onToggle={handleToggle}
         getDragLabel={getDragLabel}
-        aria-label={t("Pages")}
+        aria-label={t('Pages')}
       />
     </div>
   );
@@ -118,7 +115,7 @@ function SharedTreeRow({
   rowRef,
   tabIndex,
   treeItemProps,
-  toggleOpen,
+  toggleOpen
 }: RenderRowProps<SharedPageTreeNode>) {
   const { shareId } = useParams();
   const { t } = useTranslation();
@@ -127,7 +124,7 @@ function SharedTreeRow({
   const pageUrl = buildSharedPageUrl({
     shareId: shareId,
     pageSlugId: node.slugId,
-    pageTitle: node.name,
+    pageTitle: node.name
   });
 
   return (
@@ -148,22 +145,16 @@ function SharedTreeRow({
         hasChildren={hasChildren}
         onToggle={toggleOpen}
       />
-      <div style={{ marginRight: "4px" }}>
+      <div style={{ marginRight: '4px' }}>
         <EmojiPicker
           onEmojiSelect={() => {}}
-          icon={
-            node.icon ? (
-              node.icon
-            ) : (
-              <IconFileDescription size="18" />
-            )
-          }
+          icon={node.icon ? node.icon : <IconFileDescription size="18" />}
           readOnly={true}
           removeEmojiAction={() => {}}
           actionIconProps={{ tabIndex: -1 }}
         />
       </div>
-      <span className={classes.text}>{node.name || t("untitled")}</span>
+      <span className={classes.text}>{node.name || t('untitled')}</span>
     </Box>
   );
 }
@@ -177,7 +168,7 @@ interface SharedPageArrowProps {
 function SharedPageArrow({
   isOpen,
   hasChildren,
-  onToggle,
+  onToggle
 }: SharedPageArrowProps) {
   if (!hasChildren) {
     return (
@@ -186,11 +177,11 @@ function SharedPageArrow({
         style={{
           width: 20,
           height: 20,
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-          color: "var(--mantine-color-gray-6)",
-          flexShrink: 0,
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'var(--mantine-color-gray-6)',
+          flexShrink: 0
         }}
       >
         <IconPointFilled size={4} />

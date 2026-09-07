@@ -48,20 +48,24 @@ If you need to access the underlying state and modify the final docx `Document` 
 This function needs to return an `IPropertiesOptions` type, ie. the config that should be passed to a `Document`. Your options will be spread with the default options, so you can override any of the defaults.
 
 ```ts
-const wordDocument = defaultDocxSerializer.serialize(state.doc, opts, (state) => {
-  return {
-    numbering: {
-      config: state.numbering,
-    },
-    fonts: [], // embed fonts,
-    styles: {
-      paragraphStyles,
-      default: {
-        heading1: paragraphStyles[1],
+const wordDocument = defaultDocxSerializer.serialize(
+  state.doc,
+  opts,
+  (state) => {
+    return {
+      numbering: {
+        config: state.numbering,
       },
-    },
-  };
-});
+      fonts: [], // embed fonts,
+      styles: {
+        paragraphStyles,
+        default: {
+          heading1: paragraphStyles[1],
+        },
+      },
+    };
+  },
+);
 ```
 
 See the [docx documentation](https://docx.js.org/#/usage/document) for more details on the options you can pass in.
@@ -81,7 +85,10 @@ const nodeSerializer = {
   },
 };
 
-export const myDocxSerializer = new DocxSerializer(nodeSerializer, defaultMarks);
+export const myDocxSerializer = new DocxSerializer(
+  nodeSerializer,
+  defaultMarks,
+);
 ```
 
 The `state` is the `DocxSerializerState` and has helper methods to interact with `docx`.
@@ -89,7 +96,11 @@ The `state` is the `DocxSerializerState` and has helper methods to interact with
 If the exported content includes image links that require fetching the image data, you can use asynchronous APIs. Here's a demo example:
 
 ```ts
-import { DocxSerializerAsync, defaultAsyncNodes, defaultMarks } from 'prosemirror-docx';
+import {
+  DocxSerializerAsync,
+  defaultAsyncNodes,
+  defaultMarks,
+} from 'prosemirror-docx';
 import { EditorState } from 'prosemirror-state';
 import { writeFileSync } from 'fs';
 

@@ -1,17 +1,13 @@
-import { NodeViewProps, NodeViewWrapper } from "@tiptap/react";
-import { ActionIcon, Group, Loader, Text, Tooltip } from "@mantine/core";
-import { useCallback, useMemo, useState } from "react";
-import { getFileUrl } from "@/lib/config.ts";
-import { ResizableWrapper } from "../common/resizable-wrapper";
-import clsx from "clsx";
-import classes from "./pdf-view.module.css";
-import { useTranslation } from "react-i18next";
-import { isInternalFileUrl } from "@docmost/editor-ext";
-import {
-  IconFileTypePdf,
-  IconPaperclip,
-  IconTrash,
-} from "@tabler/icons-react";
+import { NodeViewProps, NodeViewWrapper } from '@tiptap/react';
+import { ActionIcon, Group, Loader, Text, Tooltip } from '@mantine/core';
+import { useCallback, useMemo, useState } from 'react';
+import { getFileUrl } from '@/lib/config.ts';
+import { ResizableWrapper } from '../common/resizable-wrapper';
+import clsx from 'clsx';
+import classes from './pdf-view.module.css';
+import { useTranslation } from 'react-i18next';
+import { isInternalFileUrl } from '@docmost/editor-ext';
+import { IconFileTypePdf, IconPaperclip, IconTrash } from '@tabler/icons-react';
 
 export default function PdfView(props: NodeViewProps) {
   const { t } = useTranslation();
@@ -35,7 +31,7 @@ export default function PdfView(props: NodeViewProps) {
     (newWidth: number, newHeight: number) => {
       updateAttributes({ width: newWidth, height: newHeight });
     },
-    [updateAttributes],
+    [updateAttributes]
   );
 
   const handleConvertToAttachment = useCallback(() => {
@@ -43,22 +39,22 @@ export default function PdfView(props: NodeViewProps) {
     const pos = getPos();
     if (pos === undefined) return;
     const currentNode = editor.state.doc.nodeAt(pos);
-    if (!currentNode || currentNode.type.name !== "pdf") return;
+    if (!currentNode || currentNode.type.name !== 'pdf') return;
 
     editor
       .chain()
       .insertContentAt(
         { from: pos, to: pos + currentNode.nodeSize },
         {
-          type: "attachment",
+          type: 'attachment',
           attrs: {
             url: currentNode.attrs.src,
             name: currentNode.attrs.name,
             attachmentId: currentNode.attrs.attachmentId,
             size: currentNode.attrs.size,
-            mime: "application/pdf",
-          },
-        },
+            mime: 'application/pdf'
+          }
+        }
       )
       .run();
   }, [editor, src, getPos]);
@@ -73,14 +69,17 @@ export default function PdfView(props: NodeViewProps) {
   if (!src || !safeSrc) {
     return (
       <NodeViewWrapper data-drag-handle>
-        <div className={`${classes.pdfWrapper} ${placeholder ? classes.skeleton : ''}`} style={{ height: placeholder ? 600 : undefined }}>
+        <div
+          className={`${classes.pdfWrapper} ${placeholder ? classes.skeleton : ''}`}
+          style={{ height: placeholder ? 600 : undefined }}
+        >
           {placeholder && (
             <Group justify="center" wrap="nowrap" gap="xs" maw="100%" px="md">
               <Loader size={20} style={{ flexShrink: 0 }} />
               <Text component="span" size="sm" truncate="end">
                 {placeholder?.name
-                  ? t("Uploading {{name}}", { name: placeholder.name })
-                  : t("Uploading file")}
+                  ? t('Uploading {{name}}', { name: placeholder.name })
+                  : t('Uploading file')}
               </Text>
             </Group>
           )}
@@ -94,21 +93,23 @@ export default function PdfView(props: NodeViewProps) {
       <NodeViewWrapper data-drag-handle>
         <div
           data-pdf-error
-          className={clsx(classes.pdfError, { "ProseMirror-selectednode": selected })}
+          className={clsx(classes.pdfError, {
+            'ProseMirror-selectednode': selected
+          })}
           onClick={handleSelect}
           onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
+            if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
               handleSelect();
             }
           }}
           role="button"
           tabIndex={0}
-          aria-label={t("Failed to load PDF")}
+          aria-label={t('Failed to load PDF')}
         >
           <IconFileTypePdf size={32} stroke={1.5} />
           <Text size="sm" c="dimmed">
-            {t("Failed to load PDF")}
+            {t('Failed to load PDF')}
           </Text>
         </div>
       </NodeViewWrapper>
@@ -129,7 +130,7 @@ export default function PdfView(props: NodeViewProps) {
           isEditable={editor.isEditable}
           selected={selected}
           className={clsx(classes.pdfResizeWrapper, {
-            "ProseMirror-selectednode": selected,
+            'ProseMirror-selectednode': selected
           })}
         >
           <iframe
@@ -141,7 +142,8 @@ export default function PdfView(props: NodeViewProps) {
             onLoad={(e) => {
               try {
                 const iframe = e.currentTarget;
-                const status = iframe.contentDocument?.querySelector("pre")?.textContent;
+                const status =
+                  iframe.contentDocument?.querySelector('pre')?.textContent;
                 if (status && status.includes('"statusCode":404')) {
                   setHasError(true);
                 }
@@ -152,24 +154,28 @@ export default function PdfView(props: NodeViewProps) {
           />
           {editor.isEditable && (
             <div className={classes.hoverMenu}>
-              <Tooltip position="top" label={t("Convert to attachment")} withinPortal>
+              <Tooltip
+                position="top"
+                label={t('Convert to attachment')}
+                withinPortal
+              >
                 <ActionIcon
                   size="sm"
                   variant="filled"
                   color="dark"
                   onClick={handleConvertToAttachment}
-                  aria-label={t("Convert to attachment")}
+                  aria-label={t('Convert to attachment')}
                 >
                   <IconPaperclip size={14} />
                 </ActionIcon>
               </Tooltip>
-              <Tooltip position="top" label={t("Delete")} withinPortal>
+              <Tooltip position="top" label={t('Delete')} withinPortal>
                 <ActionIcon
                   size="sm"
                   variant="filled"
                   color="dark"
                   onClick={handleDelete}
-                  aria-label={t("Delete")}
+                  aria-label={t('Delete')}
                 >
                   <IconTrash size={14} />
                 </ActionIcon>

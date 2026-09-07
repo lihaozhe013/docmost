@@ -1,8 +1,8 @@
-import type { Extensions, JSONContent } from "@tiptap/core";
-import { findChildren, getSchema } from "@tiptap/core";
-import { Node } from "@tiptap/pm/model";
-import { EditorState } from "@tiptap/pm/state";
-import type { UniqueID } from "./unique-id";
+import type { Extensions, JSONContent } from '@tiptap/core';
+import { findChildren, getSchema } from '@tiptap/core';
+import { Node } from '@tiptap/pm/model';
+import { EditorState } from '@tiptap/pm/state';
+import type { UniqueID } from './unique-id';
 
 /**
  * Creates a new document with unique IDs added to the nodes. Does the same
@@ -45,16 +45,16 @@ export function addUniqueIdsToDoc(
 ): JSONContent {
   // Find the UniqueID extension in the extensions array. If it's not found, throw an error.
   const uniqueIDExtension = extensions.find(
-    (ext) => ext.name === "uniqueID",
+    (ext) => ext.name === 'uniqueID',
   ) as typeof UniqueID | undefined;
   if (!uniqueIDExtension) {
-    throw new Error("UniqueID extension not found in the extensions array");
+    throw new Error('UniqueID extension not found in the extensions array');
   }
   const { types, attributeName, generateID } = uniqueIDExtension.options;
 
   // Convert the JSON content to a ProseMirror node
   const schema = getSchema([
-    ...extensions.filter((ext) => ext.name !== "uniqueID"),
+    ...extensions.filter((ext) => ext.name !== 'uniqueID'),
     uniqueIDExtension,
   ]);
   const contentNode = Node.fromJSON(schema, doc);

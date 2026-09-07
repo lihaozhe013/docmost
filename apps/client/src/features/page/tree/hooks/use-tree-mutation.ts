@@ -1,25 +1,25 @@
-import { useCallback } from "react";
-import { useAtom, useStore } from "jotai";
-import { notifications } from "@mantine/notifications";
-import { useTranslation } from "react-i18next";
-import { useNavigate, useParams } from "react-router-dom";
+import { useCallback } from 'react';
+import { useAtom, useStore } from 'jotai';
+import { notifications } from '@mantine/notifications';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams } from 'react-router-dom';
 
-import { treeDataAtom } from "@/features/page/tree/atoms/tree-data-atom.ts";
-import { treeModel } from "@/features/page/tree/model/tree-model";
-import type { DropOp } from "@/features/page/tree/model/tree-model.types";
-import { dropOpToMovePayload } from "./drop-op-to-move-payload";
-import { SpaceTreeNode } from "@/features/page/tree/types.ts";
-import { IPage } from "@/features/page/types/page.types.ts";
+import { treeDataAtom } from '@/features/page/tree/atoms/tree-data-atom.ts';
+import { treeModel } from '@/features/page/tree/model/tree-model';
+import type { DropOp } from '@/features/page/tree/model/tree-model.types';
+import { dropOpToMovePayload } from './drop-op-to-move-payload';
+import { SpaceTreeNode } from '@/features/page/tree/types.ts';
+import { IPage } from '@/features/page/types/page.types.ts';
 import {
   useCreatePageMutation,
   useRemovePageMutation,
   useMovePageMutation,
   useUpdatePageMutation,
-  updateCacheOnMovePage,
-} from "@/features/page/queries/page-query.ts";
-import { buildPageUrl } from "@/features/page/page.utils.ts";
-import { getSpaceUrl } from "@/lib/config.ts";
-import { useQueryEmit } from "@/features/websocket/use-query-emit.ts";
+  updateCacheOnMovePage
+} from '@/features/page/queries/page-query.ts';
+import { buildPageUrl } from '@/features/page/page.utils.ts';
+import { getSpaceUrl } from '@/lib/config.ts';
+import { useQueryEmit } from '@/features/websocket/use-query-emit.ts';
 
 export type UseTreeMutation = {
   handleMove: (sourceId: string, op: DropOp) => Promise<void>;
@@ -57,7 +57,7 @@ export function useTreeMutation(spaceId: string): UseTreeMutation {
       // optimistic apply with the new position from the payload
       let optimistic = treeModel.update(after, sourceId, {
         position: payload.position,
-        parentPageId: payload.parentPageId,
+        parentPageId: payload.parentPageId
       } as Partial<SpaceTreeNode>);
 
       // If the old parent has no children left, mark hasChildren: false so the
@@ -67,16 +67,16 @@ export function useTreeMutation(spaceId: string): UseTreeMutation {
         const oldParent = treeModel.find(optimistic, oldParentId);
         if (!oldParent?.children?.length) {
           optimistic = treeModel.update(optimistic, oldParentId, {
-            hasChildren: false,
+            hasChildren: false
           } as Partial<SpaceTreeNode>);
         }
       }
 
       // For make-child onto a previously-childless target: flip hasChildren on
       // so the new parent shows its chevron.
-      if (op.kind === "make-child") {
+      if (op.kind === 'make-child') {
         optimistic = treeModel.update(optimistic, op.targetId, {
-          hasChildren: true,
+          hasChildren: true
         } as Partial<SpaceTreeNode>);
       }
 
@@ -87,8 +87,8 @@ export function useTreeMutation(spaceId: string): UseTreeMutation {
       } catch {
         setData(before);
         notifications.show({
-          message: t("Failed to move page"),
-          color: "red",
+          message: t('Failed to move page'),
+          color: 'red'
         });
         return;
       }
@@ -101,7 +101,7 @@ export function useTreeMutation(spaceId: string): UseTreeMutation {
         position: payload.position,
         spaceId: source.spaceId,
         parentPageId: payload.parentPageId,
-        hasChildren: source.hasChildren,
+        hasChildren: source.hasChildren
       };
 
       updateCacheOnMovePage(
@@ -109,12 +109,12 @@ export function useTreeMutation(spaceId: string): UseTreeMutation {
         sourceId,
         oldParentId,
         payload.parentPageId,
-        pageData,
+        pageData
       );
 
       setTimeout(() => {
         emit({
-          operation: "moveTreeNode",
+          operation: 'moveTreeNode',
           spaceId: spaceId,
           payload: {
             id: sourceId,
@@ -122,12 +122,12 @@ export function useTreeMutation(spaceId: string): UseTreeMutation {
             oldParentId,
             index: result.index,
             position: payload.position,
-            pageData,
-          },
+            pageData
+          }
         });
       }, 50);
     },
-    [setData, store, movePageMutation, spaceId, emit, t],
+    [setData, store, movePageMutation, spaceId, emit, t]
   );
 
   const handleCreate = useCallback(
@@ -139,18 +139,18 @@ export function useTreeMutation(spaceId: string): UseTreeMutation {
       try {
         createdPage = await createPageMutation.mutateAsync(payload);
       } catch {
-        throw new Error("Failed to create page");
+        throw new Error('Failed to create page');
       }
 
       const newNode: SpaceTreeNode = {
         id: createdPage.id,
         slugId: createdPage.slugId,
-        name: "",
+        name: '',
         position: createdPage.position,
         spaceId: createdPage.spaceId,
         parentPageId: createdPage.parentPageId,
         hasChildren: false,
-        children: [],
+        children: []
       };
 
       // Read latest tree at call time. Without this, callers that mutate the
@@ -170,45 +170,45 @@ export function useTreeMutation(spaceId: string): UseTreeMutation {
 
       setTimeout(() => {
         emit({
-          operation: "addTreeNode",
+          operation: 'addTreeNode',
           spaceId,
           payload: {
             parentId,
             index: lastIndex,
-            data: newNode,
-          },
+            data: newNode
+          }
         });
       }, 50);
 
       const pageUrl = buildPageUrl(
         spaceSlug,
         createdPage.slugId,
-        createdPage.title,
+        createdPage.title
       );
       navigate(pageUrl);
     },
-    [spaceId, createPageMutation, setData, store, emit, navigate, spaceSlug],
+    [spaceId, createPageMutation, setData, store, emit, navigate, spaceSlug]
   );
 
   const handleRename = useCallback(
     async (id: string, name: string) => {
       setData((prev) =>
-        treeModel.update(prev, id, { name } as Partial<SpaceTreeNode>),
+        treeModel.update(prev, id, { name } as Partial<SpaceTreeNode>)
       );
       try {
         await updatePageMutation.mutateAsync({ pageId: id, title: name });
       } catch (error) {
-        console.error("Error updating page title:", error);
+        console.error('Error updating page title:', error);
       }
     },
-    [updatePageMutation, setData],
+    [updatePageMutation, setData]
   );
 
   const handleDelete = useCallback(
     async (id: string) => {
       const node = treeModel.find(
         store.get(treeDataAtom),
-        id,
+        id
       ) as SpaceTreeNode | null;
       const parentPageId = node?.parentPageId ?? null;
       try {
@@ -222,7 +222,7 @@ export function useTreeMutation(spaceId: string): UseTreeMutation {
             const parent = treeModel.find(next, parentPageId);
             if (!parent?.children?.length) {
               next = treeModel.update(next, parentPageId, {
-                hasChildren: false,
+                hasChildren: false
               } as Partial<SpaceTreeNode>);
             }
           }
@@ -232,8 +232,8 @@ export function useTreeMutation(spaceId: string): UseTreeMutation {
         if (
           node &&
           pageSlug &&
-          (node.slugId === pageSlug.split("-")[1] ||
-            isPageInNode(node, pageSlug.split("-")[1]))
+          (node.slugId === pageSlug.split('-')[1] ||
+            isPageInNode(node, pageSlug.split('-')[1]))
         ) {
           navigate(getSpaceUrl(spaceSlug));
         }
@@ -241,16 +241,25 @@ export function useTreeMutation(spaceId: string): UseTreeMutation {
         setTimeout(() => {
           if (!node) return;
           emit({
-            operation: "deleteTreeNode",
+            operation: 'deleteTreeNode',
             spaceId,
-            payload: { node },
+            payload: { node }
           });
         }, 50);
       } catch (error) {
-        console.error("Failed to delete page:", error);
+        console.error('Failed to delete page:', error);
       }
     },
-    [removePageMutation, setData, store, pageSlug, navigate, spaceSlug, emit, spaceId],
+    [
+      removePageMutation,
+      setData,
+      store,
+      pageSlug,
+      navigate,
+      spaceSlug,
+      emit,
+      spaceId
+    ]
   );
 
   return { handleMove, handleCreate, handleRename, handleDelete };

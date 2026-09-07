@@ -11,7 +11,7 @@ import { dbOrTx } from '@docmost/db/utils';
 
 export const WatcherType = {
   PAGE: 'page',
-  SPACE: 'space',
+  SPACE: 'space'
 } as const;
 
 export type WatcherType = (typeof WatcherType)[keyof typeof WatcherType];
@@ -34,13 +34,13 @@ export class WatcherRepo {
       cursor: pagination.cursor,
       beforeCursor: pagination.beforeCursor,
       fields: [{ expression: 'id', direction: 'asc' }],
-      parseCursor: (cursor) => ({ id: cursor.id }),
+      parseCursor: (cursor) => ({ id: cursor.id })
     });
   }
 
   async getPageWatcherIds(
     pageId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<string[]> {
     const db = dbOrTx(this.db, trx);
     const watchers = await db
@@ -66,7 +66,7 @@ export class WatcherRepo {
   async getPageUpdateRecipientIds(
     pageId: string,
     spaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<string[]> {
     const db = dbOrTx(this.db, trx);
 
@@ -92,9 +92,9 @@ export class WatcherRepo {
               .whereRef('pw.userId', '=', 'sw.userId')
               .where('pw.pageId', '=', pageId)
               .where('pw.type', '=', WatcherType.PAGE)
-              .where('pw.mutedAt', 'is not', null),
-          ),
-        ),
+              .where('pw.mutedAt', 'is not', null)
+          )
+        )
       );
 
     const rows = await pageWatchers.union(spaceWatchers).execute();
@@ -103,7 +103,7 @@ export class WatcherRepo {
 
   async insert(
     watcher: InsertableWatcher,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<Watcher | undefined> {
     const db = dbOrTx(this.db, trx);
     return db
@@ -116,7 +116,7 @@ export class WatcherRepo {
 
   async insertMany(
     watchers: InsertableWatcher[],
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<void> {
     if (watchers.length === 0) return;
     const db = dbOrTx(this.db, trx);
@@ -129,7 +129,7 @@ export class WatcherRepo {
 
   async upsert(
     watcher: InsertableWatcher,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<Watcher | undefined> {
     const db = dbOrTx(this.db, trx);
     return db
@@ -139,7 +139,7 @@ export class WatcherRepo {
         oc
           .columns(['userId', 'pageId'])
           .where('pageId', 'is not', null)
-          .doUpdateSet({ mutedAt: null }),
+          .doUpdateSet({ mutedAt: null })
       )
       .returningAll()
       .executeTakeFirst();
@@ -147,7 +147,7 @@ export class WatcherRepo {
 
   async upsertSpace(
     watcher: InsertableWatcher,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<Watcher | undefined> {
     const db = dbOrTx(this.db, trx);
     return db
@@ -157,7 +157,7 @@ export class WatcherRepo {
         oc
           .columns(['userId', 'spaceId'])
           .where('pageId', 'is', null)
-          .doNothing(),
+          .doNothing()
       )
       .returningAll()
       .executeTakeFirst();
@@ -168,7 +168,7 @@ export class WatcherRepo {
     pageId: string,
     spaceId: string,
     workspaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<void> {
     const db = dbOrTx(this.db, trx);
     const mutedAt = new Date();
@@ -181,13 +181,13 @@ export class WatcherRepo {
         workspaceId,
         type: WatcherType.PAGE,
         addedById: userId,
-        mutedAt,
+        mutedAt
       })
       .onConflict((oc) =>
         oc
           .columns(['userId', 'pageId'])
           .where('pageId', 'is not', null)
-          .doUpdateSet({ mutedAt }),
+          .doUpdateSet({ mutedAt })
       )
       .execute();
   }
@@ -195,7 +195,7 @@ export class WatcherRepo {
   async deleteSpaceWatch(
     userId: string,
     spaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<void> {
     const db = dbOrTx(this.db, trx);
     await db
@@ -219,7 +219,7 @@ export class WatcherRepo {
     return executeWithCursorPagination(query, {
       perPage: 250,
       fields: [{ expression: 'watchers.id', direction: 'asc' }],
-      parseCursor: (cursor) => ({ id: cursor.id }),
+      parseCursor: (cursor) => ({ id: cursor.id })
     });
   }
 
@@ -263,7 +263,7 @@ export class WatcherRepo {
   async deleteByUsersWithoutSpaceAccess(
     userIds: string[],
     spaceId: string,
-    opts?: { trx?: KyselyTransaction },
+    opts?: { trx?: KyselyTransaction }
   ): Promise<void> {
     if (userIds.length === 0) return;
 
@@ -280,7 +280,7 @@ export class WatcherRepo {
           .selectFrom('spaceMembers')
           .innerJoin('groupUsers', 'groupUsers.groupId', 'spaceMembers.groupId')
           .select('groupUsers.userId')
-          .where('spaceMembers.spaceId', '=', spaceId),
+          .where('spaceMembers.spaceId', '=', spaceId)
       );
 
     await db
@@ -294,7 +294,7 @@ export class WatcherRepo {
   async updateSpaceIdByPageIds(
     spaceId: string,
     pageIds: string[],
-    opts?: { trx?: KyselyTransaction },
+    opts?: { trx?: KyselyTransaction }
   ): Promise<void> {
     if (pageIds.length === 0) return;
     const { trx } = opts;
@@ -309,7 +309,7 @@ export class WatcherRepo {
   async deleteByPageIdsWithoutSpaceAccess(
     pageIds: string[],
     spaceId: string,
-    opts?: { trx?: KyselyTransaction },
+    opts?: { trx?: KyselyTransaction }
   ): Promise<void> {
     if (pageIds.length === 0) return;
     const { trx } = opts;
@@ -325,7 +325,7 @@ export class WatcherRepo {
           .selectFrom('spaceMembers')
           .innerJoin('groupUsers', 'groupUsers.groupId', 'spaceMembers.groupId')
           .select('groupUsers.userId')
-          .where('spaceMembers.spaceId', '=', spaceId),
+          .where('spaceMembers.spaceId', '=', spaceId)
       );
 
     await db
@@ -338,7 +338,7 @@ export class WatcherRepo {
   async deleteByUserAndWorkspace(
     userId: string,
     workspaceId: string,
-    opts?: { trx?: KyselyTransaction },
+    opts?: { trx?: KyselyTransaction }
   ): Promise<void> {
     const { trx } = opts;
 
@@ -355,7 +355,7 @@ export class WatcherRepo {
       eb
         .selectFrom('users')
         .select(['users.id', 'users.name', 'users.avatarUrl', 'users.email'])
-        .whereRef('users.id', '=', 'watchers.userId'),
+        .whereRef('users.id', '=', 'watchers.userId')
     ).as('user');
   }
 }

@@ -30,7 +30,7 @@ export function getPageTitle(title: string) {
 
 export function getSafePageTitle(title: string): string {
   const sanitized = sanitizeFileName(getPageTitle(title), {
-    preserveSpaces: true,
+    preserveSpaces: true
   });
   return sanitized || 'untitled';
 }
@@ -70,7 +70,7 @@ export function replaceInternalLinks(
   prosemirrorJson: any,
   slugIdToPath: Record<string, string>,
   currentPagePath: string,
-  baseUrl?: string,
+  baseUrl?: string
 ) {
   const doc = jsonToNode(prosemirrorJson);
 
@@ -102,7 +102,10 @@ export function replaceInternalLinks(
             // if link and text are same, use page title
             if (markLink === node.text) {
               //@ts-expect-error
-              node.text = getInternalLinkPageName(relativePath, currentPagePath);
+              node.text = getInternalLinkPageName(
+                relativePath,
+                currentPagePath
+              );
             }
           }
         }
@@ -113,7 +116,10 @@ export function replaceInternalLinks(
   return doc.toJSON();
 }
 
-export function getInternalLinkPageName(path: string, currentFilePath?: string): string {
+export function getInternalLinkPageName(
+  path: string,
+  currentFilePath?: string
+): string {
   const name = path?.split('/').pop().split('.').slice(0, -1).join('.');
   try {
     return decodeURIComponent(name);
@@ -121,7 +127,7 @@ export function getInternalLinkPageName(path: string, currentFilePath?: string):
     if (currentFilePath) {
       Logger.warn(
         `URI malformed in page ${currentFilePath}: ${name}. Falling back to raw name.`,
-        'ExportUtils',
+        'ExportUtils'
       );
     }
     return name;
@@ -170,7 +176,7 @@ export function computeLocalPath(
   format: string,
   parentPageId: string | null,
   currentPath: string,
-  slugIdToPath: Record<string, string>,
+  slugIdToPath: Record<string, string>
 ) {
   const children = tree[parentPageId] || [];
 

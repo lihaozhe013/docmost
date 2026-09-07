@@ -1,45 +1,45 @@
-import type { Editor } from "@tiptap/react";
-import type { Node as PMNode } from "@tiptap/pm/model";
-import Lightbox, { type Slide } from "yet-another-react-lightbox";
-import type { LightboxRequest } from "@/features/editor/atoms/editor-atoms";
-import { getFileUrl } from "@/lib/config.ts";
-import "yet-another-react-lightbox/styles.css";
-import Download from "yet-another-react-lightbox/plugins/download";
-import Fullscreen from "yet-another-react-lightbox/plugins/fullscreen";
-import Video from "yet-another-react-lightbox/plugins/video";
-import Zoom from "yet-another-react-lightbox/plugins/zoom";
-import { useEffect, useMemo, useState } from "react";
-import i18n from "@/i18n.ts";
-import { useTranslation } from "react-i18next";
+import type { Editor } from '@tiptap/react';
+import type { Node as PMNode } from '@tiptap/pm/model';
+import Lightbox, { type Slide } from 'yet-another-react-lightbox';
+import type { LightboxRequest } from '@/features/editor/atoms/editor-atoms';
+import { getFileUrl } from '@/lib/config.ts';
+import 'yet-another-react-lightbox/styles.css';
+import Download from 'yet-another-react-lightbox/plugins/download';
+import Fullscreen from 'yet-another-react-lightbox/plugins/fullscreen';
+import Video from 'yet-another-react-lightbox/plugins/video';
+import Zoom from 'yet-another-react-lightbox/plugins/zoom';
+import { useEffect, useMemo, useState } from 'react';
+import i18n from '@/i18n.ts';
+import { useTranslation } from 'react-i18next';
 
 type LightboxViewProps = {
   editor: Editor;
   open: boolean;
   src: string;
-  type: "image" | "video";
+  type: 'image' | 'video';
   onClose: () => void;
 };
 
 function getVideoMimeType(src: string) {
-  const extension = src.split(/[?#]/, 1)[0].split(".").pop()?.toLowerCase();
+  const extension = src.split(/[?#]/, 1)[0].split('.').pop()?.toLowerCase();
 
   switch (extension) {
-    case "webm":
-      return "video/webm";
-    case "ogv":
-      return "video/ogg";
-    case "mov":
-      return "video/quicktime";
-    case "m4v":
-      return "video/x-m4v";
+    case 'webm':
+      return 'video/webm';
+    case 'ogv':
+      return 'video/ogg';
+    case 'mov':
+      return 'video/quicktime';
+    case 'm4v':
+      return 'video/x-m4v';
     default:
-      return "video/mp4";
+      return 'video/mp4';
   }
 }
 
 function getFilename(src: string) {
-  const filename = src.split(/[?#]/, 1)[0].split("/").pop();
-  if (!filename) return i18n.t("Media");
+  const filename = src.split(/[?#]/, 1)[0].split('/').pop();
+  if (!filename) return i18n.t('Media');
 
   try {
     return decodeURIComponent(filename);
@@ -52,39 +52,39 @@ function getMedia(rawSrc: string, type?: string, alt?: string): Slide {
   const src = getFileUrl(rawSrc);
   const filename = getFilename(rawSrc);
 
-  if (type === "video") {
+  if (type === 'video') {
     return {
-      type: "video",
+      type: 'video',
       sources: [{ src, type: getVideoMimeType(rawSrc) }],
-      download: { url: src, filename },
+      download: { url: src, filename }
     };
   } else {
     return {
-      type: "image",
+      type: 'image',
       src,
       alt: alt || undefined,
-      download: { url: src, filename },
+      download: { url: src, filename }
     };
   }
 }
 
-const LIGHTBOX_NODE_TYPES: Record<string, "image" | "video"> = {
-  image: "image",
-  video: "video",
-  drawio: "image",
-  excalidraw: "image",
+const LIGHTBOX_NODE_TYPES: Record<string, 'image' | 'video'> = {
+  image: 'image',
+  video: 'video',
+  drawio: 'image',
+  excalidraw: 'image'
 };
 
 // video is excluded: clicks there operate the native controls
-const CLICK_TO_EXPAND_NODE_TYPES = new Set(["image", "drawio", "excalidraw"]);
+const CLICK_TO_EXPAND_NODE_TYPES = new Set(['image', 'drawio', 'excalidraw']);
 
 export function getLightboxClickRequest(node: PMNode): LightboxRequest {
   if (!CLICK_TO_EXPAND_NODE_TYPES.has(node.type.name)) return null;
 
-  const src = typeof node.attrs.src === "string" ? node.attrs.src : "";
+  const src = typeof node.attrs.src === 'string' ? node.attrs.src : '';
   if (!src) return null;
 
-  return { src: getFileUrl(src), type: "image" };
+  return { src: getFileUrl(src), type: 'image' };
 }
 
 function getPageMedia(editor: Editor): Slide[] {
@@ -94,7 +94,7 @@ function getPageMedia(editor: Editor): Slide[] {
     const type = LIGHTBOX_NODE_TYPES[node.type.name];
     if (!type) return;
 
-    const rawSrc = typeof node.attrs.src === "string" ? node.attrs.src : "";
+    const rawSrc = typeof node.attrs.src === 'string' ? node.attrs.src : '';
     if (!rawSrc) return;
 
     media.push(getMedia(rawSrc, type, node.attrs.alt));
@@ -108,7 +108,7 @@ export default function LightboxView({
   open,
   src,
   type,
-  onClose,
+  onClose
 }: LightboxViewProps) {
   const { i18n: i18nInstance } = useTranslation();
 
@@ -140,7 +140,8 @@ export default function LightboxView({
     return () => cancelAnimationFrame(frame);
   }, [editor, open, type, src]);
 
-  const slides = loadedMediaKey === `${type}:${src}` ? pageSlides : [selectedSlide];
+  const slides =
+    loadedMediaKey === `${type}:${src}` ? pageSlides : [selectedSlide];
 
   const index = useMemo(() => {
     if (!(pageSlides.length > 0)) {
@@ -148,9 +149,9 @@ export default function LightboxView({
     }
 
     const idx = slides.findIndex((slide) =>
-      type === "video"
-        ? "sources" in slide && slide.sources.some((s) => s.src === src)
-        : "src" in slide && slide.src === src
+      type === 'video'
+        ? 'sources' in slide && slide.sources.some((s) => s.src === src)
+        : 'src' in slide && slide.src === src
     );
     return idx >= 0 ? idx : 0;
   }, [slides, src, type]);
@@ -163,25 +164,25 @@ export default function LightboxView({
       slides={slides}
       plugins={[Download, Fullscreen, Video, Zoom]}
       styles={{
-        container: { backgroundColor: "rgba(0, 0, 0, 0.8)" },
+        container: { backgroundColor: 'rgba(0, 0, 0, 0.8)' },
         icon: { width: 24, height: 24 },
         toolbar: {
           margin: 8,
           borderRadius: 8,
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
-        },
+          backgroundColor: 'rgba(0, 0, 0, 0.5)'
+        }
       }}
       controller={{ closeOnBackdropClick: !isFullscreen }}
       on={{
         enterFullscreen: () => setIsFullscreen(true),
-        exitFullscreen: () => setIsFullscreen(false),
+        exitFullscreen: () => setIsFullscreen(false)
       }}
       video={{ controls: true, playsInline: true }}
       zoom={{
         scrollToZoom: true,
         maxZoomPixelRatio: 4,
         maxZoom: 4,
-        supports: ["video"],
+        supports: ['video']
       }}
     />
   );

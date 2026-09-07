@@ -5,7 +5,7 @@ import { dbOrTx } from '../../utils';
 import {
   InsertableWorkspace,
   UpdatableWorkspace,
-  Workspace,
+  Workspace
 } from '@docmost/db/types/entity.types';
 import { ExpressionBuilder, sql } from 'kysely';
 import { DB, Workspaces } from '@docmost/db/types/db';
@@ -34,7 +34,7 @@ export class WorkspaceRepo {
     'plan',
     'enforceMfa',
     'trashRetentionDays',
-    'isScimEnabled',
+    'isScimEnabled'
   ];
   constructor(@InjectKysely() private readonly db: KyselyDB) {}
 
@@ -44,7 +44,7 @@ export class WorkspaceRepo {
       withLock?: boolean;
       withMemberCount?: boolean;
       trx?: KyselyTransaction;
-    },
+    }
   ): Promise<Workspace> {
     const db = dbOrTx(this.db, opts?.trx);
 
@@ -83,7 +83,7 @@ export class WorkspaceRepo {
 
   async hostnameExists(
     hostname: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<boolean> {
     if (hostname?.length < 1) return false;
 
@@ -100,7 +100,7 @@ export class WorkspaceRepo {
   async updateWorkspace(
     updatableWorkspace: UpdatableWorkspace,
     workspaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<Workspace> {
     const db = dbOrTx(this.db, trx);
     return db
@@ -113,7 +113,7 @@ export class WorkspaceRepo {
 
   async insertWorkspace(
     insertableWorkspace: InsertableWorkspace,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<Workspace> {
     const db = dbOrTx(this.db, trx);
     return db
@@ -149,7 +149,7 @@ export class WorkspaceRepo {
       .execute();
 
     const activeUsers = users.filter(
-      (user) => user.deletedAt === null && user.deactivatedAt === null,
+      (user) => user.deletedAt === null && user.deactivatedAt === null
     );
 
     return activeUsers.length;
@@ -159,7 +159,7 @@ export class WorkspaceRepo {
     workspaceId: string,
     prefKey: string,
     prefValue: string | boolean,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ) {
     const db = dbOrTx(this.db, trx);
     return db
@@ -168,7 +168,7 @@ export class WorkspaceRepo {
         settings: sql`COALESCE(settings, '{}'::jsonb)
                 || jsonb_build_object('api', COALESCE(settings->'api', '{}'::jsonb)
                 || jsonb_build_object('${sql.raw(prefKey)}', ${sql.lit(prefValue)}))`,
-        updatedAt: new Date(),
+        updatedAt: new Date()
       })
       .where('id', '=', workspaceId)
       .returning(this.baseFields)
@@ -179,7 +179,7 @@ export class WorkspaceRepo {
     workspaceId: string,
     prefKey: string,
     prefValue: string | boolean,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ) {
     const db = dbOrTx(this.db, trx);
     return db
@@ -188,7 +188,7 @@ export class WorkspaceRepo {
         settings: sql`COALESCE(settings, '{}'::jsonb)
                 || jsonb_build_object('ai', COALESCE(settings->'ai', '{}'::jsonb)
                 || jsonb_build_object('${sql.raw(prefKey)}', ${sql.lit(prefValue)}))`,
-        updatedAt: new Date(),
+        updatedAt: new Date()
       })
       .where('id', '=', workspaceId)
       .returning(this.baseFields)
@@ -198,7 +198,7 @@ export class WorkspaceRepo {
   async updateAiEmbeddingFingerprint(
     workspaceId: string,
     fingerprint: { driver: string; model: string; dimensions: number },
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ) {
     const db = dbOrTx(this.db, trx);
     return db
@@ -207,7 +207,7 @@ export class WorkspaceRepo {
         settings: sql`COALESCE(settings, '{}'::jsonb)
                 || jsonb_build_object('ai', COALESCE(settings->'ai', '{}'::jsonb)
                 || jsonb_build_object('embedding', ${JSON.stringify(fingerprint)}::text::jsonb))`,
-        updatedAt: new Date(),
+        updatedAt: new Date()
       })
       .where('id', '=', workspaceId)
       .execute();
@@ -217,7 +217,7 @@ export class WorkspaceRepo {
     workspaceId: string,
     prefKey: string,
     prefValue: string | boolean,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ) {
     const db = dbOrTx(this.db, trx);
     return db
@@ -226,7 +226,7 @@ export class WorkspaceRepo {
         settings: sql`COALESCE(settings, '{}'::jsonb)
                 || jsonb_build_object('sharing', COALESCE(settings->'sharing', '{}'::jsonb)
                 || jsonb_build_object('${sql.raw(prefKey)}', ${sql.lit(prefValue)}))`,
-        updatedAt: new Date(),
+        updatedAt: new Date()
       })
       .where('id', '=', workspaceId)
       .returning(this.baseFields)
@@ -237,7 +237,7 @@ export class WorkspaceRepo {
     workspaceId: string,
     prefKey: string,
     prefValue: string | boolean,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ) {
     const db = dbOrTx(this.db, trx);
     return db
@@ -246,7 +246,7 @@ export class WorkspaceRepo {
         settings: sql`COALESCE(settings, '{}'::jsonb)
                 || jsonb_build_object('templates', COALESCE(settings->'templates', '{}'::jsonb)
                 || jsonb_build_object('${sql.raw(prefKey)}', ${sql.lit(prefValue)}))`,
-        updatedAt: new Date(),
+        updatedAt: new Date()
       })
       .where('id', '=', workspaceId)
       .returning(this.baseFields)
@@ -257,7 +257,7 @@ export class WorkspaceRepo {
     workspaceId: string,
     prefKey: string,
     prefValue: string | boolean,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ) {
     const db = dbOrTx(this.db, trx);
     return db
@@ -266,7 +266,7 @@ export class WorkspaceRepo {
         settings: sql`COALESCE(settings, '{}'::jsonb)
                 || jsonb_build_object('spaces', COALESCE(settings->'spaces', '{}'::jsonb)
                 || jsonb_build_object('${sql.raw(prefKey)}', ${sql.lit(prefValue)}))`,
-        updatedAt: new Date(),
+        updatedAt: new Date()
       })
       .where('id', '=', workspaceId)
       .returning(this.baseFields)
@@ -276,7 +276,7 @@ export class WorkspaceRepo {
   async updateDefaultPageEditMode(
     workspaceId: string,
     pageEditMode: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ) {
     const db = dbOrTx(this.db, trx);
     return db
@@ -284,11 +284,10 @@ export class WorkspaceRepo {
       .set({
         settings: sql`COALESCE(settings, '{}'::jsonb)
                 || jsonb_build_object('defaultPageEditMode', ${sql.lit(pageEditMode)})`,
-        updatedAt: new Date(),
+        updatedAt: new Date()
       })
       .where('id', '=', workspaceId)
       .returning(this.baseFields)
       .executeTakeFirst();
   }
-
 }

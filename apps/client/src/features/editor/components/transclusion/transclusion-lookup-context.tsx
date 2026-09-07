@@ -5,13 +5,13 @@ import React, {
   useEffect,
   useMemo,
   useRef,
-  useState,
-} from "react";
+  useState
+} from 'react';
 import {
   lookupTransclusion,
-  lookupTransclusionForShare,
-} from "@/features/transclusion/services/transclusion-api";
-import type { TransclusionLookup } from "@/features/transclusion/types/transclusion.types";
+  lookupTransclusionForShare
+} from '@/features/transclusion/services/transclusion-api';
+import type { TransclusionLookup } from '@/features/transclusion/types/transclusion.types';
 
 type LookupKey = string; // `${sourcePageId}::${transclusionId}`
 
@@ -37,7 +37,7 @@ const TransclusionLookupContext = createContext<ContextValue | null>(null);
 
 export function TransclusionLookupProvider({
   children,
-  shareId,
+  shareId
 }: {
   children: React.ReactNode;
   /**
@@ -78,7 +78,7 @@ export function TransclusionLookupProvider({
     for (const k of keys) inFlightRef.current.add(k);
 
     const references = keys.map((k) => {
-      const [sourcePageId, transclusionId] = k.split("::");
+      const [sourcePageId, transclusionId] = k.split('::');
       return { sourcePageId, transclusionId };
     });
 
@@ -94,7 +94,7 @@ export function TransclusionLookupProvider({
       const { items } = activeShareId
         ? await lookupTransclusionForShare({
             shareId: activeShareId,
-            references,
+            references
           })
         : await lookupTransclusion({ references });
       for (const r of items) {
@@ -124,10 +124,10 @@ export function TransclusionLookupProvider({
         tickRef.current = setTimeout(flush, 10);
       }
     },
-    [flush],
+    [flush]
   );
 
-  const subscribe = useCallback<ContextValue["subscribe"]>(
+  const subscribe = useCallback<ContextValue['subscribe']>(
     (s) => {
       const list = subscribersRef.current.get(s.key) ?? [];
       list.push(s);
@@ -147,10 +147,10 @@ export function TransclusionLookupProvider({
         else subscribersRef.current.set(s.key, next);
       };
     },
-    [enqueue],
+    [enqueue]
   );
 
-  const refresh = useCallback<ContextValue["refresh"]>(
+  const refresh = useCallback<ContextValue['refresh']>(
     (key) =>
       new Promise<void>((resolve) => {
         resultCacheRef.current.delete(key);
@@ -160,19 +160,19 @@ export function TransclusionLookupProvider({
         pendingRef.current.set(key, waiters);
         enqueue(key);
       }),
-    [enqueue],
+    [enqueue]
   );
 
   useEffect(
     () => () => {
       if (tickRef.current) clearTimeout(tickRef.current);
     },
-    [],
+    []
   );
 
   const value = useMemo<ContextValue>(
     () => ({ subscribe, refresh }),
-    [subscribe, refresh],
+    [subscribe, refresh]
   );
 
   return (
@@ -184,7 +184,7 @@ export function TransclusionLookupProvider({
 
 export function useTransclusionLookup(
   sourcePageId: string | null | undefined,
-  transclusionId: string | null | undefined,
+  transclusionId: string | null | undefined
 ): {
   result: TransclusionLookup | null;
   refresh: () => Promise<void>;
@@ -199,7 +199,7 @@ export function useTransclusionLookup(
       key,
       sourcePageId,
       transclusionId,
-      setResult,
+      setResult
     });
     return unsubscribe;
   }, [ctx, sourcePageId, transclusionId]);

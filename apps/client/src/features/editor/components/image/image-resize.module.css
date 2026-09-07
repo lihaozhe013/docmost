@@ -31,11 +31,11 @@
   z-index: 2;
 }
 
-.handle[data-resize-handle="left"] {
+.handle[data-resize-handle='left'] {
   left: -8px;
 }
 
-.handle[data-resize-handle="right"] {
+.handle[data-resize-handle='right'] {
   right: -8px;
 }
 
@@ -52,13 +52,22 @@
   height: 48px;
   border-radius: 4px;
   transition: background-color 0.15s ease;
-  background-color: light-dark(var(--mantine-color-blue-4), var(--mantine-color-blue-5));
+  background-color: light-dark(
+    var(--mantine-color-blue-4),
+    var(--mantine-color-blue-5)
+  );
 }
 
 .handle:hover .handleBar {
-  background-color: light-dark(var(--mantine-color-blue-6), var(--mantine-color-blue-4));
+  background-color: light-dark(
+    var(--mantine-color-blue-6),
+    var(--mantine-color-blue-4)
+  );
 }
 
 .resizing .handleBar {
-  background-color: light-dark(var(--mantine-color-blue-6), var(--mantine-color-blue-4));
+  background-color: light-dark(
+    var(--mantine-color-blue-6),
+    var(--mantine-color-blue-4)
+  );
 }

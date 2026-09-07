@@ -1,6 +1,6 @@
-import { NodeViewProps, NodeViewWrapper } from "@tiptap/react";
-import React, { useMemo, useCallback } from "react";
-import clsx from "clsx";
+import { NodeViewProps, NodeViewWrapper } from '@tiptap/react';
+import React, { useMemo, useCallback } from 'react';
+import clsx from 'clsx';
 import {
   ActionIcon,
   Button,
@@ -9,25 +9,25 @@ import {
   Group,
   Popover,
   Text,
-  TextInput,
-} from "@mantine/core";
-import { IconEdit } from "@tabler/icons-react";
-import { z } from "zod/v4";
-import { useForm } from "@mantine/form";
-import { zod4Resolver } from "mantine-form-zod-resolver";
-import { notifications } from "@mantine/notifications";
-import { useTranslation } from "react-i18next";
-import i18n from "i18next";
+  TextInput
+} from '@mantine/core';
+import { IconEdit } from '@tabler/icons-react';
+import { z } from 'zod/v4';
+import { useForm } from '@mantine/form';
+import { zod4Resolver } from 'mantine-form-zod-resolver';
+import { notifications } from '@mantine/notifications';
+import { useTranslation } from 'react-i18next';
+import i18n from 'i18next';
 import {
   getEmbedProviderById,
   getEmbedUrlAndProvider,
-  sanitizeUrl,
-} from "@docmost/editor-ext";
-import { ResizableWrapper } from "../common/resizable-wrapper";
-import classes from "./embed-view.module.css";
+  sanitizeUrl
+} from '@docmost/editor-ext';
+import { ResizableWrapper } from '../common/resizable-wrapper';
+import classes from './embed-view.module.css';
 
 const schema = z.object({
-  url: z.url({ message: i18n.t("Please enter a valid url") }).trim(),
+  url: z.url({ message: i18n.t('Please enter a valid url') }).trim()
 });
 
 export default function EmbedView(props: NodeViewProps) {
@@ -44,16 +44,16 @@ export default function EmbedView(props: NodeViewProps) {
 
   const embedForm = useForm<{ url: string }>({
     initialValues: {
-      url: "",
+      url: ''
     },
-    validate: zod4Resolver(schema),
+    validate: zod4Resolver(schema)
   });
 
   const handleResize = useCallback(
     (newWidth: number, newHeight: number) => {
       updateAttributes({ width: newWidth, height: newHeight });
     },
-    [updateAttributes],
+    [updateAttributes]
   );
 
   async function onSubmit(data: { url: string }) {
@@ -63,7 +63,7 @@ export default function EmbedView(props: NodeViewProps) {
 
     if (provider) {
       const embedProvider = getEmbedProviderById(provider);
-      if (embedProvider.id === "iframe") {
+      if (embedProvider.id === 'iframe') {
         updateAttributes({ src: sanitizeUrl(data.url) });
         return;
       }
@@ -71,11 +71,11 @@ export default function EmbedView(props: NodeViewProps) {
         updateAttributes({ src: sanitizeUrl(data.url) });
       } else {
         notifications.show({
-          message: t("Invalid {{provider}} embed link", {
-            provider: embedProvider.name,
+          message: t('Invalid {{provider}} embed link', {
+            provider: embedProvider.name
           }),
-          position: "top-right",
-          color: "red",
+          position: 'top-right',
+          color: 'red'
         });
       }
     }
@@ -96,7 +96,7 @@ export default function EmbedView(props: NodeViewProps) {
             isEditable={editor.isEditable}
             selected={selected}
             className={clsx(classes.embedWrapper, {
-              "ProseMirror-selectednode": selected,
+              'ProseMirror-selectednode': selected
             })}
           >
             <iframe
@@ -123,25 +123,25 @@ export default function EmbedView(props: NodeViewProps) {
               radius="md"
               p="xs"
               style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center'
               }}
               withBorder
-              className={clsx(selected ? "ProseMirror-selectednode" : "")}
+              className={clsx(selected ? 'ProseMirror-selectednode' : '')}
             >
-              <div style={{ display: "flex", alignItems: "center" }}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
                 <ActionIcon
                   variant="transparent"
                   color="gray"
-                  aria-label={t("Edit embed")}
+                  aria-label={t('Edit embed')}
                 >
                   <IconEdit size={18} />
                 </ActionIcon>
 
                 <Text component="span" size="lg" c="dimmed">
-                  {t("Embed {{provider}}", {
-                    provider: getEmbedProviderById(provider)?.name,
+                  {t('Embed {{provider}}', {
+                    provider: getEmbedProviderById(provider)?.name
                   })}
                 </Text>
               </div>
@@ -151,17 +151,17 @@ export default function EmbedView(props: NodeViewProps) {
             <form onSubmit={embedForm.onSubmit(onSubmit)}>
               <FocusTrap active={true}>
                 <TextInput
-                  placeholder={t("Enter {{provider}} link to embed", {
-                    provider: getEmbedProviderById(provider).name,
+                  placeholder={t('Enter {{provider}} link to embed', {
+                    provider: getEmbedProviderById(provider).name
                   })}
-                  key={embedForm.key("url")}
-                  {...embedForm.getInputProps("url")}
+                  key={embedForm.key('url')}
+                  {...embedForm.getInputProps('url')}
                   data-autofocus
                 />
               </FocusTrap>
 
               <Group justify="center" mt="xs">
-                <Button type="submit">{t("Embed link")}</Button>
+                <Button type="submit">{t('Embed link')}</Button>
               </Group>
             </form>
           </Popover.Dropdown>

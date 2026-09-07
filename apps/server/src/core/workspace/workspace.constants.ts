@@ -108,5 +108,5 @@ export const DISALLOWED_HOSTNAMES = [
   'workspace',
   'space',
   'group',
-  'members',
+  'members'
 ];

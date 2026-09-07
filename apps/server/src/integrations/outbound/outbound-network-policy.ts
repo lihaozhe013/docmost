@@ -40,7 +40,7 @@ function hasHostBits(bytes: number[], prefix: number): boolean {
 
 /** Prefix zero is reserved for the explicit `all` mode. */
 function parseCidr(
-  raw: string,
+  raw: string
 ): { address: string; prefix: number; family: 'ipv4' | 'ipv6' } | null {
   const [address, prefixRaw] = raw.split('/');
   if (!prefixRaw) return null;
@@ -99,12 +99,13 @@ export function parseOutboundNetworkPolicy(raw: string): OutboundNetworkPolicy {
 export function policyNamesAddress(
   policy: OutboundNetworkPolicy,
   ip: string,
-  port: number,
+  port: number
 ): boolean {
   const family = isIPv4(ip) ? 'ipv4' : isIPv6(ip) ? 'ipv6' : null;
   if (!family) return false;
   return policy.entries.some(
     (entry) =>
-      (entry.port === undefined || entry.port === port) && entry.list.check(ip, family),
+      (entry.port === undefined || entry.port === port) &&
+      entry.list.check(ip, family)
   );
 }

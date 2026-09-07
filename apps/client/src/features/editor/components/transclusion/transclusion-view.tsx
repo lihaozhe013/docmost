@@ -1,21 +1,17 @@
-import {
-  NodeViewContent,
-  NodeViewProps,
-  NodeViewWrapper,
-} from "@tiptap/react";
-import { ActionIcon, Menu, Tooltip } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
+import { NodeViewContent, NodeViewProps, NodeViewWrapper } from '@tiptap/react';
+import { ActionIcon, Menu, Tooltip } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import {
   IconCheck,
   IconCopy,
   IconDots,
   IconLinkOff,
-  IconTrash,
-} from "@tabler/icons-react";
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
-import classes from "./transclusion.module.css";
-import SyncBlockReferencesDropdown from "@/features/transclusion/components/sync-block-references-dropdown";
+  IconTrash
+} from '@tabler/icons-react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import classes from './transclusion.module.css';
+import SyncBlockReferencesDropdown from '@/features/transclusion/components/sync-block-references-dropdown';
 
 export default function TransclusionView(props: NodeViewProps) {
   const { editor, node, deleteNode } = props;
@@ -36,9 +32,9 @@ export default function TransclusionView(props: NodeViewProps) {
     try {
       await navigator.clipboard.write([
         new ClipboardItem({
-          "text/html": new Blob([html], { type: "text/html" }),
-          "text/plain": new Blob([html], { type: "text/plain" }),
-        }),
+          'text/html': new Blob([html], { type: 'text/html' }),
+          'text/plain': new Blob([html], { type: 'text/plain' })
+        })
       ]);
     } catch {
       // Fallback for browsers without ClipboardItem write support
@@ -51,7 +47,7 @@ export default function TransclusionView(props: NodeViewProps) {
     setCopied(true);
     window.setTimeout(() => setCopied(false), 2000);
     notifications.show({
-      message: t("Copied. Paste on any page to embed this synced block."),
+      message: t('Copied. Paste on any page to embed this synced block.')
     });
   };
 
@@ -62,8 +58,8 @@ export default function TransclusionView(props: NodeViewProps) {
   return (
     <NodeViewWrapper
       className={classes.transclusionWrap}
-      data-editable={isEditable ? "true" : "false"}
-      data-menu-open={openMenus > 0 ? "true" : "false"}
+      data-editable={isEditable ? 'true' : 'false'}
+      data-menu-open={openMenus > 0 ? 'true' : 'false'}
       data-id={transclusionId ?? undefined}
     >
       {isEditable && (
@@ -84,10 +80,10 @@ export default function TransclusionView(props: NodeViewProps) {
 
           <span className={classes.controlsDivider} />
 
-          <Tooltip label={copied ? t("Copied") : t("Copy synced block")}>
+          <Tooltip label={copied ? t('Copied') : t('Copy synced block')}>
             <ActionIcon
               variant="subtle"
-              color={copied ? "teal" : "gray"}
+              color={copied ? 'teal' : 'gray'}
               size="sm"
               onClick={handleCopy}
               disabled={!sourcePageId || !transclusionId}
@@ -107,14 +103,14 @@ export default function TransclusionView(props: NodeViewProps) {
                 leftSection={<IconLinkOff size={14} />}
                 onClick={handleUnsync}
               >
-                {t("Unsync")}
+                {t('Unsync')}
               </Menu.Item>
               <Menu.Item
                 color="red"
                 leftSection={<IconTrash size={14} />}
                 onClick={() => deleteNode()}
               >
-                {t("Delete synced block")}
+                {t('Delete synced block')}
               </Menu.Item>
             </Menu.Dropdown>
           </Menu>

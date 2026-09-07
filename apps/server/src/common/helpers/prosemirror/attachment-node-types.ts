@@ -5,7 +5,7 @@ const ATTACHMENT_NODE_TYPES = [
   'audio',
   'pdf',
   'excalidraw',
-  'drawio',
+  'drawio'
 ];
 
 export function isAttachmentNode(nodeType: string): boolean {

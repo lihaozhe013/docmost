@@ -1,24 +1,31 @@
-import { BubbleMenu as BaseBubbleMenu } from "@tiptap/react/menus";
-import { findParentNode, posToDOMRect, useEditorState } from "@tiptap/react";
-import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
-import { useSetAtom } from "jotai";
-import { Node as PMNode } from "@tiptap/pm/model";
-import { isEditorReady } from "@docmost/editor-ext";
+import { BubbleMenu as BaseBubbleMenu } from '@tiptap/react/menus';
+import { findParentNode, posToDOMRect, useEditorState } from '@tiptap/react';
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState
+} from 'react';
+import { useSetAtom } from 'jotai';
+import { Node as PMNode } from '@tiptap/pm/model';
+import { isEditorReady } from '@docmost/editor-ext';
 import {
   EditorMenuProps,
-  ShouldShowProps,
-} from "@/features/editor/components/table/types/types.ts";
+  ShouldShowProps
+} from '@/features/editor/components/table/types/types.ts';
 import {
   ActionIcon,
   Button,
   Group,
   Text,
   Tooltip,
-  useComputedColorScheme,
-} from "@mantine/core";
-import { modals } from "@mantine/modals";
-import { useDisclosure } from "@mantine/hooks";
-import clsx from "clsx";
+  useComputedColorScheme
+} from '@mantine/core';
+import { modals } from '@mantine/modals';
+import { useDisclosure } from '@mantine/hooks';
+import clsx from 'clsx';
 import {
   IconLayoutAlignCenter,
   IconLayoutAlignLeft,
@@ -26,26 +33,26 @@ import {
   IconDownload,
   IconEdit,
   IconTrash,
-  IconZoomIn,
-} from "@tabler/icons-react";
-import { useTranslation } from "react-i18next";
-import { getFileUrl } from "@/lib/config.ts";
-import { uploadFile } from "@/features/page/services/page-service.ts";
-import { svgStringToFile } from "@/lib";
-import "@excalidraw/excalidraw/index.css";
-import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
-import { IAttachment } from "@/features/attachments/types/attachment.types";
-import ReactClearModal from "react-clear-modal";
-import { useHandleLibrary } from "@excalidraw/excalidraw";
-import { localStorageLibraryAdapter } from "@/features/editor/components/excalidraw/excalidraw-utils.ts";
-import { useAltTextControl } from "@/features/editor/components/common/use-alt-text-control.tsx";
-import { lightboxRequestAtom } from "@/features/editor/atoms/editor-atoms";
-import classes from "../common/toolbar-menu.module.css";
+  IconZoomIn
+} from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
+import { getFileUrl } from '@/lib/config.ts';
+import { uploadFile } from '@/features/page/services/page-service.ts';
+import { svgStringToFile } from '@/lib';
+import '@excalidraw/excalidraw/index.css';
+import type { ExcalidrawImperativeAPI } from '@excalidraw/excalidraw/types';
+import { IAttachment } from '@/features/attachments/types/attachment.types';
+import ReactClearModal from 'react-clear-modal';
+import { useHandleLibrary } from '@excalidraw/excalidraw';
+import { localStorageLibraryAdapter } from '@/features/editor/components/excalidraw/excalidraw-utils.ts';
+import { useAltTextControl } from '@/features/editor/components/common/use-alt-text-control.tsx';
+import { lightboxRequestAtom } from '@/features/editor/atoms/editor-atoms';
+import classes from '../common/toolbar-menu.module.css';
 
 const ExcalidrawComponent = lazy(() =>
-  import("@excalidraw/excalidraw").then((module) => ({
-    default: module.Excalidraw,
-  })),
+  import('@excalidraw/excalidraw').then((module) => ({
+    default: module.Excalidraw
+  }))
 );
 
 export function ExcalidrawMenu({ editor }: EditorMenuProps) {
@@ -56,7 +63,7 @@ export function ExcalidrawMenu({ editor }: EditorMenuProps) {
     useState<ExcalidrawImperativeAPI>(null);
   useHandleLibrary({
     excalidrawAPI,
-    adapter: localStorageLibraryAdapter,
+    adapter: localStorageLibraryAdapter
   });
   const [excalidrawData, setExcalidrawData] = useState<any>(null);
   const computedColorScheme = useComputedColorScheme();
@@ -65,7 +72,7 @@ export function ExcalidrawMenu({ editor }: EditorMenuProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const isInitialLoadRef = useRef(true);
-  const lastFingerprintRef = useRef("");
+  const lastFingerprintRef = useRef('');
 
   const editorState = useEditorState({
     editor,
@@ -74,17 +81,17 @@ export function ExcalidrawMenu({ editor }: EditorMenuProps) {
         return null;
       }
 
-      const excalidrawAttr = ctx.editor.getAttributes("excalidraw");
+      const excalidrawAttr = ctx.editor.getAttributes('excalidraw');
       return {
-        isExcalidraw: ctx.editor.isActive("excalidraw"),
-        isAlignLeft: ctx.editor.isActive("excalidraw", { align: "left" }),
-        isAlignCenter: ctx.editor.isActive("excalidraw", { align: "center" }),
-        isAlignRight: ctx.editor.isActive("excalidraw", { align: "right" }),
+        isExcalidraw: ctx.editor.isActive('excalidraw'),
+        isAlignLeft: ctx.editor.isActive('excalidraw', { align: 'left' }),
+        isAlignCenter: ctx.editor.isActive('excalidraw', { align: 'center' }),
+        isAlignRight: ctx.editor.isActive('excalidraw', { align: 'right' }),
         src: excalidrawAttr?.src || null,
         attachmentId: excalidrawAttr?.attachmentId || null,
-        alt: excalidrawAttr?.alt || "",
+        alt: excalidrawAttr?.alt || ''
       };
-    },
+    }
   });
 
   const shouldShow = useCallback(
@@ -94,16 +101,16 @@ export function ExcalidrawMenu({ editor }: EditorMenuProps) {
       }
 
       return (
-        editor.isActive("excalidraw") && editor.getAttributes("excalidraw")?.src
+        editor.isActive('excalidraw') && editor.getAttributes('excalidraw')?.src
       );
     },
-    [editor],
+    [editor]
   );
 
   const getReferencedVirtualElement = useCallback(() => {
     if (!isEditorReady(editor)) return;
     const { selection } = editor.state;
-    const predicate = (node: PMNode) => node.type.name === "excalidraw";
+    const predicate = (node: PMNode) => node.type.name === 'excalidraw';
     const parent = findParentNode(predicate)(selection);
 
     if (parent) {
@@ -111,14 +118,14 @@ export function ExcalidrawMenu({ editor }: EditorMenuProps) {
       const domRect = dom.getBoundingClientRect();
       return {
         getBoundingClientRect: () => domRect,
-        getClientRects: () => [domRect],
+        getClientRects: () => [domRect]
       };
     }
 
     const domRect = posToDOMRect(editor.view, selection.from, selection.to);
     return {
       getBoundingClientRect: () => domRect,
-      getClientRects: () => [domRect],
+      getClientRects: () => [domRect]
     };
   }, [editor]);
 
@@ -126,7 +133,7 @@ export function ExcalidrawMenu({ editor }: EditorMenuProps) {
     editor
       .chain()
       .focus(undefined, { scrollIntoView: false })
-      .setExcalidrawAlign("left")
+      .setExcalidrawAlign('left')
       .run();
   }, [editor]);
 
@@ -134,7 +141,7 @@ export function ExcalidrawMenu({ editor }: EditorMenuProps) {
     editor
       .chain()
       .focus(undefined, { scrollIntoView: false })
-      .setExcalidrawAlign("center")
+      .setExcalidrawAlign('center')
       .run();
   }, [editor]);
 
@@ -142,16 +149,16 @@ export function ExcalidrawMenu({ editor }: EditorMenuProps) {
     editor
       .chain()
       .focus(undefined, { scrollIntoView: false })
-      .setExcalidrawAlign("right")
+      .setExcalidrawAlign('right')
       .run();
   }, [editor]);
 
   const handleDownload = useCallback(() => {
     if (!editorState?.src) return;
     const url = getFileUrl(editorState.src);
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = url;
-    a.download = "";
+    a.download = '';
     a.click();
   }, [editorState?.src]);
 
@@ -162,11 +169,11 @@ export function ExcalidrawMenu({ editor }: EditorMenuProps) {
   const {
     button: altTextButton,
     panel: altTextPanel,
-    isEditing: isEditingAlt,
+    isEditing: isEditingAlt
   } = useAltTextControl({
     editor,
-    nodeName: "excalidraw",
-    currentAlt: editorState?.alt || "",
+    nodeName: 'excalidraw',
+    currentAlt: editorState?.alt || ''
   });
 
   const handleOpen = useCallback(async () => {
@@ -176,11 +183,11 @@ export function ExcalidrawMenu({ editor }: EditorMenuProps) {
     try {
       const url = getFileUrl(editorState.src);
       const request = await fetch(url, {
-        credentials: "include",
-        cache: "no-store",
+        credentials: 'include',
+        cache: 'no-store'
       });
 
-      const { loadFromBlob } = await import("@excalidraw/excalidraw");
+      const { loadFromBlob } = await import('@excalidraw/excalidraw');
       const data = await loadFromBlob(await request.blob(), null, null);
       setExcalidrawData(data);
     } catch (err) {
@@ -202,15 +209,15 @@ export function ExcalidrawMenu({ editor }: EditorMenuProps) {
     setIsSaving(true);
 
     try {
-      const { exportToSvg } = await import("@excalidraw/excalidraw");
+      const { exportToSvg } = await import('@excalidraw/excalidraw');
 
       const svg = await exportToSvg({
         elements: excalidrawAPI?.getSceneElements(),
         appState: {
           exportEmbedScene: true,
-          exportWithDarkMode: false,
+          exportWithDarkMode: false
         },
-        files: excalidrawAPI?.getFiles(),
+        files: excalidrawAPI?.getFiles()
       });
 
       const serializer = new XMLSerializer();
@@ -218,10 +225,10 @@ export function ExcalidrawMenu({ editor }: EditorMenuProps) {
 
       svgString = svgString.replace(
         /https:\/\/unpkg\.com\/@excalidraw\/excalidraw@undefined/g,
-        "https://unpkg.com/@excalidraw/excalidraw@latest",
+        'https://unpkg.com/@excalidraw/excalidraw@latest'
       );
 
-      const fileName = "diagram.excalidraw.svg";
+      const fileName = 'diagram.excalidraw.svg';
       const excalidrawSvgFile = await svgStringToFile(svgString, fileName);
 
       // @ts-ignore
@@ -235,11 +242,11 @@ export function ExcalidrawMenu({ editor }: EditorMenuProps) {
         attachment = await uploadFile(excalidrawSvgFile, pageId);
       }
 
-      editor.commands.updateAttributes("excalidraw", {
+      editor.commands.updateAttributes('excalidraw', {
         src: `/api/files/${attachment.id}/${attachment.fileName}?t=${new Date(attachment.updatedAt).getTime()}`,
         title: attachment.fileName,
         size: attachment.fileSize,
-        attachmentId: attachment.id,
+        attachmentId: attachment.id
       });
 
       isDirtyRef.current = false;
@@ -265,19 +272,19 @@ export function ExcalidrawMenu({ editor }: EditorMenuProps) {
     }
 
     modals.openConfirmModal({
-      title: t("Unsaved changes"),
+      title: t('Unsaved changes'),
       children: (
         <Text size="sm">
-          {t("You have unsaved changes that will be lost.")}
+          {t('You have unsaved changes that will be lost.')}
         </Text>
       ),
       centered: true,
-      labels: { confirm: t("Discard"), cancel: t("Cancel") },
-      confirmProps: { color: "red" },
+      labels: { confirm: t('Discard'), cancel: t('Cancel') },
+      confirmProps: { color: 'red' },
       onConfirm: () => {
         isDirtyRef.current = false;
         close();
-      },
+      }
     });
   }, [close, t]);
 
@@ -301,9 +308,9 @@ export function ExcalidrawMenu({ editor }: EditorMenuProps) {
         updateDelay={0}
         getReferencedVirtualElement={getReferencedVirtualElement}
         options={{
-          placement: "top",
+          placement: 'top',
           offset: 8,
-          flip: false,
+          flip: false
         }}
         shouldShow={shouldShow}
       >
@@ -311,117 +318,125 @@ export function ExcalidrawMenu({ editor }: EditorMenuProps) {
           altTextPanel
         ) : (
           <div className={classes.toolbar}>
-          <Tooltip position="top" label={t("Align left")} withinPortal={false}>
-            <ActionIcon
-              onClick={alignLeft}
-              size="lg"
-              aria-label={t("Align left")}
-              variant="subtle"
-              className={clsx({
-                [classes.active]: editorState?.isAlignLeft,
-              })}
+            <Tooltip
+              position="top"
+              label={t('Align left')}
+              withinPortal={false}
             >
-              <IconLayoutAlignLeft size={18} />
-            </ActionIcon>
-          </Tooltip>
+              <ActionIcon
+                onClick={alignLeft}
+                size="lg"
+                aria-label={t('Align left')}
+                variant="subtle"
+                className={clsx({
+                  [classes.active]: editorState?.isAlignLeft
+                })}
+              >
+                <IconLayoutAlignLeft size={18} />
+              </ActionIcon>
+            </Tooltip>
 
-          <Tooltip
-            position="top"
-            label={t("Align center")}
-            withinPortal={false}
-          >
-            <ActionIcon
-              onClick={alignCenter}
-              size="lg"
-              aria-label={t("Align center")}
-              variant="subtle"
-              className={clsx({
-                [classes.active]: editorState?.isAlignCenter,
-              })}
+            <Tooltip
+              position="top"
+              label={t('Align center')}
+              withinPortal={false}
             >
-              <IconLayoutAlignCenter size={18} />
-            </ActionIcon>
-          </Tooltip>
+              <ActionIcon
+                onClick={alignCenter}
+                size="lg"
+                aria-label={t('Align center')}
+                variant="subtle"
+                className={clsx({
+                  [classes.active]: editorState?.isAlignCenter
+                })}
+              >
+                <IconLayoutAlignCenter size={18} />
+              </ActionIcon>
+            </Tooltip>
 
-          <Tooltip position="top" label={t("Align right")} withinPortal={false}>
-            <ActionIcon
-              onClick={alignRight}
-              size="lg"
-              aria-label={t("Align right")}
-              variant="subtle"
-              className={clsx({
-                [classes.active]: editorState?.isAlignRight,
-              })}
+            <Tooltip
+              position="top"
+              label={t('Align right')}
+              withinPortal={false}
             >
-              <IconLayoutAlignRight size={18} />
-            </ActionIcon>
-          </Tooltip>
+              <ActionIcon
+                onClick={alignRight}
+                size="lg"
+                aria-label={t('Align right')}
+                variant="subtle"
+                className={clsx({
+                  [classes.active]: editorState?.isAlignRight
+                })}
+              >
+                <IconLayoutAlignRight size={18} />
+              </ActionIcon>
+            </Tooltip>
 
-          <div className={classes.divider} />
+            <div className={classes.divider} />
 
-          {altTextButton}
+            {altTextButton}
 
-          <div className={classes.divider} />
+            <div className={classes.divider} />
 
-          <Tooltip position="top" label={t("Expand")} withinPortal={false}>
-            <ActionIcon
-              onClick={() =>
-                editorState?.src &&
-                setLightboxRequest({
-                  src: getFileUrl(editorState.src),
-                  type: "image",
-                })
-              }
-              size="lg"
-              aria-label={t("Expand")}
-              variant="subtle"
-            >
-              <IconZoomIn size={18} />
-            </ActionIcon>
-          </Tooltip>
+            <Tooltip position="top" label={t('Expand')} withinPortal={false}>
+              <ActionIcon
+                onClick={() =>
+                  editorState?.src &&
+                  setLightboxRequest({
+                    src: getFileUrl(editorState.src),
+                    type: 'image'
+                  })
+                }
+                size="lg"
+                aria-label={t('Expand')}
+                variant="subtle"
+              >
+                <IconZoomIn size={18} />
+              </ActionIcon>
+            </Tooltip>
 
-          <Tooltip position="top" label={t("Edit")} withinPortal={false}>
-            <ActionIcon
-              onClick={handleOpen}
-              size="lg"
-              aria-label={t("Edit")}
-              variant="subtle"
-              loading={isLoading}
-            >
-              <IconEdit size={18} />
-            </ActionIcon>
-          </Tooltip>
+            <Tooltip position="top" label={t('Edit')} withinPortal={false}>
+              <ActionIcon
+                onClick={handleOpen}
+                size="lg"
+                aria-label={t('Edit')}
+                variant="subtle"
+                loading={isLoading}
+              >
+                <IconEdit size={18} />
+              </ActionIcon>
+            </Tooltip>
 
-          <Tooltip position="top" label={t("Download")} withinPortal={false}>
-            <ActionIcon
-              onClick={handleDownload}
-              size="lg"
-              aria-label={t("Download")}
-              variant="subtle"
-            >
-              <IconDownload size={18} />
-            </ActionIcon>
-          </Tooltip>
+            <Tooltip position="top" label={t('Download')} withinPortal={false}>
+              <ActionIcon
+                onClick={handleDownload}
+                size="lg"
+                aria-label={t('Download')}
+                variant="subtle"
+              >
+                <IconDownload size={18} />
+              </ActionIcon>
+            </Tooltip>
 
-          <Tooltip position="top" label={t("Delete")} withinPortal={false}>
-            <ActionIcon
-              onClick={handleDelete}
-              size="lg"
-              aria-label={t("Delete")}
-              variant="subtle"
-            >
-              <IconTrash size={18} />
-            </ActionIcon>
-          </Tooltip>
+            <Tooltip position="top" label={t('Delete')} withinPortal={false}>
+              <ActionIcon
+                onClick={handleDelete}
+                size="lg"
+                aria-label={t('Delete')}
+                variant="subtle"
+              >
+                <IconTrash size={18} />
+              </ActionIcon>
+            </Tooltip>
           </div>
         )}
       </BaseBubbleMenu>
 
       <ReactClearModal
         style={{
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
           padding: 0,
-          zIndex: 200,
+          zIndex: 200
         }}
         isOpen={opened}
         onRequestClose={handleClose}
@@ -429,8 +444,8 @@ export function ExcalidrawMenu({ editor }: EditorMenuProps) {
         contentProps={{
           style: {
             padding: 0,
-            width: "90vw",
-          },
+            width: '90vw'
+          }
         }}
       >
         <Group
@@ -439,14 +454,18 @@ export function ExcalidrawMenu({ editor }: EditorMenuProps) {
           bg="var(--mantine-color-body)"
           p="xs"
         >
-          <Button onClick={handleSaveAndExit} size={"compact-sm"} loading={isSaving}>
-            {t("Save & Exit")}
+          <Button
+            onClick={handleSaveAndExit}
+            size={'compact-sm'}
+            loading={isSaving}
+          >
+            {t('Save & Exit')}
           </Button>
-          <Button onClick={handleClose} color="red" size={"compact-sm"}>
-            {t("Exit")}
+          <Button onClick={handleClose} color="red" size={'compact-sm'}>
+            {t('Exit')}
           </Button>
         </Group>
-        <div style={{ height: "90vh" }}>
+        <div style={{ height: '90vh' }}>
           <Suspense fallback={null}>
             <ExcalidrawComponent
               excalidrawAPI={(api) => setExcalidrawAPI(api)}
@@ -464,7 +483,7 @@ export function ExcalidrawMenu({ editor }: EditorMenuProps) {
               }}
               initialData={{
                 ...excalidrawData,
-                scrollToContent: true,
+                scrollToContent: true
               }}
               theme={computedColorScheme}
             />

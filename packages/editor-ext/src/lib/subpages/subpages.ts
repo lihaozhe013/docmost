@@ -1,5 +1,5 @@
-import { mergeAttributes, Node } from "@tiptap/core";
-import { ReactNodeViewRenderer } from "@tiptap/react";
+import { mergeAttributes, Node } from '@tiptap/core';
+import { ReactNodeViewRenderer } from '@tiptap/react';
 
 export interface SubpagesOptions {
   HTMLAttributes: Record<string, any>;
@@ -8,7 +8,7 @@ export interface SubpagesOptions {
 
 export interface SubpagesAttributes {}
 
-declare module "@tiptap/core" {
+declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     subpages: {
       insertSubpages: (attributes?: SubpagesAttributes) => ReturnType;
@@ -17,7 +17,7 @@ declare module "@tiptap/core" {
 }
 
 export const Subpages = Node.create<SubpagesOptions>({
-  name: "subpages",
+  name: 'subpages',
 
   addOptions() {
     return {
@@ -26,7 +26,7 @@ export const Subpages = Node.create<SubpagesOptions>({
     };
   },
 
-  group: "block",
+  group: 'block',
   atom: true,
   draggable: true,
   isolating: true,
@@ -41,11 +41,11 @@ export const Subpages = Node.create<SubpagesOptions>({
 
   renderHTML({ HTMLAttributes }) {
     return [
-      "div",
+      'div',
       mergeAttributes(
-        { "data-type": this.name },
+        { 'data-type': this.name },
         this.options.HTMLAttributes,
-        HTMLAttributes
+        HTMLAttributes,
       ),
     ];
   },

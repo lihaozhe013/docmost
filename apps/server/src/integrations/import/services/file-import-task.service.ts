@@ -6,7 +6,7 @@ import { KyselyDB } from '@docmost/db/types/kysely.types';
 import {
   extractZip,
   FileImportSource,
-  FileTaskStatus,
+  FileTaskStatus
 } from '../utils/file.utils';
 import { StorageService } from '../../storage/storage.service';
 import * as tmp from 'tmp-promise';
@@ -27,7 +27,7 @@ import {
   encodeFilePath,
   extractNotionPartialId,
   readDocmostMetadata,
-  stripNotionID,
+  stripNotionID
 } from '../utils/import.utils';
 import { executeTx } from '@docmost/db/utils';
 import { BacklinkRepo } from '@docmost/db/repos/backlink/backlink.repo';
@@ -40,7 +40,7 @@ import { EventName } from '../../../common/events/event.contants';
 import { AuditEvent, AuditResource } from '../../../common/events/audit-events';
 import {
   AUDIT_SERVICE,
-  IAuditService,
+  IAuditService
 } from '../../../integrations/audit/audit.service';
 
 @Injectable()
@@ -56,7 +56,7 @@ export class FileImportTaskService {
     private readonly importAttachmentService: ImportAttachmentService,
     private moduleRef: ModuleRef,
     private eventEmitter: EventEmitter2,
-    @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService,
+    @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService
   ) {}
 
   async processZIpImport(fileTaskId: string): Promise<void> {
@@ -83,17 +83,17 @@ export class FileImportTaskService {
     const { path: tmpZipPath, cleanup: cleanupTmpFile } = await tmp.file({
       prefix: 'docmost-import',
       postfix: '.zip',
-      discardDescriptor: true,
+      discardDescriptor: true
     });
 
     const { path: tmpExtractDir, cleanup: cleanupTmpDir } = await tmp.dir({
       prefix: 'docmost-extract-',
-      unsafeCleanup: true,
+      unsafeCleanup: true
     });
 
     try {
       const fileStream = await this.storageService.readStream(
-        fileTask.filePath,
+        fileTask.filePath
       );
       await pipeline(fileStream, createWriteStream(tmpZipPath));
       await extractZip(tmpZipPath, tmpExtractDir);
@@ -111,7 +111,7 @@ export class FileImportTaskService {
       ) {
         await this.processGenericImport({
           extractDir: tmpExtractDir,
-          fileTask,
+          fileTask
         });
       }
 
@@ -122,18 +122,18 @@ export class FileImportTaskService {
           ConfluenceModule = require('./../../../ee/confluence-import/confluence-import.service');
         } catch (err) {
           this.logger.error(
-            'Confluence import requested but EE module not bundled in this build',
+            'Confluence import requested but EE module not bundled in this build'
           );
           return;
         }
         const confluenceImportService = this.moduleRef.get(
           ConfluenceModule.ConfluenceImportService,
-          { strict: false },
+          { strict: false }
         );
 
         await confluenceImportService.processConfluenceImport({
           extractDir: tmpExtractDir,
-          fileTask,
+          fileTask
         });
       }
       try {
@@ -145,7 +145,7 @@ export class FileImportTaskService {
       } catch (err) {
         this.logger.error(
           `Failed to delete import file from storage. Task ID: ${fileTaskId}`,
-          err,
+          err
         );
       }
     } catch (err) {
@@ -192,7 +192,7 @@ export class FileImportTaskService {
         parentPageId: null,
         fileExtension: ext,
         filePath: relPath,
-        icon: pageMetadata?.icon ?? null,
+        icon: pageMetadata?.icon ?? null
       });
     }
 
@@ -224,7 +224,7 @@ export class FileImportTaskService {
       const onlyRootItem = Array.from(rootLevelItems)[0];
       // Check if this is a folder (not a file at root)
       const hasRootFiles = Array.from(pagesMap.keys()).some(
-        (filePath) => !filePath.includes('/'),
+        (filePath) => !filePath.includes('/')
       );
       if (!hasRootFiles) {
         skipRootFolder = onlyRootItem;
@@ -264,7 +264,8 @@ export class FileImportTaskService {
           const partialId = extractNotionPartialId(folderName);
           const strippedFolderName = stripNotionID(folderName);
           const isSameDir = (fileDir: string) =>
-            fileDir === parentDir || (parentDir === '.' && !fileDir.includes('/'));
+            fileDir === parentDir ||
+            (parentDir === '.' && !fileDir.includes('/'));
 
           for (const [filePath, page] of pagesMap.entries()) {
             if (!isSameDir(path.dirname(filePath))) continue;
@@ -276,7 +277,10 @@ export class FileImportTaskService {
               const fullIdMatch = fileBase.match(/[a-f0-9]{32}$/i);
               if (!fullIdMatch) continue;
               const fullId = fullIdMatch[0].toLowerCase();
-              if (!fullId.startsWith(partialId.prefix) || !fullId.endsWith(partialId.suffix)) {
+              if (
+                !fullId.startsWith(partialId.prefix) ||
+                !fullId.endsWith(partialId.suffix)
+              ) {
                 continue;
               }
             }
@@ -300,7 +304,7 @@ export class FileImportTaskService {
             parentPageId: null,
             fileExtension: '.md',
             filePath: mdPath,
-            icon: placeholderMetadata?.icon ?? null,
+            icon: placeholderMetadata?.icon ?? null
           });
         }
       }
@@ -372,7 +376,7 @@ export class FileImportTaskService {
 
       // get first position key from the server
       const nextPosition = await this.pageService.nextPagePosition(
-        fileTask.spaceId,
+        fileTask.spaceId
       );
 
       let prevPos: string | null = null;
@@ -408,7 +412,7 @@ export class FileImportTaskService {
       filePathToPageMetaMap.set(page.filePath, {
         id: page.id,
         title: page.name,
-        slugId: page.slugId,
+        slugId: page.slugId
       });
     });
 
@@ -502,7 +506,7 @@ export class FileImportTaskService {
                 extractDir,
                 pageId: page.id,
                 fileTask,
-                attachmentCandidates,
+                attachmentCandidates
               });
 
             const { html, backlinks, pageIcon } = await formatImportHtml({
@@ -512,11 +516,11 @@ export class FileImportTaskService {
               creatorId: fileTask.creatorId,
               sourcePageId: page.id,
               workspaceId: fileTask.workspaceId,
-              spaceSlug: space?.slug,
+              spaceSlug: space?.slug
             });
 
             const pmState = getProsemirrorContent(
-              await this.importService.processHTML(html),
+              await this.importService.processHTML(html)
             );
 
             const { title, prosemirrorJson } =
@@ -535,7 +539,7 @@ export class FileImportTaskService {
               workspaceId: fileTask.workspaceId,
               creatorId: fileTask.creatorId,
               lastUpdatedById: fileTask.creatorId,
-              parentPageId: page.parentPageId,
+              parentPageId: page.parentPageId
             };
 
             await trx.insertInto('pages').values(insertablePage).execute();
@@ -555,7 +559,7 @@ export class FileImportTaskService {
 
         const filteredBacklinks = allBacklinks.filter(
           ({ sourcePageId, targetPageId }) =>
-            validPageIds.has(sourcePageId) && validPageIds.has(targetPageId),
+            validPageIds.has(sourcePageId) && validPageIds.has(targetPageId)
         );
 
         // Insert backlinks in batches
@@ -568,7 +572,7 @@ export class FileImportTaskService {
           ) {
             const backlinkChunk = filteredBacklinks.slice(
               i,
-              Math.min(i + BACKLINK_BATCH_SIZE, filteredBacklinks.length),
+              Math.min(i + BACKLINK_BATCH_SIZE, filteredBacklinks.length)
             );
             await this.backlinkRepo.insertBacklink(backlinkChunk, trx);
           }
@@ -577,12 +581,12 @@ export class FileImportTaskService {
         if (validPageIds.size > 0) {
           this.eventEmitter.emit(EventName.PAGE_CREATED, {
             pageIds: Array.from(validPageIds),
-            workspaceId: fileTask.workspaceId,
+            workspaceId: fileTask.workspaceId
           });
         }
 
         this.logger.log(
-          `Successfully imported ${totalPagesProcessed} pages with ${filteredBacklinks.length} backlinks`,
+          `Successfully imported ${totalPagesProcessed} pages with ${filteredBacklinks.length} backlinks`
         );
       });
 
@@ -595,14 +599,14 @@ export class FileImportTaskService {
           metadata: {
             source: fileTask.source,
             fileTaskId: fileTask.id,
-            title: pageTitles.get(pageId),
-          },
+            title: pageTitles.get(pageId)
+          }
         }));
 
         this.auditService.logBatchWithContext(auditPayloads, {
           workspaceId: fileTask.workspaceId,
           actorId: fileTask.creatorId,
-          actorType: 'user',
+          actorType: 'user'
         });
       }
     } catch (error) {
@@ -622,7 +626,7 @@ export class FileImportTaskService {
   async updateTaskStatus(
     fileTaskId: string,
     status: FileTaskStatus,
-    errorMessage?: string,
+    errorMessage?: string
   ) {
     try {
       await this.db

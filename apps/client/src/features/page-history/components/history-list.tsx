@@ -1,29 +1,29 @@
 import {
   usePageHistoryListQuery,
-  prefetchPageHistory,
-} from "@/features/page-history/queries/page-history-query";
-import HistoryItem from "@/features/page-history/components/history-item";
+  prefetchPageHistory
+} from '@/features/page-history/queries/page-history-query';
+import HistoryItem from '@/features/page-history/components/history-item';
 import {
   activeHistoryIdAtom,
   activeHistoryPrevIdAtom,
   compareModeAtom,
   comparePairAtom,
   compareSelectionAtom,
-  historyAtoms,
-} from "@/features/page-history/atoms/history-atoms";
-import { resolveComparePair } from "@/features/page-history/utils/resolve-compare-pair";
-import { useAtom, useSetAtom } from "jotai";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+  historyAtoms
+} from '@/features/page-history/atoms/history-atoms';
+import { resolveComparePair } from '@/features/page-history/utils/resolve-compare-pair';
+import { useAtom, useSetAtom } from 'jotai';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import {
   Button,
   ScrollArea,
   Group,
   Divider,
   Loader,
-  Center,
-} from "@mantine/core";
-import { useTranslation } from "react-i18next";
-import { useHistoryRestore } from "@/features/page-history/hooks";
+  Center
+} from '@mantine/core';
+import { useTranslation } from 'react-i18next';
+import { useHistoryRestore } from '@/features/page-history/hooks';
 
 const PREFETCH_DELAY_MS = 150;
 
@@ -46,12 +46,12 @@ function HistoryList({ pageId }: Props) {
     isError,
     fetchNextPage,
     hasNextPage,
-    isFetchingNextPage,
+    isFetchingNextPage
   } = usePageHistoryListQuery(pageId);
 
   const historyItems = useMemo(
     () => pageHistoryData?.pages.flatMap((page) => page.items) ?? [],
-    [pageHistoryData],
+    [pageHistoryData]
   );
 
   const loadMoreRef = useRef<HTMLDivElement>(null);
@@ -77,7 +77,7 @@ function HistoryList({ pageId }: Props) {
         }
       }, PREFETCH_DELAY_MS);
     },
-    [clearPrefetchTimeout, historyItems],
+    [clearPrefetchTimeout, historyItems]
   );
 
   useEffect(() => {
@@ -88,9 +88,9 @@ function HistoryList({ pageId }: Props) {
     (id: string, index: number) => {
       setComparePair(null);
       setActiveHistoryId(id);
-      setActiveHistoryPrevId(historyItems[index + 1]?.id ?? "");
+      setActiveHistoryPrevId(historyItems[index + 1]?.id ?? '');
     },
-    [historyItems, setActiveHistoryId, setActiveHistoryPrevId, setComparePair],
+    [historyItems, setActiveHistoryId, setActiveHistoryPrevId, setComparePair]
   );
 
   const handleToggleCompare = useCallback(
@@ -101,7 +101,7 @@ function HistoryList({ pageId }: Props) {
         return [...prev, id];
       });
     },
-    [setCompareSelection],
+    [setCompareSelection]
   );
 
   const handleStartCompare = useCallback(
@@ -110,7 +110,7 @@ function HistoryList({ pageId }: Props) {
       setCompareMode(true);
       setCompareSelection([id]);
     },
-    [setComparePair, setCompareMode, setCompareSelection],
+    [setComparePair, setCompareMode, setCompareSelection]
   );
 
   const handleCancelCompare = useCallback(() => {
@@ -129,7 +129,7 @@ function HistoryList({ pageId }: Props) {
     compareSelection,
     setComparePair,
     setCompareMode,
-    setCompareSelection,
+    setCompareSelection
   ]);
 
   const handleRestoreItem = useCallback(
@@ -137,19 +137,19 @@ function HistoryList({ pageId }: Props) {
       handleSelect(id, index);
       confirmRestore(id);
     },
-    [handleSelect, confirmRestore],
+    [handleSelect, confirmRestore]
   );
 
   useEffect(() => {
     if (historyItems.length > 0 && !activeHistoryId) {
       setActiveHistoryId(historyItems[0].id);
-      setActiveHistoryPrevId(historyItems[1]?.id ?? "");
+      setActiveHistoryPrevId(historyItems[1]?.id ?? '');
     }
   }, [
     historyItems,
     activeHistoryId,
     setActiveHistoryId,
-    setActiveHistoryPrevId,
+    setActiveHistoryPrevId
   ]);
 
   useEffect(() => {
@@ -162,7 +162,7 @@ function HistoryList({ pageId }: Props) {
           fetchNextPage();
         }
       },
-      { threshold: 0.1 },
+      { threshold: 0.1 }
     );
 
     observer.observe(sentinel);
@@ -174,11 +174,11 @@ function HistoryList({ pageId }: Props) {
   }
 
   if (isError) {
-    return <div>{t("Error loading page history.")}</div>;
+    return <div>{t('Error loading page history.')}</div>;
   }
 
   if (historyItems.length === 0) {
-    return <>{t("No page history saved yet.")}</>;
+    return <>{t('No page history saved yet.')}</>;
   }
 
   return (
@@ -222,14 +222,14 @@ function HistoryList({ pageId }: Props) {
               size="compact-md"
               onClick={handleCancelCompare}
             >
-              {t("Cancel")}
+              {t('Cancel')}
             </Button>
             <Button
               size="compact-md"
               disabled={compareSelection.length !== 2}
               onClick={handleConfirmCompare}
             >
-              {t("Compare")}
+              {t('Compare')}
             </Button>
           </Group>
         </>
@@ -243,10 +243,10 @@ function HistoryList({ pageId }: Props) {
                 size="compact-md"
                 onClick={() => setHistoryModalOpen(false)}
               >
-                {t("Cancel")}
+                {t('Cancel')}
               </Button>
               <Button size="compact-md" onClick={() => confirmRestore()}>
-                {t("Restore")}
+                {t('Restore')}
               </Button>
             </Group>
           </>

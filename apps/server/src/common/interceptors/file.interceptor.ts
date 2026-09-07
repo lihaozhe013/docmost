@@ -3,7 +3,7 @@ import {
   NestInterceptor,
   ExecutionContext,
   CallHandler,
-  BadRequestException,
+  BadRequestException
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { FastifyRequest } from 'fastify';
@@ -12,7 +12,7 @@ import { FastifyRequest } from 'fastify';
 export class FileInterceptor implements NestInterceptor {
   public intercept(
     context: ExecutionContext,
-    next: CallHandler,
+    next: CallHandler
   ): Observable<any> {
     const req: FastifyRequest = context.switchToHttp().getRequest();
 

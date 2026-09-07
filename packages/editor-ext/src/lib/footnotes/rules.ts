@@ -1,16 +1,16 @@
 //Source MIT - https://github.com/buttondown/tiptap-footnotes
-import { Plugin, PluginKey } from "@tiptap/pm/state";
-import { ReplaceStep } from "@tiptap/pm/transform";
-import { Extension } from "@tiptap/core";
-import { updateFootnotesList } from "./utils";
+import { Plugin, PluginKey } from '@tiptap/pm/state';
+import { ReplaceStep } from '@tiptap/pm/transform';
+import { Extension } from '@tiptap/core';
+import { updateFootnotesList } from './utils';
 
 const FootnoteRules = Extension.create({
-  name: "footnoteRules",
+  name: 'footnoteRules',
   priority: 1000,
   addProseMirrorPlugins() {
     return [
       new Plugin({
-        key: new PluginKey("footnoteRules"),
+        key: new PluginKey('footnoteRules'),
         filterTransaction(tr) {
           const { from, to } = tr.selection;
 
@@ -21,11 +21,11 @@ const FootnoteRules = Extension.create({
           let selectedContent = false;
           let footnoteCount = 0;
           tr.doc.nodesBetween(from, to, (node, _, parent) => {
-            if (parent?.type.name == "doc" && node.type.name != "footnotes") {
+            if (parent?.type.name == 'doc' && node.type.name != 'footnotes') {
               selectedContent = true;
-            } else if (node.type.name == "footnote") {
+            } else if (node.type.name == 'footnote') {
               footnoteCount += 1;
-            } else if (node.type.name == "footnotes") {
+            } else if (node.type.name == 'footnotes') {
               selectedFootnotes = true;
             }
           });
@@ -54,7 +54,7 @@ const FootnoteRules = Extension.create({
               // check if any footnote references have been inserted
               if (isInsert) {
                 step.slice.content.descendants((node) => {
-                  if (node?.type.name == "footnoteReference") {
+                  if (node?.type.name == 'footnoteReference') {
                     refsChanged = true;
                     return false;
                   }
@@ -66,7 +66,7 @@ const FootnoteRules = Extension.create({
                   step.from,
                   Math.min(tr.before.content.size, step.to), // make sure to not go over the old document's limit
                   (node) => {
-                    if (node.type.name == "footnoteReference") {
+                    if (node.type.name == 'footnoteReference') {
                       refsChanged = true;
                       return false;
                     }

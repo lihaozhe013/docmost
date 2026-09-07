@@ -10,7 +10,7 @@ services:
       DATABASE_URL: 'postgresql://docmost:STRONG_DB_PASSWORD@db:5432/docmost'
       REDIS_URL: 'redis://redis:6379'
     ports:
-      - "3000:3000"
+      - '3000:3000'
     restart: unless-stopped
     volumes:
       - docmost:/app/data/storage
@@ -27,7 +27,14 @@ services:
 
   redis:
     image: redis:8
-    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    command:
+      [
+        'redis-server',
+        '--appendonly',
+        'yes',
+        '--maxmemory-policy',
+        'noeviction'
+      ]
     restart: unless-stopped
     volumes:
       - redis_data:/data

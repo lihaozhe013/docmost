@@ -1,13 +1,13 @@
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState } from 'react';
 import {
   ActionIcon,
   Popover,
   Button,
-  useMantineColorScheme,
-} from "@mantine/core";
-import { useClickOutside, useDisclosure, useWindowEvent } from "@mantine/hooks";
-import { Suspense } from "react";
-import { useTranslation } from "react-i18next";
+  useMantineColorScheme
+} from '@mantine/core';
+import { useClickOutside, useDisclosure, useWindowEvent } from '@mantine/hooks';
+import { Suspense } from 'react';
+import { useTranslation } from 'react-i18next';
 
 // Load the picker module AND the emoji data in parallel inside the lazy
 // resolution, then bind the data into the component. React.lazy only finishes
@@ -15,13 +15,13 @@ import { useTranslation } from "react-i18next";
 // Remove button until the Picker can render with real content.
 const Picker = React.lazy(async () => {
   const [pickerModule, dataModule] = await Promise.all([
-    import("@slidoapp/emoji-mart-react"),
-    import("@slidoapp/emoji-mart-data"),
+    import('@slidoapp/emoji-mart-react'),
+    import('@slidoapp/emoji-mart-data')
   ]);
   const PickerComp = pickerModule.default;
   const data = dataModule.default;
   return {
-    default: (props: any) => <PickerComp {...props} data={data} />,
+    default: (props: any) => <PickerComp {...props} data={data} />
   };
 });
 
@@ -43,7 +43,7 @@ function EmojiPicker({
   icon,
   removeEmojiAction,
   readOnly,
-  actionIconProps,
+  actionIconProps
 }: EmojiPickerInterface) {
   const { t } = useTranslation();
   const [opened, handlers] = useDisclosure(false);
@@ -53,13 +53,13 @@ function EmojiPicker({
 
   useClickOutside(
     () => handlers.close(),
-    ["mousedown", "touchstart"],
-    [dropdown, target],
+    ['mousedown', 'touchstart'],
+    [dropdown, target]
   );
 
   // We need this because the default Mantine popover closeOnEscape does not work
-  useWindowEvent("keydown", (event) => {
-    if (opened && event.key === "Escape") {
+  useWindowEvent('keydown', (event) => {
+    if (opened && event.key === 'Escape') {
       event.stopPropagation();
       event.preventDefault();
       handlers.close();
@@ -79,9 +79,9 @@ function EmojiPicker({
     let rafId = 0;
     const tryFocus = (attempts: number) => {
       if (cancelled) return;
-      const pickerEl = dropdown.querySelector("em-emoji-picker");
+      const pickerEl = dropdown.querySelector('em-emoji-picker');
       const input = pickerEl?.shadowRoot?.querySelector<HTMLInputElement>(
-        'input[type="search"]',
+        'input[type="search"]'
       );
       if (input) {
         input.focus({ preventScroll: true });
@@ -119,12 +119,12 @@ function EmojiPicker({
     >
       <Popover.Target ref={setTarget}>
         <ActionIcon
-          c={actionIconProps?.c || "gray"}
-          variant={actionIconProps?.variant || "transparent"}
+          c={actionIconProps?.c || 'gray'}
+          variant={actionIconProps?.variant || 'transparent'}
           size={actionIconProps?.size}
           tabIndex={actionIconProps?.tabIndex}
           onClick={handlers.toggle}
-          aria-label={t("Pick emoji")}
+          aria-label={t('Pick emoji')}
           aria-haspopup="dialog"
           aria-expanded={opened}
         >
@@ -132,7 +132,7 @@ function EmojiPicker({
         </ActionIcon>
       </Popover.Target>
       <Suspense fallback={null}>
-        <Popover.Dropdown bg="000" style={{ border: "none" }} ref={setDropdown}>
+        <Popover.Dropdown bg="000" style={{ border: 'none' }} ref={setDropdown}>
           <Picker
             onEmojiSelect={handleEmojiSelect}
             perLine={8}
@@ -144,14 +144,14 @@ function EmojiPicker({
             c="gray"
             size="xs"
             style={{
-              position: "absolute",
+              position: 'absolute',
               zIndex: 2,
-              bottom: "1rem",
-              right: "1rem",
+              bottom: '1rem',
+              right: '1rem'
             }}
             onClick={handleRemoveEmoji}
           >
-            {t("Remove")}
+            {t('Remove')}
           </Button>
         </Popover.Dropdown>
       </Suspense>

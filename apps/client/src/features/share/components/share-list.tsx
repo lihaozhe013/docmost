@@ -1,20 +1,20 @@
-import { Table, Group, Text, Anchor } from "@mantine/core";
-import React from "react";
-import { Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { IconWorld } from "@tabler/icons-react";
-import Paginate from "@/components/common/paginate.tsx";
-import { useCursorPaginate } from "@/hooks/use-cursor-paginate";
-import { useGetSharesQuery } from "@/features/share/queries/share-query.ts";
-import { ISharedItem } from "@/features/share/types/share.types.ts";
-import ShareActionMenu from "@/features/share/components/share-action-menu.tsx";
-import { formatLocalized, useDateFnsLocale } from "@/lib/date-locale.ts";
-import { buildSharedPageUrl } from "@/features/page/page.utils.ts";
-import { getPageIcon } from "@/lib";
-import { CustomAvatar } from "@/components/ui/custom-avatar.tsx";
-import { EmptyState } from "@/components/ui/empty-state.tsx";
-import classes from "./share.module.css";
-import rowClasses from "@/components/ui/clickable-table-row.module.css";
+import { Table, Group, Text, Anchor } from '@mantine/core';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { IconWorld } from '@tabler/icons-react';
+import Paginate from '@/components/common/paginate.tsx';
+import { useCursorPaginate } from '@/hooks/use-cursor-paginate';
+import { useGetSharesQuery } from '@/features/share/queries/share-query.ts';
+import { ISharedItem } from '@/features/share/types/share.types.ts';
+import ShareActionMenu from '@/features/share/components/share-action-menu.tsx';
+import { formatLocalized, useDateFnsLocale } from '@/lib/date-locale.ts';
+import { buildSharedPageUrl } from '@/features/page/page.utils.ts';
+import { getPageIcon } from '@/lib';
+import { CustomAvatar } from '@/components/ui/custom-avatar.tsx';
+import { EmptyState } from '@/components/ui/empty-state.tsx';
+import classes from './share.module.css';
+import rowClasses from '@/components/ui/clickable-table-row.module.css';
 
 export default function ShareList() {
   const { t } = useTranslation();
@@ -23,7 +23,7 @@ export default function ShareList() {
   const locale = useDateFnsLocale();
 
   if (!isLoading && data?.items.length === 0) {
-    return <EmptyState icon={IconWorld} title={t("No shared pages")} />;
+    return <EmptyState icon={IconWorld} title={t('No shared pages')} />;
   }
 
   return (
@@ -32,9 +32,9 @@ export default function ShareList() {
         <Table verticalSpacing="xs">
           <Table.Thead>
             <Table.Tr>
-              <Table.Th>{t("Page")}</Table.Th>
-              <Table.Th>{t("Shared by")}</Table.Th>
-              <Table.Th>{t("Shared at")}</Table.Th>
+              <Table.Th>{t('Page')}</Table.Th>
+              <Table.Th>{t('Shared by')}</Table.Th>
+              <Table.Th>{t('Shared at')}</Table.Th>
             </Table.Tr>
           </Table.Thead>
 
@@ -46,8 +46,8 @@ export default function ShareList() {
                     size="sm"
                     underline="never"
                     style={{
-                      cursor: "pointer",
-                      color: "var(--mantine-color-text)",
+                      cursor: 'pointer',
+                      color: 'var(--mantine-color-text)'
                     }}
                     className={rowClasses.link}
                     component={Link}
@@ -55,14 +55,14 @@ export default function ShareList() {
                     to={buildSharedPageUrl({
                       shareId: share.key,
                       pageTitle: share.page.title,
-                      pageSlugId: share.page.slugId,
+                      pageSlugId: share.page.slugId
                     })}
                   >
                     <Group gap="4" wrap="nowrap">
                       {getPageIcon(share.page.icon)}
                       <div className={classes.shareLinkText}>
                         <Text fz="sm" fw={500} lineClamp={1}>
-                          {share.page.title || t("untitled")}
+                          {share.page.title || t('untitled')}
                         </Text>
                       </div>
                     </Group>
@@ -81,12 +81,12 @@ export default function ShareList() {
                   </Group>
                 </Table.Td>
                 <Table.Td>
-                  <Text fz="sm" style={{ whiteSpace: "nowrap" }}>
+                  <Text fz="sm" style={{ whiteSpace: 'nowrap' }}>
                     {formatLocalized(
                       share.createdAt,
-                      "MMM dd, yyyy",
-                      "PP",
-                      locale,
+                      'MMM dd, yyyy',
+                      'PP',
+                      locale
                     )}
                   </Text>
                 </Table.Td>

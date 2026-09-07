@@ -7,7 +7,7 @@ export enum JwtType {
   API_KEY = 'api_key',
   PDF_RENDER = 'pdf_render',
   PDF_EXPORT_DOWNLOAD = 'pdf_export_download',
-  OAUTH_ACCESS = 'oauth_access',
+  OAUTH_ACCESS = 'oauth_access'
 }
 export type JwtPayload = {
   sub: string;

@@ -1,11 +1,11 @@
-import { posToDOMRect, findParentNode } from "@tiptap/react";
-import { Node as PMNode } from "@tiptap/pm/model";
-import React, { useCallback, type JSX } from "react";
+import { posToDOMRect, findParentNode } from '@tiptap/react';
+import { Node as PMNode } from '@tiptap/pm/model';
+import React, { useCallback, type JSX } from 'react';
 import {
   EditorMenuProps,
-  ShouldShowProps,
-} from "@/features/editor/components/table/types/types.ts";
-import { ActionIcon, Tooltip } from "@mantine/core";
+  ShouldShowProps
+} from '@/features/editor/components/table/types/types.ts';
+import { ActionIcon, Tooltip } from '@mantine/core';
 import {
   IconColumnInsertLeft,
   IconColumnInsertRight,
@@ -15,12 +15,16 @@ import {
   IconRowRemove,
   IconTableColumn,
   IconTableRow,
-  IconTrashX,
-} from "@tabler/icons-react";
-import { BubbleMenu } from "@tiptap/react/menus";
-import { isCellSelection, isEditorReady, isTextSelected } from "@docmost/editor-ext";
-import { useTranslation } from "react-i18next";
-import classes from "../common/toolbar-menu.module.css";
+  IconTrashX
+} from '@tabler/icons-react';
+import { BubbleMenu } from '@tiptap/react/menus';
+import {
+  isCellSelection,
+  isEditorReady,
+  isTextSelected
+} from '@docmost/editor-ext';
+import { useTranslation } from 'react-i18next';
+import classes from '../common/toolbar-menu.module.css';
 
 export const TableMenu = React.memo(
   ({ editor }: EditorMenuProps): JSX.Element => {
@@ -32,15 +36,15 @@ export const TableMenu = React.memo(
         }
 
         if (isTextSelected(editor)) return false;
-        return editor.isActive("table") && !isCellSelection(state.selection);
+        return editor.isActive('table') && !isCellSelection(state.selection);
       },
-      [editor],
+      [editor]
     );
 
     const getReferencedVirtualElement = useCallback(() => {
       if (!isEditorReady(editor)) return;
       const { selection } = editor.state;
-      const predicate = (node: PMNode) => node.type.name === "table";
+      const predicate = (node: PMNode) => node.type.name === 'table';
       const parent = findParentNode(predicate)(selection);
 
       if (parent) {
@@ -48,14 +52,14 @@ export const TableMenu = React.memo(
         const rect = dom.getBoundingClientRect();
         return {
           getBoundingClientRect: () => rect,
-          getClientRects: () => [rect],
+          getClientRects: () => [rect]
         };
       }
 
       const rect = posToDOMRect(editor.view, selection.from, selection.to);
       return {
         getBoundingClientRect: () => rect,
-        getClientRects: () => [rect],
+        getClientRects: () => [rect]
       };
     }, [editor]);
 
@@ -102,36 +106,36 @@ export const TableMenu = React.memo(
         resizeDelay={0}
         getReferencedVirtualElement={getReferencedVirtualElement}
         ref={(element) => {
-          element.style.zIndex = "99";
+          element.style.zIndex = '99';
         }}
         options={{
-          placement: "bottom",
+          placement: 'bottom',
           offset: {
-            mainAxis: 15,
+            mainAxis: 15
           },
           flip: {
-            fallbackPlacements: ["bottom", "top"],
+            fallbackPlacements: ['bottom', 'top'],
             padding: { top: 35 + 15, left: 8, right: 8, bottom: -Infinity },
-            boundary: editor.options.element as HTMLElement,
+            boundary: editor.options.element as HTMLElement
           },
           shift: {
             padding: 8 + 15,
-            crossAxis: true,
-          },
+            crossAxis: true
+          }
         }}
         shouldShow={shouldShow}
       >
         <div className={classes.toolbar}>
           <Tooltip
             position="top"
-            label={t("Add left column")}
+            label={t('Add left column')}
             withinPortal={false}
           >
             <ActionIcon
               onClick={addColumnLeft}
               variant="subtle"
               size="lg"
-              aria-label={t("Add left column")}
+              aria-label={t('Add left column')}
             >
               <IconColumnInsertLeft size={18} />
             </ActionIcon>
@@ -139,14 +143,14 @@ export const TableMenu = React.memo(
 
           <Tooltip
             position="top"
-            label={t("Add right column")}
+            label={t('Add right column')}
             withinPortal={false}
           >
             <ActionIcon
               onClick={addColumnRight}
               variant="subtle"
               size="lg"
-              aria-label={t("Add right column")}
+              aria-label={t('Add right column')}
             >
               <IconColumnInsertRight size={18} />
             </ActionIcon>
@@ -154,14 +158,14 @@ export const TableMenu = React.memo(
 
           <Tooltip
             position="top"
-            label={t("Delete column")}
+            label={t('Delete column')}
             withinPortal={false}
           >
             <ActionIcon
               onClick={deleteColumn}
               variant="subtle"
               size="lg"
-              aria-label={t("Delete column")}
+              aria-label={t('Delete column')}
             >
               <IconColumnRemove size={18} />
             </ActionIcon>
@@ -171,14 +175,14 @@ export const TableMenu = React.memo(
 
           <Tooltip
             position="top"
-            label={t("Add row above")}
+            label={t('Add row above')}
             withinPortal={false}
           >
             <ActionIcon
               onClick={addRowAbove}
               variant="subtle"
               size="lg"
-              aria-label={t("Add row above")}
+              aria-label={t('Add row above')}
             >
               <IconRowInsertTop size={18} />
             </ActionIcon>
@@ -186,25 +190,25 @@ export const TableMenu = React.memo(
 
           <Tooltip
             position="top"
-            label={t("Add row below")}
+            label={t('Add row below')}
             withinPortal={false}
           >
             <ActionIcon
               onClick={addRowBelow}
               variant="subtle"
               size="lg"
-              aria-label={t("Add row below")}
+              aria-label={t('Add row below')}
             >
               <IconRowInsertBottom size={18} />
             </ActionIcon>
           </Tooltip>
 
-          <Tooltip position="top" label={t("Delete row")} withinPortal={false}>
+          <Tooltip position="top" label={t('Delete row')} withinPortal={false}>
             <ActionIcon
               onClick={deleteRow}
               variant="subtle"
               size="lg"
-              aria-label={t("Delete row")}
+              aria-label={t('Delete row')}
             >
               <IconRowRemove size={18} />
             </ActionIcon>
@@ -214,14 +218,14 @@ export const TableMenu = React.memo(
 
           <Tooltip
             position="top"
-            label={t("Toggle header row")}
+            label={t('Toggle header row')}
             withinPortal={false}
           >
             <ActionIcon
               onClick={toggleHeaderRow}
               variant="subtle"
               size="lg"
-              aria-label={t("Toggle header row")}
+              aria-label={t('Toggle header row')}
             >
               <IconTableRow size={18} />
             </ActionIcon>
@@ -229,14 +233,14 @@ export const TableMenu = React.memo(
 
           <Tooltip
             position="top"
-            label={t("Toggle header column")}
+            label={t('Toggle header column')}
             withinPortal={false}
           >
             <ActionIcon
               onClick={toggleHeaderColumn}
               variant="subtle"
               size="lg"
-              aria-label={t("Toggle header column")}
+              aria-label={t('Toggle header column')}
             >
               <IconTableColumn size={18} />
             </ActionIcon>
@@ -246,14 +250,14 @@ export const TableMenu = React.memo(
 
           <Tooltip
             position="top"
-            label={t("Delete table")}
+            label={t('Delete table')}
             withinPortal={false}
           >
             <ActionIcon
               onClick={deleteTable}
               variant="subtle"
               size="lg"
-              aria-label={t("Delete table")}
+              aria-label={t('Delete table')}
             >
               <IconTrashX size={18} />
             </ActionIcon>
@@ -261,7 +265,7 @@ export const TableMenu = React.memo(
         </div>
       </BubbleMenu>
     );
-  },
+  }
 );
 
 export default TableMenu;

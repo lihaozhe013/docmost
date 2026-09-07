@@ -1,20 +1,20 @@
-import { NodeViewProps, NodeViewWrapper } from "@tiptap/react";
-import { Group, Image, Loader, Text } from "@mantine/core";
-import { useMemo } from "react";
-import { getFileUrl } from "@/lib/config.ts";
-import clsx from "clsx";
-import classes from "./image-view.module.css";
-import { useTranslation } from "react-i18next";
+import { NodeViewProps, NodeViewWrapper } from '@tiptap/react';
+import { Group, Image, Loader, Text } from '@mantine/core';
+import { useMemo } from 'react';
+import { getFileUrl } from '@/lib/config.ts';
+import clsx from 'clsx';
+import classes from './image-view.module.css';
+import { useTranslation } from 'react-i18next';
 
 export default function ImageView(props: NodeViewProps) {
   const { t } = useTranslation();
   const { editor, node, selected } = props;
   const { src, width, align, alt, aspectRatio, placeholder } = node.attrs;
   const alignClass = useMemo(() => {
-    if (align === "left") return "alignLeft";
-    if (align === "right") return "alignRight";
-    if (align === "center") return "alignCenter";
-    return "alignCenter";
+    if (align === 'left') return 'alignLeft';
+    if (align === 'right') return 'alignRight';
+    if (align === 'center') return 'alignCenter';
+    return 'alignCenter';
   }, [align]);
   const previewSrc = useMemo(() => {
     editor.storage.shared.imagePreviews =
@@ -31,14 +31,14 @@ export default function ImageView(props: NodeViewProps) {
     <NodeViewWrapper data-drag-handle>
       <div
         className={clsx(
-          selected && "ProseMirror-selectednode",
+          selected && 'ProseMirror-selectednode',
           classes.imageWrapper,
           !src && placeholder && classes.skeleton,
-          alignClass,
+          alignClass
         )}
         style={{
-          aspectRatio: aspectRatio ? aspectRatio : src ? undefined : "16 / 9",
-          width,
+          aspectRatio: aspectRatio ? aspectRatio : src ? undefined : '16 / 9',
+          width
         }}
       >
         {src && (
@@ -60,8 +60,8 @@ export default function ImageView(props: NodeViewProps) {
             <Loader size={20} style={{ flexShrink: 0 }} />
             <Text component="span" size="sm" truncate="end">
               {placeholder?.name
-                ? t("Uploading {{name}}", { name: placeholder.name })
-                : t("Uploading file")}
+                ? t('Uploading {{name}}', { name: placeholder.name })
+                : t('Uploading file')}
             </Text>
           </Group>
         )}

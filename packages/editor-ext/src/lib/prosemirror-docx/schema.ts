@@ -1,4 +1,9 @@
-import { FootnoteReferenceRun, HeadingLevel, Paragraph, ShadingType } from 'docx';
+import {
+  FootnoteReferenceRun,
+  HeadingLevel,
+  Paragraph,
+  ShadingType,
+} from 'docx';
 import { Node } from 'prosemirror-model';
 import {
   DocxSerializerAsync,

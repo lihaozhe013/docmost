@@ -7,7 +7,7 @@ import {
   Post,
   Req,
   Res,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { WorkspaceService } from '../services/workspace.service';
 import { UpdateWorkspaceDto } from '../dto/update-workspace.dto';
@@ -24,7 +24,7 @@ import { User, Workspace } from '@docmost/db/types/entity.types';
 import WorkspaceAbilityFactory from '../../casl/abilities/workspace-ability.factory';
 import {
   WorkspaceCaslAction,
-  WorkspaceCaslSubject,
+  WorkspaceCaslSubject
 } from '../../casl/interfaces/workspace-ability.type';
 import { FastifyReply } from 'fastify';
 import { EnvironmentService } from '../../../integrations/environment/environment.service';
@@ -37,7 +37,7 @@ export class WorkspaceController {
   constructor(
     private readonly workspaceService: WorkspaceService,
     private readonly workspaceAbility: WorkspaceAbilityFactory,
-    private environmentService: EnvironmentService,
+    private environmentService: EnvironmentService
   ) {}
 
   @Public()
@@ -60,7 +60,7 @@ export class WorkspaceController {
     return {
       cloud: false,
       tier: 'free',
-      features: [],
+      features: []
     };
   }
 
@@ -70,7 +70,7 @@ export class WorkspaceController {
     @Res({ passthrough: true }) res: FastifyReply,
     @Body() dto: UpdateWorkspaceDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
     if (
@@ -81,7 +81,7 @@ export class WorkspaceController {
 
     const updatedWorkspace = await this.workspaceService.update(
       workspace.id,
-      dto,
+      dto
     );
 
     if (
@@ -103,7 +103,7 @@ export class WorkspaceController {
     @Body()
     pagination: PaginationOptions,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
     if (ability.cannot(WorkspaceCaslAction.Read, WorkspaceCaslSubject.Member)) {
@@ -118,7 +118,7 @@ export class WorkspaceController {
   async deactivateWorkspaceMember(
     @Body() dto: RemoveWorkspaceUserDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
     if (
@@ -134,7 +134,7 @@ export class WorkspaceController {
   async activateWorkspaceMember(
     @Body() dto: RemoveWorkspaceUserDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
     if (
@@ -150,7 +150,7 @@ export class WorkspaceController {
   async deleteWorkspaceMember(
     @Body() dto: RemoveWorkspaceUserDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
     if (
@@ -166,7 +166,7 @@ export class WorkspaceController {
   async updateWorkspaceMemberRole(
     @Body() workspaceUserRoleDto: UpdateWorkspaceUserRoleDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
     if (
@@ -178,7 +178,7 @@ export class WorkspaceController {
     return this.workspaceService.updateWorkspaceUserRole(
       user,
       workspaceUserRoleDto,
-      workspace.id,
+      workspace.id
     );
   }
 
@@ -187,7 +187,7 @@ export class WorkspaceController {
   async createWorkspaceMember(
     @Body() dto: CreateWorkspaceUserDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
     if (
@@ -204,7 +204,7 @@ export class WorkspaceController {
   async resetWorkspaceMemberPassword(
     @Body() dto: ResetWorkspaceUserPasswordDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
     if (

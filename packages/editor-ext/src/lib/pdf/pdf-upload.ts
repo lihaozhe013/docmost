@@ -1,8 +1,8 @@
-import { MediaUploadOptions, UploadFn } from "../media-utils";
-import { IAttachment } from "../types";
-import { generateNodeId } from "../utils";
-import { Node } from "@tiptap/pm/model";
-import { Command } from "@tiptap/core";
+import { MediaUploadOptions, UploadFn } from '../media-utils';
+import { IAttachment } from '../types';
+import { generateNodeId } from '../utils';
+import { Node } from '@tiptap/pm/model';
+import { Command } from '@tiptap/core';
 
 const findPdfNodeByPlaceholderId = (
   doc: Node,
@@ -14,7 +14,7 @@ const findPdfNodeByPlaceholderId = (
     if (result) return false;
 
     if (
-      node.type.name === "pdf" &&
+      node.type.name === 'pdf' &&
       node.attrs.placeholder?.id === placeholderId
     ) {
       result = { node, pos };

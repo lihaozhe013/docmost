@@ -1,23 +1,23 @@
-import React, { useState } from "react";
-import { Dialog, Group, Stack, Text } from "@mantine/core";
-import { useClickOutside } from "@mantine/hooks";
-import { useAtom } from "jotai";
+import React, { useState } from 'react';
+import { Dialog, Group, Stack, Text } from '@mantine/core';
+import { useClickOutside } from '@mantine/hooks';
+import { useAtom } from 'jotai';
 import {
   activeCommentIdAtom,
   draftCommentIdAtom,
   showCommentPopupAtom,
   showReadOnlyCommentPopupAtom,
-  readOnlyCommentDataAtom,
-} from "@/features/comment/atoms/comment-atom";
-import CommentEditor from "@/features/comment/components/comment-editor";
-import CommentActions from "@/features/comment/components/comment-actions";
-import { currentUserAtom } from "@/features/user/atoms/current-user-atom";
-import { useCreateCommentMutation } from "@/features/comment/queries/comment-query";
-import { asideStateAtom } from "@/components/layouts/global/hooks/atoms/sidebar-atom";
-import { useEditor } from "@tiptap/react";
-import { isEditorReady } from "@docmost/editor-ext";
-import { CustomAvatar } from "@/components/ui/custom-avatar.tsx";
-import { useTranslation } from "react-i18next";
+  readOnlyCommentDataAtom
+} from '@/features/comment/atoms/comment-atom';
+import CommentEditor from '@/features/comment/components/comment-editor';
+import CommentActions from '@/features/comment/components/comment-actions';
+import { currentUserAtom } from '@/features/user/atoms/current-user-atom';
+import { useCreateCommentMutation } from '@/features/comment/queries/comment-query';
+import { asideStateAtom } from '@/components/layouts/global/hooks/atoms/sidebar-atom';
+import { useEditor } from '@tiptap/react';
+import { isEditorReady } from '@docmost/editor-ext';
+import { CustomAvatar } from '@/components/ui/custom-avatar.tsx';
+import { useTranslation } from 'react-i18next';
 
 interface CommentDialogProps {
   editor: ReturnType<typeof useEditor>;
@@ -27,16 +27,18 @@ interface CommentDialogProps {
 
 function CommentDialog({ editor, pageId, readOnly }: CommentDialogProps) {
   const { t } = useTranslation();
-  const [comment, setComment] = useState("");
+  const [comment, setComment] = useState('');
   const [, setShowCommentPopup] = useAtom(showCommentPopupAtom);
   const [, setShowReadOnlyCommentPopup] = useAtom(showReadOnlyCommentPopupAtom);
-  const [readOnlyCommentData, setReadOnlyCommentData] = useAtom(readOnlyCommentDataAtom);
+  const [readOnlyCommentData, setReadOnlyCommentData] = useAtom(
+    readOnlyCommentDataAtom
+  );
   const [, setActiveCommentId] = useAtom(activeCommentIdAtom);
   const [draftCommentId, setDraftCommentId] = useAtom(draftCommentIdAtom);
   const [currentUser] = useAtom(currentUserAtom);
   const [, setAsideState] = useAtom(asideStateAtom);
   const useClickOutsideRef = useClickOutside(() => {
-    if (document.querySelector("#mention")) return;
+    if (document.querySelector('#mention')) return;
     handleDialogClose();
   });
   const createCommentMutation = useCreateCommentMutation();
@@ -56,7 +58,7 @@ function CommentDialog({ editor, pageId, readOnly }: CommentDialogProps) {
   };
 
   const getSelectedText = () => {
-    if (!isEditorReady(editor)) return "";
+    if (!isEditorReady(editor)) return '';
     const { from, to } = editor.state.selection;
     return editor.state.doc.textBetween(from, to);
   };
@@ -73,7 +75,7 @@ function CommentDialog({ editor, pageId, readOnly }: CommentDialogProps) {
         pageId: pageId,
         content: JSON.stringify(comment),
         selection: selectedText,
-        type: "inline",
+        type: 'inline'
       };
 
       const createdComment =
@@ -86,25 +88,24 @@ function CommentDialog({ editor, pageId, readOnly }: CommentDialogProps) {
           .run();
         editor.commands.setTextSelection({
           from: editor.view.state.selection.from,
-          to: editor.view.state.selection.from,
+          to: editor.view.state.selection.from
         });
       }
       setActiveCommentId(createdComment.id);
 
-      setAsideState({ tab: "comments", isAsideOpen: true });
+      setAsideState({ tab: 'comments', isAsideOpen: true });
       setTimeout(() => {
         const selector = `div[data-comment-id="${createdComment.id}"]`;
         const commentElement = document.querySelector(selector);
-        commentElement?.scrollIntoView({ behavior: "smooth", block: "center" });
+        commentElement?.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
         if (isEditorReady(editor)) {
           editor.view.dispatch(editor.state.tr.scrollIntoView());
         }
       }, 400);
-
     } finally {
       setShowCommentPopup(false);
-      setDraftCommentId("");
+      setDraftCommentId('');
     }
   };
 
@@ -116,17 +117,17 @@ function CommentDialog({ editor, pageId, readOnly }: CommentDialogProps) {
         pageId,
         content: JSON.stringify(comment),
         selection: readOnlyCommentData.selectedText,
-        type: "inline",
-        yjsSelection: readOnlyCommentData.yjsSelection,
+        type: 'inline',
+        yjsSelection: readOnlyCommentData.yjsSelection
       });
 
       setActiveCommentId(createdComment.id);
-      setAsideState({ tab: "comments", isAsideOpen: true });
+      setAsideState({ tab: 'comments', isAsideOpen: true });
 
       setTimeout(() => {
         const selector = `div[data-comment-id="${createdComment.id}"]`;
         const commentElement = document.querySelector(selector);
-        commentElement?.scrollIntoView({ behavior: "smooth", block: "center" });
+        commentElement?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }, 400);
     } finally {
       setShowReadOnlyCommentPopup(false);
@@ -152,7 +153,7 @@ function CommentDialog({ editor, pageId, readOnly }: CommentDialogProps) {
       withCloseButton
       withBorder
       data-comment-dialog
-      aria-label={t("Add comment")}
+      aria-label={t('Add comment')}
     >
       <Stack gap={2}>
         <Group>
@@ -173,7 +174,7 @@ function CommentDialog({ editor, pageId, readOnly }: CommentDialogProps) {
         <CommentEditor
           onUpdate={handleCommentEditorChange}
           onSave={handleAddComment}
-          placeholder={t("Write a comment")}
+          placeholder={t('Write a comment')}
           editable={true}
           autofocus={true}
         />

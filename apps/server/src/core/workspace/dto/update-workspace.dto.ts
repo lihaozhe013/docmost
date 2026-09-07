@@ -7,7 +7,7 @@ import {
   IsInt,
   IsOptional,
   IsString,
-  Min,
+  Min
 } from 'class-validator';
 
 export class UpdateWorkspaceDto extends PartialType(CreateWorkspaceDto) {

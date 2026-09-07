@@ -1,13 +1,13 @@
-import { FC, useCallback, useEffect, useRef } from "react";
-import { BubbleMenu } from "@tiptap/react/menus";
-import type { Editor } from "@tiptap/react";
-import { useAtom } from "jotai";
-import { isTextSelected } from "@docmost/editor-ext";
-import { showLinkMenuAtom } from "@/features/editor/atoms/editor-atoms";
-import { LinkEditorPanel } from "@/features/editor/components/link/link-editor-panel";
-import { normalizeUrl } from "@/lib/utils";
-import { TextSelection } from "@tiptap/pm/state";
-import { Paper } from "@mantine/core";
+import { FC, useCallback, useEffect, useRef } from 'react';
+import { BubbleMenu } from '@tiptap/react/menus';
+import type { Editor } from '@tiptap/react';
+import { useAtom } from 'jotai';
+import { isTextSelected } from '@docmost/editor-ext';
+import { showLinkMenuAtom } from '@/features/editor/atoms/editor-atoms';
+import { LinkEditorPanel } from '@/features/editor/components/link/link-editor-panel';
+import { normalizeUrl } from '@/lib/utils';
+import { TextSelection } from '@tiptap/pm/state';
+import { Paper } from '@mantine/core';
 
 type EditorLinkMenuProps = {
   editor: Editor;
@@ -29,7 +29,7 @@ export const EditorLinkMenu: FC<EditorLinkMenuProps> = ({ editor }) => {
   const focusInput = useCallback(() => {
     requestAnimationFrame(() => {
       containerRef.current
-        ?.querySelector<HTMLInputElement>("input")
+        ?.querySelector<HTMLInputElement>('input')
         ?.focus({ preventScroll: true });
     });
   }, []);
@@ -41,7 +41,7 @@ export const EditorLinkMenu: FC<EditorLinkMenuProps> = ({ editor }) => {
         .focus()
         .setLink({
           href: internal ? url : normalizeUrl(url),
-          internal: !!internal,
+          internal: !!internal
         } as any)
         .command(({ tr }) => {
           tr.setSelection(TextSelection.create(tr.doc, tr.selection.to));
@@ -50,7 +50,7 @@ export const EditorLinkMenu: FC<EditorLinkMenuProps> = ({ editor }) => {
         .run();
       setShowLinkMenu(false);
     },
-    [editor, setShowLinkMenu],
+    [editor, setShowLinkMenu]
   );
 
   useEffect(() => {
@@ -63,22 +63,25 @@ export const EditorLinkMenu: FC<EditorLinkMenuProps> = ({ editor }) => {
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
+      if (e.key === 'Escape') {
         dismiss();
       }
     };
 
     const handleMouseDown = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
         dismiss();
       }
     };
 
-    document.addEventListener("keydown", handleKeyDown);
-    document.addEventListener("mousedown", handleMouseDown);
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('mousedown', handleMouseDown);
     return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      document.removeEventListener("mousedown", handleMouseDown);
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('mousedown', handleMouseDown);
     };
   }, [showLinkMenu, setShowLinkMenu]);
 
@@ -97,16 +100,23 @@ export const EditorLinkMenu: FC<EditorLinkMenuProps> = ({ editor }) => {
         );
       }}
       options={{
-        placement: "bottom",
+        placement: 'bottom',
         offset: 8,
         onShow: focusInput,
         onHide: () => {
           setShowLinkMenu(false);
-        },
+        }
       }}
-      style={{ zIndex: 198, position: "relative" }}
+      style={{ zIndex: 198, position: 'relative' }}
     >
-      <Paper ref={containerRef} w={320} p="sm" shadow="md" radius={6} withBorder>
+      <Paper
+        ref={containerRef}
+        w={320}
+        p="sm"
+        shadow="md"
+        radius={6}
+        withBorder
+      >
         <LinkEditorPanel onSetLink={onSetLink} />
       </Paper>
     </BubbleMenu>

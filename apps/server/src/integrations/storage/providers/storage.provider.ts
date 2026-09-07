@@ -1,6 +1,6 @@
 import {
   STORAGE_CONFIG_TOKEN,
-  STORAGE_DRIVER_TOKEN,
+  STORAGE_DRIVER_TOKEN
 } from '../constants/storage.constants';
 import { EnvironmentService } from '../../environment/environment.service';
 import {
@@ -9,7 +9,7 @@ import {
   S3StorageConfig,
   StorageConfig,
   StorageDriver,
-  StorageOption,
+  StorageOption
 } from '../interfaces';
 import { AzureDriver, LocalDriver, S3Driver } from '../drivers';
 import * as process from 'node:process';
@@ -39,12 +39,12 @@ export const storageDriverConfigProvider = {
         return {
           driver,
           config: {
-            storagePath: LOCAL_STORAGE_PATH,
-          },
+            storagePath: LOCAL_STORAGE_PATH
+          }
         };
 
-      case StorageOption.S3:
-        { const s3Config = {
+      case StorageOption.S3: {
+        const s3Config = {
           driver,
           config: {
             region: environmentService.getAwsS3Region(),
@@ -52,8 +52,8 @@ export const storageDriverConfigProvider = {
             bucket: environmentService.getAwsS3Bucket(),
             baseUrl: environmentService.getAwsS3Url(),
             forcePathStyle: environmentService.getAwsS3ForcePathStyle(),
-            credentials: undefined,
-          },
+            credentials: undefined
+          }
         };
 
         /**
@@ -67,11 +67,12 @@ export const storageDriverConfigProvider = {
         ) {
           s3Config.config.credentials = {
             accessKeyId: environmentService.getAwsS3AccessKeyId(),
-            secretAccessKey: environmentService.getAwsS3SecretAccessKey(),
+            secretAccessKey: environmentService.getAwsS3SecretAccessKey()
           };
         }
 
-        return s3Config; }
+        return s3Config;
+      }
 
       case StorageOption.AZURE:
         return {
@@ -81,8 +82,8 @@ export const storageDriverConfigProvider = {
             container: environmentService.getAzureStorageContainer(),
             accountKey: environmentService.getAzureStorageAccountKey(),
             endpoint: environmentService.getAzureStorageEndpoint() || undefined,
-            baseUrl: environmentService.getAzureStorageUrl() || undefined,
-          },
+            baseUrl: environmentService.getAzureStorageUrl() || undefined
+          }
         };
 
       default:
@@ -90,11 +91,11 @@ export const storageDriverConfigProvider = {
     }
   },
 
-  inject: [EnvironmentService],
+  inject: [EnvironmentService]
 };
 
 export const storageDriverProvider = {
   provide: STORAGE_DRIVER_TOKEN,
   useFactory: (config: StorageConfig) => createStorageDriver(config),
-  inject: [STORAGE_CONFIG_TOKEN],
+  inject: [STORAGE_CONFIG_TOKEN]
 };

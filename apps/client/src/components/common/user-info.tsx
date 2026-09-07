@@ -1,6 +1,6 @@
-import { Group, Text } from "@mantine/core";
-import { CustomAvatar } from "@/components/ui/custom-avatar.tsx";
-import React from "react";
+import { Group, Text } from '@mantine/core';
+import { CustomAvatar } from '@/components/ui/custom-avatar.tsx';
+import React from 'react';
 import { IUser } from '@/features/user/types/user.types.ts';
 
 interface UserInfoProps {

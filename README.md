@@ -1,8 +1,8 @@
 # Docmost (Personal fork)
 
-A trimmed, self-hosted fork of [Docmost](https://docmost.com) for private use among
-family, friends and colleagues. It is free for everyone and is not intended for
-public signups.
+A trimmed, self-hosted fork of [Docmost](https://docmost.com) for private use
+among family, friends and colleagues. It is free for everyone and is not
+intended for public signups.
 
 This fork diverges from upstream on purpose: enterprise/cloud features, email
 (SMTP) delivery, and license-gated surfaces have been removed, and user
@@ -22,9 +22,9 @@ Removed:
 
 Added:
 
-- **Admin-managed accounts**: an owner/admin creates a member by name/email/role;
-  the server generates a one-time random password shown only to the admin. The
-  member signs in with it and changes it in Account settings.
+- **Admin-managed accounts**: an owner/admin creates a member by
+  name/email/role; the server generates a one-time random password shown only to
+  the admin. The member signs in with it and changes it in Account settings.
   (`POST /api/workspace/members/create`)
 - **Admin password reset**: an owner/admin can reset any member's password,
   which signs the member out of all sessions. The new one-time password is shown
@@ -57,11 +57,11 @@ Kept:
 docker compose up -d
 ```
 
-3. Open `http://localhost:3000`, complete the initial setup
-   (`/setup/register`) which creates the workspace owner.
-4. Create accounts for other people: Workspace settings → Members →
-   **Create member**. Share the one-time password with the member outside of
-   Docmost (chat, phone, etc.) — it cannot be retrieved later.
+3. Open `http://localhost:3000`, complete the initial setup (`/setup/register`)
+   which creates the workspace owner.
+4. Create accounts for other people: Workspace settings → Members → **Create
+   member**. Share the one-time password with the member outside of Docmost
+   (chat, phone, etc.) — it cannot be retrieved later.
 5. Members change their password at Account → My profile → Change password.
 
 ### Notes

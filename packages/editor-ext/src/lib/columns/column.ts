@@ -1,5 +1,5 @@
-import { Node, mergeAttributes, findParentNode } from "@tiptap/core";
-import { TextSelection } from "@tiptap/pm/state";
+import { Node, mergeAttributes, findParentNode } from '@tiptap/core';
+import { TextSelection } from '@tiptap/pm/state';
 
 export interface ColumnOptions {
   HTMLAttributes: Record<string, any>;
@@ -9,7 +9,7 @@ export interface ColumnAttributes {
   width?: number | null;
 }
 
-declare module "@tiptap/core" {
+declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     column: {
       setColumnWidth: (width: number | null) => ReturnType;
@@ -18,9 +18,9 @@ declare module "@tiptap/core" {
 }
 
 export const Column = Node.create<ColumnOptions>({
-  name: "column",
-  group: "block",
-  content: "block+",
+  name: 'column',
+  group: 'block',
+  content: 'block+',
   defining: true,
   isolating: true,
   selectable: false,
@@ -36,13 +36,13 @@ export const Column = Node.create<ColumnOptions>({
       width: {
         default: null,
         parseHTML: (element) => {
-          const value = element.getAttribute("data-width");
+          const value = element.getAttribute('data-width');
           return value ? parseFloat(value) : null;
         },
         renderHTML: (attributes: ColumnAttributes) => {
           if (!attributes.width) return {};
           return {
-            "data-width": attributes.width,
+            'data-width': attributes.width,
             style: `flex: ${attributes.width}`,
           };
         },
@@ -60,9 +60,9 @@ export const Column = Node.create<ColumnOptions>({
 
   renderHTML({ HTMLAttributes }) {
     return [
-      "div",
+      'div',
       mergeAttributes(
-        { "data-type": this.name },
+        { 'data-type': this.name },
         this.options.HTMLAttributes,
         HTMLAttributes,
       ),
@@ -74,14 +74,14 @@ export const Column = Node.create<ColumnOptions>({
     const jumpToColumn = (direction: 1 | -1) => () => {
       const { state, dispatch } = this.editor.view;
 
-      const columns = findParentNode(
-        (node) => node.type.name === "columns",
-      )(state.selection);
+      const columns = findParentNode((node) => node.type.name === 'columns')(
+        state.selection,
+      );
       if (!columns) return false;
 
-      const column = findParentNode(
-        (node) => node.type.name === "column",
-      )(state.selection);
+      const column = findParentNode((node) => node.type.name === 'column')(
+        state.selection,
+      );
       if (!column) return false;
 
       let currentIndex = -1;
@@ -112,7 +112,7 @@ export const Column = Node.create<ColumnOptions>({
 
     return {
       Tab: jumpToColumn(1),
-      "Shift-Tab": jumpToColumn(-1),
+      'Shift-Tab': jumpToColumn(-1),
     };
   },
 
@@ -121,7 +121,7 @@ export const Column = Node.create<ColumnOptions>({
       setColumnWidth:
         (width) =>
         ({ commands }) =>
-          commands.updateAttributes("column", { width }),
+          commands.updateAttributes('column', { width }),
     };
   },
 });

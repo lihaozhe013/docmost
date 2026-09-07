@@ -3,7 +3,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
-  UnauthorizedException,
+  UnauthorizedException
 } from '@nestjs/common';
 import { TokenService } from '../../core/auth/services/token.service';
 import { UserRepo } from '@docmost/db/repos/user/user.repo';
@@ -25,7 +25,7 @@ export class AuthenticationExtension implements Extension {
     private userRepo: UserRepo,
     private pageRepo: PageRepo,
     private readonly spaceMemberRepo: SpaceMemberRepo,
-    private readonly pagePermissionRepo: PagePermissionRepo,
+    private readonly pagePermissionRepo: PagePermissionRepo
   ) {}
 
   async onAuthenticate(data: onAuthenticatePayload) {
@@ -61,7 +61,7 @@ export class AuthenticationExtension implements Extension {
 
     const userSpaceRoles = await this.spaceMemberRepo.getUserSpaceRoles(
       user.id,
-      page.spaceId,
+      page.spaceId
     );
 
     const userSpaceRole = findHighestUserSpaceRole(userSpaceRoles);
@@ -78,7 +78,7 @@ export class AuthenticationExtension implements Extension {
     if (hasAnyRestriction) {
       if (!canAccess) {
         this.logger.warn(
-          `User ${user.id} denied page-level access to page: ${pageId}`,
+          `User ${user.id} denied page-level access to page: ${pageId}`
         );
         throw new UnauthorizedException();
       }
@@ -86,7 +86,7 @@ export class AuthenticationExtension implements Extension {
       if (!canEdit) {
         data.connectionConfig.readOnly = true;
         this.logger.debug(
-          `User ${user.id} granted readonly access to restricted page: ${pageId}`,
+          `User ${user.id} granted readonly access to restricted page: ${pageId}`
         );
       }
     } else {
@@ -104,7 +104,7 @@ export class AuthenticationExtension implements Extension {
     this.logger.debug(`Authenticated user ${user.id} on page ${pageId}`);
 
     return {
-      user,
+      user
     };
   }
 }

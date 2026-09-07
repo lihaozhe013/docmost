@@ -1,17 +1,17 @@
-import { isNodeEmpty } from "@tiptap/core";
-import { Plugin, PluginKey } from "@tiptap/pm/state";
-import { Decoration, DecorationSet } from "@tiptap/pm/view";
-import { Placeholder as TiptapPlaceholder } from "@tiptap/extensions";
+import { isNodeEmpty } from '@tiptap/core';
+import { Plugin, PluginKey } from '@tiptap/pm/state';
+import { Decoration, DecorationSet } from '@tiptap/pm/view';
+import { Placeholder as TiptapPlaceholder } from '@tiptap/extensions';
 
 export const Placeholder = TiptapPlaceholder.extend({
   addProseMirrorPlugins() {
     const editor = this.editor;
     const options = this.options;
-    const dataAttribute = `data-${options.dataAttribute || "placeholder"}`;
+    const dataAttribute = `data-${options.dataAttribute || 'placeholder'}`;
 
     return [
       new Plugin({
-        key: new PluginKey("docmostPlaceholder"),
+        key: new PluginKey('docmostPlaceholder'),
         props: {
           decorations: (state) => {
             if (options.showOnlyWhenEditable && !editor.isEditable) {
@@ -33,7 +33,7 @@ export const Placeholder = TiptapPlaceholder.extend({
 
               if ((hasAnchor || !options.showOnlyCurrent) && isEmpty) {
                 const emptyNodeClass =
-                  typeof options.emptyNodeClass === "function"
+                  typeof options.emptyNodeClass === 'function'
                     ? options.emptyNodeClass({ editor, node, pos, hasAnchor })
                     : options.emptyNodeClass;
                 const classes = [emptyNodeClass];
@@ -43,12 +43,12 @@ export const Placeholder = TiptapPlaceholder.extend({
 
                 decorations.push(
                   Decoration.node(pos, pos + node.nodeSize, {
-                    class: classes.join(" "),
+                    class: classes.join(' '),
                     [dataAttribute]:
-                      typeof options.placeholder === "function"
+                      typeof options.placeholder === 'function'
                         ? options.placeholder({ editor, node, pos, hasAnchor })
-                        : options.placeholder,
-                  }),
+                        : options.placeholder
+                  })
                 );
               }
 
@@ -56,9 +56,9 @@ export const Placeholder = TiptapPlaceholder.extend({
             });
 
             return DecorationSet.create(doc, decorations);
-          },
-        },
-      }),
+          }
+        }
+      })
     ];
-  },
+  }
 });

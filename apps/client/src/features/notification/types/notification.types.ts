@@ -1,18 +1,18 @@
 export type NotificationType =
-  | "comment.user_mention"
-  | "comment.created"
-  | "comment.resolved"
-  | "page.user_mention"
-  | "page.permission_granted"
-  | "page.updated"
-  | "page.verification_expiring"
-  | "page.verification_expired"
-  | "page.verified"
-  | "page.approval_requested"
-  | "page.approval_rejected"
-  | "siem_destination.failing"
-  | "siem_destination.disabled"
-  | "siem_destination.recovered";
+  | 'comment.user_mention'
+  | 'comment.created'
+  | 'comment.resolved'
+  | 'page.user_mention'
+  | 'page.permission_granted'
+  | 'page.updated'
+  | 'page.verification_expiring'
+  | 'page.verification_expired'
+  | 'page.verified'
+  | 'page.approval_requested'
+  | 'page.approval_rejected'
+  | 'siem_destination.failing'
+  | 'siem_destination.disabled'
+  | 'siem_destination.recovered';
 
 export type INotification = {
   id: string;
@@ -46,6 +46,6 @@ export type INotification = {
   } | null;
 };
 
-export type NotificationFilter = "all" | "unread";
+export type NotificationFilter = 'all' | 'unread';
 
-export type NotificationTab = "direct" | "updates" | "all";
+export type NotificationTab = 'direct' | 'updates' | 'all';

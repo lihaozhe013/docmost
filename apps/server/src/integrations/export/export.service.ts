@@ -2,7 +2,7 @@ import {
   BadRequestException,
   Injectable,
   Logger,
-  NotFoundException,
+  NotFoundException
 } from '@nestjs/common';
 import { jsonToHtml, jsonToNode } from '../../collaboration/collaboration.util';
 import { ExportFormat } from './dto/export-dto';
@@ -19,11 +19,11 @@ import {
   getSafePageTitle,
   PageExportTree,
   replaceInternalLinks,
-  updateAttachmentUrlsToLocalPaths,
+  updateAttachmentUrlsToLocalPaths
 } from './utils';
 import {
   ExportMetadata,
-  ExportPageMetadata,
+  ExportPageMetadata
 } from '../../common/helpers/types/export-metadata.types';
 import { PageRepo } from '@docmost/db/repos/page/page.repo';
 import { PagePermissionRepo } from '@docmost/db/repos/page/page-permission.repo';
@@ -36,7 +36,7 @@ import { EnvironmentService } from '../environment/environment.service';
 import { DomainService } from '../environment/domain.service';
 import {
   getAttachmentIds,
-  getProsemirrorContent,
+  getProsemirrorContent
 } from '../../common/helpers/prosemirror/utils';
 import { htmlToMarkdown } from '@docmost/editor-ext';
 
@@ -52,14 +52,14 @@ export class ExportService {
     @InjectKysely() private readonly db: KyselyDB,
     private readonly storageService: StorageService,
     private readonly environmentService: EnvironmentService,
-    private readonly domainService: DomainService,
+    private readonly domainService: DomainService
   ) {}
 
   async exportPage(format: string, page: Page, singlePage?: boolean) {
     const titleNode = {
       type: 'heading',
       attrs: { level: 1 },
-      content: [{ type: 'text', text: getPageTitle(page.title) }],
+      content: [{ type: 'text', text: getPageTitle(page.title) }]
     };
 
     let prosemirrorJson: any;
@@ -69,7 +69,7 @@ export class ExportService {
       prosemirrorJson = await this.turnPageMentionsToLinks(
         getProsemirrorContent(page.content),
         page.workspaceId,
-        baseUrl,
+        baseUrl
       );
     } else {
       // mentions is already turned to links during the zip process
@@ -95,7 +95,7 @@ export class ExportService {
     if (format === ExportFormat.Markdown) {
       const newPageHtml = pageHtml.replace(
         /<colgroup[^>]*>[\s\S]*?<\/colgroup>/gim,
-        '',
+        ''
       );
       return htmlToMarkdown(newPageHtml);
     }
@@ -109,19 +109,19 @@ export class ExportService {
     includeAttachments: boolean,
     includeChildren: boolean,
     userId?: string,
-    ignorePermissions = false,
+    ignorePermissions = false
   ) {
     let pages: Page[];
 
     if (includeChildren) {
       //@ts-ignore
       pages = await this.pageRepo.getPageAndDescendants(pageId, {
-        includeContent: true,
+        includeContent: true
       });
     } else {
       // Only fetch the single page when includeChildren is false
       const page = await this.pageRepo.findById(pageId, {
-        includeContent: true,
+        includeContent: true
       });
       if (page) {
         pages = [page];
@@ -137,7 +137,7 @@ export class ExportService {
         pages,
         pageId,
         userId,
-        pages[0].spaceId,
+        pages[0].spaceId
       );
       if (pages.length === 0) {
         throw new BadRequestException('No accessible pages to export');
@@ -171,13 +171,13 @@ export class ExportService {
       includeAttachments,
       baseUrl,
       userId,
-      ignorePermissions,
+      ignorePermissions
     );
 
     const zipFile = zip.generateNodeStream({
       type: 'nodebuffer',
       streamFiles: true,
-      compression: 'DEFLATE',
+      compression: 'DEFLATE'
     });
 
     return { type: 'zip' as const, stream: zipFile, page: pages[0] };
@@ -188,7 +188,7 @@ export class ExportService {
     format: string,
     includeAttachments: boolean,
     userId?: string,
-    ignorePermissions = false,
+    ignorePermissions = false
   ) {
     const space = await this.db
       .selectFrom('spaces')
@@ -213,7 +213,7 @@ export class ExportService {
         'pages.spaceId',
         'pages.workspaceId',
         'pages.createdAt',
-        'pages.updatedAt',
+        'pages.updatedAt'
       ])
       .where('spaceId', '=', spaceId)
       .where('deletedAt', 'is', null)
@@ -224,7 +224,7 @@ export class ExportService {
         pages as Page[],
         null,
         userId,
-        spaceId,
+        spaceId
       );
       if (pages.length === 0) {
         throw new BadRequestException('No accessible pages to export');
@@ -243,20 +243,20 @@ export class ExportService {
       includeAttachments,
       baseUrl,
       userId,
-      ignorePermissions,
+      ignorePermissions
     );
 
     const zipFile = zip.generateNodeStream({
       type: 'nodebuffer',
       streamFiles: true,
-      compression: 'DEFLATE',
+      compression: 'DEFLATE'
     });
 
     const fileName = `${space.name}-space-export.zip`;
     return {
       fileStream: zipFile,
       fileName,
-      spaceName: space.name,
+      spaceName: space.name
     };
   }
 
@@ -267,7 +267,7 @@ export class ExportService {
     includeAttachments: boolean,
     baseUrl: string,
     userId?: string,
-    ignorePermissions = false,
+    ignorePermissions = false
   ): Promise<void> {
     const slugIdToPath: Record<string, string> = {};
     const pageIdToFilePath: Record<string, string> = {};
@@ -282,7 +282,7 @@ export class ExportService {
       : new Map<string, AllowedAttachment>();
 
     const stack: { folder: JSZip; parentPageId: string | null }[] = [
-      { folder: zip, parentPageId: null },
+      { folder: zip, parentPageId: null }
     ];
 
     while (stack.length > 0) {
@@ -297,7 +297,7 @@ export class ExportService {
           page.workspaceId,
           baseUrl,
           userId,
-          ignorePermissions,
+          ignorePermissions
         );
 
         const currentPagePath = slugIdToPath[page.slugId];
@@ -306,11 +306,15 @@ export class ExportService {
           prosemirrorJson,
           slugIdToPath,
           currentPagePath,
-          baseUrl,
+          baseUrl
         );
 
         if (includeAttachments) {
-          await this.zipAttachments(updatedJsonContent, folder, allowedAttachments);
+          await this.zipAttachments(
+            updatedJsonContent,
+            folder,
+            allowedAttachments
+          );
           updatedJsonContent =
             updateAttachmentUrlsToLocalPaths(updatedJsonContent);
         }
@@ -318,12 +322,12 @@ export class ExportService {
         const pageTitle = getSafePageTitle(page.title);
         const pageExportContent = await this.exportPage(format, {
           ...page,
-          content: updatedJsonContent,
+          content: updatedJsonContent
         });
 
         folder.file(
           `${pageTitle}${getExportExtension(format)}`,
-          pageExportContent,
+          pageExportContent
         );
 
         pageIdToFilePath[page.id] = currentPagePath;
@@ -336,7 +340,7 @@ export class ExportService {
           position: page.position,
           parentPath,
           createdAt: page.createdAt?.toISOString() ?? new Date().toISOString(),
-          updatedAt: page.updatedAt?.toISOString() ?? new Date().toISOString(),
+          updatedAt: page.updatedAt?.toISOString() ?? new Date().toISOString()
         };
 
         if (childPages.length > 0) {
@@ -350,7 +354,7 @@ export class ExportService {
       exportedAt: new Date().toISOString(),
       source: 'docmost',
       version: packageJson.version,
-      pages: pagesMetadata,
+      pages: pagesMetadata
     };
 
     zip.file('docmost-metadata.json', JSON.stringify(metadata, null, 2));
@@ -359,7 +363,7 @@ export class ExportService {
   async zipAttachments(
     prosemirrorJson: any,
     zip: JSZip,
-    allowed: Map<string, AllowedAttachment>,
+    allowed: Map<string, AllowedAttachment>
   ) {
     const attachmentIds = getAttachmentIds(prosemirrorJson);
 
@@ -369,28 +373,30 @@ export class ExportService {
         if (!attachment) return;
         try {
           const fileBuffer = await this.storageService.read(
-            attachment.filePath,
+            attachment.filePath
           );
           const filePath = `/files/${attachment.id}/${attachment.fileName}`;
           zip.file(filePath, fileBuffer);
         } catch (err) {
           this.logger.debug(`Attachment export error ${attachment.id}`, err);
         }
-      }),
+      })
     );
   }
 
   private async resolveAccessibleAttachments(
     tree: PageExportTree,
     userId: string | undefined,
-    ignorePermissions: boolean,
+    ignorePermissions: boolean
   ): Promise<Map<string, AllowedAttachment>> {
     const allAttachmentIds = new Set<string>();
     let spaceId: string | undefined;
     for (const siblings of Object.values(tree)) {
       for (const page of siblings) {
         if (!spaceId) spaceId = page.spaceId;
-        for (const id of getAttachmentIds(getProsemirrorContent(page.content))) {
+        for (const id of getAttachmentIds(
+          getProsemirrorContent(page.content)
+        )) {
           allAttachmentIds.add(id);
         }
       }
@@ -411,21 +417,19 @@ export class ExportService {
     if (!ignorePermissions && userId) {
       const ownerPageIds = [
         ...new Set(
-          attachments
-            .map((a) => a.pageId)
-            .filter((id): id is string => !!id),
-        ),
+          attachments.map((a) => a.pageId).filter((id): id is string => !!id)
+        )
       ];
       const accessible = ownerPageIds.length
         ? await this.pagePermissionRepo.filterAccessiblePageIds({
             pageIds: ownerPageIds,
             userId,
-            spaceId,
+            spaceId
           })
         : [];
       const accessibleSet = new Set(accessible);
       visible = attachments.filter(
-        (a) => a.pageId && accessibleSet.has(a.pageId),
+        (a) => a.pageId && accessibleSet.has(a.pageId)
       );
     }
 
@@ -437,7 +441,7 @@ export class ExportService {
     workspaceId: string,
     baseUrl: string,
     userId?: string,
-    ignorePermissions = false,
+    ignorePermissions = false
   ) {
     const doc = jsonToNode(prosemirrorJson);
 
@@ -459,7 +463,7 @@ export class ExportService {
     if (!ignorePermissions && userId) {
       pageMentionIds = await this.pagePermissionRepo.filterAccessiblePageIds({
         pageIds: pageMentionIds,
-        userId,
+        userId
       });
     }
 
@@ -473,7 +477,7 @@ export class ExportService {
               'title',
               'creatorId',
               'spaceId',
-              'workspaceId',
+              'workspaceId'
             ])
             .select((eb) => this.pageRepo.withSpace(eb))
             .where('id', 'in', pageMentionIds)
@@ -484,7 +488,7 @@ export class ExportService {
     const pageMap = new Map(pages.map((page) => [page.id, page]));
 
     let editorState = EditorState.create({
-      doc: doc,
+      doc: doc
     });
 
     const transaction = editorState.tr;
@@ -499,7 +503,7 @@ export class ExportService {
       pos: number,
       title: string,
       slugId: string,
-      spaceSlug: string,
+      spaceSlug: string
     ) => {
       const linkTitle = title || 'untitled';
       const truncatedTitle = linkTitle?.substring(0, 70);
@@ -533,7 +537,7 @@ export class ExportService {
             pos,
             page.title,
             page.slugId,
-            page.space.slug,
+            page.space.slug
           );
         } else {
           // if page is not found, default to  the node label and slugId
@@ -565,7 +569,7 @@ export class ExportService {
     pages: Page[],
     rootPageId: string | null,
     userId: string,
-    spaceId: string,
+    spaceId: string
   ): Promise<Page[]> {
     if (pages.length === 0) return [];
 
@@ -574,8 +578,8 @@ export class ExportService {
       {
         pageIds,
         userId,
-        spaceId,
-      },
+        spaceId
+      }
     );
     const accessibleSet = new Set(accessibleIds);
 

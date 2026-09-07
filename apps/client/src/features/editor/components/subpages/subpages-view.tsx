@@ -1,19 +1,19 @@
-import { NodeViewProps, NodeViewWrapper } from "@tiptap/react";
-import { Stack, Text, Anchor, ActionIcon } from "@mantine/core";
-import { IconFileDescription } from "@tabler/icons-react";
-import { useGetSidebarPagesQuery } from "@/features/page/queries/page-query";
-import { useMemo } from "react";
-import { Link, useParams } from "react-router-dom";
-import classes from "./subpages.module.css";
-import styles from "../mention/mention.module.css";
+import { NodeViewProps, NodeViewWrapper } from '@tiptap/react';
+import { Stack, Text, Anchor, ActionIcon } from '@mantine/core';
+import { IconFileDescription } from '@tabler/icons-react';
+import { useGetSidebarPagesQuery } from '@/features/page/queries/page-query';
+import { useMemo } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import classes from './subpages.module.css';
+import styles from '../mention/mention.module.css';
 import {
   buildPageUrl,
-  buildSharedPageUrl,
-} from "@/features/page/page.utils.ts";
-import { useTranslation } from "react-i18next";
-import { sortPositionKeys } from "@/features/page/tree/utils/utils";
-import { useSharedPageSubpages } from "@/features/share/hooks/use-shared-page-subpages";
-import { extractPageSlugId } from "@/lib";
+  buildSharedPageUrl
+} from '@/features/page/page.utils.ts';
+import { useTranslation } from 'react-i18next';
+import { sortPositionKeys } from '@/features/page/tree/utils/utils';
+import { useSharedPageSubpages } from '@/features/share/hooks/use-shared-page-subpages';
+import { extractPageSlugId } from '@/lib';
 
 export default function SubpagesView(props: NodeViewProps) {
   const { editor } = props;
@@ -25,7 +25,7 @@ export default function SubpagesView(props: NodeViewProps) {
   const routePageId = extractPageSlugId(pageSlug);
   let currentPageId = storagePageId;
 
-  if (shareId){
+  if (shareId) {
     currentPageId = routePageId;
   }
 
@@ -33,7 +33,7 @@ export default function SubpagesView(props: NodeViewProps) {
   const sharedSubpages = useSharedPageSubpages(currentPageId);
 
   const { data, isLoading, error } = useGetSidebarPagesQuery(
-    shareId ? null : { pageId: currentPageId },
+    shareId ? null : { pageId: currentPageId }
   );
 
   const subpages = useMemo(() => {
@@ -44,7 +44,7 @@ export default function SubpagesView(props: NodeViewProps) {
         slugId: node.slugId,
         title: node.name,
         icon: node.icon,
-        position: node.position,
+        position: node.position
       }));
     }
 
@@ -62,7 +62,7 @@ export default function SubpagesView(props: NodeViewProps) {
     return (
       <NodeViewWrapper data-drag-handle>
         <Text c="dimmed" size="md" py="md">
-          {t("Failed to load subpages")}
+          {t('Failed to load subpages')}
         </Text>
       </NodeViewWrapper>
     );
@@ -73,7 +73,7 @@ export default function SubpagesView(props: NodeViewProps) {
       <NodeViewWrapper data-drag-handle>
         <div className={classes.container}>
           <Text c="dimmed" size="md" py="md">
-            {t("No subpages")}
+            {t('No subpages')}
           </Text>
         </div>
       </NodeViewWrapper>
@@ -94,7 +94,7 @@ export default function SubpagesView(props: NodeViewProps) {
                   ? buildSharedPageUrl({
                       shareId,
                       pageSlugId: page.slugId,
-                      pageTitle: page.title,
+                      pageTitle: page.title
                     })
                   : buildPageUrl(spaceSlug, page.slugId, page.title)
               }
@@ -103,21 +103,21 @@ export default function SubpagesView(props: NodeViewProps) {
               draggable={false}
             >
               {page?.icon ? (
-                <span style={{ marginRight: "4px" }}>{page.icon}</span>
+                <span style={{ marginRight: '4px' }}>{page.icon}</span>
               ) : (
                 <ActionIcon
                   variant="transparent"
                   color="gray"
                   component="span"
                   size={18}
-                  style={{ verticalAlign: "text-bottom" }}
+                  style={{ verticalAlign: 'text-bottom' }}
                 >
                   <IconFileDescription size={18} />
                 </ActionIcon>
               )}
 
               <span className={styles.pageMentionText}>
-                {page?.title || t("untitled")}
+                {page?.title || t('untitled')}
               </span>
             </Anchor>
           ))}

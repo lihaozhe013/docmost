@@ -1,6 +1,6 @@
 export interface IFileTask {
   id: string;
-  type: "import" | "export";
+  type: 'import' | 'export';
   source: string;
   status: string;
   fileName: string;

@@ -1,13 +1,13 @@
-import { useMemo, useRef, useState, KeyboardEvent } from "react";
-import clsx from "clsx";
-import { IconPlus } from "@tabler/icons-react";
-import { useTranslation } from "react-i18next";
-import { useComputedColorScheme } from "@mantine/core";
-import { ILabel } from "@/features/label/types/label.types.ts";
-import { useWorkspaceLabelsQuery } from "@/features/label/queries/label-query.ts";
-import { getLabelColor } from "@/features/label/utils/label-colors.ts";
-import { normalizeLabelName } from "@/features/label/utils/normalize-label.ts";
-import classes from "@/features/label/label.module.css";
+import { useMemo, useRef, useState, KeyboardEvent } from 'react';
+import clsx from 'clsx';
+import { IconPlus } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
+import { useComputedColorScheme } from '@mantine/core';
+import { ILabel } from '@/features/label/types/label.types.ts';
+import { useWorkspaceLabelsQuery } from '@/features/label/queries/label-query.ts';
+import { getLabelColor } from '@/features/label/utils/label-colors.ts';
+import { normalizeLabelName } from '@/features/label/utils/normalize-label.ts';
+import classes from '@/features/label/label.module.css';
 
 type LabelPickerProps = {
   applied: ILabel[];
@@ -31,11 +31,11 @@ export function LabelPicker({
   applied,
   enabled,
   onAdd,
-  onClose,
+  onClose
 }: LabelPickerProps) {
   const { t } = useTranslation();
-  const scheme = useComputedColorScheme("light");
-  const [query, setQuery] = useState("");
+  const scheme = useComputedColorScheme('light');
+  const [query, setQuery] = useState('');
   const [hover, setHover] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -44,7 +44,7 @@ export function LabelPicker({
 
   const appliedNames = useMemo(
     () => new Set(applied.map((l) => l.name.toLowerCase())),
-    [applied],
+    [applied]
   );
 
   const suggestions = useMemo(() => {
@@ -64,23 +64,23 @@ export function LabelPicker({
     } else if (canCreate) {
       onAdd(normalized);
     }
-    setQuery("");
+    setQuery('');
     setHover(0);
     inputRef.current?.focus();
   };
 
   const onKey = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "ArrowDown") {
+    if (e.key === 'ArrowDown') {
       e.preventDefault();
       setHover((h) => Math.min(Math.max(total - 1, 0), h + 1));
-    } else if (e.key === "ArrowUp") {
+    } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       setHover((h) => Math.max(0, h - 1));
-    } else if (e.key === "Enter") {
+    } else if (e.key === 'Enter') {
       e.preventDefault();
       if (total === 0) return;
       select(hover);
-    } else if (e.key === "Escape") {
+    } else if (e.key === 'Escape') {
       e.preventDefault();
       onClose();
     }
@@ -94,7 +94,7 @@ export function LabelPicker({
           type="text"
           autoFocus
           maxLength={MAX_LABEL_NAME_LENGTH}
-          placeholder={t("Search or create…")}
+          placeholder={t('Search or create…')}
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
@@ -107,12 +107,12 @@ export function LabelPicker({
         {total === 0 && (
           <div className={classes.popoverEmpty}>
             {normalized.length === 0
-              ? t("No labels yet")
+              ? t('No labels yet')
               : appliedNames.has(normalized)
-                ? t("Already added")
+                ? t('Already added')
                 : !isValidLabelName(normalized)
-                  ? t("Invalid label name")
-                  : t("No matches")}
+                  ? t('Invalid label name')
+                  : t('No matches')}
           </div>
         )}
         {suggestions.map((s, i) => {
@@ -123,7 +123,7 @@ export function LabelPicker({
               type="button"
               className={clsx(
                 classes.popoverItem,
-                hover === i && classes.popoverItemHover,
+                hover === i && classes.popoverItemHover
               )}
               onMouseEnter={() => setHover(i)}
               onClick={() => select(i)}
@@ -141,7 +141,7 @@ export function LabelPicker({
             type="button"
             className={clsx(
               classes.popoverItem,
-              hover === suggestions.length && classes.popoverItemHover,
+              hover === suggestions.length && classes.popoverItemHover
             )}
             onMouseEnter={() => setHover(suggestions.length)}
             onClick={() => select(suggestions.length)}
@@ -150,7 +150,7 @@ export function LabelPicker({
               <IconPlus size={12} stroke={2} />
             </span>
             <span className={classes.popoverItemName}>
-              {t("Create")} <b>"{normalized}"</b>
+              {t('Create')} <b>"{normalized}"</b>
             </span>
           </button>
         )}

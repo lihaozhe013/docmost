@@ -1,22 +1,22 @@
-import { useEffect } from "react";
-import type { Editor } from "@tiptap/react";
-import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
-import { draggable } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
-import { disableNativeDragPreview } from "@atlaskit/pragmatic-drag-and-drop/element/disable-native-drag-preview";
+import { useEffect } from 'react';
+import type { Editor } from '@tiptap/react';
+import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
+import { draggable } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
+import { disableNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/disable-native-drag-preview';
 import {
   autoScrollForElements,
-  autoScrollWindowForElements,
-} from "@atlaskit/pragmatic-drag-and-drop-auto-scroll/element";
-import { getTableHandlePluginSpec } from "@docmost/editor-ext";
+  autoScrollWindowForElements
+} from '@atlaskit/pragmatic-drag-and-drop-auto-scroll/element';
+import { getTableHandlePluginSpec } from '@docmost/editor-ext';
 
 // Uses pragmatic-drag-and-drop instead of native HTML5 DnD because the native
 // dragstart→dragover→drop lifecycle was being silently cancelled
 export function useTableHandleDrag(
   editor: Editor,
-  orientation: "col" | "row",
+  orientation: 'col' | 'row',
   element: HTMLElement | null,
   wrapper: HTMLElement | null,
-  onDragStart?: () => void,
+  onDragStart?: () => void
 ) {
   useEffect(() => {
     if (!element) return;
@@ -53,7 +53,7 @@ export function useTableHandleDrag(
           spec.updateDragPosition(clientX, clientY);
           spec.commitDrop();
           spec.endDrag();
-        },
+        }
       }),
       // Wrapper owns horizontal auto-scroll (it has `overflow-x: auto`);
       // window owns vertical. Locking each axis prevents the window's
@@ -65,15 +65,15 @@ export function useTableHandleDrag(
       // Only the column handle registers wrapper auto-scroll (rows can't
       // scroll horizontally) — registering twice on the same wrapper
       // triggers a dev-mode warning from pragmatic-dnd-auto-scroll.
-      orientation === "col" &&
-      wrapper &&
-      !wrapper.classList.contains("tableWrapperNoOverflow")
+      orientation === 'col' &&
+        wrapper &&
+        !wrapper.classList.contains('tableWrapperNoOverflow')
         ? autoScrollForElements({
             element: wrapper,
-            getAllowedAxis: () => "horizontal",
+            getAllowedAxis: () => 'horizontal'
           })
         : () => {},
-      autoScrollWindowForElements({ getAllowedAxis: () => "vertical" }),
+      autoScrollWindowForElements({ getAllowedAxis: () => 'vertical' })
     );
   }, [editor, orientation, element, wrapper, onDragStart]);
 }

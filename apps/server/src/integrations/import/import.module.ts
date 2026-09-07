@@ -13,10 +13,10 @@ import { PageModule } from '../../core/page/page.module';
     ImportService,
     FileImportTaskService,
     FileTaskProcessor,
-    ImportAttachmentService,
+    ImportAttachmentService
   ],
   exports: [ImportService, ImportAttachmentService],
   controllers: [ImportController, FileTaskController],
-  imports: [StorageModule, PageModule],
+  imports: [StorageModule, PageModule]
 })
 export class ImportModule {}

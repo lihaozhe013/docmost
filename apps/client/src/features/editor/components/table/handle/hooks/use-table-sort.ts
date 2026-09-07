@@ -1,12 +1,12 @@
-import { useCallback, useMemo } from "react";
-import type { Editor } from "@tiptap/react";
-import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
+import { useCallback, useMemo } from 'react';
+import type { Editor } from '@tiptap/react';
+import type { Node as ProseMirrorNode } from '@tiptap/pm/model';
 import {
   convertArrayOfRowsToTableNode,
   convertTableNodeToArrayOfRows,
   isEditorReady,
-  transpose,
-} from "@docmost/editor-ext";
+  transpose
+} from '@docmost/editor-ext';
 import {
   getCellSortText,
   isCellEmpty,
@@ -14,12 +14,12 @@ import {
   type SortDirection,
   type SortableItem,
   sortItems,
-  weaveItems,
-} from "../lib/sort-cells";
+  weaveItems
+} from '../lib/sort-cells';
 
 interface Args {
   editor: Editor;
-  orientation: "col" | "row";
+  orientation: 'col' | 'row';
   index: number;
   tableNode: ProseMirrorNode;
   tablePos: number;
@@ -47,13 +47,13 @@ export function useTableSort({
   index,
   tableNode,
   tablePos,
-  direction,
+  direction
 }: Args) {
   const canSort = useMemo(() => {
     if (tableHasMergedCells(tableNode)) return false;
 
     const rows = convertTableNodeToArrayOfRows(tableNode);
-    const axes = orientation === "col" ? rows : transpose(rows);
+    const axes = orientation === 'col' ? rows : transpose(rows);
     if (axes.length < 2) return false;
 
     return axes.some((cells) => {
@@ -67,19 +67,19 @@ export function useTableSort({
     if (!canSort || !isEditorReady(editor)) return;
 
     const rows = convertTableNodeToArrayOfRows(tableNode);
-    const axes = orientation === "col" ? rows : transpose(rows);
+    const axes = orientation === 'col' ? rows : transpose(rows);
 
     const items: SortableItem<(ProseMirrorNode | null)[]>[] = axes.map(
       (cells, originalOrder) => {
         const sortCell = cells[index];
         return {
           payload: cells,
-          text: sortCell ? getCellSortText(sortCell) : "",
+          text: sortCell ? getCellSortText(sortCell) : '',
           isHeader: isAllHeader(cells),
           isEmpty: !sortCell || isCellEmpty(sortCell),
-          originalOrder,
+          originalOrder
         };
-      },
+      }
     );
 
     const dataItems = items.filter((it) => !it.isHeader);
@@ -87,7 +87,7 @@ export function useTableSort({
     const woven = weaveItems(items, sortedData);
 
     const newAxes = woven.map((it) => it.payload);
-    const newRows = orientation === "col" ? newAxes : transpose(newAxes);
+    const newRows = orientation === 'col' ? newAxes : transpose(newAxes);
 
     const newTable = convertArrayOfRowsToTableNode(tableNode, newRows);
 

@@ -3,7 +3,7 @@ import { InjectKysely } from 'nestjs-kysely';
 import { KyselyDB } from '../../types/kysely.types';
 import {
   InsertableNotification,
-  Notification,
+  Notification
 } from '@docmost/db/types/entity.types';
 import { PaginationOptions } from '@docmost/db/pagination/pagination-options';
 import { executeWithCursorPagination } from '@docmost/db/pagination/cursor-pagination';
@@ -13,14 +13,14 @@ import { jsonObjectFrom } from 'kysely/helpers/postgres';
 import { SpaceMemberRepo } from '@docmost/db/repos/space/space-member.repo';
 import {
   NotificationTab,
-  NotificationType,
+  NotificationType
 } from '../../../core/notification/notification.constants';
 
 @Injectable()
 export class NotificationRepo {
   constructor(
     @InjectKysely() private readonly db: KyselyDB,
-    private readonly spaceMemberRepo: SpaceMemberRepo,
+    private readonly spaceMemberRepo: SpaceMemberRepo
   ) {}
 
   async findById(notificationId: string): Promise<Notification | undefined> {
@@ -34,7 +34,7 @@ export class NotificationRepo {
   async findByUserId(
     userId: string,
     pagination: PaginationOptions,
-    type: NotificationTab = 'all',
+    type: NotificationTab = 'all'
   ) {
     let query = this.db
       .selectFrom('notifications')
@@ -46,12 +46,8 @@ export class NotificationRepo {
       .where((eb) =>
         eb.or([
           eb('spaceId', 'is', null),
-          eb(
-            'spaceId',
-            'in',
-            this.spaceMemberRepo.getUserSpaceIdsQuery(userId),
-          ),
-        ]),
+          eb('spaceId', 'in', this.spaceMemberRepo.getUserSpaceIdsQuery(userId))
+        ])
       );
 
     if (type === 'direct') {
@@ -65,7 +61,7 @@ export class NotificationRepo {
       cursor: pagination.cursor,
       beforeCursor: pagination.beforeCursor,
       fields: [{ expression: 'id', direction: 'desc' }],
-      parseCursor: (cursor) => ({ id: cursor.id }),
+      parseCursor: (cursor) => ({ id: cursor.id })
     });
   }
 
@@ -86,12 +82,8 @@ export class NotificationRepo {
       .where((eb) =>
         eb.or([
           eb('spaceId', 'is', null),
-          eb(
-            'spaceId',
-            'in',
-            this.spaceMemberRepo.getUserSpaceIdsQuery(userId),
-          ),
-        ]),
+          eb('spaceId', 'in', this.spaceMemberRepo.getUserSpaceIdsQuery(userId))
+        ])
       )
       .executeTakeFirst();
 
@@ -110,7 +102,7 @@ export class NotificationRepo {
 
   async markMultipleAsRead(
     notificationIds: string[],
-    userId: string,
+    userId: string
   ): Promise<void> {
     if (notificationIds.length === 0) {
       return;
@@ -146,7 +138,7 @@ export class NotificationRepo {
     userIds: string[],
     pageId: string,
     type: string,
-    withinHours: number,
+    withinHours: number
   ): Promise<Set<string>> {
     if (userIds.length === 0) return new Set();
 
@@ -170,7 +162,7 @@ export class NotificationRepo {
       eb
         .selectFrom('users')
         .select(['users.id', 'users.name', 'users.avatarUrl'])
-        .whereRef('users.id', '=', 'notifications.actorId'),
+        .whereRef('users.id', '=', 'notifications.actorId')
     ).as('actor');
   }
 
@@ -179,7 +171,7 @@ export class NotificationRepo {
       eb
         .selectFrom('pages')
         .select(['pages.id', 'pages.title', 'pages.slugId', 'pages.icon'])
-        .whereRef('pages.id', '=', 'notifications.pageId'),
+        .whereRef('pages.id', '=', 'notifications.pageId')
     ).as('page');
   }
 
@@ -188,7 +180,7 @@ export class NotificationRepo {
       eb
         .selectFrom('spaces')
         .select(['spaces.id', 'spaces.name', 'spaces.slug'])
-        .whereRef('spaces.id', '=', 'notifications.spaceId'),
+        .whereRef('spaces.id', '=', 'notifications.spaceId')
     ).as('space');
   }
 }

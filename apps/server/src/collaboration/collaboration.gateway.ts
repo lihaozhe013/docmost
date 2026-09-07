@@ -8,12 +8,12 @@ import { EnvironmentService } from '../integrations/environment/environment.serv
 import {
   createRetryStrategy,
   parseRedisUrl,
-  RedisConfig,
+  RedisConfig
 } from '../common/helpers';
 import { LoggerExtension } from './extensions/logger.extension';
 import {
   RedisSyncExtension,
-  SerializedHTTPRequest,
+  SerializedHTTPRequest
 } from './extensions/redis-sync';
 import { toWebRequest } from './extensions/redis-sync/redis-sync.types';
 import { WsSocketWrapper } from './extensions/redis-sync/ws-socket-wrapper';
@@ -24,7 +24,7 @@ import * as os from 'node:os';
 import { CollabWsAdapter } from './adapter/collab-ws.adapter';
 import {
   CollaborationHandler,
-  CollabEventHandlers,
+  CollabEventHandlers
 } from './collaboration.handler';
 
 @Injectable()
@@ -41,7 +41,7 @@ export class CollaborationGateway {
     private persistenceExtension: PersistenceExtension,
     private loggerExtension: LoggerExtension,
     private environmentService: EnvironmentService,
-    private collabEventsService: CollaborationHandler,
+    private collabEventsService: CollaborationHandler
   ) {
     this.redisConfig = parseRedisUrl(this.environmentService.getRedisUrl());
     this.withRedis = !this.environmentService.isCollabDisableRedis();
@@ -53,8 +53,8 @@ export class CollaborationGateway {
       extensions: [
         this.authenticationExtension,
         this.persistenceExtension,
-        this.loggerExtension,
-      ],
+        this.loggerExtension
+      ]
     });
 
     if (this.withRedis) {
@@ -68,14 +68,14 @@ export class CollaborationGateway {
           db: this.redisConfig.db,
           family: this.redisConfig.family,
           tls: this.redisConfig.tls,
-          retryStrategy: createRetryStrategy(),
+          retryStrategy: createRetryStrategy()
         }),
         serverId: `collab-${os?.hostname()}-${nanoid(10)}`,
         prefix: 'collab',
         pack,
         unpack,
         // @ts-ignore
-        customEvents: this.collabEventsService.getHandlers(this.hocuspocus),
+        customEvents: this.collabEventsService.getHandlers(this.hocuspocus)
       });
       this.hocuspocus.configuration.extensions.push(this.redisSync);
       // @ts-ignore
@@ -90,9 +90,9 @@ export class CollaborationGateway {
       headers: {
         'sec-websocket-key': request.headers['sec-websocket-key'] ?? '',
         'sec-websocket-protocol':
-          request.headers['sec-websocket-protocol'] ?? '',
+          request.headers['sec-websocket-protocol'] ?? ''
       },
-      socket: { remoteAddress: request.socket?.remoteAddress ?? '' },
+      socket: { remoteAddress: request.socket?.remoteAddress ?? '' }
     };
   }
 
@@ -114,14 +114,14 @@ export class CollaborationGateway {
         this.redisSync!.onSocketClose(
           socketId,
           code,
-          new Uint8Array(reason).buffer,
+          new Uint8Array(reason).buffer
         );
       });
     } else {
       // Fallback to direct Hocuspocus connection
       const clientConnection = this.hocuspocus.handleConnection(
         client,
-        toWebRequest(this.serializeRequest(request)),
+        toWebRequest(this.serializeRequest(request))
       );
 
       client.on('message', (data: Buffer) => {
@@ -145,7 +145,7 @@ export class CollaborationGateway {
   handleYjsEvent<TName extends keyof CollabEventHandlers>(
     eventName: TName,
     documentName: string,
-    payload: Parameters<CollabEventHandlers[TName]>[1],
+    payload: Parameters<CollabEventHandlers[TName]>[1]
   ) {
     return this.redisSync?.handleEvent(eventName, documentName, payload);
   }
@@ -176,7 +176,7 @@ export class CollaborationGateway {
         this.hocuspocus.configuration.extensions.push({
           async afterUnloadDocument({ instance }) {
             if (instance.getDocumentsCount() === 0) resolve('');
-          },
+          }
         });
 
         collabWsAdapter?.close();

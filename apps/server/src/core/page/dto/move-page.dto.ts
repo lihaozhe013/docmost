@@ -3,7 +3,7 @@ import {
   IsOptional,
   MinLength,
   MaxLength,
-  IsNotEmpty,
+  IsNotEmpty
 } from 'class-validator';
 
 export class MovePageDto {

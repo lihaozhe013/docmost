@@ -1,6 +1,6 @@
-import React from "react";
-import { Helmet } from "react-helmet-async";
-import { getAppName } from "@/lib/config.ts";
+import React from 'react';
+import { Helmet } from 'react-helmet-async';
+import { getAppName } from '@/lib/config.ts';
 
 type DocumentTitleProps = {
   title?: string;
@@ -11,7 +11,7 @@ type DocumentTitleProps = {
 export function DocumentTitle({
   title,
   withAppName = true,
-  children,
+  children
 }: DocumentTitleProps) {
   const appName = getAppName();
 

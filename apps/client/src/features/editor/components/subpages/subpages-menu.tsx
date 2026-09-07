@@ -1,12 +1,12 @@
-import { BubbleMenu as BaseBubbleMenu } from "@tiptap/react/menus";
-import { posToDOMRect, findParentNode } from "@tiptap/react";
-import { Node as PMNode } from "@tiptap/pm/model";
-import React, { useCallback, type JSX } from "react";
-import { ActionIcon, Tooltip } from "@mantine/core";
-import { IconTrash } from "@tabler/icons-react";
-import { useTranslation } from "react-i18next";
-import { Editor } from "@tiptap/core";
-import { isEditorReady } from "@docmost/editor-ext";
+import { BubbleMenu as BaseBubbleMenu } from '@tiptap/react/menus';
+import { posToDOMRect, findParentNode } from '@tiptap/react';
+import { Node as PMNode } from '@tiptap/pm/model';
+import React, { useCallback, type JSX } from 'react';
+import { ActionIcon, Tooltip } from '@mantine/core';
+import { IconTrash } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
+import { Editor } from '@tiptap/core';
+import { isEditorReady } from '@docmost/editor-ext';
 
 interface SubpagesMenuProps {
   editor: Editor;
@@ -28,7 +28,7 @@ export const SubpagesMenu = React.memo(
           return false;
         }
 
-        return editor.isActive("subpages");
+        return editor.isActive('subpages');
       },
       [editor]
     );
@@ -36,7 +36,7 @@ export const SubpagesMenu = React.memo(
     const getReferenceClientRect = useCallback(() => {
       if (!isEditorReady(editor)) return new DOMRect();
       const { selection } = editor.state;
-      const predicate = (node: PMNode) => node.type.name === "subpages";
+      const predicate = (node: PMNode) => node.type.name === 'subpages';
       const parent = findParentNode(predicate)(selection);
 
       if (parent) {
@@ -64,13 +64,13 @@ export const SubpagesMenu = React.memo(
         updateDelay={0}
         shouldShow={shouldShow}
       >
-        <Tooltip position="top" label={t("Delete")}>
+        <Tooltip position="top" label={t('Delete')}>
           <ActionIcon
             onClick={deleteNode}
             variant="default"
             size="lg"
             color="red"
-            aria-label={t("Delete")}
+            aria-label={t('Delete')}
           >
             <IconTrash size={18} />
           </ActionIcon>

@@ -1,19 +1,19 @@
-import { Group, Box, Button, TextInput, Stack, Textarea } from "@mantine/core";
-import React, { useEffect } from "react";
+import { Group, Box, Button, TextInput, Stack, Textarea } from '@mantine/core';
+import React, { useEffect } from 'react';
 import {
   useGroupQuery,
-  useUpdateGroupMutation,
-} from "@/features/group/queries/group-query.ts";
-import { useForm } from "@mantine/form";
-import { z } from "zod/v4";
-import { useParams } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { zod4Resolver } from "mantine-form-zod-resolver";
-import { IGroup } from "@/features/group/types/group.types.ts";
+  useUpdateGroupMutation
+} from '@/features/group/queries/group-query.ts';
+import { useForm } from '@mantine/form';
+import { z } from 'zod/v4';
+import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { zod4Resolver } from 'mantine-form-zod-resolver';
+import { IGroup } from '@/features/group/types/group.types.ts';
 
 const formSchema = z.object({
   name: z.string().min(2).max(100),
-  description: z.string().max(500),
+  description: z.string().max(500)
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -21,7 +21,10 @@ interface EditGroupFormProps {
   onClose?: () => void;
   group?: IGroup;
 }
-export function EditGroupForm({ onClose, group: groupProp }: EditGroupFormProps) {
+export function EditGroupForm({
+  onClose,
+  group: groupProp
+}: EditGroupFormProps) {
   const { t } = useTranslation();
   const updateGroupMutation = useUpdateGroupMutation();
   const { isSuccess } = updateGroupMutation;
@@ -42,8 +45,8 @@ export function EditGroupForm({ onClose, group: groupProp }: EditGroupFormProps)
     validate: zod4Resolver(formSchema),
     initialValues: {
       name: group?.name,
-      description: group?.description,
-    },
+      description: group?.description
+    }
   });
 
   const handleSubmit = async (data: {
@@ -53,7 +56,7 @@ export function EditGroupForm({ onClose, group: groupProp }: EditGroupFormProps)
     const groupData = {
       groupId: groupId,
       name: data.name,
-      description: data.description,
+      description: data.description
     };
 
     await updateGroupMutation.mutateAsync(groupData);
@@ -67,27 +70,27 @@ export function EditGroupForm({ onClose, group: groupProp }: EditGroupFormProps)
             <TextInput
               withAsterisk
               id="name"
-              label={t("Group name")}
-              placeholder={t("e.g Developers")}
+              label={t('Group name')}
+              placeholder={t('e.g Developers')}
               variant="filled"
               data-autofocus
-              {...form.getInputProps("name")}
+              {...form.getInputProps('name')}
             />
 
             <Textarea
               id="description"
-              label={t("Group description")}
-              placeholder={t("e.g Group for developers")}
+              label={t('Group description')}
+              placeholder={t('e.g Group for developers')}
               variant="filled"
               autosize
               minRows={2}
               maxRows={8}
-              {...form.getInputProps("description")}
+              {...form.getInputProps('description')}
             />
           </Stack>
 
           <Group justify="flex-end" mt="md">
-            <Button type="submit">{t("Save")}</Button>
+            <Button type="submit">{t('Save')}</Button>
           </Group>
         </form>
       </Box>

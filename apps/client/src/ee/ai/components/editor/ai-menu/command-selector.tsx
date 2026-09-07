@@ -1,8 +1,8 @@
-import { Loader, Menu, ScrollArea } from "@mantine/core";
-import { IconChevronRight } from "@tabler/icons-react";
-import { ReactNode } from "react";
-import { CommandItem } from "./command-items.ts";
-import classes from "./ai-menu.module.css";
+import { Loader, Menu, ScrollArea } from '@mantine/core';
+import { IconChevronRight } from '@tabler/icons-react';
+import { ReactNode } from 'react';
+import { CommandItem } from './command-items.ts';
+import classes from './ai-menu.module.css';
 
 interface CommandSelectorProps {
   selectedIndex: number;
@@ -20,7 +20,7 @@ const CommandSelector = ({
   isLoading,
   output,
   currentItems,
-  handleCommand,
+  handleCommand
 }: CommandSelectorProps) => {
   return (
     <Menu
@@ -38,7 +38,7 @@ const CommandSelector = ({
           {currentItems.map((item, index) => {
             const isSelected = selectedIndex === index;
             const showLoader =
-              isLoading && output === "" && !item.subCommandSet;
+              isLoading && output === '' && !item.subCommandSet;
 
             return (
               <Menu.Item

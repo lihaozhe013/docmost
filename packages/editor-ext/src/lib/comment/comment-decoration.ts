@@ -16,7 +16,9 @@ export function commentDecoration(): Plugin {
 
         if (decorationMeta) {
           const { from, to } = tr.selection;
-          const decoration = Decoration.inline(from, to, { class: commentMarkClass });
+          const decoration = Decoration.inline(from, to, {
+            class: commentMarkClass,
+          });
           return DecorationSet.create(tr.doc, [decoration]);
         } else if (decorationMeta === false) {
           return DecorationSet.empty;

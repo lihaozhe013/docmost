@@ -11,12 +11,12 @@ describe('TransclusionController.lookup', () => {
     service = {
       lookup: jest.fn(),
       listReferences: jest.fn(),
-      unsyncReference: jest.fn(),
+      unsyncReference: jest.fn()
     } as any;
 
     const module = await Test.createTestingModule({
       controllers: [TransclusionController],
-      providers: [{ provide: TransclusionService, useValue: service }],
+      providers: [{ provide: TransclusionService, useValue: service }]
     })
       .overrideGuard(JwtAuthGuard)
       .useValue({ canActivate: () => true })
@@ -35,9 +35,9 @@ describe('TransclusionController.lookup', () => {
           sourcePageId: 'p1',
           transclusionId: 'e1',
           content: { type: 'doc' },
-          sourceUpdatedAt: new Date(),
-        },
-      ],
+          sourceUpdatedAt: new Date()
+        }
+      ]
     } as any);
 
     const out = await controller.lookup({ references: [ref] } as any, user);

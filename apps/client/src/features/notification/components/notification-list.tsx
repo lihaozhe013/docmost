@@ -1,16 +1,16 @@
-import { Center, Divider, Loader, Stack, Text } from "@mantine/core";
-import { IconBellOff } from "@tabler/icons-react";
-import { useTranslation } from "react-i18next";
-import { useEffect, useRef } from "react";
-import { NotificationItem } from "./notification-item";
+import { Center, Divider, Loader, Stack, Text } from '@mantine/core';
+import { IconBellOff } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
+import { useEffect, useRef } from 'react';
+import { NotificationItem } from './notification-item';
 import {
   INotification,
   NotificationFilter,
-  NotificationTab,
-} from "../types/notification.types";
-import { groupNotificationsByTime } from "../notification.utils";
-import { useNotificationsQuery } from "../queries/notification-query";
-import classes from "../notification.module.css";
+  NotificationTab
+} from '../types/notification.types';
+import { groupNotificationsByTime } from '../notification.utils';
+import { useNotificationsQuery } from '../queries/notification-query';
+import classes from '../notification.module.css';
 
 type NotificationListProps = {
   tab: NotificationTab;
@@ -21,16 +21,11 @@ type NotificationListProps = {
 export function NotificationList({
   tab,
   filter,
-  onNavigate,
+  onNavigate
 }: NotificationListProps) {
   const { t } = useTranslation();
-  const {
-    data,
-    isLoading,
-    hasNextPage,
-    fetchNextPage,
-    isFetchingNextPage,
-  } = useNotificationsQuery(tab as string);
+  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
+    useNotificationsQuery(tab as string);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
 
@@ -44,7 +39,7 @@ export function NotificationList({
           fetchNextPage();
         }
       },
-      { threshold: 0.1 },
+      { threshold: 0.1 }
     );
 
     observer.observe(sentinel);
@@ -59,11 +54,10 @@ export function NotificationList({
     );
   }
 
-  const allNotifications =
-    data?.pages.flatMap((page) => page.items) ?? [];
+  const allNotifications = data?.pages.flatMap((page) => page.items) ?? [];
 
   const filtered =
-    filter === "unread"
+    filter === 'unread'
       ? allNotifications.filter((n) => !n.readAt)
       : allNotifications;
 
@@ -71,11 +65,15 @@ export function NotificationList({
     return (
       <Center py="xl">
         <Stack align="center" gap="xs">
-          <IconBellOff size={32} stroke={1.5} color="var(--mantine-color-dimmed)" />
+          <IconBellOff
+            size={32}
+            stroke={1.5}
+            color="var(--mantine-color-dimmed)"
+          />
           <Text size="sm" c="dimmed">
-            {filter === "unread"
-              ? t("No unread notifications")
-              : t("No notifications")}
+            {filter === 'unread'
+              ? t('No unread notifications')
+              : t('No notifications')}
           </Text>
         </Stack>
       </Center>
@@ -83,10 +81,10 @@ export function NotificationList({
   }
 
   const timeGroupLabels = {
-    today: t("Today"),
-    yesterday: t("Yesterday"),
-    this_week: t("This week"),
-    older: t("Older"),
+    today: t('Today'),
+    yesterday: t('Yesterday'),
+    this_week: t('This week'),
+    older: t('Older')
   };
 
   const groups = groupNotificationsByTime(filtered, timeGroupLabels);

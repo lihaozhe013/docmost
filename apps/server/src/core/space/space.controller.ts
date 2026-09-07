@@ -7,7 +7,7 @@ import {
   HttpStatus,
   NotFoundException,
   Post,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { SpaceService } from './services/space.service';
 import { AuthUser } from '../../common/decorators/auth-user.decorator';
@@ -24,14 +24,14 @@ import { UpdateSpaceMemberRoleDto } from './dto/update-space-member-role.dto';
 import SpaceAbilityFactory from '../casl/abilities/space-ability.factory';
 import {
   SpaceCaslAction,
-  SpaceCaslSubject,
+  SpaceCaslSubject
 } from '../casl/interfaces/space-ability.type';
 import { UpdateSpaceDto } from './dto/update-space.dto';
 import { findHighestUserSpaceRole } from '@docmost/db/repos/space/utils';
 import { SpaceMemberRepo } from '@docmost/db/repos/space/space-member.repo';
 import {
   WorkspaceCaslAction,
-  WorkspaceCaslSubject,
+  WorkspaceCaslSubject
 } from '../casl/interfaces/workspace-ability.type';
 import WorkspaceAbilityFactory from '../casl/abilities/workspace-ability.factory';
 import { CreateSpaceDto } from './dto/create-space.dto';
@@ -44,7 +44,7 @@ export class SpaceController {
     private readonly spaceMemberService: SpaceMemberService,
     private readonly spaceMemberRepo: SpaceMemberRepo,
     private readonly spaceAbility: SpaceAbilityFactory,
-    private readonly workspaceAbility: WorkspaceAbilityFactory,
+    private readonly workspaceAbility: WorkspaceAbilityFactory
   ) {}
 
   @HttpCode(HttpStatus.OK)
@@ -53,18 +53,18 @@ export class SpaceController {
   async getWorkspaceSpaces(
     @Body()
     pagination: PaginationOptions,
-    @AuthUser() user: User,
+    @AuthUser() user: User
   ) {
     const result = await this.spaceMemberService.getUserSpaces(
       user.id,
-      pagination,
+      pagination
     );
 
     if (result.items.length > 0) {
       const spaceIds = result.items.map((s) => s.id);
       const roles = await this.spaceMemberRepo.getUserRolesForSpaces(
         user.id,
-        spaceIds,
+        spaceIds
       );
 
       const roleMap = new Map<string, string[]>();
@@ -78,13 +78,13 @@ export class SpaceController {
         const spaceRoles = roleMap.get(space.id);
         const role = spaceRoles
           ? findHighestUserSpaceRole(
-              spaceRoles.map((r) => ({ userId: user.id, role: r })),
+              spaceRoles.map((r) => ({ userId: user.id, role: r }))
             )
           : undefined;
 
         return {
           ...space,
-          membership: { userId: user.id, role },
+          membership: { userId: user.id, role }
         };
       });
     }
@@ -98,11 +98,11 @@ export class SpaceController {
   async getSpaceInfo(
     @Body() spaceIdDto: SpaceIdDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const space = await this.spaceService.getSpaceInfo(
       spaceIdDto.spaceId,
-      workspace.id,
+      workspace.id
     );
 
     if (!space) {
@@ -116,7 +116,7 @@ export class SpaceController {
 
     const userSpaceRoles = await this.spaceMemberRepo.getUserSpaceRoles(
       user.id,
-      space.id,
+      space.id
     );
 
     const userSpaceRole = findHighestUserSpaceRole(userSpaceRoles);
@@ -124,7 +124,7 @@ export class SpaceController {
     const membership = {
       userId: user.id,
       role: userSpaceRole,
-      permissions: ability.rules,
+      permissions: ability.rules
     };
 
     return { ...space, membership };
@@ -136,7 +136,7 @@ export class SpaceController {
   createSpace(
     @Body() createSpaceDto: CreateSpaceDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
     if (
@@ -153,11 +153,11 @@ export class SpaceController {
   async updateSpace(
     @Body() updateSpaceDto: UpdateSpaceDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const ability = await this.spaceAbility.createForUser(
       user,
-      updateSpaceDto.spaceId,
+      updateSpaceDto.spaceId
     );
     if (ability.cannot(SpaceCaslAction.Manage, SpaceCaslSubject.Settings)) {
       throw new ForbiddenException();
@@ -170,11 +170,11 @@ export class SpaceController {
   async deleteSpace(
     @Body() spaceIdDto: SpaceIdDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const ability = await this.spaceAbility.createForUser(
       user,
-      spaceIdDto.spaceId,
+      spaceIdDto.spaceId
     );
     if (ability.cannot(SpaceCaslAction.Manage, SpaceCaslSubject.Settings)) {
       throw new ForbiddenException();
@@ -189,11 +189,11 @@ export class SpaceController {
     @Body()
     pagination: PaginationOptions,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const ability = await this.spaceAbility.createForUser(
       user,
-      spaceIdDto.spaceId,
+      spaceIdDto.spaceId
     );
 
     if (ability.cannot(SpaceCaslAction.Read, SpaceCaslSubject.Member)) {
@@ -203,7 +203,7 @@ export class SpaceController {
     return this.spaceMemberService.getSpaceMembers(
       spaceIdDto.spaceId,
       workspace.id,
-      pagination,
+      pagination
     );
   }
 
@@ -212,7 +212,7 @@ export class SpaceController {
   async addSpaceMember(
     @Body() dto: AddSpaceMembersDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     if (
       (!dto.userIds || dto.userIds.length === 0) &&
@@ -229,7 +229,7 @@ export class SpaceController {
     return this.spaceMemberService.addMembersToSpaceBatch(
       dto,
       user,
-      workspace.id,
+      workspace.id
     );
   }
 
@@ -238,7 +238,7 @@ export class SpaceController {
   async removeSpaceMember(
     @Body() dto: RemoveSpaceMemberDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     this.validateIds(dto);
 
@@ -255,7 +255,7 @@ export class SpaceController {
   async updateSpaceMemberRole(
     @Body() dto: UpdateSpaceMemberRoleDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     this.validateIds(dto);
 
@@ -273,7 +273,7 @@ export class SpaceController {
     }
     if (dto.userId && dto.groupId) {
       throw new BadRequestException(
-        'please provide either a userId or groupId and both',
+        'please provide either a userId or groupId and both'
       );
     }
   }

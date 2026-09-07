@@ -1,17 +1,17 @@
-import React, { Dispatch, FC, SetStateAction } from "react";
+import React, { Dispatch, FC, SetStateAction } from 'react';
 import {
   IconAlignCenter,
   IconAlignJustified,
   IconAlignLeft,
   IconAlignRight,
   IconCheck,
-  IconChevronDown,
-} from "@tabler/icons-react";
-import { Menu, Button, Tooltip, rem } from "@mantine/core";
-import type { Editor } from "@tiptap/react";
-import { useEditorState } from "@tiptap/react";
-import { useTranslation } from "react-i18next";
-import { isEditorReady } from "@docmost/editor-ext";
+  IconChevronDown
+} from '@tabler/icons-react';
+import { Menu, Button, Tooltip, rem } from '@mantine/core';
+import type { Editor } from '@tiptap/react';
+import { useEditorState } from '@tiptap/react';
+import { useTranslation } from 'react-i18next';
+import { isEditorReady } from '@docmost/editor-ext';
 
 interface TextAlignmentProps {
   editor: Editor | null;
@@ -29,7 +29,7 @@ export interface BubbleMenuItem {
 export const TextAlignmentSelector: FC<TextAlignmentProps> = ({
   editor,
   isOpen,
-  setIsOpen,
+  setIsOpen
 }) => {
   const { t } = useTranslation();
 
@@ -41,12 +41,12 @@ export const TextAlignmentSelector: FC<TextAlignmentProps> = ({
       }
 
       return {
-        isAlignLeft: ctx.editor.isActive({ textAlign: "left" }),
-        isAlignCenter: ctx.editor.isActive({ textAlign: "center" }),
-        isAlignRight: ctx.editor.isActive({ textAlign: "right" }),
-        isAlignJustify: ctx.editor.isActive({ textAlign: "justify" }),
+        isAlignLeft: ctx.editor.isActive({ textAlign: 'left' }),
+        isAlignCenter: ctx.editor.isActive({ textAlign: 'center' }),
+        isAlignRight: ctx.editor.isActive({ textAlign: 'right' }),
+        isAlignJustify: ctx.editor.isActive({ textAlign: 'justify' })
       };
-    },
+    }
   });
 
   if (!editor || !editorState) {
@@ -55,29 +55,29 @@ export const TextAlignmentSelector: FC<TextAlignmentProps> = ({
 
   const items: BubbleMenuItem[] = [
     {
-      name: "Align left",
+      name: 'Align left',
       isActive: () => editorState?.isAlignLeft,
-      command: () => editor.chain().focus().setTextAlign("left").run(),
-      icon: IconAlignLeft,
+      command: () => editor.chain().focus().setTextAlign('left').run(),
+      icon: IconAlignLeft
     },
     {
-      name: "Align center",
+      name: 'Align center',
       isActive: () => editorState?.isAlignCenter,
-      command: () => editor.chain().focus().setTextAlign("center").run(),
-      icon: IconAlignCenter,
+      command: () => editor.chain().focus().setTextAlign('center').run(),
+      icon: IconAlignCenter
     },
     {
-      name: "Align right",
+      name: 'Align right',
       isActive: () => editorState?.isAlignRight,
-      command: () => editor.chain().focus().setTextAlign("right").run(),
-      icon: IconAlignRight,
+      command: () => editor.chain().focus().setTextAlign('right').run(),
+      icon: IconAlignRight
     },
     {
-      name: "Justify",
+      name: 'Justify',
       isActive: () => editorState?.isAlignJustify,
-      command: () => editor.chain().focus().setTextAlign("justify").run(),
-      icon: IconAlignJustified,
-    },
+      command: () => editor.chain().focus().setTextAlign('justify').run(),
+      icon: IconAlignJustified
+    }
   ];
 
   const activeItem = items.filter((item) => item.isActive()).pop() ?? items[0];
@@ -92,20 +92,20 @@ export const TextAlignmentSelector: FC<TextAlignmentProps> = ({
     >
       <Menu.Target>
         <Tooltip
-          label={t("Text align")}
+          label={t('Text align')}
           withArrow
           disabled={isOpen}
           withinPortal={false}
         >
           <Button
             variant="default"
-            style={{ border: "none", height: "34px" }}
+            style={{ border: 'none', height: '34px' }}
             px="5"
             radius="0"
             rightSection={<IconChevronDown size={16} />}
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => setIsOpen(!isOpen)}
-            aria-label={t("Text align")}
+            aria-label={t('Text align')}
             aria-haspopup="menu"
             aria-expanded={isOpen}
           >

@@ -16,7 +16,7 @@ import { LabelModule } from '../label/label.module';
     PageService,
     PageHistoryService,
     TrashCleanupService,
-    BacklinkService,
+    BacklinkService
   ],
   exports: [PageService, PageHistoryService],
   imports: [
@@ -24,7 +24,7 @@ import { LabelModule } from '../label/label.module';
     CollaborationModule,
     WatcherModule,
     TransclusionModule,
-    LabelModule,
-  ],
+    LabelModule
+  ]
 })
 export class PageModule {}

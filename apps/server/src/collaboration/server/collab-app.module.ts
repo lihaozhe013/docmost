@@ -28,7 +28,7 @@ import { parseRedisUrl } from '../../common/helpers';
     HealthModule,
     EventEmitterModule.forRoot(),
     RedisModule.forRootAsync({
-      useClass: RedisConfigService,
+      useClass: RedisConfigService
     }),
     CacheModule.registerAsync({
       isGlobal: true,
@@ -44,21 +44,21 @@ import { parseRedisUrl } from '../../common/helpers';
               socket: {
                 family,
                 reconnectStrategy: defaultReconnectStrategy,
-                ...tls,
-              },
-            }),
-          ],
+                ...tls
+              }
+            })
+          ]
         };
       },
-      inject: [EnvironmentService],
-    }),
+      inject: [EnvironmentService]
+    })
   ],
   controllers: [
     AppController,
     ...(process.env.COLLAB_SHOW_STATS?.toLowerCase() === 'true'
       ? [CollaborationController]
-      : []),
+      : [])
   ],
-  providers: [AppService],
+  providers: [AppService]
 })
 export class CollabAppModule {}

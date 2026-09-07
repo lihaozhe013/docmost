@@ -22,7 +22,7 @@ export class VersionService {
     return {
       currentVersion: packageJson?.version,
       latestVersion: latestVersion,
-      releaseUrl: 'https://github.com/docmost/docmost/releases',
+      releaseUrl: 'https://github.com/docmost/docmost/releases'
     };
   }
 }

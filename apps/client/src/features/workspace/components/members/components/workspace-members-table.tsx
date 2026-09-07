@@ -1,31 +1,32 @@
-import { Group, Table, Text, Badge } from "@mantine/core";
+import { Group, Table, Text, Badge } from '@mantine/core';
 import {
   useChangeMemberRoleMutation,
-  useWorkspaceMembersQuery,
-} from "@/features/workspace/queries/workspace-query.ts";
-import { CustomAvatar } from "@/components/ui/custom-avatar.tsx";
-import React from "react";
-import RoleSelectMenu from "@/components/ui/role-select-menu.tsx";
+  useWorkspaceMembersQuery
+} from '@/features/workspace/queries/workspace-query.ts';
+import { CustomAvatar } from '@/components/ui/custom-avatar.tsx';
+import React from 'react';
+import RoleSelectMenu from '@/components/ui/role-select-menu.tsx';
 import {
   getUserRoleLabel,
-  userRoleData,
-} from "@/features/workspace/types/user-role-data.ts";
-import useUserRole from "@/hooks/use-user-role.tsx";
-import { UserRole } from "@/lib/types.ts";
-import { useTranslation } from "react-i18next";
-import Paginate from "@/components/common/paginate.tsx";
-import { SearchInput } from "@/components/common/search-input.tsx";
-import NoTableResults from "@/components/common/no-table-results.tsx";
-import { usePaginateAndSearch } from "@/hooks/use-paginate-and-search.tsx";
-import MemberActionMenu from "@/features/workspace/components/members/components/members-action-menu.tsx";
+  userRoleData
+} from '@/features/workspace/types/user-role-data.ts';
+import useUserRole from '@/hooks/use-user-role.tsx';
+import { UserRole } from '@/lib/types.ts';
+import { useTranslation } from 'react-i18next';
+import Paginate from '@/components/common/paginate.tsx';
+import { SearchInput } from '@/components/common/search-input.tsx';
+import NoTableResults from '@/components/common/no-table-results.tsx';
+import { usePaginateAndSearch } from '@/hooks/use-paginate-and-search.tsx';
+import MemberActionMenu from '@/features/workspace/components/members/components/members-action-menu.tsx';
 
 export default function WorkspaceMembersTable() {
   const { t } = useTranslation();
-  const { search, cursor, goNext, goPrev, handleSearch } = usePaginateAndSearch();
+  const { search, cursor, goNext, goPrev, handleSearch } =
+    usePaginateAndSearch();
   const { data, isLoading } = useWorkspaceMembersQuery({
     cursor,
     limit: 100,
-    query: search,
+    query: search
   });
   const changeMemberRoleMutation = useChangeMemberRoleMutation();
   const { isAdmin, isOwner } = useUserRole();
@@ -37,7 +38,7 @@ export default function WorkspaceMembersTable() {
   const handleRoleChange = async (
     userId: string,
     currentRole: string,
-    newRole: string,
+    newRole: string
   ) => {
     if (newRole === currentRole) {
       return;
@@ -45,7 +46,7 @@ export default function WorkspaceMembersTable() {
 
     const memberRoleUpdate = {
       userId: userId,
-      role: newRole,
+      role: newRole
     };
 
     await changeMemberRoleMutation.mutateAsync(memberRoleUpdate);
@@ -58,10 +59,10 @@ export default function WorkspaceMembersTable() {
         <Table highlightOnHover verticalSpacing="sm">
           <Table.Thead>
             <Table.Tr>
-              <Table.Th>{t("User")}</Table.Th>
-              <Table.Th>{t("Status")}</Table.Th>
-              <Table.Th>{t("Role")}</Table.Th>
-              <Table.Th aria-label={t("Action")} />
+              <Table.Th>{t('User')}</Table.Th>
+              <Table.Th>{t('Status')}</Table.Th>
+              <Table.Th>{t('Role')}</Table.Th>
+              <Table.Th aria-label={t('Action')} />
             </Table.Tr>
           </Table.Thead>
 
@@ -88,10 +89,10 @@ export default function WorkspaceMembersTable() {
                   <Table.Td>
                     {user.deactivatedAt ? (
                       <Badge variant="light" color="orange">
-                        {t("Deactivated")}
+                        {t('Deactivated')}
                       </Badge>
                     ) : (
-                      <Badge variant="light">{t("Active")}</Badge>
+                      <Badge variant="light">{t('Active')}</Badge>
                     )}
                   </Table.Td>
                   <Table.Td>

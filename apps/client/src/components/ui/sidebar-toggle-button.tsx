@@ -1,18 +1,24 @@
-import React from "react";
+import React from 'react';
 import {
   IconLayoutSidebarRightCollapse,
   IconLayoutSidebarRightExpand
-} from "@tabler/icons-react";
-import { ActionIcon, BoxProps, ElementProps, MantineColor, MantineSize } from "@mantine/core";
+} from '@tabler/icons-react';
+import {
+  ActionIcon,
+  BoxProps,
+  ElementProps,
+  MantineColor,
+  MantineSize
+} from '@mantine/core';
 
-export interface SidebarToggleProps extends BoxProps, ElementProps<"button"> {
+export interface SidebarToggleProps extends BoxProps, ElementProps<'button'> {
   size?: MantineSize | `compact-${MantineSize}` | (string & {});
   color?: MantineColor;
   opened?: boolean;
 }
 
 const SidebarToggle = React.forwardRef<HTMLButtonElement, SidebarToggleProps>(
-  ({ opened, size = "sm", ...others }, ref) => {
+  ({ opened, size = 'sm', ...others }, ref) => {
     return (
       <ActionIcon
         size={size}

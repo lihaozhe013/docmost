@@ -1,25 +1,25 @@
-import { useEffect, useState } from "react";
-import { ScrollArea, Text, Divider, UnstyledButton } from "@mantine/core";
+import { useEffect, useState } from 'react';
+import { ScrollArea, Text, Divider, UnstyledButton } from '@mantine/core';
 import {
   IconHome,
   IconStar,
   IconLayoutGrid,
   IconSettings,
-  IconUserPlus,
-} from "@tabler/icons-react";
-import { Link, useLocation } from "react-router-dom";
-import classes from "./global-sidebar.module.css";
-import { useTranslation } from "react-i18next";
-import { useAtom } from "jotai";
-import { mobileSidebarAtom } from "@/components/layouts/global/hooks/atoms/sidebar-atom";
-import { useToggleSidebar } from "@/components/layouts/global/hooks/hooks/use-toggle-sidebar";
-import { useFavoritesQuery } from "@/features/favorite/queries/favorite-query";
-import { getSpaceUrl } from "@/lib/config";
-import { useDisclosure } from "@mantine/hooks";
-import CreateMemberModal from "@/features/workspace/components/members/components/create-member-modal.tsx";
-import useUserRole from "@/hooks/use-user-role.tsx";
-import { CustomAvatar } from "@/components/ui/custom-avatar";
-import { AvatarIconType } from "@/features/attachments/types/attachment.types";
+  IconUserPlus
+} from '@tabler/icons-react';
+import { Link, useLocation } from 'react-router-dom';
+import classes from './global-sidebar.module.css';
+import { useTranslation } from 'react-i18next';
+import { useAtom } from 'jotai';
+import { mobileSidebarAtom } from '@/components/layouts/global/hooks/atoms/sidebar-atom';
+import { useToggleSidebar } from '@/components/layouts/global/hooks/hooks/use-toggle-sidebar';
+import { useFavoritesQuery } from '@/features/favorite/queries/favorite-query';
+import { getSpaceUrl } from '@/lib/config';
+import { useDisclosure } from '@mantine/hooks';
+import CreateMemberModal from '@/features/workspace/components/members/components/create-member-modal.tsx';
+import useUserRole from '@/hooks/use-user-role.tsx';
+import { CustomAvatar } from '@/components/ui/custom-avatar';
+import { AvatarIconType } from '@/features/attachments/types/attachment.types';
 
 export default function GlobalSidebar() {
   const { t } = useTranslation();
@@ -29,16 +29,22 @@ export default function GlobalSidebar() {
   const toggleMobileSidebar = useToggleSidebar(mobileSidebarAtom);
   const { isAdmin } = useUserRole();
   const mainNavItems = [
-    { label: "Home", icon: IconHome, path: "/home" },
-    { label: "Favorites", icon: IconStar, path: "/favorites" },
-    { label: "Spaces", icon: IconLayoutGrid, path: "/spaces" },
+    { label: 'Home', icon: IconHome, path: '/home' },
+    { label: 'Favorites', icon: IconStar, path: '/favorites' },
+    { label: 'Spaces', icon: IconLayoutGrid, path: '/spaces' }
   ];
-  const { data: favoriteSpacesData, isPending: isFavoritesPending } = useFavoritesQuery("space");
-  const favoriteSpaces = favoriteSpacesData?.pages.flatMap((p) => p.items) ?? [];
+  const { data: favoriteSpacesData, isPending: isFavoritesPending } =
+    useFavoritesQuery('space');
+  const favoriteSpaces =
+    favoriteSpacesData?.pages.flatMap((p) => p.items) ?? [];
   const sortedFavoriteSpaces = [...favoriteSpaces]
     .filter((fav) => fav.space)
     .sort((a, b) => {
-      const cmp = (a.space!.name ?? "").localeCompare(b.space!.name ?? "", undefined, { sensitivity: "base" });
+      const cmp = (a.space!.name ?? '').localeCompare(
+        b.space!.name ?? '',
+        undefined,
+        { sensitivity: 'base' }
+      );
       return cmp !== 0 ? cmp : a.id.localeCompare(b.id);
     });
   const [inviteOpened, { open: openInvite, close: closeInvite }] =
@@ -63,7 +69,7 @@ export default function GlobalSidebar() {
               key={item.label}
               className={classes.link}
               data-active={active === item.path || undefined}
-              aria-current={active === item.path ? "page" : undefined}
+              aria-current={active === item.path ? 'page' : undefined}
               to={item.path}
               onClick={handleNavClick}
             >
@@ -75,10 +81,12 @@ export default function GlobalSidebar() {
 
         <Divider my="xs" />
         <div className={classes.section}>
-          <Text component="h2" className={classes.sectionHeader}>{t("Favorite spaces")}</Text>
+          <Text component="h2" className={classes.sectionHeader}>
+            {t('Favorite spaces')}
+          </Text>
           {!isFavoritesPending && sortedFavoriteSpaces.length === 0 ? (
             <Text size="xs" c="dimmed" pl="xs" py={4}>
-              {t("Favorite spaces appear here")}
+              {t('Favorite spaces appear here')}
             </Text>
           ) : (
             <>
@@ -109,42 +117,35 @@ export default function GlobalSidebar() {
                   onClick={handleNavClick}
                 >
                   <Text size="xs" c="dimmed">
-                    {t("View all")}
+                    {t('View all')}
                   </Text>
                 </Link>
               )}
             </>
           )}
         </div>
-
       </ScrollArea>
 
       <div className={classes.bottomSection}>
         {isAdmin && (
-          <UnstyledButton
-            className={classes.link}
-            onClick={openInvite}
-          >
+          <UnstyledButton className={classes.link} onClick={openInvite}>
             <IconUserPlus className={classes.linkIcon} stroke={2} />
-            <span>{t("Create Member")}</span>
+            <span>{t('Create Member')}</span>
           </UnstyledButton>
         )}
         <Link
           className={classes.link}
-          data-active={active.startsWith("/settings") || undefined}
-          aria-current={active.startsWith("/settings") ? "page" : undefined}
+          data-active={active.startsWith('/settings') || undefined}
+          aria-current={active.startsWith('/settings') ? 'page' : undefined}
           to="/settings/account/profile"
           onClick={handleNavClick}
         >
           <IconSettings className={classes.linkIcon} stroke={2} />
-          <span>{t("Settings")}</span>
+          <span>{t('Settings')}</span>
         </Link>
       </div>
 
-      <CreateMemberModal
-        opened={inviteOpened}
-        onClose={closeInvite}
-      />
+      <CreateMemberModal opened={inviteOpened} onClose={closeInvite} />
     </div>
   );
 }

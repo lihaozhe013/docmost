@@ -3,17 +3,17 @@ import {
   defaultBlockAt,
   findParentNode,
   mergeAttributes,
-} from "@tiptap/core";
-import { Selection } from "@tiptap/pm/state";
+} from '@tiptap/core';
+import { Selection } from '@tiptap/pm/state';
 
 export interface DetailsContentOptions {
   HTMLAttributes: Record<string, any>;
 }
 
 export const DetailsContent = Node.create<DetailsContentOptions>({
-  name: "detailsContent",
-  group: "block",
-  content: "block*",
+  name: 'detailsContent',
+  group: 'block',
+  content: 'block*',
   defining: true,
   selectable: false,
   addOptions() {
@@ -32,9 +32,9 @@ export const DetailsContent = Node.create<DetailsContentOptions>({
 
   renderHTML({ HTMLAttributes }) {
     return [
-      "div",
+      'div',
       mergeAttributes(
-        { "data-type": this.name },
+        { 'data-type': this.name },
         this.options.HTMLAttributes,
         HTMLAttributes,
       ),

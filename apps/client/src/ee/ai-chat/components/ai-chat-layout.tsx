@@ -1,12 +1,12 @@
-import { useEffect, useRef } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { useChatInfoQuery } from "../queries/ai-chat-query";
-import { useChatStream } from "../hooks/use-chat-stream";
-import ChatMessageList from "./chat-message-list";
-import ChatEmptyState from "./chat-empty-state";
-import ChatInput from "./chat-input";
-import type { HomeAiPromptInitialState } from "@/features/home/components/home-ai-prompt";
-import classes from "../styles/ai-chat.module.css";
+import { useEffect, useRef } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useChatInfoQuery } from '../queries/ai-chat-query';
+import { useChatStream } from '../hooks/use-chat-stream';
+import ChatMessageList from './chat-message-list';
+import ChatEmptyState from './chat-empty-state';
+import ChatInput from './chat-input';
+import type { HomeAiPromptInitialState } from '@/features/home/components/home-ai-prompt';
+import classes from '../styles/ai-chat.module.css';
 
 export default function AiChatLayout() {
   const { chatId } = useParams<{ chatId: string }>();
@@ -19,7 +19,7 @@ export default function AiChatLayout() {
   // kicking off orphan uploads) tied to a chat they have no access to.
   useEffect(() => {
     if (chatId && chatInfoQuery.isError) {
-      navigate("/ai", { replace: true });
+      navigate('/ai', { replace: true });
     }
   }, [chatId, chatInfoQuery.isError, navigate]);
   const {
@@ -30,7 +30,7 @@ export default function AiChatLayout() {
     error,
     sendMessage,
     stopGeneration,
-    hydrateFromServer,
+    hydrateFromServer
   } = useChatStream(chatId);
 
   const autoSentRef = useRef(false);
@@ -48,9 +48,9 @@ export default function AiChatLayout() {
 
     autoSentRef.current = true;
     sendMessage(
-      state.initialContent ?? "",
+      state.initialContent ?? '',
       state.initialMentions ?? [],
-      state.initialAttachments ?? [],
+      state.initialAttachments ?? []
     );
     navigate(location.pathname, { replace: true, state: null });
   }, [chatId, location, navigate, sendMessage]);
@@ -76,9 +76,9 @@ export default function AiChatLayout() {
           {error && (
             <div
               style={{
-                padding: "var(--mantine-spacing-sm) var(--mantine-spacing-lg)",
-                color: "var(--mantine-color-red-6)",
-                fontSize: "var(--mantine-font-size-sm)",
+                padding: 'var(--mantine-spacing-sm) var(--mantine-spacing-lg)',
+                color: 'var(--mantine-color-red-6)',
+                fontSize: 'var(--mantine-font-size-sm)'
               }}
             >
               {error}

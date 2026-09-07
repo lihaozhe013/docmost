@@ -7,12 +7,12 @@ export const LOCAL_STORAGE_PATH = path.resolve(
   process.cwd(),
   '..',
   '..',
-  LOCAL_STORAGE_DIR,
+  LOCAL_STORAGE_DIR
 );
 
 export function getPageTitle(
   title: string | null | undefined,
-  isBase?: boolean,
+  isBase?: boolean
 ): string {
   return title || (isBase ? 'Untitled base' : 'untitled');
 }

@@ -4,14 +4,14 @@ import {
   useEffect,
   useRef,
   useState,
-  type ReactNode,
+  type ReactNode
 } from 'react';
 import { flushSync } from 'react-dom';
 import { createRoot } from 'react-dom/client';
 import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
 import {
   draggable,
-  dropTargetForElements,
+  dropTargetForElements
 } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { pointerOutsideOfPreview } from '@atlaskit/pragmatic-drag-and-drop/element/pointer-outside-of-preview';
 import { setCustomNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview';
@@ -19,7 +19,7 @@ import {
   attachInstruction,
   extractInstruction,
   type Instruction,
-  type ItemMode,
+  type ItemMode
 } from '@atlaskit/pragmatic-drag-and-drop-hitbox/tree-item';
 import { triggerPostMoveFlash } from '@atlaskit/pragmatic-drag-and-drop-flourish/trigger-post-move-flash';
 import * as liveRegion from '@atlaskit/pragmatic-drag-and-drop-live-region';
@@ -76,7 +76,7 @@ function DocTreeRowInner<T extends object>(props: Props<T>) {
     getDragLabel,
     contextId,
     registerRowElement,
-    getRootData,
+    getRootData
   } = props;
 
   const isOpen = openIds.has(node.id);
@@ -138,7 +138,7 @@ function DocTreeRowInner<T extends object>(props: Props<T>) {
             id: node.id,
             type: DRAG_TYPE,
             uniqueContextId: contextId,
-            isOpenOnDragStart: isOpen,
+            isOpenOnDragStart: isOpen
           }),
           onGenerateDragPreview: ({ nativeSetDragImage }) => {
             setCustomNativeDragPreview({
@@ -153,15 +153,17 @@ function DocTreeRowInner<T extends object>(props: Props<T>) {
                 // falls back to a default snapshot of the source row (and the
                 // stale image can linger on screen).
                 flushSync(() => {
-                  root.render(<DocTreeDragPreview label={getDragLabel(node)} />);
+                  root.render(
+                    <DocTreeDragPreview label={getDragLabel(node)} />
+                  );
                 });
                 return () => root.unmount();
-              },
+              }
             });
           },
           onDragStart: () => setIsDragging(true),
-          onDrop: () => setIsDragging(false),
-        }),
+          onDrop: () => setIsDragging(false)
+        })
       );
     }
 
@@ -188,7 +190,7 @@ function DocTreeRowInner<T extends object>(props: Props<T>) {
             !treeModel.isDescendant(
               getRootData(),
               source.data.id as string,
-              node.id,
+              node.id
             ),
           getData: ({ input, element }) =>
             attachInstruction(
@@ -199,8 +201,8 @@ function DocTreeRowInner<T extends object>(props: Props<T>) {
                 currentLevel: level,
                 indentPerLevel,
                 mode,
-                block,
-              },
+                block
+              }
             ),
           onDrag: ({ self }) => {
             const inst = extractInstruction(self.data);
@@ -209,12 +211,7 @@ function DocTreeRowInner<T extends object>(props: Props<T>) {
             // regardless of the specific instruction type. Reorder-before and
             // reorder-after also benefit: once expanded, the user can see the
             // children and refine their drop target.
-            if (
-              inst &&
-              hasChildren &&
-              !isOpen &&
-              !autoExpandTimerRef.current
-            ) {
+            if (inst && hasChildren && !isOpen && !autoExpandTimerRef.current) {
               autoExpandTimerRef.current = setTimeout(() => {
                 onToggle(node.id, true);
                 autoExpandTimerRef.current = null;
@@ -254,9 +251,7 @@ function DocTreeRowInner<T extends object>(props: Props<T>) {
                     return parent ? getDragLabel(parent) : 'root';
                   })();
             const sourceNode = treeModel.find(liveTree, sourceId);
-            const sourceLabel = sourceNode
-              ? getDragLabel(sourceNode)
-              : 'item';
+            const sourceLabel = sourceNode ? getDragLabel(sourceNode) : 'item';
             liveRegion.announce(`Moved ${sourceLabel} under ${parentName}.`);
             // After a make-child drop, expand this row so the user sees the
             // just-dropped child — especially important when the row had no
@@ -264,8 +259,8 @@ function DocTreeRowInner<T extends object>(props: Props<T>) {
             // otherwise be invisible.
             if (op.kind === 'make-child') onToggle(node.id, true);
             if (source.data.isOpenOnDragStart) onToggle(sourceId, true);
-          },
-        }),
+          }
+        })
       );
     }
 
@@ -285,7 +280,7 @@ function DocTreeRowInner<T extends object>(props: Props<T>) {
     onMove,
     onToggle,
     getRootData,
-    cancelAutoExpand,
+    cancelAutoExpand
   ]);
 
   useEffect(() => () => cancelAutoExpand(), [cancelAutoExpand]);
@@ -314,7 +309,7 @@ function DocTreeRowInner<T extends object>(props: Props<T>) {
     'aria-selected': isSelected ? (true as const) : undefined,
     'aria-current': isSelected ? ('page' as const) : undefined,
     'aria-label': getDragLabel(node),
-    'data-row-id': node.id,
+    'data-row-id': node.id
   };
 
   return (
@@ -345,7 +340,7 @@ function DocTreeRowInner<T extends object>(props: Props<T>) {
           rowRef,
           tabIndex: activeId === node.id ? 0 : -1,
           treeItemProps,
-          toggleOpen,
+          toggleOpen
         })}
       </div>
       {instruction && (
@@ -368,7 +363,7 @@ function DocTreeRowInner<T extends object>(props: Props<T>) {
 // reference equality (callbacks are useCallback-stable from the parent).
 function arePropsEqual<T extends object>(
   prev: Props<T>,
-  next: Props<T>,
+  next: Props<T>
 ): boolean {
   if (prev.node !== next.node) return false;
   if (prev.level !== next.level) return false;
@@ -403,5 +398,5 @@ function arePropsEqual<T extends object>(
 
 export const DocTreeRow = memo(
   DocTreeRowInner,
-  arePropsEqual,
+  arePropsEqual
 ) as typeof DocTreeRowInner;

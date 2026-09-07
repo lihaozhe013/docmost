@@ -1,8 +1,8 @@
-import { Loader, Paper, ScrollArea } from "@mantine/core";
-import DOMPurify from "dompurify";
-import { marked } from "marked";
-import { memo } from "react";
-import classes from "./ai-menu.module.css";
+import { Loader, Paper, ScrollArea } from '@mantine/core';
+import DOMPurify from 'dompurify';
+import { marked } from 'marked';
+import { memo } from 'react';
+import classes from './ai-menu.module.css';
 
 interface ResultPreviewProps {
   output: string;
@@ -19,7 +19,9 @@ const ResultPreview = memo(({ output, isLoading }: ResultPreviewProps) => {
         <div className={classes.resultPreviewWrapper}>
           {parsedOutput && (
             <div
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(parsedOutput) }}
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(parsedOutput)
+              }}
             />
           )}
           {isLoading && <Loader size={12} ml="xs" display="inline-block" />}

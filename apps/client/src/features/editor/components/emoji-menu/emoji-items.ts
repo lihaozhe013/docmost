@@ -1,10 +1,14 @@
-import { CommandProps, EmojiMenuItemType } from "./types";
-import { buildEmojiIndex, getFrequentlyUsedEmoji, sortFrequentlyUsedEmoji } from "./utils";
+import { CommandProps, EmojiMenuItemType } from './types';
+import {
+  buildEmojiIndex,
+  getFrequentlyUsedEmoji,
+  sortFrequentlyUsedEmoji
+} from './utils';
 
 const MAX_RESULTS = 5;
 
 const searchEmoji = async (query: string): Promise<EmojiMenuItemType[]> => {
-  if (query === "") {
+  if (query === '') {
     return sortFrequentlyUsedEmoji(getFrequentlyUsedEmoji());
   }
 
@@ -18,13 +22,18 @@ const searchEmoji = async (query: string): Promise<EmojiMenuItemType[]> => {
       id: entry.id,
       emoji: entry.native,
       command: ({ editor, range }: CommandProps) => {
-        editor.chain().focus().deleteRange(range).insertContent(entry.native + " ").run();
-      },
+        editor
+          .chain()
+          .focus()
+          .deleteRange(range)
+          .insertContent(entry.native + ' ')
+          .run();
+      }
     }));
 };
 
 export const getEmojiItems = async ({
-  query,
+  query
 }: {
   query: string;
 }): Promise<EmojiMenuItemType[]> => {

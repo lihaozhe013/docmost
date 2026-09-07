@@ -10,17 +10,17 @@ export class PageHistoryService {
 
   async findById(historyId: string): Promise<PageHistory> {
     return await this.pageHistoryRepo.findById(historyId, {
-      includeContent: true,
+      includeContent: true
     });
   }
 
   async findHistoryByPageId(
     pageId: string,
-    paginationOptions: PaginationOptions,
+    paginationOptions: PaginationOptions
   ): Promise<CursorPaginationResult<PageHistory>> {
     return this.pageHistoryRepo.findPageHistoryByPageId(
       pageId,
-      paginationOptions,
+      paginationOptions
     );
   }
 }

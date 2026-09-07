@@ -6,16 +6,16 @@ import {
   Tooltip,
   ActionIcon,
   Checkbox,
-  Menu,
-} from "@mantine/core";
-import { IconDots } from "@tabler/icons-react";
-import { CustomAvatar } from "@/components/ui/custom-avatar.tsx";
-import { formattedDate } from "@/lib/time";
-import classes from "./css/history.module.css";
-import clsx from "clsx";
-import { IPageHistory } from "@/features/page-history/types/page.types";
-import { memo, useCallback } from "react";
-import { useTranslation } from "react-i18next";
+  Menu
+} from '@mantine/core';
+import { IconDots } from '@tabler/icons-react';
+import { CustomAvatar } from '@/components/ui/custom-avatar.tsx';
+import { formattedDate } from '@/lib/time';
+import classes from './css/history.module.css';
+import clsx from 'clsx';
+import { IPageHistory } from '@/features/page-history/types/page.types';
+import { memo, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const MAX_VISIBLE_AVATARS = 5;
 
@@ -48,7 +48,7 @@ const HistoryItem = memo(function HistoryItem({
   canCompare,
   onToggleCompare,
   onStartCompare,
-  onRestore,
+  onRestore
 }: HistoryItemProps) {
   const { t } = useTranslation();
   const date = formattedDate(new Date(historyItem.createdAt));
@@ -81,7 +81,7 @@ const HistoryItem = memo(function HistoryItem({
           checked={isChecked}
           disabled={isCheckboxDisabled}
           onChange={() => onToggleCompare(historyItem.id)}
-          aria-label={t("Select version from {{date}}", { date })}
+          aria-label={t('Select version from {{date}}', { date })}
         />
       )}
 
@@ -156,7 +156,7 @@ const HistoryItem = memo(function HistoryItem({
               variant="subtle"
               color="gray"
               className={classes.itemMenu}
-              aria-label={t("Version actions for {{date}}", { date })}
+              aria-label={t('Version actions for {{date}}', { date })}
               onClick={(e) => e.stopPropagation()}
             >
               <IconDots size={18} />
@@ -167,11 +167,11 @@ const HistoryItem = memo(function HistoryItem({
               disabled={!canCompare}
               onClick={() => onStartCompare(historyItem.id)}
             >
-              {t("Compare")}
+              {t('Compare')}
             </Menu.Item>
             {onRestore && (
               <Menu.Item onClick={() => onRestore(historyItem.id, index)}>
-                {t("Restore")}
+                {t('Restore')}
               </Menu.Item>
             )}
           </Menu.Dropdown>

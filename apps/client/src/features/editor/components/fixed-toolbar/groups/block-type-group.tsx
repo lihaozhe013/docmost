@@ -1,7 +1,7 @@
-import { FC } from "react";
-import type { Editor } from "@tiptap/react";
-import { useEditorState } from "@tiptap/react";
-import { Button, Menu } from "@mantine/core";
+import { FC } from 'react';
+import type { Editor } from '@tiptap/react';
+import { useEditorState } from '@tiptap/react';
+import { Button, Menu } from '@mantine/core';
 import {
   IconBlockquote,
   IconBraces,
@@ -11,9 +11,9 @@ import {
   IconH3,
   IconMenu4,
   IconPageBreak,
-  IconTypography,
-} from "@tabler/icons-react";
-import { useTranslation } from "react-i18next";
+  IconTypography
+} from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   editor: Editor;
@@ -25,20 +25,20 @@ export const BlockTypeGroup: FC<Props> = ({ editor }) => {
   const state = useEditorState({
     editor,
     selector: (ctx) => ({
-      isHeading1: !!ctx.editor?.isActive("heading", { level: 1 }),
-      isHeading2: !!ctx.editor?.isActive("heading", { level: 2 }),
-      isHeading3: !!ctx.editor?.isActive("heading", { level: 3 }),
-      isBlockquote: !!ctx.editor?.isActive("blockquote"),
-      isCodeBlock: !!ctx.editor?.isActive("codeBlock"),
-    }),
+      isHeading1: !!ctx.editor?.isActive('heading', { level: 1 }),
+      isHeading2: !!ctx.editor?.isActive('heading', { level: 2 }),
+      isHeading3: !!ctx.editor?.isActive('heading', { level: 3 }),
+      isBlockquote: !!ctx.editor?.isActive('blockquote'),
+      isCodeBlock: !!ctx.editor?.isActive('codeBlock')
+    })
   });
 
-  let label = t("Normal text");
-  if (state.isHeading1) label = t("Heading 1");
-  else if (state.isHeading2) label = t("Heading 2");
-  else if (state.isHeading3) label = t("Heading 3");
-  else if (state.isBlockquote) label = t("Quote");
-  else if (state.isCodeBlock) label = t("Code block");
+  let label = t('Normal text');
+  if (state.isHeading1) label = t('Heading 1');
+  else if (state.isHeading2) label = t('Heading 2');
+  else if (state.isHeading3) label = t('Heading 3');
+  else if (state.isBlockquote) label = t('Quote');
+  else if (state.isCodeBlock) label = t('Code block');
 
   return (
     <Menu shadow="md" position="bottom-start" withArrow={false}>
@@ -56,10 +56,10 @@ export const BlockTypeGroup: FC<Props> = ({ editor }) => {
         <Menu.Item
           leftSection={<IconTypography size={16} />}
           onClick={() =>
-            editor.chain().focus().toggleNode("paragraph", "paragraph").run()
+            editor.chain().focus().toggleNode('paragraph', 'paragraph').run()
           }
         >
-          {t("Text")}
+          {t('Text')}
         </Menu.Item>
         <Menu.Item
           leftSection={<IconH1 size={16} />}
@@ -67,7 +67,7 @@ export const BlockTypeGroup: FC<Props> = ({ editor }) => {
             editor.chain().focus().toggleHeading({ level: 1 }).run()
           }
         >
-          {t("Heading 1")}
+          {t('Heading 1')}
         </Menu.Item>
         <Menu.Item
           leftSection={<IconH2 size={16} />}
@@ -75,7 +75,7 @@ export const BlockTypeGroup: FC<Props> = ({ editor }) => {
             editor.chain().focus().toggleHeading({ level: 2 }).run()
           }
         >
-          {t("Heading 2")}
+          {t('Heading 2')}
         </Menu.Item>
         <Menu.Item
           leftSection={<IconH3 size={16} />}
@@ -83,31 +83,31 @@ export const BlockTypeGroup: FC<Props> = ({ editor }) => {
             editor.chain().focus().toggleHeading({ level: 3 }).run()
           }
         >
-          {t("Heading 3")}
+          {t('Heading 3')}
         </Menu.Item>
         <Menu.Item
           leftSection={<IconBlockquote size={16} />}
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
         >
-          {t("Quote")}
+          {t('Quote')}
         </Menu.Item>
         <Menu.Item
           leftSection={<IconBraces size={16} />}
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}
         >
-          {t("Code block")}
+          {t('Code block')}
         </Menu.Item>
         <Menu.Item
           leftSection={<IconMenu4 size={16} />}
           onClick={() => editor.chain().focus().setHorizontalRule().run()}
         >
-          {t("Divider")}
+          {t('Divider')}
         </Menu.Item>
         <Menu.Item
           leftSection={<IconPageBreak size={16} />}
           onClick={() => editor.chain().focus().setPageBreak().run()}
         >
-          {t("Page break")}
+          {t('Page break')}
         </Menu.Item>
       </Menu.Dropdown>
     </Menu>

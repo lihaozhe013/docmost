@@ -1,6 +1,6 @@
-import React from "react";
-import { Group, Text } from "@mantine/core";
-import classes from "./auth.module.css";
+import React from 'react';
+import { Group, Text } from '@mantine/core';
+import classes from './auth.module.css';
 
 type AuthLayoutProps = {
   children: React.ReactNode;
@@ -16,7 +16,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
           width={22}
           height={22}
         />
-        <Text size="28px" fw={700} style={{ userSelect: "none" }}>
+        <Text size="28px" fw={700} style={{ userSelect: 'none' }}>
           Docmost
         </Text>
       </Group>

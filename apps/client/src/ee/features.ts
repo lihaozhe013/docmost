@@ -8,5 +8,5 @@ export const Feature = {
   TEMPLATES: 'templates',
   DOCX_EXPORT: 'export:docx',
   AI_CONTROLS: 'ai:controls',
-  MCP_CONTROLS: 'mcp:controls',
+  MCP_CONTROLS: 'mcp:controls'
 } as const;

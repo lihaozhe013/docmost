@@ -1,10 +1,10 @@
-import { useAppVersion } from "@/features/workspace/queries/workspace-query.ts";
-import { isCloud } from "@/lib/config.ts";
-import classes from "@/components/settings/settings.module.css";
-import { Indicator, Text, Tooltip } from "@mantine/core";
-import React from "react";
-import semverGt from "semver/functions/gt";
-import { useTranslation } from "react-i18next";
+import { useAppVersion } from '@/features/workspace/queries/workspace-query.ts';
+import { isCloud } from '@/lib/config.ts';
+import classes from '@/components/settings/settings.module.css';
+import { Indicator, Text, Tooltip } from '@mantine/core';
+import React from 'react';
+import semverGt from 'semver/functions/gt';
+import { useTranslation } from 'react-i18next';
 
 export default function AppVersion() {
   const { t } = useTranslation();
@@ -22,23 +22,23 @@ export default function AppVersion() {
   return (
     <div className={classes.text}>
       <Tooltip
-        label={t("{{latestVersion}} is available", {
-          latestVersion: `v${appVersion?.latestVersion}`,
+        label={t('{{latestVersion}} is available', {
+          latestVersion: `v${appVersion?.latestVersion}`
         })}
         disabled={!hasUpdate}
       >
         <Indicator
-          label={t("New update")}
+          label={t('New update')}
           color="gray"
           inline
           size={16}
           position="middle-end"
-          style={{ cursor: "pointer" }}
+          style={{ cursor: 'pointer' }}
           disabled={!hasUpdate}
           onClick={() => {
             window.open(
-              "https://github.com/docmost/docmost/releases",
-              "_blank",
+              'https://github.com/docmost/docmost/releases',
+              '_blank'
             );
           }}
         >

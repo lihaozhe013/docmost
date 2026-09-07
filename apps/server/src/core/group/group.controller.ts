@@ -5,7 +5,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
-  ForbiddenException,
+  ForbiddenException
 } from '@nestjs/common';
 import { GroupService } from './services/group.service';
 import { CreateGroupDto } from './dto/create-group.dto';
@@ -22,7 +22,7 @@ import { User, Workspace } from '@docmost/db/types/entity.types';
 import WorkspaceAbilityFactory from '../casl/abilities/workspace-ability.factory';
 import {
   WorkspaceCaslAction,
-  WorkspaceCaslSubject,
+  WorkspaceCaslSubject
 } from '../casl/interfaces/workspace-ability.type';
 
 @UseGuards(JwtAuthGuard)
@@ -31,7 +31,7 @@ export class GroupController {
   constructor(
     private readonly groupService: GroupService,
     private readonly groupUserService: GroupUserService,
-    private readonly workspaceAbility: WorkspaceAbilityFactory,
+    private readonly workspaceAbility: WorkspaceAbilityFactory
   ) {}
 
   @HttpCode(HttpStatus.OK)
@@ -39,7 +39,7 @@ export class GroupController {
   getWorkspaceGroups(
     @Body() pagination: PaginationOptions,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
     if (ability.cannot(WorkspaceCaslAction.Read, WorkspaceCaslSubject.Group)) {
@@ -54,7 +54,7 @@ export class GroupController {
   getGroup(
     @Body() groupIdDto: GroupIdDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
     if (ability.cannot(WorkspaceCaslAction.Read, WorkspaceCaslSubject.Group)) {
@@ -68,7 +68,7 @@ export class GroupController {
   createGroup(
     @Body() createGroupDto: CreateGroupDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
     if (
@@ -84,7 +84,7 @@ export class GroupController {
   updateGroup(
     @Body() updateGroupDto: UpdateGroupDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
     if (
@@ -102,7 +102,7 @@ export class GroupController {
     @Body() groupIdDto: GroupIdDto,
     @Body() pagination: PaginationOptions,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
     if (ability.cannot(WorkspaceCaslAction.Read, WorkspaceCaslSubject.Group)) {
@@ -112,7 +112,7 @@ export class GroupController {
     return this.groupUserService.getGroupUsers(
       groupIdDto.groupId,
       workspace.id,
-      pagination,
+      pagination
     );
   }
 
@@ -121,7 +121,7 @@ export class GroupController {
   addGroupMember(
     @Body() addGroupUserDto: AddGroupUserDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
     if (
@@ -133,7 +133,7 @@ export class GroupController {
     return this.groupUserService.addUsersToGroupBatch(
       addGroupUserDto.userIds,
       addGroupUserDto.groupId,
-      workspace.id,
+      workspace.id
     );
   }
 
@@ -142,7 +142,7 @@ export class GroupController {
   removeGroupMember(
     @Body() removeGroupUserDto: RemoveGroupUserDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
     if (
@@ -154,7 +154,7 @@ export class GroupController {
     return this.groupUserService.removeUserFromGroup(
       removeGroupUserDto.userId,
       removeGroupUserDto.groupId,
-      workspace.id,
+      workspace.id
     );
   }
 
@@ -163,7 +163,7 @@ export class GroupController {
   deleteGroup(
     @Body() groupIdDto: GroupIdDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
     if (

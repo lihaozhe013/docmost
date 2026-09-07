@@ -1,13 +1,13 @@
-import { useGroupQuery } from "@/features/group/queries/group-query";
-import { useParams } from "react-router-dom";
-import { Group, Title, Text } from "@mantine/core";
-import AddGroupMemberModal from "@/features/group/components/add-group-member-modal";
-import React from "react";
-import { useDisclosure } from "@mantine/hooks";
-import EditGroupModal from "@/features/group/components/edit-group-modal.tsx";
-import GroupActionMenu from "@/features/group/components/group-action-menu.tsx";
-import useUserRole from "@/hooks/use-user-role.tsx";
-import { useTranslation } from "react-i18next";
+import { useGroupQuery } from '@/features/group/queries/group-query';
+import { useParams } from 'react-router-dom';
+import { Group, Title, Text } from '@mantine/core';
+import AddGroupMemberModal from '@/features/group/components/add-group-member-modal';
+import React from 'react';
+import { useDisclosure } from '@mantine/hooks';
+import EditGroupModal from '@/features/group/components/edit-group-modal.tsx';
+import GroupActionMenu from '@/features/group/components/group-action-menu.tsx';
+import useUserRole from '@/hooks/use-user-role.tsx';
+import { useTranslation } from 'react-i18next';
 
 export default function GroupDetails() {
   const { groupId } = useParams();

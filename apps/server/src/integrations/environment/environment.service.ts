@@ -56,7 +56,7 @@ export class EnvironmentService {
   getRedisUrl(): string {
     return this.configService.get<string>(
       'REDIS_URL',
-      'redis://localhost:6379',
+      'redis://localhost:6379'
     );
   }
 
@@ -227,7 +227,7 @@ export class EnvironmentService {
   getAiEmbeddingDimension(): number {
     return parseInt(
       this.configService.get<string>('AI_EMBEDDING_DIMENSION'),
-      10,
+      10
     );
   }
 
@@ -258,7 +258,7 @@ export class EnvironmentService {
   getTurbopufferNamespacePrefix(): string {
     return this.configService.get<string>(
       'TURBOPUFFER_NAMESPACE_PREFIX',
-      'docmost',
+      'docmost'
     );
   }
 
@@ -277,7 +277,7 @@ export class EnvironmentService {
   getOllamaApiUrl(): string {
     return this.configService.get<string>(
       'OLLAMA_API_URL',
-      'http://localhost:11434',
+      'http://localhost:11434'
     );
   }
 

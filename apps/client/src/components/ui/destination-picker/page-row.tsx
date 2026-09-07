@@ -1,11 +1,11 @@
-import { KeyboardEvent, useState } from "react";
-import { ActionIcon } from "@mantine/core";
-import { IconChevronRight, IconFileDescription } from "@tabler/icons-react";
-import { useTranslation } from "react-i18next";
-import { IPage } from "@/features/page/types/page.types";
-import { getPageTitle } from "@/features/page/page.utils";
-import { PageChildren } from "./page-children";
-import classes from "./destination-picker.module.css";
+import { KeyboardEvent, useState } from 'react';
+import { ActionIcon } from '@mantine/core';
+import { IconChevronRight, IconFileDescription } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
+import { IPage } from '@/features/page/types/page.types';
+import { getPageTitle } from '@/features/page/page.utils';
+import { PageChildren } from './page-children';
+import classes from './destination-picker.module.css';
 
 type PageRowProps = {
   page: Partial<IPage>;
@@ -22,7 +22,7 @@ export function PageRow({
   limit,
   selectedId,
   excludePageId,
-  onSelect,
+  onSelect
 }: PageRowProps) {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
@@ -33,10 +33,10 @@ export function PageRow({
   const rowClasses = [
     classes.pageRow,
     isSelected && classes.selected,
-    isExcluded && classes.disabled,
+    isExcluded && classes.disabled
   ]
     .filter(Boolean)
-    .join(" ");
+    .join(' ');
 
   const handleSelect = () => {
     if (!isExcluded) onSelect(page);
@@ -44,7 +44,7 @@ export function PageRow({
 
   const handleRowKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.target !== e.currentTarget) return;
-    if (e.key === "Enter" || e.key === " ") {
+    if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       handleSelect();
     }
@@ -63,11 +63,11 @@ export function PageRow({
       >
         {page.hasChildren ? (
           <ActionIcon
-            className={`${classes.chevron} ${expanded ? classes.chevronExpanded : ""}`}
+            className={`${classes.chevron} ${expanded ? classes.chevronExpanded : ''}`}
             variant="subtle"
             color="gray"
             size="sm"
-            aria-label={expanded ? t("Collapse") : t("Expand")}
+            aria-label={expanded ? t('Collapse') : t('Expand')}
             aria-expanded={expanded}
             onClick={(e) => {
               e.stopPropagation();

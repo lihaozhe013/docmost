@@ -1,9 +1,9 @@
-import { useAtom } from "jotai";
-import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
-import { ActionIcon, Menu, rem } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
+import { useAtom } from 'jotai';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
+import { ActionIcon, Menu, rem } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { notifications } from '@mantine/notifications';
 import {
   IconArrowRight,
   IconCopy,
@@ -12,30 +12,30 @@ import {
   IconLink,
   IconStar,
   IconStarFilled,
-  IconTrash,
-} from "@tabler/icons-react";
+  IconTrash
+} from '@tabler/icons-react';
 
-import ExportModal from "@/components/common/export-modal";
-import MovePageModal from "@/features/page/components/move-page-modal.tsx";
-import CopyPageModal from "@/features/page/components/copy-page-modal.tsx";
-import { useDeletePageModal } from "@/features/page/hooks/use-delete-page-modal.tsx";
-import { buildPageUrl } from "@/features/page/page.utils.ts";
-import { getPageTitle } from "@/features/page/page.utils";
-import { duplicatePage } from "@/features/page/services/page-service.ts";
-import { useClipboard } from "@/hooks/use-clipboard";
-import { getAppUrl } from "@/lib/config.ts";
-import { useQueryEmit } from "@/features/websocket/use-query-emit.ts";
+import ExportModal from '@/components/common/export-modal';
+import MovePageModal from '@/features/page/components/move-page-modal.tsx';
+import CopyPageModal from '@/features/page/components/copy-page-modal.tsx';
+import { useDeletePageModal } from '@/features/page/hooks/use-delete-page-modal.tsx';
+import { buildPageUrl } from '@/features/page/page.utils.ts';
+import { getPageTitle } from '@/features/page/page.utils';
+import { duplicatePage } from '@/features/page/services/page-service.ts';
+import { useClipboard } from '@/hooks/use-clipboard';
+import { getAppUrl } from '@/lib/config.ts';
+import { useQueryEmit } from '@/features/websocket/use-query-emit.ts';
 import {
   useFavoriteIds,
   useAddFavoriteMutation,
-  useRemoveFavoriteMutation,
-} from "@/features/favorite/queries/favorite-query";
+  useRemoveFavoriteMutation
+} from '@/features/favorite/queries/favorite-query';
 
-import { treeDataAtom } from "@/features/page/tree/atoms/tree-data-atom.ts";
-import { treeModel } from "@/features/page/tree/model/tree-model";
-import { useTreeMutation } from "@/features/page/tree/hooks/use-tree-mutation.ts";
-import type { SpaceTreeNode } from "@/features/page/tree/types.ts";
-import classes from "@/features/page/tree/styles/tree.module.css";
+import { treeDataAtom } from '@/features/page/tree/atoms/tree-data-atom.ts';
+import { treeModel } from '@/features/page/tree/model/tree-model';
+import { useTreeMutation } from '@/features/page/tree/hooks/use-tree-mutation.ts';
+import type { SpaceTreeNode } from '@/features/page/tree/types.ts';
+import classes from '@/features/page/tree/styles/tree.module.css';
 
 export interface NodeMenuProps {
   node: SpaceTreeNode;
@@ -54,13 +54,13 @@ export function NodeMenu({ node, canEdit }: NodeMenuProps) {
     useDisclosure(false);
   const [
     movePageModalOpened,
-    { open: openMovePageModal, close: closeMoveSpaceModal },
+    { open: openMovePageModal, close: closeMoveSpaceModal }
   ] = useDisclosure(false);
   const [
     copyPageModalOpened,
-    { open: openCopyPageModal, close: closeCopySpaceModal },
+    { open: openCopyPageModal, close: closeCopySpaceModal }
   ] = useDisclosure(false);
-  const favoriteIds = useFavoriteIds("page", node.spaceId);
+  const favoriteIds = useFavoriteIds('page', node.spaceId);
   const addFavorite = useAddFavoriteMutation();
   const removeFavorite = useRemoveFavoriteMutation();
   const isFavorited = favoriteIds.has(node.id);
@@ -69,7 +69,7 @@ export function NodeMenu({ node, canEdit }: NodeMenuProps) {
     const pageUrl =
       getAppUrl() + buildPageUrl(spaceSlug, node.slugId, node.name);
     clipboard.copy(pageUrl);
-    notifications.show({ message: t("Link copied") });
+    notifications.show({ message: t('Link copied') });
   };
 
   const handleDuplicatePage = async () => {
@@ -92,30 +92,30 @@ export function NodeMenu({ node, canEdit }: NodeMenuProps) {
         icon: duplicatedPage.icon,
         hasChildren: duplicatedPage.hasChildren,
         canEdit: true,
-        children: [],
+        children: []
       };
 
       setData((prev) =>
-        treeModel.insert(prev, parentId, treeNodeData, newIndex),
+        treeModel.insert(prev, parentId, treeNodeData, newIndex)
       );
 
       setTimeout(() => {
         emit({
-          operation: "addTreeNode",
+          operation: 'addTreeNode',
           spaceId: node.spaceId,
           payload: {
             parentId,
             index: newIndex,
-            data: treeNodeData,
-          },
+            data: treeNodeData
+          }
         });
       }, 50);
 
-      notifications.show({ message: t("Page duplicated successfully") });
+      notifications.show({ message: t('Page duplicated successfully') });
     } catch (err: any) {
       notifications.show({
-        message: err?.response?.data?.message || "An error occurred",
-        color: "red",
+        message: err?.response?.data?.message || 'An error occurred',
+        color: 'red'
       });
     }
   };
@@ -128,7 +128,9 @@ export function NodeMenu({ node, canEdit }: NodeMenuProps) {
             variant="subtle"
             color="gray"
             className={classes.actionIcon}
-            aria-label={t("Page menu for {{name}}", { name: getPageTitle(node.name, node.isBase, t) })}
+            aria-label={t('Page menu for {{name}}', {
+              name: getPageTitle(node.name, node.isBase, t)
+            })}
             tabIndex={-1}
             onClick={(e) => {
               e.preventDefault();
@@ -151,24 +153,28 @@ export function NodeMenu({ node, canEdit }: NodeMenuProps) {
               handleCopyLink();
             }}
           >
-            {t("Copy link")}
+            {t('Copy link')}
           </Menu.Item>
 
           <Menu.Item
             leftSection={
-              isFavorited ? <IconStarFilled size={16} /> : <IconStar size={16} />
+              isFavorited ? (
+                <IconStarFilled size={16} />
+              ) : (
+                <IconStar size={16} />
+              )
             }
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               if (isFavorited) {
-                removeFavorite.mutate({ type: "page", pageId: node.id });
+                removeFavorite.mutate({ type: 'page', pageId: node.id });
               } else {
-                addFavorite.mutate({ type: "page", pageId: node.id });
+                addFavorite.mutate({ type: 'page', pageId: node.id });
               }
             }}
           >
-            {isFavorited ? t("Remove from favorites") : t("Add to favorites")}
+            {isFavorited ? t('Remove from favorites') : t('Add to favorites')}
           </Menu.Item>
 
           <Menu.Item
@@ -179,7 +185,7 @@ export function NodeMenu({ node, canEdit }: NodeMenuProps) {
               openExportModal();
             }}
           >
-            {t("Export page")}
+            {t('Export page')}
           </Menu.Item>
 
           {canEdit && (
@@ -192,7 +198,7 @@ export function NodeMenu({ node, canEdit }: NodeMenuProps) {
                   handleDuplicatePage();
                 }}
               >
-                {t("Duplicate")}
+                {t('Duplicate')}
               </Menu.Item>
 
               <Menu.Item
@@ -203,7 +209,7 @@ export function NodeMenu({ node, canEdit }: NodeMenuProps) {
                   openMovePageModal();
                 }}
               >
-                {t("Move")}
+                {t('Move')}
               </Menu.Item>
 
               <Menu.Item
@@ -214,7 +220,7 @@ export function NodeMenu({ node, canEdit }: NodeMenuProps) {
                   openCopyPageModal();
                 }}
               >
-                {t("Copy to space")}
+                {t('Copy to space')}
               </Menu.Item>
 
               <Menu.Divider />
@@ -225,11 +231,11 @@ export function NodeMenu({ node, canEdit }: NodeMenuProps) {
                   e.preventDefault();
                   e.stopPropagation();
                   openDeleteModal({
-                    onConfirm: () => handleDelete(node.id),
+                    onConfirm: () => handleDelete(node.id)
                   });
                 }}
               >
-                {t("Move to trash")}
+                {t('Move to trash')}
               </Menu.Item>
             </>
           )}

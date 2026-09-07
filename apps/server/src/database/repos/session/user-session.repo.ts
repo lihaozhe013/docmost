@@ -1,6 +1,6 @@
 import {
   InsertableUserSession,
-  UserSession,
+  UserSession
 } from '@docmost/db/types/entity.types';
 import { KyselyDB, KyselyTransaction } from '@docmost/db/types/kysely.types';
 import { dbOrTx } from '@docmost/db/utils';
@@ -14,7 +14,7 @@ export class UserSessionRepo {
 
   async insertSession(
     session: InsertableUserSession,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<UserSession> {
     const db = dbOrTx(this.db, trx);
     return db
@@ -36,7 +36,7 @@ export class UserSessionRepo {
 
   async findActiveByUser(
     userId: string,
-    workspaceId: string,
+    workspaceId: string
   ): Promise<UserSession[]> {
     return this.db
       .selectFrom('userSessions')
@@ -60,7 +60,7 @@ export class UserSessionRepo {
   async revokeById(
     id: string,
     userId: string,
-    workspaceId: string,
+    workspaceId: string
   ): Promise<void> {
     await this.db
       .updateTable('userSessions')
@@ -75,7 +75,7 @@ export class UserSessionRepo {
   async revokeAllExceptCurrent(
     currentSessionId: string,
     userId: string,
-    workspaceId: string,
+    workspaceId: string
   ): Promise<void> {
     await this.db
       .updateTable('userSessions')
@@ -90,7 +90,7 @@ export class UserSessionRepo {
   async revokeByUserId(
     userId: string,
     workspaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<void> {
     const db = dbOrTx(this.db, trx);
     await db
@@ -102,10 +102,7 @@ export class UserSessionRepo {
       .execute();
   }
 
-  async deleteByUserId(
-    userId: string,
-    workspaceId: string,
-  ): Promise<void> {
+  async deleteByUserId(userId: string, workspaceId: string): Promise<void> {
     await this.db
       .deleteFrom('userSessions')
       .where('userId', '=', userId)
@@ -116,7 +113,7 @@ export class UserSessionRepo {
   async deleteAllExceptCurrent(
     currentSessionId: string,
     userId: string,
-    workspaceId: string,
+    workspaceId: string
   ): Promise<void> {
     await this.db
       .deleteFrom('userSessions')
@@ -131,10 +128,7 @@ export class UserSessionRepo {
     await this.db
       .deleteFrom('userSessions')
       .where((eb) =>
-        eb.or([
-          eb('revokedAt', '<', cutoff),
-          eb('expiresAt', '<', cutoff),
-        ]),
+        eb.or([eb('revokedAt', '<', cutoff), eb('expiresAt', '<', cutoff)])
       )
       .execute();
   }

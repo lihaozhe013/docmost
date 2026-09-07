@@ -1,15 +1,15 @@
-import { EditorView } from "@tiptap/pm/view";
-import { getPageById } from "@/features/page/services/page-service.ts";
-import { IPage } from "@/features/page/types/page.types.ts";
-import { v7 } from "uuid";
-import { extractPageSlugId } from "@/lib";
+import { EditorView } from '@tiptap/pm/view';
+import { getPageById } from '@/features/page/services/page-service.ts';
+import { IPage } from '@/features/page/types/page.types.ts';
+import { v7 } from 'uuid';
+import { extractPageSlugId } from '@/lib';
 
 export type LinkFn = (
   url: string,
   view: EditorView,
   pos: number,
   creatorId: string,
-  anchorId?: string,
+  anchorId?: string
 ) => void;
 
 export interface InternalLinkOptions {
@@ -31,12 +31,12 @@ export const handleInternalLink =
 
         const node = schema.nodes.mention.create({
           id: v7(),
-          label: page.title || "Untitled",
-          entityType: "page",
+          label: page.title || 'Untitled',
+          entityType: 'page',
           entityId: page.id,
           slugId: page.slugId,
           creatorId: creatorId,
-          anchorId: anchorId,
+          anchorId: anchorId
         });
 
         if (!node) return;
@@ -52,11 +52,11 @@ export const handleInternalLink =
         transaction.addMark(
           pos,
           pos + url.length,
-          schema.marks.link.create({ href: url }),
+          schema.marks.link.create({ href: url })
         );
 
         view.dispatch(transaction);
-      },
+      }
     );
   };
 
@@ -72,5 +72,5 @@ export const createMentionAction = handleInternalLink({
   validateFn: (url: string, view: EditorView) => {
     // validation is already done on the paste handler
     return true;
-  },
+  }
 });

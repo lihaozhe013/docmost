@@ -4,24 +4,27 @@ import {
   Inject,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
+  UnauthorizedException
 } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { NotificationSettingKey } from '../notification/notification.constants';
-import { comparePasswordHash, diffAuditTrackedFields } from '../../common/helpers/utils';
+import {
+  comparePasswordHash,
+  diffAuditTrackedFields
+} from '../../common/helpers/utils';
 import { Workspace } from '@docmost/db/types/entity.types';
 import { validateSsoEnforcement } from '../auth/auth.util';
 import { AuditEvent, AuditResource } from '../../common/events/audit-events';
 import {
   AUDIT_SERVICE,
-  IAuditService,
+  IAuditService
 } from '../../integrations/audit/audit.service';
 
 @Injectable()
 export class UserService {
   constructor(
     private userRepo: UserRepo,
-    @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService,
+    @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService
   ) {}
 
   async findById(userId: string, workspaceId: string) {
@@ -31,13 +34,13 @@ export class UserService {
   async update(
     updateUserDto: UpdateUserDto,
     userId: string,
-    workspace: Workspace,
+    workspace: Workspace
   ) {
     const includePassword =
       updateUserDto.email != null && updateUserDto.confirmPassword != null;
 
     const user = await this.userRepo.findById(userId, workspace.id, {
-      includePassword,
+      includePassword
     });
 
     if (!user) {
@@ -49,7 +52,7 @@ export class UserService {
       return this.userRepo.updatePreference(
         userId,
         'fullPageWidth',
-        updateUserDto.fullPageWidth,
+        updateUserDto.fullPageWidth
       );
     }
 
@@ -57,7 +60,7 @@ export class UserService {
       return this.userRepo.updatePreference(
         userId,
         'pageEditMode',
-        updateUserDto.pageEditMode.toLowerCase(),
+        updateUserDto.pageEditMode.toLowerCase()
       );
     }
 
@@ -65,7 +68,7 @@ export class UserService {
       return this.userRepo.updatePreference(
         userId,
         'editorToolbar',
-        updateUserDto.editorToolbar,
+        updateUserDto.editorToolbar
       );
     }
 
@@ -74,7 +77,7 @@ export class UserService {
       notificationPageUserMention: 'page.userMention',
       notificationCommentUserMention: 'comment.userMention',
       notificationCommentCreated: 'comment.created',
-      notificationCommentResolved: 'comment.resolved',
+      notificationCommentResolved: 'comment.resolved'
     };
 
     for (const [dtoField, settingKey] of Object.entries(notificationSettings)) {
@@ -82,12 +85,16 @@ export class UserService {
         return this.userRepo.updateNotificationSetting(
           userId,
           settingKey,
-          updateUserDto[dtoField],
+          updateUserDto[dtoField]
         );
       }
     }
 
-    const userBefore = { name: user.name, email: user.email, locale: user.locale };
+    const userBefore = {
+      name: user.name,
+      email: user.email,
+      locale: user.locale
+    };
 
     if (updateUserDto.name) {
       user.name = updateUserDto.name;
@@ -98,17 +105,19 @@ export class UserService {
 
       if (!updateUserDto.confirmPassword) {
         throw new BadRequestException(
-          'You must provide a password to change your email',
+          'You must provide a password to change your email'
         );
       }
 
       const isPasswordMatch = await comparePasswordHash(
         updateUserDto.confirmPassword,
-        user.password,
+        user.password
       );
 
       if (!isPasswordMatch) {
-        throw new BadRequestException('You must provide the correct password to change your email');
+        throw new BadRequestException(
+          'You must provide the correct password to change your email'
+        );
       }
 
       if (await this.userRepo.findByEmail(updateUserDto.email, workspace.id)) {
@@ -130,7 +139,7 @@ export class UserService {
       ['name', 'email'],
       updateUserDto,
       userBefore,
-      user,
+      user
     );
 
     if (changes) {
@@ -138,7 +147,7 @@ export class UserService {
         event: AuditEvent.USER_UPDATED,
         resourceType: AuditResource.USER,
         resourceId: userId,
-        changes,
+        changes
       });
     }
 

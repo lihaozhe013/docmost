@@ -1,12 +1,12 @@
-import { useEffect } from "react";
-import { socketAtom } from "@/features/websocket/atoms/socket-atom.ts";
-import { useAtom } from "jotai";
-import { treeDataAtom } from "@/features/page/tree/atoms/tree-data-atom.ts";
-import { WebSocketEvent } from "@/features/websocket/types";
-import { SpaceTreeNode } from "@/features/page/tree/types.ts";
-import { useQueryClient } from "@tanstack/react-query";
-import { treeModel } from "@/features/page/tree/model/tree-model";
-import localEmitter from "@/lib/local-emitter.ts";
+import { useEffect } from 'react';
+import { socketAtom } from '@/features/websocket/atoms/socket-atom.ts';
+import { useAtom } from 'jotai';
+import { treeDataAtom } from '@/features/page/tree/atoms/tree-data-atom.ts';
+import { WebSocketEvent } from '@/features/websocket/types';
+import { SpaceTreeNode } from '@/features/page/tree/types.ts';
+import { useQueryClient } from '@tanstack/react-query';
+import { treeModel } from '@/features/page/tree/model/tree-model';
+import localEmitter from '@/lib/local-emitter.ts';
 
 export const useTreeSocket = () => {
   const [socket] = useAtom(socketAtom);
@@ -19,45 +19,45 @@ export const useTreeSocket = () => {
       setTreeData((prev) => {
         if (!treeModel.find(prev, event?.id)) return prev;
         return treeModel.update(prev, event.id, {
-          name: event.payload.title,
+          name: event.payload.title
         } as Partial<SpaceTreeNode>);
       });
     };
 
-    localEmitter.on("message", updateNodeName);
+    localEmitter.on('message', updateNodeName);
     return () => {
-      localEmitter.off("message", updateNodeName);
+      localEmitter.off('message', updateNodeName);
     };
   }, []);
 
   useEffect(() => {
-    socket?.on("message", (event: WebSocketEvent) => {
+    socket?.on('message', (event: WebSocketEvent) => {
       switch (event.operation) {
-        case "updateOne":
-          if (event.entity[0] === "pages") {
+        case 'updateOne':
+          if (event.entity[0] === 'pages') {
             setTreeData((prev) => {
               if (!treeModel.find(prev, event.id)) return prev;
               let next = prev;
               if (event.payload?.title !== undefined) {
                 next = treeModel.update(next, event.id, {
-                  name: event.payload.title,
+                  name: event.payload.title
                 } as Partial<SpaceTreeNode>);
               }
               if (event.payload?.icon !== undefined) {
                 next = treeModel.update(next, event.id, {
-                  icon: event.payload.icon,
+                  icon: event.payload.icon
                 } as Partial<SpaceTreeNode>);
               }
               if (event.payload?.isBase !== undefined) {
                 next = treeModel.update(next, event.id, {
-                  isBase: event.payload.isBase,
+                  isBase: event.payload.isBase
                 } as Partial<SpaceTreeNode>);
               }
               return next;
             });
           }
           break;
-        case "addTreeNode":
+        case 'addTreeNode':
           setTreeData((prev) => {
             if (treeModel.find(prev, event.payload.data.id)) return prev;
             const newParentId = event.payload.parentId as string | null;
@@ -65,19 +65,19 @@ export const useTreeSocket = () => {
               prev,
               newParentId,
               event.payload.data,
-              event.payload.index,
+              event.payload.index
             );
             // Mirror the emitter: flip new parent's hasChildren to true so
             // the chevron renders on the receiver.
             if (newParentId) {
               next = treeModel.update(next, newParentId, {
-                hasChildren: true,
+                hasChildren: true
               } as Partial<SpaceTreeNode>);
             }
             return next;
           });
           break;
-        case "moveTreeNode":
+        case 'moveTreeNode':
           setTreeData((prev) => {
             const sourceBefore = treeModel.find(prev, event.payload.id);
             if (!sourceBefore) return prev;
@@ -87,7 +87,7 @@ export const useTreeSocket = () => {
 
             const placed = treeModel.place(prev, event.payload.id, {
               parentId: newParentId,
-              index: event.payload.index,
+              index: event.payload.index
             });
             // `place` silently returns the same reference if the destination
             // parent isn't loaded on this client. Falling back to removing the
@@ -99,7 +99,7 @@ export const useTreeSocket = () => {
 
             let next = treeModel.update(placed, event.payload.id, {
               position: event.payload.position,
-              parentPageId: newParentId,
+              parentPageId: newParentId
             } as Partial<SpaceTreeNode>);
 
             // Mirror the emitter's hasChildren bookkeeping so both clients
@@ -108,24 +108,24 @@ export const useTreeSocket = () => {
               const oldParent = treeModel.find(next, oldParentId);
               if (!oldParent?.children?.length) {
                 next = treeModel.update(next, oldParentId, {
-                  hasChildren: false,
+                  hasChildren: false
                 } as Partial<SpaceTreeNode>);
               }
             }
             if (newParentId) {
               next = treeModel.update(next, newParentId, {
-                hasChildren: true,
+                hasChildren: true
               } as Partial<SpaceTreeNode>);
             }
 
             return next;
           });
           break;
-        case "deleteTreeNode":
+        case 'deleteTreeNode':
           setTreeData((prev) => {
             if (!treeModel.find(prev, event.payload.node.id)) return prev;
             queryClient.invalidateQueries({
-              queryKey: ["pages", event.payload.node.slugId].filter(Boolean),
+              queryKey: ['pages', event.payload.node.slugId].filter(Boolean)
             });
             let next = treeModel.remove(prev, event.payload.node.id);
             // Mirror the emitter's hasChildren bookkeeping so both clients
@@ -135,7 +135,7 @@ export const useTreeSocket = () => {
               const parent = treeModel.find(next, parentPageId);
               if (!parent?.children?.length) {
                 next = treeModel.update(next, parentPageId, {
-                  hasChildren: false,
+                  hasChildren: false
                 } as Partial<SpaceTreeNode>);
               }
             }

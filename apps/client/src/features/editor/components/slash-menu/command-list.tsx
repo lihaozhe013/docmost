@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   SlashMenuGroupedItemsType,
-  SlashMenuItemType,
-} from "@/features/editor/components/slash-menu/types";
+  SlashMenuItemType
+} from '@/features/editor/components/slash-menu/types';
 import {
   ActionIcon,
   Group,
@@ -10,17 +10,17 @@ import {
   ScrollArea,
   Text,
   UnstyledButton,
-  VisuallyHidden,
-} from "@mantine/core";
-import classes from "./slash-menu.module.css";
-import clsx from "clsx";
-import { useTranslation } from "react-i18next";
+  VisuallyHidden
+} from '@mantine/core';
+import classes from './slash-menu.module.css';
+import clsx from 'clsx';
+import { useTranslation } from 'react-i18next';
 
 const CommandList = ({
   items,
   command,
   editor,
-  range,
+  range
 }: {
   items: SlashMenuGroupedItemsType;
   command: any;
@@ -30,8 +30,8 @@ const CommandList = ({
   const { t } = useTranslation();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const viewportRef = useRef<HTMLDivElement>(null);
-  const [countAnnouncement, setCountAnnouncement] = useState("");
-  const [selectionAnnouncement, setSelectionAnnouncement] = useState("");
+  const [countAnnouncement, setCountAnnouncement] = useState('');
+  const [selectionAnnouncement, setSelectionAnnouncement] = useState('');
 
   const flatItems = useMemo(() => {
     return Object.values(items).flat();
@@ -44,28 +44,28 @@ const CommandList = ({
         command(item);
       }
     },
-    [command, flatItems],
+    [command, flatItems]
   );
 
   useEffect(() => {
-    const navigationKeys = ["ArrowUp", "ArrowDown", "Enter"];
+    const navigationKeys = ['ArrowUp', 'ArrowDown', 'Enter'];
     const onKeyDown = (e: KeyboardEvent) => {
       if (navigationKeys.includes(e.key)) {
         e.preventDefault();
 
-        if (e.key === "ArrowUp") {
+        if (e.key === 'ArrowUp') {
           setSelectedIndex(
-            (selectedIndex + flatItems.length - 1) % flatItems.length,
+            (selectedIndex + flatItems.length - 1) % flatItems.length
           );
           return true;
         }
 
-        if (e.key === "ArrowDown") {
+        if (e.key === 'ArrowDown') {
           setSelectedIndex((selectedIndex + 1) % flatItems.length);
           return true;
         }
 
-        if (e.key === "Enter") {
+        if (e.key === 'Enter') {
           const item = flatItems[selectedIndex];
 
           if (item) {
@@ -76,8 +76,8 @@ const CommandList = ({
         }
       }
     };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
   }, [command, flatItems, selectedIndex]);
 
   useEffect(() => {
@@ -86,18 +86,18 @@ const CommandList = ({
 
   useEffect(() => {
     if (flatItems.length === 0) {
-      setCountAnnouncement("");
+      setCountAnnouncement('');
       return;
     }
     setCountAnnouncement(
-      t("{{count}} command available", { count: flatItems.length }),
+      t('{{count}} command available', { count: flatItems.length })
     );
   }, [flatItems.length, t]);
 
   useEffect(() => {
     const item = flatItems[selectedIndex];
     if (!item) {
-      setSelectionAnnouncement("");
+      setSelectionAnnouncement('');
       return;
     }
     setSelectionAnnouncement(`${t(item.title)}, ${t(item.description)}`);
@@ -106,7 +106,7 @@ const CommandList = ({
   useEffect(() => {
     viewportRef.current
       ?.querySelector(`[data-item-index="${selectedIndex}"]`)
-      ?.scrollIntoView({ block: "nearest" });
+      ?.scrollIntoView({ block: 'nearest' });
   }, [selectedIndex]);
 
   return flatItems.length > 0 ? (
@@ -116,7 +116,7 @@ const CommandList = ({
       p="xs"
       withBorder
       role="listbox"
-      aria-label={t("Slash commands")}
+      aria-label={t('Slash commands')}
       aria-activedescendant={`slash-command-option-${selectedIndex}`}
     >
       <VisuallyHidden role="status" aria-live="polite" aria-atomic="true">
@@ -135,44 +135,48 @@ const CommandList = ({
         {(() => {
           let flatIndex = -1;
           return Object.entries(items).map(([category, categoryItems]) => (
-          <div key={category} role="group" aria-label={category}>
-            <Text c="dimmed" mb={4} fw={500} tt="capitalize">
-              {category}
-            </Text>
-            {categoryItems.map((item: SlashMenuItemType) => {
-              flatIndex += 1;
-              const itemIndex = flatIndex;
-              return (
-              <UnstyledButton
-                data-item-index={itemIndex}
-                id={`slash-command-option-${itemIndex}`}
-                role="option"
-                aria-selected={itemIndex === selectedIndex}
-                aria-disabled={false}
-                onClick={() => selectItem(itemIndex)}
-                className={clsx(classes.menuBtn, {
-                  [classes.selectedItem]: itemIndex === selectedIndex,
-                })}
-              >
-                <Group wrap="nowrap">
-                  <ActionIcon variant="default" component="div" aria-hidden="true">
-                    <item.icon size={18} />
-                  </ActionIcon>
+            <div key={category} role="group" aria-label={category}>
+              <Text c="dimmed" mb={4} fw={500} tt="capitalize">
+                {category}
+              </Text>
+              {categoryItems.map((item: SlashMenuItemType) => {
+                flatIndex += 1;
+                const itemIndex = flatIndex;
+                return (
+                  <UnstyledButton
+                    data-item-index={itemIndex}
+                    id={`slash-command-option-${itemIndex}`}
+                    role="option"
+                    aria-selected={itemIndex === selectedIndex}
+                    aria-disabled={false}
+                    onClick={() => selectItem(itemIndex)}
+                    className={clsx(classes.menuBtn, {
+                      [classes.selectedItem]: itemIndex === selectedIndex
+                    })}
+                  >
+                    <Group wrap="nowrap">
+                      <ActionIcon
+                        variant="default"
+                        component="div"
+                        aria-hidden="true"
+                      >
+                        <item.icon size={18} />
+                      </ActionIcon>
 
-                  <div style={{ flex: 1 }}>
-                    <Text size="sm" fw={500}>
-                      {t(item.title)}
-                    </Text>
+                      <div style={{ flex: 1 }}>
+                        <Text size="sm" fw={500}>
+                          {t(item.title)}
+                        </Text>
 
-                    <Text c="dimmed" size="xs">
-                      {t(item.description)}
-                    </Text>
-                  </div>
-                </Group>
-              </UnstyledButton>
-              );
-            })}
-          </div>
+                        <Text c="dimmed" size="xs">
+                          {t(item.description)}
+                        </Text>
+                      </div>
+                    </Group>
+                  </UnstyledButton>
+                );
+              })}
+            </div>
           ));
         })()}
       </ScrollArea>

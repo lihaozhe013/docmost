@@ -14,7 +14,7 @@ export const TREE_EVENTS = new Set([
   'addTreeNode',
   'moveTreeNode',
   'deleteTreeNode',
-  'refetchRootTreeNodeEvent',
+  'refetchRootTreeNodeEvent'
 ]);
 
 export function getBaseRoomName(pageId: string): string {
@@ -25,5 +25,5 @@ export const BASE_INBOUND_EVENTS = new Set([
   'base:subscribe',
   'base:unsubscribe',
   'base:presence',
-  'base:presence:leave',
+  'base:presence:leave'
 ]);

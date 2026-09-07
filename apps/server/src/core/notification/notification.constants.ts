@@ -12,7 +12,7 @@ export const NotificationType = {
   PAGE_APPROVAL_REJECTED: 'page.approval_rejected',
   SIEM_DESTINATION_FAILING: 'siem_destination.failing',
   SIEM_DESTINATION_DISABLED: 'siem_destination.disabled',
-  SIEM_DESTINATION_RECOVERED: 'siem_destination.recovered',
+  SIEM_DESTINATION_RECOVERED: 'siem_destination.recovered'
 } as const;
 
 export type NotificationType =
@@ -32,7 +32,7 @@ export const NotificationTypeToSettingKey: Partial<
   [NotificationType.PAGE_USER_MENTION]: 'page.userMention',
   [NotificationType.COMMENT_USER_MENTION]: 'comment.userMention',
   [NotificationType.COMMENT_CREATED]: 'comment.created',
-  [NotificationType.COMMENT_RESOLVED]: 'comment.resolved',
+  [NotificationType.COMMENT_RESOLVED]: 'comment.resolved'
 };
 
 export type NotificationTab = 'direct' | 'updates' | 'all';
@@ -45,14 +45,16 @@ export const DIRECT_NOTIFICATION_TYPES: NotificationType[] = [
   NotificationType.PAGE_PERMISSION_GRANTED,
   NotificationType.SIEM_DESTINATION_FAILING,
   NotificationType.SIEM_DESTINATION_DISABLED,
-  NotificationType.SIEM_DESTINATION_RECOVERED,
+  NotificationType.SIEM_DESTINATION_RECOVERED
 ];
 
 export const UPDATES_NOTIFICATION_TYPES: NotificationType[] = [
-  NotificationType.PAGE_UPDATED,
+  NotificationType.PAGE_UPDATED
 ];
 
-export function getTypesForTab(tab: NotificationTab): NotificationType[] | undefined {
+export function getTypesForTab(
+  tab: NotificationTab
+): NotificationType[] | undefined {
   if (tab === 'direct') return DIRECT_NOTIFICATION_TYPES;
   if (tab === 'updates') return UPDATES_NOTIFICATION_TYPES;
   return undefined;

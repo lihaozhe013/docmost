@@ -4,30 +4,38 @@ import { dropOpToMovePayload } from './drop-op-to-move-payload';
 
 vi.mock('fractional-indexing-jittered', () => ({
   generateJitteredKeyBetween: (a: string | null, b: string | null) =>
-    `${a ?? 'START'}|${b ?? 'END'}`,
+    `${a ?? 'START'}|${b ?? 'END'}`
 }));
 
-const n = (id: string, position: string, children?: SpaceTreeNode[]): SpaceTreeNode =>
-  ({ id, position, children, name: id } as unknown as SpaceTreeNode);
+const n = (
+  id: string,
+  position: string,
+  children?: SpaceTreeNode[]
+): SpaceTreeNode =>
+  ({ id, position, children, name: id }) as unknown as SpaceTreeNode;
 
 const tree: SpaceTreeNode[] = [
   n('a', 'A', [n('a1', 'AA'), n('a2', 'AB')]),
-  n('b', 'B'),
+  n('b', 'B')
 ];
 
 describe('dropOpToMovePayload', () => {
   it('reorder-before computes parentId + position between prev and target', () => {
     const p = dropOpToMovePayload(tree, 'a2', {
       kind: 'reorder-before',
-      targetId: 'a1',
+      targetId: 'a1'
     });
-    expect(p).toEqual({ pageId: 'a2', parentPageId: 'a', position: 'START|AA' });
+    expect(p).toEqual({
+      pageId: 'a2',
+      parentPageId: 'a',
+      position: 'START|AA'
+    });
   });
 
   it('reorder-after computes position between target and next', () => {
     const p = dropOpToMovePayload(tree, 'a1', {
       kind: 'reorder-after',
-      targetId: 'a2',
+      targetId: 'a2'
     });
     expect(p).toEqual({ pageId: 'a1', parentPageId: 'a', position: 'AB|END' });
   });
@@ -35,7 +43,7 @@ describe('dropOpToMovePayload', () => {
   it('make-child appends with position after last child', () => {
     const p = dropOpToMovePayload(tree, 'b', {
       kind: 'make-child',
-      targetId: 'a',
+      targetId: 'a'
     });
     expect(p).toEqual({ pageId: 'b', parentPageId: 'a', position: 'AB|END' });
   });
@@ -43,7 +51,7 @@ describe('dropOpToMovePayload', () => {
   it('reorder-before at root: parentPageId is null', () => {
     const p = dropOpToMovePayload(tree, 'b', {
       kind: 'reorder-before',
-      targetId: 'a',
+      targetId: 'a'
     });
     expect(p).toEqual({ pageId: 'b', parentPageId: null, position: 'START|A' });
   });
@@ -58,11 +66,11 @@ describe('dropOpToMovePayload', () => {
       n('a', 'A'),
       n('b', 'AB'),
       n('c', 'B'),
-      n('d', 'BC'),
+      n('d', 'BC')
     ];
     const p = dropOpToMovePayload(adjacent, 'b', {
       kind: 'reorder-after',
-      targetId: 'a',
+      targetId: 'a'
     });
     // After-tree is [a, b, c, d] (no-op shape). Source 'b' at index 1.
     // prev = 'A', next = 'B'. Old buggy code returned prev='A', next=null.
@@ -74,11 +82,11 @@ describe('dropOpToMovePayload', () => {
       n('a', 'A'),
       n('b', 'AB'),
       n('c', 'B'),
-      n('d', 'BC'),
+      n('d', 'BC')
     ];
     const p = dropOpToMovePayload(adjacent, 'b', {
       kind: 'reorder-before',
-      targetId: 'c',
+      targetId: 'c'
     });
     // After-tree is [a, b, c, d]. Source 'b' at index 1.
     // prev = 'A', next = 'B'. Old buggy code returned prev=null, next='B'.
@@ -86,12 +94,10 @@ describe('dropOpToMovePayload', () => {
   });
 
   it('make-child when source is already last child of target uses post-move neighbors', () => {
-    const t: SpaceTreeNode[] = [
-      n('p', 'P', [n('x', 'X'), n('y', 'Y')]),
-    ];
+    const t: SpaceTreeNode[] = [n('p', 'P', [n('x', 'X'), n('y', 'Y')])];
     const p = dropOpToMovePayload(t, 'y', {
       kind: 'make-child',
-      targetId: 'p',
+      targetId: 'p'
     });
     // After-tree: 'y' becomes last child of 'p' → [x, y]. y at index 1.
     // prev = 'X', next = null. Old buggy: prev=Y (source's own position), next=null.

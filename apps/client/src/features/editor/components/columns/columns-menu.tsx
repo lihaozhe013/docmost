@@ -1,13 +1,13 @@
-import { BubbleMenu as BaseBubbleMenu } from "@tiptap/react/menus";
-import { findParentNode, posToDOMRect, useEditorState } from "@tiptap/react";
-import React, { useCallback, useRef, useState } from "react";
-import { DOMSerializer, Node as PMNode } from "@tiptap/pm/model";
+import { BubbleMenu as BaseBubbleMenu } from '@tiptap/react/menus';
+import { findParentNode, posToDOMRect, useEditorState } from '@tiptap/react';
+import React, { useCallback, useRef, useState } from 'react';
+import { DOMSerializer, Node as PMNode } from '@tiptap/pm/model';
 import {
   EditorMenuProps,
-  ShouldShowProps,
-} from "@/features/editor/components/table/types/types.ts";
-import { ActionIcon, Tooltip, Popover, Button } from "@mantine/core";
-import clsx from "clsx";
+  ShouldShowProps
+} from '@/features/editor/components/table/types/types.ts';
+import { ActionIcon, Tooltip, Popover, Button } from '@mantine/core';
+import clsx from 'clsx';
 import {
   IconChevronDown,
   IconCheck,
@@ -17,12 +17,12 @@ import {
   IconLayoutSidebarRight,
   IconLayoutAlignCenter,
   IconCopy,
-  IconTrash,
-} from "@tabler/icons-react";
-import { isEditorReady, isTextSelected } from "@docmost/editor-ext";
-import type { WidthMode, ColumnsLayout } from "@docmost/editor-ext";
-import { useTranslation } from "react-i18next";
-import classes from "../common/toolbar-menu.module.css";
+  IconTrash
+} from '@tabler/icons-react';
+import { isEditorReady, isTextSelected } from '@docmost/editor-ext';
+import type { WidthMode, ColumnsLayout } from '@docmost/editor-ext';
+import { useTranslation } from 'react-i18next';
+import classes from '../common/toolbar-menu.module.css';
 
 type LayoutPreset = {
   layout: ColumnsLayout;
@@ -31,32 +31,32 @@ type LayoutPreset = {
 };
 
 const twoColumnPresets: LayoutPreset[] = [
-  { layout: "two_equal", label: "Equal columns", icon: IconColumns2 },
+  { layout: 'two_equal', label: 'Equal columns', icon: IconColumns2 },
   {
-    layout: "two_left_sidebar",
-    label: "Left sidebar",
-    icon: IconLayoutSidebar,
+    layout: 'two_left_sidebar',
+    label: 'Left sidebar',
+    icon: IconLayoutSidebar
   },
   {
-    layout: "two_right_sidebar",
-    label: "Right sidebar",
-    icon: IconLayoutSidebarRight,
-  },
+    layout: 'two_right_sidebar',
+    label: 'Right sidebar',
+    icon: IconLayoutSidebarRight
+  }
 ];
 
 const threeColumnPresets: LayoutPreset[] = [
-  { layout: "three_equal", label: "Equal columns", icon: IconColumns3 },
+  { layout: 'three_equal', label: 'Equal columns', icon: IconColumns3 },
   {
-    layout: "three_with_sidebars",
-    label: "Wide center",
-    icon: IconLayoutAlignCenter,
+    layout: 'three_with_sidebars',
+    label: 'Wide center',
+    icon: IconLayoutAlignCenter
   },
   {
-    layout: "three_left_wide",
-    label: "Left wide",
-    icon: IconLayoutSidebarRight,
+    layout: 'three_left_wide',
+    label: 'Left wide',
+    icon: IconLayoutSidebarRight
   },
-  { layout: "three_right_wide", label: "Right wide", icon: IconLayoutSidebar },
+  { layout: 'three_right_wide', label: 'Right wide', icon: IconLayoutSidebar }
 ];
 
 function getPresetsForCount(count: number): LayoutPreset[] {
@@ -72,23 +72,23 @@ export function ColumnsMenu({ editor }: EditorMenuProps) {
   const copyTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const nodesWithMenus = [
-    "callout",
-    "image",
-    "video",
-    "drawio",
-    "excalidraw",
-    "table",
+    'callout',
+    'image',
+    'video',
+    'drawio',
+    'excalidraw',
+    'table'
   ];
 
   const shouldShow = useCallback(
     ({ state }: ShouldShowProps) => {
       if (!state || !isEditorReady(editor)) return false;
-      if (!editor.isActive("columns")) return false;
+      if (!editor.isActive('columns')) return false;
       if (isTextSelected(editor)) return false;
       if (nodesWithMenus.some((name) => editor.isActive(name))) return false;
 
       const parent = findParentNode(
-        (node: PMNode) => node.type.name === "columns",
+        (node: PMNode) => node.type.name === 'columns'
       )(state.selection);
       if (!parent) return false;
 
@@ -98,7 +98,7 @@ export function ColumnsMenu({ editor }: EditorMenuProps) {
       const rect = dom.getBoundingClientRect();
       return rect.bottom > 0 && rect.top < window.innerHeight;
     },
-    [editor],
+    [editor]
   );
 
   const editorState = useEditorState({
@@ -108,22 +108,22 @@ export function ColumnsMenu({ editor }: EditorMenuProps) {
 
       const { selection } = ctx.editor.state;
       const parent = findParentNode(
-        (node: PMNode) => node.type.name === "columns",
+        (node: PMNode) => node.type.name === 'columns'
       )(selection);
 
       return {
         columnCount: parent?.node.childCount || 2,
-        layout: (parent?.node.attrs.layout as ColumnsLayout) || "two_equal",
-        isNormal: ctx.editor.isActive("columns", { widthMode: "normal" }),
-        isWide: ctx.editor.isActive("columns", { widthMode: "wide" }),
+        layout: (parent?.node.attrs.layout as ColumnsLayout) || 'two_equal',
+        isNormal: ctx.editor.isActive('columns', { widthMode: 'normal' }),
+        isWide: ctx.editor.isActive('columns', { widthMode: 'wide' })
       };
-    },
+    }
   });
 
   const getReferencedVirtualElement = useCallback(() => {
     if (!isEditorReady(editor)) return;
     const { selection } = editor.state;
-    const predicate = (node: PMNode) => node.type.name === "columns";
+    const predicate = (node: PMNode) => node.type.name === 'columns';
     const parent = findParentNode(predicate)(selection);
 
     if (parent) {
@@ -134,7 +134,7 @@ export function ColumnsMenu({ editor }: EditorMenuProps) {
       if (domRect.bottom <= 0 || domRect.top >= window.innerHeight) {
         return {
           getBoundingClientRect: () => domRect,
-          getClientRects: () => [domRect],
+          getClientRects: () => [domRect]
         };
       }
 
@@ -146,24 +146,24 @@ export function ColumnsMenu({ editor }: EditorMenuProps) {
           domRect.x,
           domRect.y,
           domRect.width,
-          maxBottom - domRect.y,
+          maxBottom - domRect.y
         );
         return {
           getBoundingClientRect: () => clamped,
-          getClientRects: () => [clamped],
+          getClientRects: () => [clamped]
         };
       }
 
       return {
         getBoundingClientRect: () => domRect,
-        getClientRects: () => [domRect],
+        getClientRects: () => [domRect]
       };
     }
 
     const domRect = posToDOMRect(editor.view, selection.from, selection.to);
     return {
       getBoundingClientRect: () => domRect,
-      getClientRects: () => [domRect],
+      getClientRects: () => [domRect]
     };
   }, [editor]);
 
@@ -176,7 +176,7 @@ export function ColumnsMenu({ editor }: EditorMenuProps) {
         .run();
       setIsCountOpen(false);
     },
-    [editor],
+    [editor]
   );
 
   const setLayout = useCallback(
@@ -187,19 +187,19 @@ export function ColumnsMenu({ editor }: EditorMenuProps) {
         .setColumnsLayout(layout)
         .run();
     },
-    [editor],
+    [editor]
   );
 
   const handleCopy = useCallback(() => {
     const { state } = editor;
     const parent = findParentNode(
-      (node: PMNode) => node.type.name === "columns",
+      (node: PMNode) => node.type.name === 'columns'
     )(state.selection);
     if (!parent) return;
 
     const serializer = DOMSerializer.fromSchema(state.schema);
     const dom = serializer.serializeNode(parent.node);
-    const wrapper = document.createElement("div");
+    const wrapper = document.createElement('div');
     wrapper.appendChild(dom);
 
     const onSuccess = () => {
@@ -212,11 +212,11 @@ export function ColumnsMenu({ editor }: EditorMenuProps) {
       navigator.clipboard
         .write([
           new ClipboardItem({
-            "text/html": new Blob([wrapper.innerHTML], { type: "text/html" }),
-            "text/plain": new Blob([parent.node.textContent], {
-              type: "text/plain",
-            }),
-          }),
+            'text/html': new Blob([wrapper.innerHTML], { type: 'text/html' }),
+            'text/plain': new Blob([parent.node.textContent], {
+              type: 'text/plain'
+            })
+          })
         ])
         .then(onSuccess)
         .catch(execCommandFallback);
@@ -225,15 +225,15 @@ export function ColumnsMenu({ editor }: EditorMenuProps) {
     }
 
     function execCommandFallback() {
-      wrapper.style.position = "fixed";
-      wrapper.style.left = "-9999px";
+      wrapper.style.position = 'fixed';
+      wrapper.style.left = '-9999px';
       document.body.appendChild(wrapper);
       const range = document.createRange();
       range.selectNodeContents(wrapper);
       const sel = window.getSelection();
       sel?.removeAllRanges();
       sel?.addRange(range);
-      document.execCommand("copy");
+      document.execCommand('copy');
       sel?.removeAllRanges();
       document.body.removeChild(wrapper);
       editor.view.focus();
@@ -243,14 +243,14 @@ export function ColumnsMenu({ editor }: EditorMenuProps) {
 
   const handleDelete = useCallback(() => {
     const parent = findParentNode(
-      (node: PMNode) => node.type.name === "columns",
+      (node: PMNode) => node.type.name === 'columns'
     )(editor.state.selection);
     if (!parent) return;
     editor.chain().focus().setNodeSelection(parent.pos).deleteSelection().run();
   }, [editor]);
 
   const columnCount = editorState?.columnCount || 2;
-  const currentLayout = editorState?.layout || "two_equal";
+  const currentLayout = editorState?.layout || 'two_equal';
   const presets = getPresetsForCount(columnCount);
 
   return (
@@ -260,11 +260,11 @@ export function ColumnsMenu({ editor }: EditorMenuProps) {
       updateDelay={0}
       getReferencedVirtualElement={getReferencedVirtualElement}
       options={{
-        placement: "bottom",
+        placement: 'bottom',
         offset: {
-          mainAxis: 5,
+          mainAxis: 5
         },
-        flip: false,
+        flip: false
       }}
       shouldShow={shouldShow}
     >
@@ -277,9 +277,9 @@ export function ColumnsMenu({ editor }: EditorMenuProps) {
               size="compact-sm"
               rightSection={<IconChevronDown size={12} />}
               onClick={() => setIsCountOpen(!isCountOpen)}
-              aria-label={t("Column count")}
+              aria-label={t('Column count')}
             >
-              {t("{{count}} Columns", { count: columnCount })}
+              {t('{{count}} Columns', { count: columnCount })}
             </Button>
           </Popover.Target>
           <Popover.Dropdown p={4}>
@@ -287,8 +287,8 @@ export function ColumnsMenu({ editor }: EditorMenuProps) {
               {[2, 3, 4, 5].map((n) => (
                 <Button
                   key={n}
-                  variant={n === columnCount ? "light" : "subtle"}
-                  color={n === columnCount ? "blue" : "dark"}
+                  variant={n === columnCount ? 'light' : 'subtle'}
+                  color={n === columnCount ? 'blue' : 'dark'}
                   justify="space-between"
                   fullWidth
                   rightSection={
@@ -297,7 +297,7 @@ export function ColumnsMenu({ editor }: EditorMenuProps) {
                   onClick={() => setColumnCount(n)}
                   size="xs"
                 >
-                  {t("{{count}} Columns", { count: n })}
+                  {t('{{count}} Columns', { count: n })}
                 </Button>
               ))}
             </Button.Group>
@@ -314,7 +314,7 @@ export function ColumnsMenu({ editor }: EditorMenuProps) {
               aria-label={t(preset.label)}
               variant="subtle"
               className={clsx({
-                [classes.active]: currentLayout === preset.layout,
+                [classes.active]: currentLayout === preset.layout
               })}
             >
               <preset.icon size={18} />
@@ -326,13 +326,13 @@ export function ColumnsMenu({ editor }: EditorMenuProps) {
 
         <Tooltip
           position="top"
-          label={copied ? t("Copied") : t("Copy")}
+          label={copied ? t('Copied') : t('Copy')}
           withinPortal={false}
         >
           <ActionIcon
             onClick={handleCopy}
             size="lg"
-            aria-label={t("Copy")}
+            aria-label={t('Copy')}
             variant="subtle"
           >
             {copied ? (
@@ -343,11 +343,11 @@ export function ColumnsMenu({ editor }: EditorMenuProps) {
           </ActionIcon>
         </Tooltip>
 
-        <Tooltip position="top" label={t("Delete")} withinPortal={false}>
+        <Tooltip position="top" label={t('Delete')} withinPortal={false}>
           <ActionIcon
             onClick={handleDelete}
             size="lg"
-            aria-label={t("Delete")}
+            aria-label={t('Delete')}
             variant="subtle"
           >
             <IconTrash size={18} />

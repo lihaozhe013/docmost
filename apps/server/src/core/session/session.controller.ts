@@ -6,7 +6,7 @@ import {
   HttpStatus,
   Post,
   Req,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { SessionService } from './session.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -26,13 +26,13 @@ export class SessionController {
   async listSessions(
     @AuthUser() user: User,
     @AuthWorkspace() workspace: Workspace,
-    @Req() req: FastifyRequest,
+    @Req() req: FastifyRequest
   ) {
     const currentSessionId = (req.raw as any).sessionId ?? null;
     const sessions = await this.sessionService.getActiveSessions(
       user.id,
       workspace.id,
-      currentSessionId,
+      currentSessionId
     );
     return { sessions };
   }
@@ -43,18 +43,18 @@ export class SessionController {
     @Body() dto: RevokeSessionDto,
     @AuthUser() user: User,
     @AuthWorkspace() workspace: Workspace,
-    @Req() req: FastifyRequest,
+    @Req() req: FastifyRequest
   ) {
     const currentSessionId = (req.raw as any).sessionId;
     if (dto.sessionId === currentSessionId) {
       throw new BadRequestException(
-        'Cannot revoke current session. Use logout instead.',
+        'Cannot revoke current session. Use logout instead.'
       );
     }
     await this.sessionService.revokeSession(
       dto.sessionId,
       user.id,
-      workspace.id,
+      workspace.id
     );
   }
 
@@ -63,18 +63,18 @@ export class SessionController {
   async revokeAllSessions(
     @AuthUser() user: User,
     @AuthWorkspace() workspace: Workspace,
-    @Req() req: FastifyRequest,
+    @Req() req: FastifyRequest
   ) {
     const currentSessionId = (req.raw as any).sessionId;
     if (!currentSessionId) {
       throw new BadRequestException(
-        'Current session not found. Please log in again.',
+        'Current session not found. Please log in again.'
       );
     }
     await this.sessionService.revokeAllOtherSessions(
       currentSessionId,
       user.id,
-      workspace.id,
+      workspace.id
     );
   }
 }

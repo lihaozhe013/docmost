@@ -8,7 +8,7 @@ import { sql } from 'kysely';
 import {
   InsertableSpaceMember,
   SpaceMember,
-  UpdatableSpaceMember,
+  UpdatableSpaceMember
 } from '@docmost/db/types/entity.types';
 import { PaginationOptions } from '../../pagination/pagination-options';
 import { MemberInfo, UserSpaceRole } from './types';
@@ -18,7 +18,7 @@ import { SpaceRepo } from '@docmost/db/repos/space/space.repo';
 import { withCache } from '../../../common/helpers/with-cache';
 import {
   CacheKey,
-  PERMISSION_CACHE_TTL_MS,
+  PERMISSION_CACHE_TTL_MS
 } from '../../../common/helpers/cache-keys';
 
 @Injectable()
@@ -27,12 +27,12 @@ export class SpaceMemberRepo {
     @InjectKysely() private readonly db: KyselyDB,
     private readonly groupRepo: GroupRepo,
     private readonly spaceRepo: SpaceRepo,
-    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
   ) {}
 
   async insertSpaceMember(
     insertableSpaceMember: InsertableSpaceMember,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<void> {
     const db = dbOrTx(this.db, trx);
     await db
@@ -46,7 +46,7 @@ export class SpaceMemberRepo {
     updatableSpaceMember: UpdatableSpaceMember,
     spaceMemberId: string,
     spaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<void> {
     const db = dbOrTx(this.db, trx);
     await db
@@ -63,7 +63,7 @@ export class SpaceMemberRepo {
       userId?: string;
       groupId?: string;
     },
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<SpaceMember> {
     const db = dbOrTx(this.db, trx);
     let query = db
@@ -83,7 +83,7 @@ export class SpaceMemberRepo {
   async removeSpaceMemberById(
     memberId: string,
     spaceId: string,
-    opts?: { trx?: KyselyTransaction },
+    opts?: { trx?: KyselyTransaction }
   ): Promise<void> {
     const { trx } = opts;
     const db = dbOrTx(this.db, trx);
@@ -97,7 +97,7 @@ export class SpaceMemberRepo {
   async roleCountBySpaceId(
     role: string,
     spaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<number> {
     const db = dbOrTx(this.db, trx);
     const { count } = await db
@@ -112,7 +112,7 @@ export class SpaceMemberRepo {
 
   async getSpaceMembersPaginated(
     spaceId: string,
-    pagination: PaginationOptions,
+    pagination: PaginationOptions
   ) {
     let baseQuery = this.db
       .selectFrom('spaceMembers')
@@ -128,18 +128,18 @@ export class SpaceMemberRepo {
         'groups.name as groupName',
         'groups.isDefault as groupIsDefault',
         'spaceMembers.role',
-        'spaceMembers.createdAt',
+        'spaceMembers.createdAt'
       ])
       .select((eb) => this.groupRepo.withMemberCount(eb))
       .select(
         sql<number>`case when groups.id is not null then 1 else 0 end`.as(
-          'isGroup',
-        ),
+          'isGroup'
+        )
       )
       .select(
         sql<number>`case "space_members"."role" when 'admin' then 1 when 'writer' then 2 when 'reader' then 3 else 4 end`.as(
-          'roleOrder',
-        ),
+          'roleOrder'
+        )
       )
       .select(sql<string>`coalesce(users.name, groups.name)`.as('memberName'))
       .where('spaceId', '=', spaceId);
@@ -149,18 +149,18 @@ export class SpaceMemberRepo {
         eb(
           sql`f_unaccent(users.name)`,
           'ilike',
-          sql`f_unaccent(${'%' + pagination.query + '%'})`,
+          sql`f_unaccent(${'%' + pagination.query + '%'})`
         )
           .or(
             sql`users.email`,
             'ilike',
-            sql`f_unaccent(${'%' + pagination.query + '%'})`,
+            sql`f_unaccent(${'%' + pagination.query + '%'})`
           )
           .or(
             sql`f_unaccent(groups.name)`,
             'ilike',
-            sql`f_unaccent(${'%' + pagination.query + '%'})`,
-          ),
+            sql`f_unaccent(${'%' + pagination.query + '%'})`
+          )
       );
     }
 
@@ -174,14 +174,14 @@ export class SpaceMemberRepo {
         { expression: 'sub.roleOrder', direction: 'asc', key: 'roleOrder' },
         { expression: 'sub.isGroup', direction: 'desc', key: 'isGroup' },
         { expression: 'sub.memberName', direction: 'asc', key: 'memberName' },
-        { expression: 'sub.id', direction: 'asc', key: 'id' },
+        { expression: 'sub.id', direction: 'asc', key: 'id' }
       ],
       parseCursor: (cursor) => ({
         roleOrder: parseInt(cursor.roleOrder, 10),
         isGroup: parseInt(cursor.isGroup, 10),
         memberName: cursor.memberName,
-        id: cursor.id,
-      }),
+        id: cursor.id
+      })
     });
 
     let memberInfo: MemberInfo;
@@ -193,7 +193,7 @@ export class SpaceMemberRepo {
           name: member.userName,
           email: member.userEmail,
           avatarUrl: member.userAvatarUrl,
-          type: 'user',
+          type: 'user'
         };
       } else if (member.groupId) {
         memberInfo = {
@@ -201,14 +201,14 @@ export class SpaceMemberRepo {
           name: member.groupName,
           memberCount: member.memberCount as number,
           isDefault: member.groupIsDefault,
-          type: 'group',
+          type: 'group'
         };
       }
 
       return {
         ...memberInfo,
         role: member.role,
-        createdAt: member.createdAt,
+        createdAt: member.createdAt
       };
     });
 
@@ -227,7 +227,7 @@ export class SpaceMemberRepo {
    */
   async getUserSpaceRoles(
     userId: string,
-    spaceId: string,
+    spaceId: string
   ): Promise<UserSpaceRole[]> {
     return withCache(
       this.cacheManager,
@@ -245,11 +245,11 @@ export class SpaceMemberRepo {
               .innerJoin(
                 'groupUsers',
                 'groupUsers.groupId',
-                'spaceMembers.groupId',
+                'spaceMembers.groupId'
               )
               .select(['groupUsers.userId', 'spaceMembers.role'])
               .where('groupUsers.userId', '=', userId)
-              .where('spaceMembers.spaceId', '=', spaceId),
+              .where('spaceMembers.spaceId', '=', spaceId)
           )
           .execute();
 
@@ -257,13 +257,13 @@ export class SpaceMemberRepo {
           return undefined;
         }
         return roles;
-      },
+      }
     );
   }
 
   async getUserIdsWithSpaceAccess(
     userIds: string[],
-    spaceId: string,
+    spaceId: string
   ): Promise<Set<string>> {
     if (userIds.length === 0) return new Set();
 
@@ -278,7 +278,7 @@ export class SpaceMemberRepo {
           .innerJoin('groupUsers', 'groupUsers.groupId', 'spaceMembers.groupId')
           .select('groupUsers.userId')
           .where('groupUsers.userId', 'in', userIds)
-          .where('spaceMembers.spaceId', '=', spaceId),
+          .where('spaceMembers.spaceId', '=', spaceId)
       )
       .execute();
 
@@ -307,7 +307,7 @@ export class SpaceMemberRepo {
           .innerJoin('groupUsers', 'groupUsers.groupId', 'spaceMembers.groupId')
           .innerJoin('spaces', 'spaces.id', 'spaceMembers.spaceId')
           .select('spaces.id')
-          .where('groupUsers.userId', '=', userId),
+          .where('groupUsers.userId', '=', userId)
       );
   }
 
@@ -318,7 +318,7 @@ export class SpaceMemberRepo {
 
   async getUserRolesForSpaces(
     userId: string,
-    spaceIds: string[],
+    spaceIds: string[]
   ): Promise<{ spaceId: string; role: string }[]> {
     if (spaceIds.length === 0) return [];
 
@@ -330,14 +330,10 @@ export class SpaceMemberRepo {
       .unionAll(
         this.db
           .selectFrom('spaceMembers')
-          .innerJoin(
-            'groupUsers',
-            'groupUsers.groupId',
-            'spaceMembers.groupId',
-          )
+          .innerJoin('groupUsers', 'groupUsers.groupId', 'spaceMembers.groupId')
           .select(['spaceMembers.spaceId', 'spaceMembers.role'])
           .where('groupUsers.userId', '=', userId)
-          .where('spaceMembers.spaceId', 'in', spaceIds),
+          .where('spaceMembers.spaceId', 'in', spaceIds)
       )
       .execute();
   }
@@ -354,12 +350,12 @@ export class SpaceMemberRepo {
         eb(
           sql`f_unaccent(name)`,
           'ilike',
-          sql`f_unaccent(${'%' + pagination.query + '%'})`,
+          sql`f_unaccent(${'%' + pagination.query + '%'})`
         ).or(
           sql`f_unaccent(description)`,
           'ilike',
-          sql`f_unaccent(${'%' + pagination.query + '%'})`,
-        ),
+          sql`f_unaccent(${'%' + pagination.query + '%'})`
+        )
       );
     }
 
@@ -369,9 +365,9 @@ export class SpaceMemberRepo {
       beforeCursor: pagination.beforeCursor,
       fields: [
         { expression: 'name', direction: 'asc' },
-        { expression: 'id', direction: 'asc' },
+        { expression: 'id', direction: 'asc' }
       ],
-      parseCursor: (cursor) => ({ name: cursor.name, id: cursor.id }),
+      parseCursor: (cursor) => ({ name: cursor.name, id: cursor.id })
     });
   }
 }

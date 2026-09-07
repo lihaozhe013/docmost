@@ -4,6 +4,6 @@ import { createPinoConfig } from './pino.config';
 
 @Module({
   imports: [PinoLoggerModule.forRoot(createPinoConfig())],
-  exports: [PinoLoggerModule],
+  exports: [PinoLoggerModule]
 })
 export class LoggerModule {}

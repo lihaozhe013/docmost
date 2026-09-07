@@ -9,7 +9,7 @@ export default [
   ...tseslint.configs.recommended,
   eslintConfigPrettier,
   {
-    ignores: ['eslint.config.mjs'],
+    ignores: ['eslint.config.mjs']
   },
   {
     languageOptions: {
@@ -18,8 +18,8 @@ export default [
       parser: tseslint.parser,
       parserOptions: {
         projectService: true,
-        tsconfigRootDir: import.meta.dirname,
-      },
+        tsconfigRootDir: import.meta.dirname
+      }
     },
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
@@ -28,7 +28,7 @@ export default [
       '@typescript-eslint/no-empty-object-type': 'off',
       'prefer-rest-params': 'off',
       'no-useless-catch': 'off',
-      'no-useless-escape': 'off',
-    },
-  },
+      'no-useless-escape': 'off'
+    }
+  }
 ];

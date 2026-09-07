@@ -5,6 +5,6 @@ import { TransclusionService } from './transclusion.service';
 @Module({
   controllers: [TransclusionController],
   providers: [TransclusionService],
-  exports: [TransclusionService],
+  exports: [TransclusionService]
 })
 export class TransclusionModule {}

@@ -1,7 +1,7 @@
-import { useAtomValue } from "jotai";
-import { treeDataAtom } from "@/features/page/tree/atoms/tree-data-atom.ts";
-import React, { useCallback, useEffect, useState } from "react";
-import { findBreadcrumbPath } from "@/features/page/tree/utils";
+import { useAtomValue } from 'jotai';
+import { treeDataAtom } from '@/features/page/tree/atoms/tree-data-atom.ts';
+import React, { useCallback, useEffect, useState } from 'react';
+import { findBreadcrumbPath } from '@/features/page/tree/utils';
 import {
   Button,
   Anchor,
@@ -9,18 +9,18 @@ import {
   Breadcrumbs,
   ActionIcon,
   Text,
-  Tooltip,
-} from "@mantine/core";
-import { IconCornerDownRightDouble, IconDots } from "@tabler/icons-react";
-import { Link, useParams } from "react-router-dom";
-import classes from "./breadcrumb.module.css";
-import { SpaceTreeNode } from "@/features/page/tree/types.ts";
-import { buildPageUrl, getPageTitle } from "@/features/page/page.utils.ts";
-import type { TFunction } from "i18next";
-import { usePageQuery } from "@/features/page/queries/page-query.ts";
-import { extractPageSlugId } from "@/lib";
-import { useMediaQuery } from "@mantine/hooks";
-import { useTranslation } from "react-i18next";
+  Tooltip
+} from '@mantine/core';
+import { IconCornerDownRightDouble, IconDots } from '@tabler/icons-react';
+import { Link, useParams } from 'react-router-dom';
+import classes from './breadcrumb.module.css';
+import { SpaceTreeNode } from '@/features/page/tree/types.ts';
+import { buildPageUrl, getPageTitle } from '@/features/page/page.utils.ts';
+import type { TFunction } from 'i18next';
+import { usePageQuery } from '@/features/page/queries/page-query.ts';
+import { extractPageSlugId } from '@/lib';
+import { useMediaQuery } from '@mantine/hooks';
+import { useTranslation } from 'react-i18next';
 
 function getTitle(node: SpaceTreeNode, t: TFunction) {
   const name = getPageTitle(node.name, node.isBase, t);
@@ -38,9 +38,9 @@ export default function Breadcrumb() {
   >(null);
   const { pageSlug, spaceSlug } = useParams();
   const { data: currentPage } = usePageQuery({
-    pageId: extractPageSlugId(pageSlug),
+    pageId: extractPageSlugId(pageSlug)
   });
-  const isMobile = useMediaQuery("(max-width: 48em)");
+  const isMobile = useMediaQuery('(max-width: 48em)');
 
   useEffect(() => {
     if (treeData?.length > 0 && currentPage) {
@@ -57,9 +57,9 @@ export default function Breadcrumb() {
           component={Link}
           to={buildPageUrl(spaceSlug, node.slugId, node.name)}
           variant="default"
-          style={{ border: "none" }}
+          style={{ border: 'none' }}
         >
-          <Text fz={"sm"} className={classes.truncatedText}>
+          <Text fz={'sm'} className={classes.truncatedText}>
             {getTitle(node, t)}
           </Text>
         </Button>
@@ -74,9 +74,9 @@ export default function Breadcrumb() {
           component={Link}
           to={buildPageUrl(spaceSlug, node.slugId, node.name)}
           variant="default"
-          style={{ border: "none" }}
+          style={{ border: 'none' }}
         >
-          <Text fz={"sm"} className={classes.truncatedText}>
+          <Text fz={'sm'} className={classes.truncatedText}>
             {getTitle(node, t)}
           </Text>
         </Button>
@@ -93,13 +93,13 @@ export default function Breadcrumb() {
           fz="sm"
           key={node.id}
           className={classes.truncatedText}
-          aria-current={isCurrent ? "page" : undefined}
+          aria-current={isCurrent ? 'page' : undefined}
         >
           {getTitle(node, t)}
         </Anchor>
       </Tooltip>
     ),
-    [spaceSlug, t],
+    [spaceSlug, t]
   );
 
   const getBreadcrumbItems = () => {
@@ -123,7 +123,7 @@ export default function Breadcrumb() {
             <ActionIcon
               color="gray"
               variant="transparent"
-              aria-label={t("Show hidden breadcrumbs")}
+              aria-label={t('Show hidden breadcrumbs')}
             >
               <IconDots size={20} stroke={2} />
             </ActionIcon>
@@ -133,12 +133,12 @@ export default function Breadcrumb() {
           </Popover.Dropdown>
         </Popover>,
         //renderAnchor(secondLastNode),
-        renderAnchor(lastNode, true),
+        renderAnchor(lastNode, true)
       ];
     }
 
     return breadcrumbNodes.map((node, i) =>
-      renderAnchor(node, i === breadcrumbNodes.length - 1),
+      renderAnchor(node, i === breadcrumbNodes.length - 1)
     );
   };
 
@@ -155,11 +155,11 @@ export default function Breadcrumb() {
           key="mobile-hidden-nodes"
         >
           <Popover.Target>
-            <Tooltip label={t("Breadcrumbs")}>
+            <Tooltip label={t('Breadcrumbs')}>
               <ActionIcon
                 color="gray"
                 variant="transparent"
-                aria-label={t("Breadcrumbs")}
+                aria-label={t('Breadcrumbs')}
               >
                 <IconCornerDownRightDouble size={20} stroke={2} />
               </ActionIcon>
@@ -168,17 +168,17 @@ export default function Breadcrumb() {
           <Popover.Dropdown>
             <MobileHiddenNodesTooltipContent />
           </Popover.Dropdown>
-        </Popover>,
+        </Popover>
       ];
     }
 
     return breadcrumbNodes.map((node, i) =>
-      renderAnchor(node, i === breadcrumbNodes.length - 1),
+      renderAnchor(node, i === breadcrumbNodes.length - 1)
     );
   };
 
   return (
-    <nav aria-label={t("Breadcrumb")} className={classes.breadcrumbDiv}>
+    <nav aria-label={t('Breadcrumb')} className={classes.breadcrumbDiv}>
       {breadcrumbNodes && (
         <Breadcrumbs className={classes.breadcrumbs}>
           {isMobile ? getMobileBreadcrumbItems() : getBreadcrumbItems()}

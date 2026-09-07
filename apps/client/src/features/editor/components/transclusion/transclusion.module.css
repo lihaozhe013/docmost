@@ -44,8 +44,8 @@
   transition: border 0.3s;
 }
 
-.transclusionWrap[data-editable="false"],
-.includeWrap[data-editable="false"] {
+.transclusionWrap[data-editable='false'],
+.includeWrap[data-editable='false'] {
   margin-left: 0;
   margin-right: 0;
   width: 100%;
@@ -56,17 +56,17 @@
    so the synced block sits flush with surrounding paragraphs (whose own
    margins already provide the right rhythm). */
 :global(.react-renderer.node-transclusionSource):has(
-    .transclusionWrap[data-editable="false"]
-  ),
+  .transclusionWrap[data-editable='false']
+),
 :global(.react-renderer.node-transclusionReference):has(
-    .includeWrap[data-editable="false"]
-  ) {
+  .includeWrap[data-editable='false']
+) {
   margin-top: 0;
   margin-bottom: 0;
 }
 
-.transclusionWrap[data-editable="true"]:hover,
-.transclusionWrap[data-editable="true"]:focus-within {
+.transclusionWrap[data-editable='true']:hover,
+.transclusionWrap[data-editable='true']:focus-within {
   border: 2px solid
     light-dark(
       var(--mantine-color-orange-2),
@@ -95,7 +95,7 @@
    8px gap between wrap and floating chrome, so the menu doesn't fade out
    on the way to it. */
 .transclusionControls::after {
-  content: "";
+  content: '';
   position: absolute;
   top: 100%;
   left: 0;
@@ -105,7 +105,7 @@
 
 .transclusionWrap:hover .transclusionControls,
 .transclusionWrap:focus-within .transclusionControls,
-.transclusionWrap[data-menu-open="true"] .transclusionControls {
+.transclusionWrap[data-menu-open='true'] .transclusionControls {
   opacity: 1;
   pointer-events: auto;
 }
@@ -135,9 +135,9 @@
   transition: border 0.3s;
 }
 
-.includeWrap[data-editable="true"]:hover,
-.includeWrap[data-editable="true"][data-focused="true"],
-.includeWrap[data-editable="true"][data-menu-open="true"] {
+.includeWrap[data-editable='true']:hover,
+.includeWrap[data-editable='true'][data-focused='true'],
+.includeWrap[data-editable='true'][data-menu-open='true'] {
   border: 2px solid
     light-dark(
       var(--mantine-color-orange-2),
@@ -166,7 +166,7 @@
    8px gap between wrap and floating chrome, so the menu doesn't fade out
    on the way to it. */
 .includeControls::after {
-  content: "";
+  content: '';
   position: absolute;
   top: 100%;
   left: 0;
@@ -176,8 +176,8 @@
 
 .includeWrap:hover .includeControls,
 .includeWrap:focus-within .includeControls,
-.includeWrap[data-focused="true"] .includeControls,
-.includeWrap[data-menu-open="true"] .includeControls {
+.includeWrap[data-focused='true'] .includeControls,
+.includeWrap[data-menu-open='true'] .includeControls {
   opacity: 1;
   pointer-events: auto;
 }

@@ -1,7 +1,7 @@
-import bytes from "bytes";
-import { castToBoolean } from "@/lib/utils.tsx";
-import { AvatarIconType } from "@/features/attachments/types/attachment.types.ts";
-import { sanitizeUrl } from "@docmost/editor-ext";
+import bytes from 'bytes';
+import { castToBoolean } from '@/lib/utils.tsx';
+import { AvatarIconType } from '@/features/attachments/types/attachment.types.ts';
+import { sanitizeUrl } from '@docmost/editor-ext';
 
 declare global {
   interface Window {
@@ -10,7 +10,7 @@ declare global {
 }
 
 export function getAppName(): string {
-  return "Docmost";
+  return 'Docmost';
 }
 
 export function getAppUrl(): string {
@@ -18,82 +18,82 @@ export function getAppUrl(): string {
 }
 
 export function getServerAppUrl(): string {
-  return getConfigValue("APP_URL");
+  return getConfigValue('APP_URL');
 }
 
 export function getBackendUrl(): string {
-  return getAppUrl() + "/api";
+  return getAppUrl() + '/api';
 }
 
 export function getCollaborationUrl(): string {
   const baseUrl =
-    getConfigValue("COLLAB_URL") ||
+    getConfigValue('COLLAB_URL') ||
     (import.meta.env.DEV ? process.env.APP_URL : getAppUrl());
 
-  const collabUrl = new URL("/collab", baseUrl);
-  collabUrl.protocol = collabUrl.protocol === "https:" ? "wss:" : "ws:";
+  const collabUrl = new URL('/collab', baseUrl);
+  collabUrl.protocol = collabUrl.protocol === 'https:' ? 'wss:' : 'ws:';
   return collabUrl.toString();
 }
 
 export function getSubdomainHost(): string {
-  return getConfigValue("SUBDOMAIN_HOST");
+  return getConfigValue('SUBDOMAIN_HOST');
 }
 
 export function isCloud(): boolean {
-  return castToBoolean(getConfigValue("CLOUD"));
+  return castToBoolean(getConfigValue('CLOUD'));
 }
 
 export function getAiVectorDriver(): string {
-  return getConfigValue("AI_VECTOR_DRIVER");
+  return getConfigValue('AI_VECTOR_DRIVER');
 }
 
 export function getAvatarUrl(
   avatarUrl: string,
-  type: AvatarIconType = AvatarIconType.AVATAR,
+  type: AvatarIconType = AvatarIconType.AVATAR
 ) {
   if (!avatarUrl) return null;
-  if (avatarUrl?.startsWith("http")) return avatarUrl;
+  if (avatarUrl?.startsWith('http')) return avatarUrl;
 
   return getBackendUrl() + `/attachments/img/${type}/` + encodeURI(avatarUrl);
 }
 
 export function getSpaceUrl(spaceSlug: string) {
-  return "/s/" + spaceSlug;
+  return '/s/' + spaceSlug;
 }
 
 export function getFileUrl(src: string) {
   if (!src) return src;
-  if (src.startsWith("http")) return src;
-  if (src.startsWith("/api/")) {
+  if (src.startsWith('http')) return src;
+  if (src.startsWith('/api/')) {
     // Remove the '/api' prefix
     return getBackendUrl() + src.substring(4);
   }
-  if (src.startsWith("/files/")) {
+  if (src.startsWith('/files/')) {
     return getBackendUrl() + src;
   }
   return sanitizeUrl(src);
 }
 
 export function getFileUploadSizeLimit() {
-  const limit = getConfigValue("FILE_UPLOAD_SIZE_LIMIT", "50mb");
+  const limit = getConfigValue('FILE_UPLOAD_SIZE_LIMIT', '50mb');
   return bytes(limit);
 }
 
 export function getFileImportSizeLimit() {
-  const limit = getConfigValue("FILE_IMPORT_SIZE_LIMIT", "200mb");
+  const limit = getConfigValue('FILE_IMPORT_SIZE_LIMIT', '200mb');
   return bytes(limit);
 }
 
 export function getDrawioUrl() {
-  return getConfigValue("DRAWIO_URL", "https://embed.diagrams.net");
+  return getConfigValue('DRAWIO_URL', 'https://embed.diagrams.net');
 }
 
 export function getBillingTrialDays() {
-  return getConfigValue("BILLING_TRIAL_DAYS");
+  return getConfigValue('BILLING_TRIAL_DAYS');
 }
 
 export function getPostHogHost() {
-  return getConfigValue("POSTHOG_HOST");
+  return getConfigValue('POSTHOG_HOST');
 }
 
 export function isPostHogEnabled(): boolean {
@@ -101,7 +101,7 @@ export function isPostHogEnabled(): boolean {
 }
 
 export function getPostHogKey() {
-  return getConfigValue("POSTHOG_KEY");
+  return getConfigValue('POSTHOG_KEY');
 }
 
 function getConfigValue(key: string, defaultValue: string = undefined): string {

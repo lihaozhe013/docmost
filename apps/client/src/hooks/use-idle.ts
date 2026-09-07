@@ -1,17 +1,17 @@
 // Mantine Idle hook to support reset handle  - MIT
 //src: https://github.com/mantinedev/mantine/blob/06018d0beff22caa7b36d796e56ad597cc5c23f7/packages/%40mantine/hooks/src/use-idle/use-idle.ts
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
 const DEFAULT_EVENTS: (keyof DocumentEventMap)[] = [
-  "keypress",
-  "mousemove",
-  "touchmove",
-  "click",
-  "scroll",
+  'keypress',
+  'mousemove',
+  'touchmove',
+  'click',
+  'scroll'
 ];
 const DEFAULT_OPTIONS = {
   events: DEFAULT_EVENTS,
-  initialState: true,
+  initialState: true
 };
 
 export function useIdle(
@@ -19,7 +19,7 @@ export function useIdle(
   options?: Partial<{
     events: (keyof DocumentEventMap)[];
     initialState: boolean;
-  }>,
+  }>
 ) {
   const { events, initialState } = { ...DEFAULT_OPTIONS, ...options };
   const [idle, setIdle] = useState<boolean>(initialState);
@@ -49,7 +49,7 @@ export function useIdle(
 
     return () => {
       events.forEach((event) =>
-        document.removeEventListener(event, handleEvents),
+        document.removeEventListener(event, handleEvents)
       );
     };
   }, [timeout, events]);

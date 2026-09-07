@@ -1,14 +1,14 @@
-import api from "@/lib/api-client.ts";
+import api from '@/lib/api-client.ts';
 import type {
   AiChat,
   AiChatMessage,
   AiChatStreamEvent,
-  ChatAttachment,
-} from "../types/ai-chat.types";
-import { IPagination } from "@/lib/types.ts";
+  ChatAttachment
+} from '../types/ai-chat.types';
+import { IPagination } from '@/lib/types.ts';
 
 export async function createChat(): Promise<AiChat> {
-  const req = await api.post<AiChat>("/ai/chats/create");
+  const req = await api.post<AiChat>('/ai/chats/create');
   return req.data;
 }
 
@@ -16,44 +16,44 @@ export async function listChats(params?: {
   limit?: number;
   cursor?: string;
 }): Promise<IPagination<AiChat>> {
-  const req = await api.post("/ai/chats", params);
+  const req = await api.post('/ai/chats', params);
   return req.data;
 }
 
 export async function getChatInfo(
-  chatId: string,
+  chatId: string
 ): Promise<{ chat: AiChat; messages: AiChatMessage[] }> {
-  const req = await api.post("/ai/chats/info", { chatId });
+  const req = await api.post('/ai/chats/info', { chatId });
   return req.data;
 }
 
 export async function deleteChat(chatId: string): Promise<void> {
-  await api.post("/ai/chats/delete", { chatId });
+  await api.post('/ai/chats/delete', { chatId });
 }
 
 export async function updateChatTitle(
   chatId: string,
-  title: string,
+  title: string
 ): Promise<void> {
-  await api.post("/ai/chats/update", { chatId, title });
+  await api.post('/ai/chats/update', { chatId, title });
 }
 
 export async function searchChats(query: string): Promise<AiChat[]> {
-  const req = await api.post("/ai/chats/search", { query });
+  const req = await api.post('/ai/chats/search', { query });
   return req.data;
 }
 
 export async function uploadChatFile(
   file: File,
-  chatId?: string,
+  chatId?: string
 ): Promise<ChatAttachment> {
   const formData = new FormData();
-  formData.append("file", file);
+  formData.append('file', file);
   if (chatId) {
-    formData.append("chatId", chatId);
+    formData.append('chatId', chatId);
   }
-  return await api.post("/ai/chats/upload", formData, {
-    headers: { "Content-Type": "multipart/form-data" },
+  return await api.post('/ai/chats/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
   });
 }
 
@@ -67,18 +67,18 @@ export function sendChatMessage(
   },
   onEvent: (event: AiChatStreamEvent) => void,
   onError?: (error: string) => void,
-  onComplete?: () => void,
+  onComplete?: () => void
 ): AbortController {
   const abortController = new AbortController();
 
   (async () => {
     try {
-      const response = await fetch("/api/ai/chats/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/ai/chats/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(params),
         signal: abortController.signal,
-        credentials: "include",
+        credentials: 'include'
       });
 
       if (!response.ok) {
@@ -98,24 +98,24 @@ export function sendChatMessage(
       const decoder = new TextDecoder();
 
       if (!reader) {
-        onError?.("Response body is not readable");
+        onError?.('Response body is not readable');
         return;
       }
 
-      let buffer = "";
+      let buffer = '';
       try {
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
 
           buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split("\n");
-          buffer = lines.pop() || "";
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
 
           for (const line of lines) {
-            if (line.startsWith("data: ")) {
+            if (line.startsWith('data: ')) {
               const data = line.slice(6);
-              if (data === "[DONE]") {
+              if (data === '[DONE]') {
                 onComplete?.();
                 return;
               }
@@ -134,7 +134,7 @@ export function sendChatMessage(
 
       onComplete?.();
     } catch (error: any) {
-      if (error.name !== "AbortError") {
+      if (error.name !== 'AbortError') {
         onError?.(error.message);
       }
     }

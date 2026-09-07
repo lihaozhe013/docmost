@@ -3,7 +3,7 @@ export enum WorkspaceCaslAction {
   Create = 'create',
   Read = 'read',
   Edit = 'edit',
-  Delete = 'delete',
+  Delete = 'delete'
 }
 export enum WorkspaceCaslSubject {
   Settings = 'settings',
@@ -12,7 +12,7 @@ export enum WorkspaceCaslSubject {
   Group = 'group',
   Attachment = 'attachment',
   API = 'api_key',
-  Audit = 'audit',
+  Audit = 'audit'
 }
 
 export type IWorkspaceAbility =

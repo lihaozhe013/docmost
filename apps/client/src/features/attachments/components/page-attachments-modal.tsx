@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActionIcon,
   Anchor,
@@ -8,18 +8,18 @@ import {
   Modal,
   ScrollArea,
   Text,
-  Tooltip,
-} from "@mantine/core";
-import { IconDownload } from "@tabler/icons-react";
-import { useTranslation } from "react-i18next";
-import { SearchInput } from "@/components/common/search-input.tsx";
-import { CustomAvatar } from "@/components/ui/custom-avatar.tsx";
-import { usePageAttachmentsQuery } from "@/features/attachments/queries/attachment-query.ts";
-import { IPageAttachment } from "@/features/attachments/types/attachment.types.ts";
-import { AttachmentFileIcon } from "@/features/attachments/components/attachment-file-icon.tsx";
-import { formatBytes } from "@/lib";
-import { getFileUrl } from "@/lib/config.ts";
-import { formattedDate } from "@/lib/time.ts";
+  Tooltip
+} from '@mantine/core';
+import { IconDownload } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
+import { SearchInput } from '@/components/common/search-input.tsx';
+import { CustomAvatar } from '@/components/ui/custom-avatar.tsx';
+import { usePageAttachmentsQuery } from '@/features/attachments/queries/attachment-query.ts';
+import { IPageAttachment } from '@/features/attachments/types/attachment.types.ts';
+import { AttachmentFileIcon } from '@/features/attachments/components/attachment-file-icon.tsx';
+import { formatBytes } from '@/lib';
+import { getFileUrl } from '@/lib/config.ts';
+import { formattedDate } from '@/lib/time.ts';
 
 interface PageAttachmentsModalProps {
   pageId: string;
@@ -30,7 +30,7 @@ interface PageAttachmentsModalProps {
 export default function PageAttachmentsModal({
   pageId,
   open,
-  onClose,
+  onClose
 }: PageAttachmentsModalProps) {
   const { t } = useTranslation();
 
@@ -38,9 +38,9 @@ export default function PageAttachmentsModal({
     <Modal
       opened={open}
       onClose={onClose}
-      title={t("Attachments")}
+      title={t('Attachments')}
       size={800}
-      closeButtonProps={{ "aria-label": t("Close") }}
+      closeButtonProps={{ 'aria-label': t('Close') }}
     >
       <PageAttachmentsList pageId={pageId} />
     </Modal>
@@ -49,7 +49,7 @@ export default function PageAttachmentsModal({
 
 function PageAttachmentsList({ pageId }: { pageId: string }) {
   const { t } = useTranslation();
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
   const {
     data,
     isLoading,
@@ -57,12 +57,12 @@ function PageAttachmentsList({ pageId }: { pageId: string }) {
     isFetching,
     fetchNextPage,
     hasNextPage,
-    isFetchingNextPage,
+    isFetchingNextPage
   } = usePageAttachmentsQuery(pageId, search);
 
   const attachments = useMemo(
     () => data?.pages.flatMap((page) => page.items) ?? [],
-    [data],
+    [data]
   );
 
   const loadMoreRef = useRef<HTMLDivElement>(null);
@@ -77,7 +77,7 @@ function PageAttachmentsList({ pageId }: { pageId: string }) {
           fetchNextPage();
         }
       },
-      { threshold: 0.1 },
+      { threshold: 0.1 }
     );
 
     observer.observe(sentinel);
@@ -90,7 +90,7 @@ function PageAttachmentsList({ pageId }: { pageId: string }) {
     <>
       <SearchInput
         onSearch={handleSearch}
-        placeholder={t("Search attachments...")}
+        placeholder={t('Search attachments...')}
       />
 
       {isLoading ? (
@@ -100,15 +100,15 @@ function PageAttachmentsList({ pageId }: { pageId: string }) {
       ) : isError ? (
         <Center py="xl">
           <Text size="sm" c="dimmed">
-            {t("Error loading attachments.")}
+            {t('Error loading attachments.')}
           </Text>
         </Center>
       ) : attachments.length === 0 ? (
         <Center py="xl">
           <Text size="sm" c="dimmed">
             {search
-              ? t("No results found")
-              : t("No attachments on this page yet.")}
+              ? t('No results found')
+              : t('No attachments on this page yet.')}
           </Text>
         </Center>
       ) : (
@@ -148,20 +148,20 @@ function AttachmentRow({ attachment }: { attachment: IPageAttachment }) {
           fw={500}
           c="inherit"
           truncate="end"
-          style={{ display: "block" }}
+          style={{ display: 'block' }}
         >
           {attachment.fileName}
         </Anchor>
         <Text size="xs" c="dimmed" mt={2} truncate="end">
           {formatBytes(Number(attachment.fileSize))}
-          {" · "}
+          {' · '}
           {formattedDate(new Date(attachment.createdAt))}
         </Text>
       </div>
 
       {attachment.creator && (
         <Tooltip
-          label={t("Uploaded by {{name}}", { name: attachment.creator.name })}
+          label={t('Uploaded by {{name}}', { name: attachment.creator.name })}
           withArrow
         >
           <CustomAvatar
@@ -172,7 +172,7 @@ function AttachmentRow({ attachment }: { attachment: IPageAttachment }) {
         </Tooltip>
       )}
 
-      <Tooltip label={t("Download attachment")} withArrow>
+      <Tooltip label={t('Download attachment')} withArrow>
         <ActionIcon
           component="a"
           href={fileUrl}
@@ -181,7 +181,7 @@ function AttachmentRow({ attachment }: { attachment: IPageAttachment }) {
           rel="noopener noreferrer"
           variant="subtle"
           color="gray"
-          aria-label={t("Download {{name}}", { name: attachment.fileName })}
+          aria-label={t('Download {{name}}', { name: attachment.fileName })}
         >
           <IconDownload size={18} />
         </ActionIcon>

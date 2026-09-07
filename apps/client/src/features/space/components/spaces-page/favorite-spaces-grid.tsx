@@ -1,21 +1,30 @@
-import { Text, SimpleGrid, Card, rem, Group, Box, Button, Title } from "@mantine/core";
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { useFavoritesQuery } from "@/features/favorite/queries/favorite-query";
-import { CustomAvatar } from "@/components/ui/custom-avatar";
-import { AvatarIconType } from "@/features/attachments/types/attachment.types";
-import { getSpaceUrl } from "@/lib/config";
-import { prefetchSpace } from "@/features/space/queries/space-query";
-import StarButton from "@/features/favorite/components/star-button";
-import { IconChevronDown } from "@tabler/icons-react";
-import spaceClasses from "../space-grid.module.css";
+import {
+  Text,
+  SimpleGrid,
+  Card,
+  rem,
+  Group,
+  Box,
+  Button,
+  Title
+} from '@mantine/core';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useFavoritesQuery } from '@/features/favorite/queries/favorite-query';
+import { CustomAvatar } from '@/components/ui/custom-avatar';
+import { AvatarIconType } from '@/features/attachments/types/attachment.types';
+import { getSpaceUrl } from '@/lib/config';
+import { prefetchSpace } from '@/features/space/queries/space-query';
+import StarButton from '@/features/favorite/components/star-button';
+import { IconChevronDown } from '@tabler/icons-react';
+import spaceClasses from '../space-grid.module.css';
 
 const INITIAL_COUNT = 8;
 
 export default function FavoriteSpacesGrid() {
   const { t } = useTranslation();
-  const { data } = useFavoritesQuery("space");
+  const { data } = useFavoritesQuery('space');
   const [expanded, setExpanded] = useState(false);
 
   const allSpaces = (data?.pages.flatMap((p) => p.items) ?? [])
@@ -31,7 +40,7 @@ export default function FavoriteSpacesGrid() {
   return (
     <Box mb="xl">
       <Title order={2} size="h6" fw={500} mb="md">
-        {t("Favorite spaces")}
+        {t('Favorite spaces')}
       </Title>
 
       <SimpleGrid cols={{ base: 1, xs: 2, sm: 4 }}>
@@ -42,9 +51,7 @@ export default function FavoriteSpacesGrid() {
             radius="md"
             component={Link}
             to={getSpaceUrl(fav.space!.slug)}
-            onMouseEnter={() =>
-              prefetchSpace(fav.space!.slug, fav.space!.id)
-            }
+            onMouseEnter={() => prefetchSpace(fav.space!.slug, fav.space!.id)}
             className={spaceClasses.card}
             withBorder
           >
@@ -82,7 +89,7 @@ export default function FavoriteSpacesGrid() {
             rightSection={<IconChevronDown size={14} />}
             onClick={() => setExpanded(true)}
           >
-            {t("Show more")}
+            {t('Show more')}
           </Button>
         </Group>
       )}

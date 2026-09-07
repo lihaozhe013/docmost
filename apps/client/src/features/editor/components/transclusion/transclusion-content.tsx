@@ -1,7 +1,7 @@
-import { EditorProvider } from "@tiptap/react";
-import { useMemo } from "react";
-import { mainExtensions } from "@/features/editor/extensions/extensions";
-import { UniqueID } from "@docmost/editor-ext";
+import { EditorProvider } from '@tiptap/react';
+import { useMemo } from 'react';
+import { mainExtensions } from '@/features/editor/extensions/extensions';
+import { UniqueID } from '@docmost/editor-ext';
 
 type Props = {
   content: unknown;
@@ -10,14 +10,14 @@ type Props = {
 export default function TransclusionContent({ content }: Props) {
   const extensions = useMemo(() => {
     const filtered = mainExtensions.filter(
-      (e: any) => e.name !== "uniqueID" && e.name !== "globalDragHandle",
+      (e: any) => e.name !== 'uniqueID' && e.name !== 'globalDragHandle'
     );
     return [
       ...filtered,
       UniqueID.configure({
-        types: ["heading", "paragraph", "transclusionSource"],
-        updateDocument: false,
-      }),
+        types: ['heading', 'paragraph', 'transclusionSource'],
+        updateDocument: false
+      })
     ];
   }, []);
 

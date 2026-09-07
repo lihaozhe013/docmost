@@ -2,7 +2,7 @@ import {
   BadRequestException,
   Injectable,
   Logger,
-  NotFoundException,
+  NotFoundException
 } from '@nestjs/common';
 import { CreateShareDto, ShareInfoDto, UpdateShareDto } from './dto/share.dto';
 import { InjectKysely } from 'nestjs-kysely';
@@ -15,7 +15,7 @@ import {
   getAttachmentIds,
   getProsemirrorContent,
   isAttachmentNode,
-  removeMarkTypeFromDoc,
+  removeMarkTypeFromDoc
 } from '../../common/helpers/prosemirror/utils';
 import { Node } from '@tiptap/pm/model';
 import { ShareRepo } from '@docmost/db/repos/share/share.repo';
@@ -37,7 +37,7 @@ export class ShareService {
     private readonly pagePermissionRepo: PagePermissionRepo,
     @InjectKysely() private readonly db: KyselyDB,
     private readonly tokenService: TokenService,
-    private readonly transclusionService: TransclusionService,
+    private readonly transclusionService: TransclusionService
   ) {}
 
   async getShareTree(shareId: string, workspaceId: string) {
@@ -47,7 +47,7 @@ export class ShareService {
     }
 
     const isRestricted = await this.pagePermissionRepo.hasRestrictedAncestor(
-      share.pageId,
+      share.pageId
     );
     if (isRestricted) {
       throw new NotFoundException('Share not found');
@@ -57,7 +57,7 @@ export class ShareService {
       const pageTree =
         await this.pageRepo.getPageAndDescendantsExcludingRestricted(
           share.pageId,
-          { includeContent: false },
+          { includeContent: false }
         );
 
       return { share, pageTree };
@@ -87,7 +87,7 @@ export class ShareService {
         searchIndexing: createShareDto.searchIndexing ?? false,
         creatorId: authUserId,
         spaceId: page.spaceId,
-        workspaceId,
+        workspaceId
       });
     } catch (err) {
       this.logger.error(err);
@@ -100,9 +100,9 @@ export class ShareService {
       return this.shareRepo.updateShare(
         {
           includeSubPages: updateShareDto.includeSubPages,
-          searchIndexing: updateShareDto.searchIndexing,
+          searchIndexing: updateShareDto.searchIndexing
         },
-        shareId,
+        shareId
       );
     } catch (err) {
       this.logger.error(err);
@@ -122,7 +122,7 @@ export class ShareService {
 
     const page = await this.pageRepo.findById(dto.pageId, {
       includeContent: true,
-      includeCreator: true,
+      includeCreator: true
     });
 
     if (!page || page.deletedAt) {
@@ -131,7 +131,7 @@ export class ShareService {
 
     // Block access to restricted pages
     const isRestricted = await this.pagePermissionRepo.hasRestrictedAncestor(
-      page.id,
+      page.id
     );
     if (isRestricted) {
       throw new NotFoundException('Shared page not found');
@@ -163,7 +163,7 @@ export class ShareService {
             'shares.creatorId',
             'shares.spaceId',
             'shares.workspaceId',
-            'shares.createdAt',
+            'shares.createdAt'
           ])
           .where(isValidUUID(pageId) ? 'pages.id' : 'pages.slugId', '=', pageId)
           .where('pages.deletedAt', 'is', null)
@@ -187,12 +187,12 @@ export class ShareService {
                   's.creatorId',
                   's.spaceId',
                   's.workspaceId',
-                  's.createdAt',
+                  's.createdAt'
                 ])
                 .where('p.deletedAt', 'is', null)
                 .where(sql`ph.share_id`, 'is', null) // stop if share found
-                .where(sql`ph.level`, '<', sql`25`), // prevent loop
-          ),
+                .where(sql`ph.level`, '<', sql`25`) // prevent loop
+          )
       )
       .selectFrom('page_hierarchy')
       .selectAll()
@@ -223,14 +223,14 @@ export class ShareService {
         id: share.id,
         slugId: share.slugId,
         title: share.title,
-        icon: share.icon,
-      },
+        icon: share.icon
+      }
     };
   }
 
   async getShareAncestorPage(
     ancestorPageId: string,
-    childPageId: string,
+    childPageId: string
   ): Promise<any> {
     let ancestor = null;
     try {
@@ -251,7 +251,7 @@ export class ShareService {
                   .then(true)
                   .else(false)
                   .end()
-                  .as('found'),
+                  .as('found')
             ])
             .where(isValidUUID(childPageId) ? 'id' : 'slugId', '=', childPageId)
             .unionAll((exp) =>
@@ -270,12 +270,12 @@ export class ShareService {
                       .then(true)
                       .else(false)
                       .end()
-                      .as('found'),
+                      .as('found')
                 ])
                 .innerJoin('page_ancestors as pa', 'pa.parentPageId', 'p.id')
                 // Continue recursing only when the target ancestor hasn't been found on that branch.
-                .where('pa.found', '=', false),
-            ),
+                .where('pa.found', '=', false)
+            )
         )
         .selectFrom('page_ancestors')
         .selectAll()
@@ -302,7 +302,7 @@ export class ShareService {
   async lookupTransclusionForShare(
     shareId: string,
     references: Array<{ sourcePageId: string; transclusionId: string }>,
-    workspaceId: string,
+    workspaceId: string
   ): Promise<{ items: TransclusionLookup[] }> {
     const share = await this.shareRepo.findById(shareId);
     if (!share || share.workspaceId !== workspaceId) {
@@ -310,14 +310,14 @@ export class ShareService {
     }
     const sharingAllowed = await this.isSharingAllowed(
       workspaceId,
-      share.spaceId,
+      share.spaceId
     );
     if (!sharingAllowed) {
       throw new NotFoundException('Share not found');
     }
 
     const candidatePageIds = Array.from(
-      new Set(references.map((r) => r.sourcePageId)),
+      new Set(references.map((r) => r.sourcePageId))
     );
 
     // TODO: Reduce DB round trips at scale by replacing the per-page chain
@@ -353,16 +353,16 @@ export class ShareService {
           await this.pagePermissionRepo.hasRestrictedAncestor(pageId);
         if (restricted) return null;
         return pageId;
-      }),
+      })
     );
     const accessibleSet = new Set<string>(
-      accessibleResults.filter((id): id is string => id !== null),
+      accessibleResults.filter((id): id is string => id !== null)
     );
 
     const { items } = await this.transclusionService.lookupWithAccessSet(
       references,
       accessibleSet,
-      workspaceId,
+      workspaceId
     );
 
     // Sanitize each item's content for public delivery
@@ -374,10 +374,10 @@ export class ShareService {
         const doc = await this.prepareContentForShare(
           item.content,
           item.sourcePageId,
-          workspaceId,
+          workspaceId
         );
         return { ...item, content: doc?.toJSON() ?? item.content };
-      }),
+      })
     );
 
     // Collapse `not_found` to `no_access` for share viewers so the response
@@ -388,9 +388,9 @@ export class ShareService {
         ? {
             sourcePageId: item.sourcePageId,
             transclusionId: item.transclusionId,
-            status: 'no_access' as const,
+            status: 'no_access' as const
           }
-        : item,
+        : item
     );
 
     return { items: sanitized };
@@ -398,14 +398,14 @@ export class ShareService {
 
   async isSharingAllowed(
     workspaceId: string,
-    spaceId: string,
+    spaceId: string
   ): Promise<boolean> {
     const result = await this.db
       .selectFrom('workspaces')
       .innerJoin('spaces', 'spaces.workspaceId', 'workspaces.id')
       .select([
         'workspaces.settings as workspaceSettings',
-        'spaces.settings as spaceSettings',
+        'spaces.settings as spaceSettings'
       ])
       .where('workspaces.id', '=', workspaceId)
       .where('spaces.id', '=', spaceId)
@@ -425,7 +425,7 @@ export class ShareService {
     const doc = await this.prepareContentForShare(
       page.content,
       page.id,
-      page.workspaceId,
+      page.workspaceId
     );
     return doc?.toJSON() ?? page.content;
   }
@@ -454,7 +454,7 @@ export class ShareService {
   private async prepareContentForShare(
     content: unknown,
     attachmentOwnerPageId: string,
-    workspaceId: string,
+    workspaceId: string
   ): Promise<Node | null> {
     const pmJson = getProsemirrorContent(content);
     const attachmentIds = getAttachmentIds(pmJson);
@@ -465,10 +465,10 @@ export class ShareService {
         const token = await this.tokenService.generateAttachmentToken({
           attachmentId,
           pageId: attachmentOwnerPageId,
-          workspaceId,
+          workspaceId
         });
         tokenMap.set(attachmentId, token);
-      }),
+      })
     );
 
     const doc = jsonToNode(pmJson);

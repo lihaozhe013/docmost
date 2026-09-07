@@ -1,4 +1,4 @@
-import { ISpace } from "@/features/space/types/space.types.ts";
+import { ISpace } from '@/features/space/types/space.types.ts';
 
 export interface IPage {
   id: string;
@@ -97,7 +97,7 @@ export interface IExportPageParams {
 }
 
 export enum ExportFormat {
-  HTML = "html",
-  Markdown = "markdown",
-  Docx = "docx",
+  HTML = 'html',
+  Markdown = 'markdown',
+  Docx = 'docx'
 }

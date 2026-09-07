@@ -6,18 +6,18 @@
   user-select: none;
 }
 
-.ProseMirror[contenteditable="false"] .page-break {
+.ProseMirror[contenteditable='false'] .page-break {
   margin: 0;
   border: none;
   height: 0;
 }
 
-.ProseMirror[contenteditable="false"] .page-break::after {
+.ProseMirror[contenteditable='false'] .page-break::after {
   content: none;
 }
 
 .ProseMirror .page-break::after {
-  content: "Page break";
+  content: 'Page break';
   position: absolute;
   top: 50%;
   left: 50%;

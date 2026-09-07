@@ -7,8 +7,8 @@ import { executeTx } from '@docmost/db/utils';
 import { PaginationOptions } from '@docmost/db/pagination/pagination-options';
 import { PagePermissionRepo } from '@docmost/db/repos/page/page-permission.repo';
 import { normalizeLabelName } from './utils';
-import { EventEmitter2 } from "@nestjs/event-emitter";
-import { EventName } from "../../common/events/event.contants";
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { EventName } from '../../common/events/event.contants';
 
 @Injectable()
 export class LabelService {
@@ -16,13 +16,13 @@ export class LabelService {
     private readonly labelRepo: LabelRepo,
     private readonly pagePermissionRepo: PagePermissionRepo,
     private readonly eventEmitter: EventEmitter2,
-    @InjectKysely() private readonly db: KyselyDB,
+    @InjectKysely() private readonly db: KyselyDB
   ) {}
 
   async addLabelsToPage(
     pageId: string,
     names: string[],
-    workspaceId: string,
+    workspaceId: string
   ): Promise<Label[]> {
     const attached: Label[] = [];
     await executeTx(this.db, async (trx) => {
@@ -31,7 +31,7 @@ export class LabelService {
           name.trim(),
           workspaceId,
           LabelType.PAGE,
-          trx,
+          trx
         );
         await this.labelRepo.addLabelToPage(pageId, label.id, trx);
         attached.push(label);
@@ -40,16 +40,16 @@ export class LabelService {
 
     this.eventEmitter.emit(EventName.PAGE_UPDATED, {
       pageIds: [pageId],
-      workspaceId: workspaceId,
+      workspaceId: workspaceId
     });
-    
+
     return attached;
   }
 
   async removeLabelFromPage(
     pageId: string,
     labelId: string,
-    workspaceId: string,
+    workspaceId: string
   ): Promise<void> {
     await executeTx(this.db, async (trx) => {
       const label = await this.labelRepo.findById(labelId, trx);
@@ -61,13 +61,13 @@ export class LabelService {
         pageId,
         labelId,
         workspaceId,
-        trx,
+        trx
       );
 
       const count = await this.labelRepo.getLabelPageCount(
         labelId,
         workspaceId,
-        trx,
+        trx
       );
       if (count === 0) {
         await this.labelRepo.deleteLabel(labelId, workspaceId, trx);
@@ -76,7 +76,7 @@ export class LabelService {
 
     this.eventEmitter.emit(EventName.PAGE_UPDATED, {
       pageIds: [pageId],
-      workspaceId: workspaceId,
+      workspaceId: workspaceId
     });
   }
 
@@ -88,14 +88,9 @@ export class LabelService {
     workspaceId: string,
     userId: string,
     type: LabelType,
-    pagination: PaginationOptions,
+    pagination: PaginationOptions
   ) {
-    return this.labelRepo.findLabels(
-      workspaceId,
-      userId,
-      type,
-      pagination,
-    );
+    return this.labelRepo.findLabels(workspaceId, userId, type, pagination);
   }
 
   async findPagesByLabel(
@@ -105,20 +100,26 @@ export class LabelService {
       spaceId?: string;
       query?: string;
       pagination: PaginationOptions;
-    },
+    }
   ) {
-    const result = await this.labelRepo.findPagesByLabelId(labelId, userId, opts);
+    const result = await this.labelRepo.findPagesByLabelId(
+      labelId,
+      userId,
+      opts
+    );
     if (result.items.length === 0) return result;
 
-    const accessibleIds = await this.pagePermissionRepo.filterAccessiblePageIds({
-      pageIds: result.items.map((p) => p.id),
-      userId,
-      spaceId: opts.spaceId,
-    });
+    const accessibleIds = await this.pagePermissionRepo.filterAccessiblePageIds(
+      {
+        pageIds: result.items.map((p) => p.id),
+        userId,
+        spaceId: opts.spaceId
+      }
+    );
     const accessible = new Set(accessibleIds);
     return {
       items: result.items.filter((p) => accessible.has(p.id)),
-      meta: result.meta,
+      meta: result.meta
     };
   }
 
@@ -127,28 +128,24 @@ export class LabelService {
     type: LabelType,
     workspaceId: string,
     userId: string,
-    spaceId?: string,
+    spaceId?: string
   ) {
     const normalized = normalizeLabelName(name);
     const label = await this.labelRepo.findByNameAndWorkspace(
       normalized,
       workspaceId,
-      type,
+      type
     );
 
     // Uniform response shape.
     // We don't want to expose whether the label row exists
     const usageCount = label
-      ? await this.labelRepo.getLabelPageCountForUser(
-          label.id,
-          userId,
-          spaceId,
-        )
+      ? await this.labelRepo.getLabelPageCountForUser(label.id, userId, spaceId)
       : 0;
 
     return {
       name: normalized,
-      usageCount,
+      usageCount
     };
   }
 }

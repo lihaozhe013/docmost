@@ -7,6 +7,6 @@ import { GroupUserService } from './services/group-user.service';
   imports: [],
   controllers: [GroupController],
   providers: [GroupService, GroupUserService],
-  exports: [GroupService, GroupUserService],
+  exports: [GroupService, GroupUserService]
 })
 export class GroupModule {}

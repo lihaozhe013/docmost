@@ -8,7 +8,7 @@ import { dbOrTx } from '@docmost/db/utils';
 import {
   Attachment,
   InsertableAttachment,
-  UpdatableAttachment,
+  UpdatableAttachment
 } from '@docmost/db/types/entity.types';
 import { AttachmentType } from '../../../core/attachment/attachment.constants';
 import { PaginationOptions } from '@docmost/db/pagination/pagination-options';
@@ -33,14 +33,14 @@ export class AttachmentRepo {
     'workspaceId',
     'createdAt',
     'updatedAt',
-    'deletedAt',
+    'deletedAt'
   ];
 
   async findById(
     attachmentId: string,
     opts?: {
       trx?: KyselyTransaction;
-    },
+    }
   ): Promise<Attachment> {
     const db = dbOrTx(this.db, opts?.trx);
 
@@ -55,7 +55,7 @@ export class AttachmentRepo {
     attachmentId: string,
     opts?: {
       trx?: KyselyTransaction;
-    },
+    }
   ): Promise<Attachment> {
     const db = dbOrTx(this.db, opts?.trx);
 
@@ -68,7 +68,7 @@ export class AttachmentRepo {
 
   async insertAttachment(
     insertableAttachment: InsertableAttachment,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<Attachment> {
     const db = dbOrTx(this.db, trx);
 
@@ -83,7 +83,7 @@ export class AttachmentRepo {
     spaceId: string,
     opts?: {
       trx?: KyselyTransaction;
-    },
+    }
   ): Promise<Attachment[]> {
     const db = dbOrTx(this.db, opts?.trx);
 
@@ -107,7 +107,7 @@ export class AttachmentRepo {
       query = query.where(
         sql`f_unaccent(file_name)`,
         'ilike',
-        sql`f_unaccent(${'%' + pagination.query + '%'})`,
+        sql`f_unaccent(${'%' + pagination.query + '%'})`
       );
     }
 
@@ -116,7 +116,7 @@ export class AttachmentRepo {
       cursor: pagination.cursor,
       beforeCursor: pagination.beforeCursor,
       fields: [{ expression: 'id', direction: 'desc' }],
-      parseCursor: (cursor) => ({ id: cursor.id }),
+      parseCursor: (cursor) => ({ id: cursor.id })
     });
   }
 
@@ -125,7 +125,7 @@ export class AttachmentRepo {
       eb
         .selectFrom('users')
         .select(['users.id', 'users.name', 'users.avatarUrl'])
-        .whereRef('users.id', '=', 'attachments.creatorId'),
+        .whereRef('users.id', '=', 'attachments.creatorId')
     ).as('creator');
   }
 
@@ -133,7 +133,7 @@ export class AttachmentRepo {
     ids: string[],
     opts?: {
       trx?: KyselyTransaction;
-    },
+    }
   ): Promise<Attachment[]> {
     if (ids.length === 0) return [];
     const db = dbOrTx(this.db, opts?.trx);
@@ -149,7 +149,7 @@ export class AttachmentRepo {
     aiChatId: string,
     opts?: {
       trx?: KyselyTransaction;
-    },
+    }
   ): Promise<Attachment[]> {
     const db = dbOrTx(this.db, opts?.trx);
 
@@ -163,7 +163,7 @@ export class AttachmentRepo {
   updateAttachmentsByPageId(
     updatableAttachment: UpdatableAttachment,
     pageIds: string[],
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ) {
     return dbOrTx(this.db, trx)
       .updateTable('attachments')
@@ -175,7 +175,7 @@ export class AttachmentRepo {
 
   async updateAttachment(
     updatableAttachment: UpdatableAttachment,
-    attachmentId: string,
+    attachmentId: string
   ): Promise<Attachment> {
     return await this.db
       .updateTable('attachments')
@@ -189,7 +189,7 @@ export class AttachmentRepo {
     attachmentIds: string[],
     aiChatId: string,
     creatorId: string,
-    workspaceId: string,
+    workspaceId: string
   ): Promise<void> {
     if (attachmentIds.length === 0) return;
 

@@ -1,5 +1,5 @@
-import { ThemeIcon } from "@mantine/core";
-import { IconFileDescription, IconTable } from "@tabler/icons-react";
+import { ThemeIcon } from '@mantine/core';
+import { IconFileDescription, IconTable } from '@tabler/icons-react';
 
 type Props = {
   icon?: string | null;

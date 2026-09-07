@@ -2,7 +2,7 @@ import {
   BadRequestException,
   Inject,
   Injectable,
-  NotFoundException,
+  NotFoundException
 } from '@nestjs/common';
 import { PaginationOptions } from '@docmost/db/pagination/pagination-options';
 import { KyselyDB, KyselyTransaction } from '@docmost/db/types/kysely.types';
@@ -22,7 +22,7 @@ import { executeTx } from '@docmost/db/utils';
 import { AuditEvent, AuditResource } from '../../../common/events/audit-events';
 import {
   AUDIT_SERVICE,
-  IAuditService,
+  IAuditService
 } from '../../../integrations/audit/audit.service';
 
 @Injectable()
@@ -34,7 +34,7 @@ export class SpaceMemberService {
     private watcherRepo: WatcherRepo,
     private favoriteRepo: FavoriteRepo,
     @InjectKysely() private readonly db: KyselyDB,
-    @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService,
+    @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService
   ) {}
 
   async addUserToSpace(
@@ -42,7 +42,7 @@ export class SpaceMemberService {
     spaceId: string,
     role: string,
     workspaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<void> {
     //if (existingSpaceUser) {
     //           throw new BadRequestException('User already added to this space');
@@ -51,9 +51,9 @@ export class SpaceMemberService {
       {
         userId: userId,
         spaceId: spaceId,
-        role: role,
+        role: role
       },
-      trx,
+      trx
     );
   }
 
@@ -62,15 +62,15 @@ export class SpaceMemberService {
     spaceId: string,
     role: string,
     workspaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<void> {
     await this.spaceMemberRepo.insertSpaceMember(
       {
         groupId: groupId,
         spaceId: spaceId,
-        role: role,
+        role: role
       },
-      trx,
+      trx
     );
   }
 
@@ -81,7 +81,7 @@ export class SpaceMemberService {
   async getSpaceMembers(
     spaceId: string,
     workspaceId: string,
-    pagination: PaginationOptions,
+    pagination: PaginationOptions
   ): Promise<CursorPaginationResult<any>> {
     const space = await this.spaceRepo.findById(spaceId, workspaceId);
     if (!space) {
@@ -90,16 +90,15 @@ export class SpaceMemberService {
 
     return await this.spaceMemberRepo.getSpaceMembersPaginated(
       spaceId,
-      pagination,
+      pagination
     );
   }
 
   async addMembersToSpaceBatch(
     dto: AddSpaceMembersDto,
     authUser: User,
-    workspaceId: string,
+    workspaceId: string
   ): Promise<void> {
-
     const space = await this.spaceRepo.findById(dto.spaceId, workspaceId);
     if (!space) {
       throw new NotFoundException('Space not found');
@@ -118,9 +117,9 @@ export class SpaceMemberService {
             selectFrom('spaceMembers')
               .select('id')
               .whereRef('spaceMembers.userId', '=', 'users.id')
-              .where('spaceMembers.spaceId', '=', dto.spaceId),
-          ),
-        ),
+              .where('spaceMembers.spaceId', '=', dto.spaceId)
+          )
+        )
       );
 
     const validGroupsQuery = this.db
@@ -134,9 +133,9 @@ export class SpaceMemberService {
             selectFrom('spaceMembers')
               .select('id')
               .whereRef('spaceMembers.groupId', '=', 'groups.id')
-              .where('spaceMembers.spaceId', '=', dto.spaceId),
-          ),
-        ),
+              .where('spaceMembers.spaceId', '=', dto.spaceId)
+          )
+        )
       );
 
     let validUsers = [],
@@ -154,7 +153,7 @@ export class SpaceMemberService {
         spaceId: dto.spaceId,
         userId: user.id,
         role: dto.role,
-        addedById: authUser.id,
+        addedById: authUser.id
       });
     }
 
@@ -164,7 +163,7 @@ export class SpaceMemberService {
         spaceId: dto.spaceId,
         groupId: group.id,
         role: dto.role,
-        addedById: authUser.id,
+        addedById: authUser.id
       });
     }
 
@@ -181,15 +180,15 @@ export class SpaceMemberService {
           resourceId: dto.spaceId,
           spaceId: dto.spaceId,
           changes: {
-            after: { role: dto.role },
+            after: { role: dto.role }
           },
           metadata: {
             spaceId: dto.spaceId,
             spaceName: space.name,
             userId: user.id,
             userName: user.name,
-            memberType: 'user',
-          },
+            memberType: 'user'
+          }
         });
       }
 
@@ -200,15 +199,15 @@ export class SpaceMemberService {
           resourceId: dto.spaceId,
           spaceId: dto.spaceId,
           changes: {
-            after: { role: dto.role },
+            after: { role: dto.role }
           },
           metadata: {
             spaceId: dto.spaceId,
             spaceName: space.name,
             groupId: group.id,
             groupName: group.name,
-            memberType: 'group',
-          },
+            memberType: 'group'
+          }
         });
       }
     }
@@ -216,7 +215,7 @@ export class SpaceMemberService {
 
   async removeMemberFromSpace(
     dto: RemoveSpaceMemberDto,
-    workspaceId: string,
+    workspaceId: string
   ): Promise<void> {
     const space = await this.spaceRepo.findById(dto.spaceId, workspaceId);
     if (!space) {
@@ -229,19 +228,19 @@ export class SpaceMemberService {
       spaceMember = await this.spaceMemberRepo.getSpaceMemberByTypeId(
         dto.spaceId,
         {
-          userId: dto.userId,
-        },
+          userId: dto.userId
+        }
       );
     } else if (dto.groupId) {
       spaceMember = await this.spaceMemberRepo.getSpaceMemberByTypeId(
         dto.spaceId,
         {
-          groupId: dto.groupId,
-        },
+          groupId: dto.groupId
+        }
       );
     } else {
       throw new BadRequestException(
-        'Please provide a valid userId or groupId to remove',
+        'Please provide a valid userId or groupId to remove'
       );
     }
 
@@ -258,7 +257,7 @@ export class SpaceMemberService {
       affectedUserIds = [dto.userId];
     } else if (dto.groupId) {
       affectedUserIds = await this.groupUserRepo.getUserIdsByGroupId(
-        dto.groupId,
+        dto.groupId
       );
     }
 
@@ -266,19 +265,19 @@ export class SpaceMemberService {
       await this.spaceMemberRepo.removeSpaceMemberById(
         spaceMember.id,
         dto.spaceId,
-        { trx },
+        { trx }
       );
 
       await this.watcherRepo.deleteByUsersWithoutSpaceAccess(
         affectedUserIds,
         dto.spaceId,
-        { trx },
+        { trx }
       );
 
       await this.favoriteRepo.deleteByUsersWithoutSpaceAccess(
         affectedUserIds,
         dto.spaceId,
-        { trx },
+        { trx }
       );
     });
 
@@ -288,21 +287,21 @@ export class SpaceMemberService {
       resourceId: dto.spaceId,
       spaceId: dto.spaceId,
       changes: {
-        before: { role: spaceMember.role },
+        before: { role: spaceMember.role }
       },
       metadata: {
         spaceId: dto.spaceId,
         spaceName: space.name,
         userId: spaceMember.userId,
         groupId: spaceMember.groupId,
-        memberType: spaceMember.userId ? 'user' : 'group',
-      },
+        memberType: spaceMember.userId ? 'user' : 'group'
+      }
     });
   }
 
   async updateSpaceMemberRole(
     dto: UpdateSpaceMemberRoleDto,
-    workspaceId: string,
+    workspaceId: string
   ): Promise<void> {
     const space = await this.spaceRepo.findById(dto.spaceId, workspaceId);
     if (!space) {
@@ -315,19 +314,19 @@ export class SpaceMemberService {
       spaceMember = await this.spaceMemberRepo.getSpaceMemberByTypeId(
         dto.spaceId,
         {
-          userId: dto.userId,
-        },
+          userId: dto.userId
+        }
       );
     } else if (dto.groupId) {
       spaceMember = await this.spaceMemberRepo.getSpaceMemberByTypeId(
         dto.spaceId,
         {
-          groupId: dto.groupId,
-        },
+          groupId: dto.groupId
+        }
       );
     } else {
       throw new BadRequestException(
-        'Please provide a valid userId or groupId to remove',
+        'Please provide a valid userId or groupId to remove'
       );
     }
 
@@ -355,7 +354,7 @@ export class SpaceMemberService {
         { role: dto.role },
         spaceMember.id,
         dto.spaceId,
-        trx,
+        trx
       );
     });
 
@@ -366,37 +365,37 @@ export class SpaceMemberService {
       spaceId: dto.spaceId,
       changes: {
         before: { role: spaceMember.role },
-        after: { role: dto.role },
+        after: { role: dto.role }
       },
       metadata: {
         spaceId: dto.spaceId,
         spaceName: space.name,
         userId: spaceMember.userId,
         groupId: spaceMember.groupId,
-        memberType: spaceMember.userId ? 'user' : 'group',
-      },
+        memberType: spaceMember.userId ? 'user' : 'group'
+      }
     });
   }
 
   async validateLastAdmin(
     spaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<void> {
     const spaceOwnerCount = await this.spaceMemberRepo.roleCountBySpaceId(
       SpaceRole.ADMIN,
       spaceId,
-      trx,
+      trx
     );
     if (spaceOwnerCount === 1) {
       throw new BadRequestException(
-        'There must be at least one space admin with full access',
+        'There must be at least one space admin with full access'
       );
     }
   }
 
   async getUserSpaces(
     userId: string,
-    pagination: PaginationOptions,
+    pagination: PaginationOptions
   ): Promise<CursorPaginationResult<Space>> {
     return this.spaceMemberRepo.getUserSpaces(userId, pagination);
   }

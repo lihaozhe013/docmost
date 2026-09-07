@@ -1,6 +1,6 @@
-import { ReactNodeViewRenderer } from "@tiptap/react";
-import { Node, mergeAttributes } from "@tiptap/core";
-import { sanitizeUrl, isInternalFileUrl } from "../utils";
+import { ReactNodeViewRenderer } from '@tiptap/react';
+import { Node, mergeAttributes } from '@tiptap/core';
+import { sanitizeUrl, isInternalFileUrl } from '../utils';
 
 export type PdfOptions = {
   view: any;
@@ -20,7 +20,7 @@ export type PdfAttributes = {
   };
 };
 
-declare module "@tiptap/core" {
+declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     pdfBlock: {
       setPdf: (attributes: PdfAttributes) => ReturnType;
@@ -29,9 +29,9 @@ declare module "@tiptap/core" {
 }
 
 export const TiptapPdf = Node.create<PdfOptions>({
-  name: "pdf",
+  name: 'pdf',
 
-  group: "block",
+  group: 'block',
   isolating: true,
   atom: true,
   defining: true,
@@ -47,41 +47,43 @@ export const TiptapPdf = Node.create<PdfOptions>({
   addAttributes() {
     return {
       src: {
-        default: "",
+        default: '',
         parseHTML: (element) => {
-          const src = element.getAttribute("src");
+          const src = element.getAttribute('src');
           const sanitized = sanitizeUrl(src);
-          return isInternalFileUrl(sanitized) ? sanitized : "";
+          return isInternalFileUrl(sanitized) ? sanitized : '';
         },
         renderHTML: (attributes) => ({
-          src: isInternalFileUrl(attributes.src) ? sanitizeUrl(attributes.src) : "",
+          src: isInternalFileUrl(attributes.src)
+            ? sanitizeUrl(attributes.src)
+            : '',
         }),
       },
       name: {
         default: undefined,
-        parseHTML: (element) => element.getAttribute("data-name"),
+        parseHTML: (element) => element.getAttribute('data-name'),
         renderHTML: (attributes: PdfAttributes) => ({
-          "data-name": attributes.name,
+          'data-name': attributes.name,
         }),
       },
       attachmentId: {
         default: undefined,
-        parseHTML: (element) => element.getAttribute("data-attachment-id"),
+        parseHTML: (element) => element.getAttribute('data-attachment-id'),
         renderHTML: (attributes: PdfAttributes) => ({
-          "data-attachment-id": attributes.attachmentId,
+          'data-attachment-id': attributes.attachmentId,
         }),
       },
       size: {
         default: null,
-        parseHTML: (element) => element.getAttribute("data-size"),
+        parseHTML: (element) => element.getAttribute('data-size'),
         renderHTML: (attributes: PdfAttributes) => ({
-          "data-size": attributes.size,
+          'data-size': attributes.size,
         }),
       },
       width: {
         default: 800,
         parseHTML: (element) => {
-          const raw = element.getAttribute("width");
+          const raw = element.getAttribute('width');
           if (!raw) return null;
           const num = parseFloat(raw);
           return isNaN(num) ? null : num;
@@ -93,7 +95,7 @@ export const TiptapPdf = Node.create<PdfOptions>({
       height: {
         default: 600,
         parseHTML: (element) => {
-          const raw = element.getAttribute("height");
+          const raw = element.getAttribute('height');
           if (!raw) return null;
           const num = parseFloat(raw);
           return isNaN(num) ? null : num;
@@ -119,16 +121,18 @@ export const TiptapPdf = Node.create<PdfOptions>({
 
   renderHTML({ HTMLAttributes }) {
     return [
-      "div",
+      'div',
       mergeAttributes(
-        { "data-type": this.name },
+        { 'data-type': this.name },
         this.options.HTMLAttributes,
         HTMLAttributes,
       ),
       [
-        "iframe",
+        'iframe',
         {
-          src: isInternalFileUrl(HTMLAttributes.src) ? sanitizeUrl(HTMLAttributes.src) : "",
+          src: isInternalFileUrl(HTMLAttributes.src)
+            ? sanitizeUrl(HTMLAttributes.src)
+            : '',
           width: HTMLAttributes.width || 800,
           height: HTMLAttributes.height || 600,
         },
@@ -142,7 +146,7 @@ export const TiptapPdf = Node.create<PdfOptions>({
         (attrs: PdfAttributes) =>
         ({ commands }) => {
           return commands.insertContent({
-            type: "pdf",
+            type: 'pdf',
             attrs,
           });
         },

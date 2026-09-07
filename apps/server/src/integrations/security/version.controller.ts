@@ -4,7 +4,7 @@ import {
   HttpStatus,
   NotFoundException,
   Post,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { VersionService } from './version.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -15,7 +15,7 @@ import { EnvironmentService } from '../environment/environment.service';
 export class VersionController {
   constructor(
     private readonly versionService: VersionService,
-    private readonly environmentService: EnvironmentService,
+    private readonly environmentService: EnvironmentService
   ) {}
 
   @HttpCode(HttpStatus.OK)

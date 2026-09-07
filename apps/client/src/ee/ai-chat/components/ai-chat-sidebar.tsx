@@ -1,32 +1,32 @@
-import { useState, useCallback, useEffect, useMemo, useRef } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   ActionIcon,
   Center,
   Text,
   TextInput,
   Loader,
-  Tooltip,
-} from "@mantine/core";
-import { modals } from "@mantine/modals";
-import { useDebouncedValue } from "@mantine/hooks";
-import { IconPlus, IconSearch, IconMessageCircle2 } from "@tabler/icons-react";
-import { useTranslation } from "react-i18next";
+  Tooltip
+} from '@mantine/core';
+import { modals } from '@mantine/modals';
+import { useDebouncedValue } from '@mantine/hooks';
+import { IconPlus, IconSearch, IconMessageCircle2 } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 import {
   useChatsQuery,
   useDeleteChatMutation,
   useUpdateChatTitleMutation,
-  useSearchChatsQuery,
-} from "../queries/ai-chat-query";
-import AiChatSidebarItem from "./ai-chat-sidebar-item";
-import { groupChatsByAge } from "../utils/group-chats-by-age";
-import classes from "../styles/chat-sidebar.module.css";
+  useSearchChatsQuery
+} from '../queries/ai-chat-query';
+import AiChatSidebarItem from './ai-chat-sidebar-item';
+import { groupChatsByAge } from '../utils/group-chats-by-age';
+import classes from '../styles/chat-sidebar.module.css';
 
 export default function AiChatSidebar() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { chatId } = useParams<{ chatId: string }>();
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
   const [debouncedSearch] = useDebouncedValue(search, 300);
   const chatsQuery = useChatsQuery();
   const searchQuery = useSearchChatsQuery(debouncedSearch);
@@ -57,7 +57,7 @@ export default function AiChatSidebar() {
           fetchNextPage();
         }
       },
-      { threshold: 0.1 },
+      { threshold: 0.1 }
     );
 
     observer.observe(sentinel);
@@ -75,44 +75,47 @@ export default function AiChatSidebar() {
         return;
       }
       event.preventDefault();
-      navigate("/ai");
+      navigate('/ai');
     },
-    [navigate],
+    [navigate]
   );
 
   const handleDelete = useCallback(
     (id: string, title: string | null) => {
       modals.openConfirmModal({
-        title: t("Delete chat"),
+        title: t('Delete chat'),
         centered: true,
         children: (
           <Text size="sm">
-            {t("Are you sure you want to delete '{{title}}'? This action cannot be undone.", {
-              title: title || t("Untitled"),
-            })}
+            {t(
+              "Are you sure you want to delete '{{title}}'? This action cannot be undone.",
+              {
+                title: title || t('Untitled')
+              }
+            )}
           </Text>
         ),
-        labels: { confirm: t("Delete"), cancel: t("Cancel") },
-        confirmProps: { color: "red" },
+        labels: { confirm: t('Delete'), cancel: t('Cancel') },
+        confirmProps: { color: 'red' },
         onConfirm: () => {
           deleteMutation.mutate(id, {
             onSuccess: () => {
               if (chatId === id) {
-                navigate("/ai");
+                navigate('/ai');
               }
-            },
+            }
           });
-        },
+        }
       });
     },
-    [deleteMutation, chatId, navigate, t],
+    [deleteMutation, chatId, navigate, t]
   );
 
   const handleRename = useCallback(
     (chatId: string, title: string) => {
       renameMutation.mutate({ chatId, title });
     },
-    [renameMutation],
+    [renameMutation]
   );
 
   const isLoading = chatsQuery.isLoading || searchQuery.isLoading;
@@ -120,15 +123,15 @@ export default function AiChatSidebar() {
   return (
     <div className={classes.sidebar}>
       <div className={classes.header}>
-        <h2 className={classes.title}>{t("AI Chat")}</h2>
-        <Tooltip label={t("New chat")} openDelay={250} withArrow>
+        <h2 className={classes.title}>{t('AI Chat')}</h2>
+        <Tooltip label={t('New chat')} openDelay={250} withArrow>
           <ActionIcon
             component={Link}
             to="/ai"
             variant="subtle"
             color="gray"
             onClick={handleNewChat}
-            aria-label={t("New chat")}
+            aria-label={t('New chat')}
           >
             <IconPlus size={18} />
           </ActionIcon>
@@ -137,8 +140,8 @@ export default function AiChatSidebar() {
 
       <TextInput
         className={classes.searchInput}
-        placeholder={t("Search chats...")}
-        aria-label={t("Search chats")}
+        placeholder={t('Search chats...')}
+        aria-label={t('Search chats')}
         leftSection={<IconSearch size={14} />}
         size="xs"
         value={search}
@@ -155,12 +158,12 @@ export default function AiChatSidebar() {
               className={classes.chatListEmptyIcon}
             />
             <div className={classes.chatListEmptyTitle}>
-              {isSearching ? t("No chats found") : t("No conversations yet")}
+              {isSearching ? t('No chats found') : t('No conversations yet')}
             </div>
             <div className={classes.chatListEmptyHint}>
               {isSearching
-                ? t("Try a different search term.")
-                : t("Start a new chat to see it here.")}
+                ? t('Try a different search term.')
+                : t('Start a new chat to see it here.')}
             </div>
           </div>
         )}

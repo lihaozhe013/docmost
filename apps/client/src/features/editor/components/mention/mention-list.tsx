@@ -5,9 +5,9 @@ import React, {
   useImperativeHandle,
   useMemo,
   useRef,
-  useState,
-} from "react";
-import { useSearchSuggestionsQuery } from "@/features/search/queries/search-query.ts";
+  useState
+} from 'react';
+import { useSearchSuggestionsQuery } from '@/features/search/queries/search-query.ts';
 import {
   ActionIcon,
   Divider,
@@ -16,40 +16,40 @@ import {
   ScrollArea,
   Text,
   UnstyledButton,
-  VisuallyHidden,
-} from "@mantine/core";
-import clsx from "clsx";
-import classes from "./mention.module.css";
-import { CustomAvatar } from "@/components/ui/custom-avatar.tsx";
-import { IconFileDescription, IconPlus } from "@tabler/icons-react";
-import { useSpaceQuery } from "@/features/space/queries/space-query.ts";
-import { useParams } from "react-router-dom";
-import { v7 as uuid7 } from "uuid";
-import { useAtom } from "jotai";
-import { currentUserAtom } from "@/features/user/atoms/current-user-atom.ts";
+  VisuallyHidden
+} from '@mantine/core';
+import clsx from 'clsx';
+import classes from './mention.module.css';
+import { CustomAvatar } from '@/components/ui/custom-avatar.tsx';
+import { IconFileDescription, IconPlus } from '@tabler/icons-react';
+import { useSpaceQuery } from '@/features/space/queries/space-query.ts';
+import { useParams } from 'react-router-dom';
+import { v7 as uuid7 } from 'uuid';
+import { useAtom } from 'jotai';
+import { currentUserAtom } from '@/features/user/atoms/current-user-atom.ts';
 import {
   MentionListProps,
-  MentionSuggestionItem,
-} from "@/features/editor/components/mention/mention.type.ts";
-import { IPage } from "@/features/page/types/page.types";
-import { getPageTitle } from "@/features/page/page.utils";
+  MentionSuggestionItem
+} from '@/features/editor/components/mention/mention.type.ts';
+import { IPage } from '@/features/page/types/page.types';
+import { getPageTitle } from '@/features/page/page.utils';
 import {
   useCreatePageMutation,
-  usePageQuery,
-} from "@/features/page/queries/page-query";
-import { treeDataAtom } from "@/features/page/tree/atoms/tree-data-atom";
-import { treeModel } from "@/features/page/tree/model/tree-model";
-import { SpaceTreeNode } from "@/features/page/tree/types";
-import { useTranslation } from "react-i18next";
-import { useQueryEmit } from "@/features/websocket/use-query-emit";
-import { extractPageSlugId } from "@/lib";
-import { AutoTooltipText } from "@/components/ui/auto-tooltip-text.tsx";
+  usePageQuery
+} from '@/features/page/queries/page-query';
+import { treeDataAtom } from '@/features/page/tree/atoms/tree-data-atom';
+import { treeModel } from '@/features/page/tree/model/tree-model';
+import { SpaceTreeNode } from '@/features/page/tree/types';
+import { useTranslation } from 'react-i18next';
+import { useQueryEmit } from '@/features/websocket/use-query-emit';
+import { extractPageSlugId } from '@/lib';
+import { AutoTooltipText } from '@/components/ui/auto-tooltip-text.tsx';
 
 const MentionList = forwardRef<any, MentionListProps>((props, ref) => {
   const [selectedIndex, setSelectedIndex] = useState(1);
   const viewportRef = useRef<HTMLDivElement>(null);
-  const [countAnnouncement, setCountAnnouncement] = useState("");
-  const [selectionAnnouncement, setSelectionAnnouncement] = useState("");
+  const [countAnnouncement, setCountAnnouncement] = useState('');
+  const [selectionAnnouncement, setSelectionAnnouncement] = useState('');
   const { pageSlug, spaceSlug } = useParams();
   const { data: page } = usePageQuery({ pageId: extractPageSlugId(pageSlug) });
   const { data: space } = useSpaceQuery(spaceSlug);
@@ -67,17 +67,17 @@ const MentionList = forwardRef<any, MentionListProps>((props, ref) => {
     includePages: true,
     spaceId: space?.id,
     limit: props.query ? 10 : 5,
-    preload: true,
+    preload: true
   });
 
   const createPageItem = (label: string): MentionSuggestionItem => {
     return {
       id: null,
       label: label,
-      entityType: "page",
+      entityType: 'page',
       entityId: null,
       slugId: null,
-      icon: null,
+      icon: null
     };
   };
 
@@ -86,32 +86,32 @@ const MentionList = forwardRef<any, MentionListProps>((props, ref) => {
       let items: MentionSuggestionItem[] = [];
 
       if (suggestion?.users?.length > 0) {
-        items.push({ entityType: "header", label: t("People") });
+        items.push({ entityType: 'header', label: t('People') });
 
         items = items.concat(
           suggestion.users.map((user) => ({
             id: uuid7(),
             label: user.name,
-            entityType: "user",
+            entityType: 'user',
             entityId: user.id,
-            avatarUrl: user.avatarUrl,
-          })),
+            avatarUrl: user.avatarUrl
+          }))
         );
       }
 
       if (suggestion?.pages?.length > 0) {
-        items.push({ entityType: "header", label: t("Pages") });
+        items.push({ entityType: 'header', label: t('Pages') });
         items = items.concat(
           suggestion.pages.map((page) => ({
             id: uuid7(),
             label: getPageTitle(page.title, page.isBase, t),
-            entityType: "page",
+            entityType: 'page',
             entityId: page.id,
             slugId: page.slugId,
             icon: page.icon,
             spaceName: page.space?.name,
-            spaceSlug: page.space?.slug,
-          })),
+            spaceSlug: page.space?.slug
+          }))
         );
       }
       if (!isInCommentContext && props.query) {
@@ -129,31 +129,31 @@ const MentionList = forwardRef<any, MentionListProps>((props, ref) => {
     (index: number) => {
       const item = renderItems?.[index];
       if (item) {
-        if (item.entityType === "user") {
+        if (item.entityType === 'user') {
           props.command({
             id: item.id,
             label: item.label,
-            entityType: "user",
+            entityType: 'user',
             entityId: item.entityId,
-            creatorId: currentUser?.user.id,
+            creatorId: currentUser?.user.id
           });
         }
-        if (item.entityType === "page" && item.id !== null) {
+        if (item.entityType === 'page' && item.id !== null) {
           props.command({
             id: item.id,
-            label: item.label || t("Untitled"),
-            entityType: "page",
+            label: item.label || t('Untitled'),
+            entityType: 'page',
             entityId: item.entityId,
             slugId: item.slugId,
-            creatorId: currentUser?.user.id,
+            creatorId: currentUser?.user.id
           });
         }
-        if (item.entityType === "page" && item.id === null) {
+        if (item.entityType === 'page' && item.id === null) {
           createPage(item.label);
         }
       }
     },
-    [renderItems],
+    [renderItems]
   );
 
   const upHandler = () => {
@@ -163,7 +163,7 @@ const MentionList = forwardRef<any, MentionListProps>((props, ref) => {
 
     do {
       newIndex = (newIndex + renderItems.length - 1) % renderItems.length;
-    } while (renderItems[newIndex].entityType === "header");
+    } while (renderItems[newIndex].entityType === 'header');
     setSelectedIndex(newIndex);
   };
 
@@ -172,13 +172,13 @@ const MentionList = forwardRef<any, MentionListProps>((props, ref) => {
     let newIndex = selectedIndex;
     do {
       newIndex = (newIndex + 1) % renderItems.length;
-    } while (renderItems[newIndex].entityType === "header");
+    } while (renderItems[newIndex].entityType === 'header');
     setSelectedIndex(newIndex);
   };
 
   const enterHandler = () => {
     if (!renderItems.length) return;
-    if (renderItems[selectedIndex]?.entityType !== "header") {
+    if (renderItems[selectedIndex]?.entityType !== 'header') {
       selectItem(selectedIndex);
     }
   };
@@ -188,57 +188,57 @@ const MentionList = forwardRef<any, MentionListProps>((props, ref) => {
   }, [suggestion]);
 
   const selectableCount = useMemo(
-    () => renderItems.filter((item) => item.entityType !== "header").length,
-    [renderItems],
+    () => renderItems.filter((item) => item.entityType !== 'header').length,
+    [renderItems]
   );
 
   useEffect(() => {
     if (renderItems.length === 0) {
-      setCountAnnouncement(t("No results"));
+      setCountAnnouncement(t('No results'));
       return;
     }
     setCountAnnouncement(
-      t("{{count}} result available", { count: selectableCount }),
+      t('{{count}} result available', { count: selectableCount })
     );
   }, [renderItems.length, selectableCount, t]);
 
   useEffect(() => {
     const item = renderItems[selectedIndex];
-    if (!item || item.entityType === "header") {
-      setSelectionAnnouncement("");
+    if (!item || item.entityType === 'header') {
+      setSelectionAnnouncement('');
       return;
     }
-    if (item.entityType === "user") {
-      setSelectionAnnouncement(`${t("People")}: ${item.label}`);
+    if (item.entityType === 'user') {
+      setSelectionAnnouncement(`${t('People')}: ${item.label}`);
       return;
     }
-    if (item.entityType === "page") {
+    if (item.entityType === 'page') {
       if (item.id === null) {
-        setSelectionAnnouncement(`${t("Create page")}: ${item.label}`);
+        setSelectionAnnouncement(`${t('Create page')}: ${item.label}`);
         return;
       }
-      const pageLabel = item.label || t("Untitled");
+      const pageLabel = item.label || t('Untitled');
       setSelectionAnnouncement(
         item.spaceName
-          ? `${t("Pages")}: ${pageLabel}, ${item.spaceName}`
-          : `${t("Pages")}: ${pageLabel}`,
+          ? `${t('Pages')}: ${pageLabel}, ${item.spaceName}`
+          : `${t('Pages')}: ${pageLabel}`
       );
     }
   }, [selectedIndex, renderItems, t]);
 
   useImperativeHandle(ref, () => ({
     onKeyDown: ({ event }) => {
-      if (event.key === "ArrowUp") {
+      if (event.key === 'ArrowUp') {
         upHandler();
         return true;
       }
 
-      if (event.key === "ArrowDown") {
+      if (event.key === 'ArrowDown') {
         downHandler();
         return true;
       }
 
-      if (event.key === "Enter") {
+      if (event.key === 'Enter') {
         // don't trap the enter button if there are no items to render
         if (renderItems.length === 0) {
           return false;
@@ -248,14 +248,14 @@ const MentionList = forwardRef<any, MentionListProps>((props, ref) => {
       }
 
       return false;
-    },
+    }
   }));
 
   const createPage = async (title: string) => {
     const payload: { spaceId: string; parentPageId?: string; title: string } = {
       spaceId: space.id,
       parentPageId: page.id || null,
-      title: title,
+      title: title
     };
 
     let createdPage: IPage;
@@ -270,7 +270,7 @@ const MentionList = forwardRef<any, MentionListProps>((props, ref) => {
         spaceId: createdPage.spaceId,
         parentPageId: createdPage.parentPageId,
         hasChildren: false,
-        children: [],
+        children: []
       };
 
       const lastIndex = data.length;
@@ -280,32 +280,32 @@ const MentionList = forwardRef<any, MentionListProps>((props, ref) => {
       props.command({
         id: uuid7(),
         label: getPageTitle(createdPage.title, createdPage.isBase, t),
-        entityType: "page",
+        entityType: 'page',
         entityId: createdPage.id,
         slugId: createdPage.slugId,
-        creatorId: currentUser?.user.id,
+        creatorId: currentUser?.user.id
       });
 
       setTimeout(() => {
         emit({
-          operation: "addTreeNode",
+          operation: 'addTreeNode',
           spaceId: space.id,
           payload: {
             parentId,
             index: lastIndex,
-            data: newNode,
-          },
+            data: newNode
+          }
         });
       }, 50);
     } catch (err) {
-      throw new Error("Failed to create page");
+      throw new Error('Failed to create page');
     }
   };
 
   useEffect(() => {
     viewportRef.current
       ?.querySelector(`[data-item-index="${selectedIndex}"]`)
-      ?.scrollIntoView({ block: "nearest" });
+      ?.scrollIntoView({ block: 'nearest' });
   }, [selectedIndex]);
 
   const popupWidth = isInCommentContext ? 280 : 320;
@@ -317,18 +317,18 @@ const MentionList = forwardRef<any, MentionListProps>((props, ref) => {
           {countAnnouncement}
         </VisuallyHidden>
         <Text c="dimmed" size="sm" px="sm">
-          {t("No results")}
+          {t('No results')}
         </Text>
       </Paper>
     );
   }
 
-  const hasUsers = renderItems.some((item) => item.entityType === "user");
+  const hasUsers = renderItems.some((item) => item.entityType === 'user');
   const hasPages = renderItems.some(
-    (item) => item.entityType === "page" && item.id !== null,
+    (item) => item.entityType === 'page' && item.id !== null
   );
   const createPageItemData = renderItems.find(
-    (item) => item.entityType === "page" && item.id === null,
+    (item) => item.entityType === 'page' && item.id === null
   );
 
   return (
@@ -339,7 +339,7 @@ const MentionList = forwardRef<any, MentionListProps>((props, ref) => {
       radius="md"
       py={6}
       role="listbox"
-      aria-label={t("Mention suggestions")}
+      aria-label={t('Mention suggestions')}
       aria-activedescendant={`mention-option-${selectedIndex}`}
     >
       <VisuallyHidden role="status" aria-live="polite" aria-atomic="true">
@@ -352,13 +352,13 @@ const MentionList = forwardRef<any, MentionListProps>((props, ref) => {
         viewportRef={viewportRef}
         mah={350}
         w={popupWidth}
-        scrollbars={"y"}
+        scrollbars={'y'}
         scrollbarSize={6}
-        overscrollBehavior={"contain"}
+        overscrollBehavior={'contain'}
         styles={{ content: { minWidth: 0 } }}
       >
         {renderItems?.map((item, index) => {
-          if (item.entityType === "header") {
+          if (item.entityType === 'header') {
             const isFirst = index === 0;
             return (
               <div key={`${item.label}-${index}`} role="presentation">
@@ -371,13 +371,13 @@ const MentionList = forwardRef<any, MentionListProps>((props, ref) => {
                   pt={isFirst ? 2 : 4}
                   pb={4}
                   tt="uppercase"
-                  style={{ userSelect: "none" }}
+                  style={{ userSelect: 'none' }}
                 >
                   {item.label}
                 </Text>
               </div>
             );
-          } else if (item.entityType === "user") {
+          } else if (item.entityType === 'user') {
             return (
               <UnstyledButton
                 data-item-index={index}
@@ -387,13 +387,13 @@ const MentionList = forwardRef<any, MentionListProps>((props, ref) => {
                 aria-selected={index === selectedIndex}
                 onClick={() => selectItem(index)}
                 className={clsx(classes.menuBtn, {
-                  [classes.selectedItem]: index === selectedIndex,
+                  [classes.selectedItem]: index === selectedIndex
                 })}
                 px="sm"
               >
                 <Group gap="sm">
                   <CustomAvatar
-                    size={"sm"}
+                    size={'sm'}
                     avatarUrl={item.avatarUrl}
                     name={item.label}
                   />
@@ -406,7 +406,7 @@ const MentionList = forwardRef<any, MentionListProps>((props, ref) => {
                 </Group>
               </UnstyledButton>
             );
-          } else if (item.entityType === "page" && item.id !== null) {
+          } else if (item.entityType === 'page' && item.id !== null) {
             return (
               <UnstyledButton
                 data-item-index={index}
@@ -416,7 +416,7 @@ const MentionList = forwardRef<any, MentionListProps>((props, ref) => {
                 aria-selected={index === selectedIndex}
                 onClick={() => selectItem(index)}
                 className={clsx(classes.menuBtn, {
-                  [classes.selectedItem]: index === selectedIndex,
+                  [classes.selectedItem]: index === selectedIndex
                 })}
                 px="sm"
               >
@@ -466,7 +466,7 @@ const MentionList = forwardRef<any, MentionListProps>((props, ref) => {
               }
               className={clsx(classes.menuBtn, {
                 [classes.selectedItem]:
-                  renderItems.indexOf(createPageItemData) === selectedIndex,
+                  renderItems.indexOf(createPageItemData) === selectedIndex
               })}
               px="sm"
             >
@@ -481,9 +481,9 @@ const MentionList = forwardRef<any, MentionListProps>((props, ref) => {
                   <IconPlus size={16} stroke={1.5} />
                 </ActionIcon>
 
-                <div style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
+                <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
                   <Text size="sm" fw={500} truncate>
-                    {t("Create page")}: {createPageItemData.label}
+                    {t('Create page')}: {createPageItemData.label}
                   </Text>
                 </div>
               </Group>

@@ -30,7 +30,7 @@
 .history:hover .itemMenu,
 .history:focus-within .itemMenu,
 .history.active .itemMenu,
-.itemMenu[aria-expanded="true"] {
+.itemMenu[aria-expanded='true'] {
   opacity: 1;
 }
 

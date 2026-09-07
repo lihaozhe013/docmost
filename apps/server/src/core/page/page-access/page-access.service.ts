@@ -4,7 +4,7 @@ import { PagePermissionRepo } from '@docmost/db/repos/page/page-permission.repo'
 import SpaceAbilityFactory from '../../casl/abilities/space-ability.factory';
 import {
   SpaceCaslAction,
-  SpaceCaslSubject,
+  SpaceCaslSubject
 } from '../../casl/interfaces/space-ability.type';
 import { SpaceRepo } from '@docmost/db/repos/space/space.repo';
 
@@ -13,7 +13,7 @@ export class PageAccessService {
   constructor(
     private readonly pagePermissionRepo: PagePermissionRepo,
     private readonly spaceAbility: SpaceAbilityFactory,
-    private readonly spaceRepo: SpaceRepo,
+    private readonly spaceRepo: SpaceRepo
   ) {}
 
   /**
@@ -32,7 +32,7 @@ export class PageAccessService {
 
     const canAccess = await this.pagePermissionRepo.canUserAccessPage(
       user.id,
-      page.id,
+      page.id
     );
     if (!canAccess) {
       throw new ForbiddenException();
@@ -45,7 +45,7 @@ export class PageAccessService {
    */
   async validateCanViewWithPermissions(
     page: Page,
-    user: User,
+    user: User
   ): Promise<{ canEdit: boolean; hasRestriction: boolean }> {
     const ability = await this.spaceAbility.createForUser(user, page.spaceId);
 
@@ -64,7 +64,7 @@ export class PageAccessService {
       canEdit: hasAnyRestriction
         ? canEdit
         : ability.can(SpaceCaslAction.Edit, SpaceCaslSubject.Page),
-      hasRestriction: hasAnyRestriction,
+      hasRestriction: hasAnyRestriction
     };
   }
 
@@ -75,7 +75,7 @@ export class PageAccessService {
    */
   async validateCanEdit(
     page: Page,
-    user: User,
+    user: User
   ): Promise<{ hasRestriction: boolean }> {
     const ability = await this.spaceAbility.createForUser(user, page.spaceId);
 
@@ -105,7 +105,7 @@ export class PageAccessService {
   async validateCanComment(
     page: Page,
     user: User,
-    workspaceId: string,
+    workspaceId: string
   ): Promise<void> {
     try {
       await this.validateCanEdit(page, user);

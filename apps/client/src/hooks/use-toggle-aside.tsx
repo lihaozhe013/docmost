@@ -1,7 +1,7 @@
-import { asideStateAtom } from "@/components/layouts/global/hooks/atoms/sidebar-atom";
-import { useAtom } from "jotai";
+import { asideStateAtom } from '@/components/layouts/global/hooks/atoms/sidebar-atom';
+import { useAtom } from 'jotai';
 
-export const ASIDE_PANEL_ID = "aside-panel";
+export const ASIDE_PANEL_ID = 'aside-panel';
 
 const useToggleAside = () => {
   const [asideState, setAsideState] = useAtom(asideStateAtom);
@@ -28,8 +28,8 @@ export const useAsideTriggerProps = (tab: string) => {
         setAsideState({ tab, isAsideOpen: true });
       }
     },
-    "aria-expanded": asideState.isAsideOpen && asideState.tab === tab,
-    "aria-controls": ASIDE_PANEL_ID,
+    'aria-expanded': asideState.isAsideOpen && asideState.tab === tab,
+    'aria-controls': ASIDE_PANEL_ID
   } as const;
 };
 

@@ -1,6 +1,6 @@
-import { FC } from "react";
-import type { Editor } from "@tiptap/react";
-import { ActionIcon, Menu, Tooltip } from "@mantine/core";
+import { FC } from 'react';
+import type { Editor } from '@tiptap/react';
+import { ActionIcon, Menu, Tooltip } from '@mantine/core';
 import {
   IconBold,
   IconChevronDown,
@@ -12,12 +12,12 @@ import {
   IconStrikethrough,
   IconSubscript,
   IconSuperscript,
-  IconUnderline,
-} from "@tabler/icons-react";
-import { useTranslation } from "react-i18next";
-import clsx from "clsx";
-import type { ToolbarState } from "../use-toolbar-state";
-import classes from "../fixed-toolbar.module.css";
+  IconUnderline
+} from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
+import clsx from 'clsx';
+import type { ToolbarState } from '../use-toolbar-state';
+import classes from '../fixed-toolbar.module.css';
 
 interface Props {
   editor: Editor;
@@ -29,12 +29,12 @@ export const InlineMarksGroup: FC<Props> = ({ editor, state }) => {
 
   return (
     <ActionIcon.Group>
-      <Tooltip label={t("Bold")} withArrow>
+      <Tooltip label={t('Bold')} withArrow>
         <ActionIcon
           variant="subtle"
           color="dark"
           size="md"
-          aria-label={t("Bold")}
+          aria-label={t('Bold')}
           aria-pressed={state.isBold}
           className={clsx({ [classes.active]: state.isBold })}
           onClick={() => editor.chain().focus().toggleBold().run()}
@@ -42,12 +42,12 @@ export const InlineMarksGroup: FC<Props> = ({ editor, state }) => {
           <IconBold size={16} />
         </ActionIcon>
       </Tooltip>
-      <Tooltip label={t("Underline")} withArrow>
+      <Tooltip label={t('Underline')} withArrow>
         <ActionIcon
           variant="subtle"
           color="dark"
           size="md"
-          aria-label={t("Underline")}
+          aria-label={t('Underline')}
           aria-pressed={state.isUnderline}
           className={clsx({ [classes.active]: state.isUnderline })}
           onClick={() => editor.chain().focus().toggleUnderline().run()}
@@ -55,12 +55,12 @@ export const InlineMarksGroup: FC<Props> = ({ editor, state }) => {
           <IconUnderline size={16} />
         </ActionIcon>
       </Tooltip>
-      <Tooltip label={t("Italic")} withArrow>
+      <Tooltip label={t('Italic')} withArrow>
         <ActionIcon
           variant="subtle"
           color="dark"
           size="md"
-          aria-label={t("Italic")}
+          aria-label={t('Italic')}
           aria-pressed={state.isItalic}
           className={clsx({ [classes.active]: state.isItalic })}
           onClick={() => editor.chain().focus().toggleItalic().run()}
@@ -74,7 +74,7 @@ export const InlineMarksGroup: FC<Props> = ({ editor, state }) => {
             variant="subtle"
             color="dark"
             size="md"
-            aria-label={t("More inline formatting")}
+            aria-label={t('More inline formatting')}
           >
             <IconChevronDown size={14} />
           </ActionIcon>
@@ -84,45 +84,45 @@ export const InlineMarksGroup: FC<Props> = ({ editor, state }) => {
             leftSection={<IconStrikethrough size={16} />}
             onClick={() => editor.chain().focus().toggleStrike().run()}
           >
-            {t("Strikethrough")}
+            {t('Strikethrough')}
           </Menu.Item>
           <Menu.Item
             leftSection={<IconCode size={16} />}
             onClick={() => editor.chain().focus().toggleCode().run()}
           >
-            {t("Inline code")}
+            {t('Inline code')}
           </Menu.Item>
           <Menu.Item
             leftSection={<IconSubscript size={16} />}
             onClick={() => editor.chain().focus().toggleSubscript().run()}
           >
-            {t("Subscript")}
+            {t('Subscript')}
           </Menu.Item>
           <Menu.Item
             leftSection={<IconSuperscript size={16} />}
             onClick={() => editor.chain().focus().toggleSuperscript().run()}
           >
-            {t("Superscript")}
+            {t('Superscript')}
           </Menu.Item>
           <Menu.Divider />
           <Menu.Item
             leftSection={<IconIndentIncrease size={16} />}
             onClick={() => editor.chain().focus().indent().run()}
           >
-            {t("Increase indent")}
+            {t('Increase indent')}
           </Menu.Item>
           <Menu.Item
             leftSection={<IconIndentDecrease size={16} />}
             onClick={() => editor.chain().focus().outdent().run()}
           >
-            {t("Decrease indent")}
+            {t('Decrease indent')}
           </Menu.Item>
           <Menu.Divider />
           <Menu.Item
             leftSection={<IconClearFormatting size={16} />}
             onClick={() => editor.chain().focus().unsetAllMarks().run()}
           >
-            {t("Clear formatting")}
+            {t('Clear formatting')}
           </Menu.Item>
         </Menu.Dropdown>
       </Menu>

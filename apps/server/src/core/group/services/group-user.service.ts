@@ -3,7 +3,7 @@ import {
   forwardRef,
   Inject,
   Injectable,
-  NotFoundException,
+  NotFoundException
 } from '@nestjs/common';
 import { PaginationOptions } from '@docmost/db/pagination/pagination-options';
 import { GroupService } from './group.service';
@@ -18,7 +18,7 @@ import { FavoriteRepo } from '@docmost/db/repos/favorite/favorite.repo';
 import { AuditEvent, AuditResource } from '../../../common/events/audit-events';
 import {
   AUDIT_SERVICE,
-  IAuditService,
+  IAuditService
 } from '../../../integrations/audit/audit.service';
 import { dbOrTx } from '@docmost/db/utils';
 
@@ -33,19 +33,19 @@ export class GroupUserService {
     private readonly watcherRepo: WatcherRepo,
     private readonly favoriteRepo: FavoriteRepo,
     @InjectKysely() private readonly db: KyselyDB,
-    @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService,
+    @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService
   ) {}
 
   async getGroupUsers(
     groupId: string,
     workspaceId: string,
-    pagination: PaginationOptions,
+    pagination: PaginationOptions
   ) {
     await this.groupService.findAndValidateGroup(groupId, workspaceId);
 
     const groupUsers = await this.groupUserRepo.getGroupUsersPaginated(
       groupId,
-      pagination,
+      pagination
     );
 
     return groupUsers;
@@ -55,7 +55,7 @@ export class GroupUserService {
     userIds: string[],
     groupId: string,
     workspaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<void> {
     const db = dbOrTx(this.db, trx);
     await this.groupService.findAndValidateGroup(groupId, workspaceId, trx);
@@ -77,7 +77,7 @@ export class GroupUserService {
     for (const user of validUsers) {
       groupUsersToInsert.push({
         userId: user.id,
-        groupId: groupId,
+        groupId: groupId
       });
     }
 
@@ -96,9 +96,9 @@ export class GroupUserService {
         changes: {
           after: {
             userId: user.id,
-            userName: user.name,
-          },
-        },
+            userName: user.name
+          }
+        }
       });
     }
   }
@@ -106,11 +106,11 @@ export class GroupUserService {
   async removeUserFromGroup(
     userId: string,
     groupId: string,
-    workspaceId: string,
+    workspaceId: string
   ): Promise<void> {
     const group = await this.groupService.findAndValidateGroup(
       groupId,
-      workspaceId,
+      workspaceId
     );
 
     const user = await this.userRepo.findById(userId, workspaceId);
@@ -121,13 +121,13 @@ export class GroupUserService {
 
     if (group.isDefault) {
       throw new BadRequestException(
-        'You cannot remove users from a default group',
+        'You cannot remove users from a default group'
       );
     }
 
     const groupUser = await this.groupUserRepo.getGroupUserById(
       userId,
-      groupId,
+      groupId
     );
 
     if (!groupUser) {
@@ -144,13 +144,13 @@ export class GroupUserService {
         await this.watcherRepo.deleteByUsersWithoutSpaceAccess(
           [userId],
           spaceId,
-          { trx },
+          { trx }
         );
 
         await this.favoriteRepo.deleteByUsersWithoutSpaceAccess(
           [userId],
           spaceId,
-          { trx },
+          { trx }
         );
       }
     });
@@ -162,12 +162,12 @@ export class GroupUserService {
       changes: {
         before: {
           userId: user.id,
-          userName: user.name,
-        },
+          userName: user.name
+        }
       },
       metadata: {
-        groupName: group.name,
-      },
+        groupName: group.name
+      }
     });
   }
 }

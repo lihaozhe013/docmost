@@ -12,5 +12,5 @@ export const ALL_NAMED_THROTTLERS_SKIPPED: Record<string, boolean> = {
   [OAUTH_REGISTER_THROTTLER]: true,
   [OAUTH_TOKEN_THROTTLER]: true,
   [OAUTH_AUTHORIZE_THROTTLER]: true,
-  [SIEM_TEST_THROTTLER]: true,
+  [SIEM_TEST_THROTTLER]: true
 };

@@ -5,7 +5,7 @@ import Redis, { RedisOptions } from 'ioredis';
 import {
   createRetryStrategy,
   parseRedisUrl,
-  RedisConfig,
+  RedisConfig
 } from '../../common/helpers';
 
 export class WsRedisIoAdapter extends IoAdapter {
@@ -18,7 +18,7 @@ export class WsRedisIoAdapter extends IoAdapter {
     const options: RedisOptions = {
       family: this.redisConfig.family,
       tls: this.redisConfig.tls,
-      retryStrategy: createRetryStrategy(),
+      retryStrategy: createRetryStrategy()
     };
 
     const pubClient = new Redis(process.env.REDIS_URL, options);

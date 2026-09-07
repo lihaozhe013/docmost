@@ -1,11 +1,11 @@
-import { atom } from "jotai";
-import { atomWithStorage } from "jotai/utils";
-import { ICurrentUser, IUser } from "@/features/user/types/user.types";
-import { IWorkspace } from "@/features/workspace/types/workspace.types";
+import { atom } from 'jotai';
+import { atomWithStorage } from 'jotai/utils';
+import { ICurrentUser, IUser } from '@/features/user/types/user.types';
+import { IWorkspace } from '@/features/workspace/types/workspace.types';
 
 export const currentUserAtom = atomWithStorage<ICurrentUser | null>(
-  "currentUser",
-  null,
+  'currentUser',
+  null
 );
 
 export const userAtom = atom(
@@ -18,7 +18,7 @@ export const userAtom = atom(
     if (currentUser) {
       set(currentUserAtom, {
         ...currentUser,
-        user: newUser,
+        user: newUser
       });
     }
   }
@@ -34,7 +34,7 @@ export const workspaceAtom = atom(
     if (currentUser) {
       set(currentUserAtom, {
         ...currentUser,
-        workspace: newWorkspace,
+        workspace: newWorkspace
       });
     }
   }

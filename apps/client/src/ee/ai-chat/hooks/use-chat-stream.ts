@@ -1,14 +1,14 @@
-import { useState, useCallback, useEffect, useRef } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
-import { sendChatMessage } from "../services/ai-chat-service";
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { sendChatMessage } from '../services/ai-chat-service';
 import type {
   AiChatMessage,
   AiChatStreamEvent,
   AiChatToolCall,
   ChatAttachment,
-  PageMention,
-} from "../types/ai-chat.types";
+  PageMention
+} from '../types/ai-chat.types';
 
 type ChatStreamOptions = {
   onChatCreated?: (chatId: string) => void;
@@ -16,13 +16,13 @@ type ChatStreamOptions = {
 
 export function useChatStream(
   chatId: string | undefined,
-  options?: ChatStreamOptions,
+  options?: ChatStreamOptions
 ) {
   const [messages, setMessages] = useState<AiChatMessage[]>([]);
-  const [streamingContent, setStreamingContent] = useState("");
-  const [streamingToolCalls, setStreamingToolCalls] = useState<AiChatToolCall[]>(
-    [],
-  );
+  const [streamingContent, setStreamingContent] = useState('');
+  const [streamingToolCalls, setStreamingToolCalls] = useState<
+    AiChatToolCall[]
+  >([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [errorCode, setErrorCode] = useState<string | null>(null);
@@ -59,14 +59,19 @@ export function useChatStream(
   }, []);
 
   const sendMessage = useCallback(
-    (content: string, mentions: PageMention[] = [], attachments: ChatAttachment[] = [], contextPageId?: string) => {
+    (
+      content: string,
+      mentions: PageMention[] = [],
+      attachments: ChatAttachment[] = [],
+      contextPageId?: string
+    ) => {
       if (isStreaming || (!content.trim() && attachments.length === 0)) return;
 
       setError(null);
       setErrorCode(null);
       setIsRetryable(false);
       setIsStreaming(true);
-      setStreamingContent("");
+      setStreamingContent('');
       setStreamingToolCalls([]);
 
       const metadata: Record<string, unknown> = {};
@@ -77,18 +82,18 @@ export function useChatStream(
         metadata.attachments = attachments.map((a) => ({
           id: a.id,
           fileName: a.fileName,
-          fileExt: a.fileExt,
+          fileExt: a.fileExt
         }));
       }
 
       const userMessage: AiChatMessage = {
         id: `temp-${Date.now()}`,
-        chatId: currentChatIdRef.current || "",
-        role: "user",
+        chatId: currentChatIdRef.current || '',
+        role: 'user',
         content,
         toolCalls: null,
         metadata: Object.keys(metadata).length ? metadata : null,
-        createdAt: new Date().toISOString(),
+        createdAt: new Date().toISOString()
       };
 
       setMessages((prev) => [...prev, userMessage]);
@@ -101,11 +106,11 @@ export function useChatStream(
           content,
           mentionedPageIds: mentions.map((m) => m.id),
           ...(contextPageId && { contextPageId }),
-          ...(attachmentIds.length && { attachmentIds }),
+          ...(attachmentIds.length && { attachmentIds })
         },
         (event: AiChatStreamEvent) => {
           switch (event.type) {
-            case "chat_created":
+            case 'chat_created':
               currentChatIdRef.current = event.chatId;
               // Claim authority over this new chatId so when the consumer's
               // prop catches up via navigation/onChatCreated, the reset effect
@@ -116,55 +121,55 @@ export function useChatStream(
               } else {
                 navigate(`/ai/chat/${event.chatId}`, { replace: true });
               }
-              queryClient.invalidateQueries({ queryKey: ["ai-chats"] });
+              queryClient.invalidateQueries({ queryKey: ['ai-chats'] });
               break;
-            case "content":
+            case 'content':
               setStreamingContent((prev) => prev + event.text);
               break;
-            case "tool_call":
+            case 'tool_call':
               setStreamingToolCalls((prev) => [
                 ...prev,
                 {
                   id: event.id,
                   name: event.name,
-                  args: event.args,
-                },
+                  args: event.args
+                }
               ]);
               break;
-            case "tool_result":
+            case 'tool_result':
               setStreamingToolCalls((prev) =>
                 prev.map((tc) =>
-                  tc.id === event.id ? { ...tc, result: event.result } : tc,
-                ),
+                  tc.id === event.id ? { ...tc, result: event.result } : tc
+                )
               );
               break;
-            case "done": {
+            case 'done': {
               setStreamingContent((currentContent) => {
                 setStreamingToolCalls((currentToolCalls) => {
                   const assistantMessage: AiChatMessage = {
                     id: event.messageId,
-                    chatId: currentChatIdRef.current || "",
-                    role: "assistant",
+                    chatId: currentChatIdRef.current || '',
+                    role: 'assistant',
                     content: currentContent || null,
                     toolCalls: currentToolCalls.length
                       ? currentToolCalls
                       : null,
                     metadata: event.usage ? { tokenUsage: event.usage } : null,
-                    createdAt: new Date().toISOString(),
+                    createdAt: new Date().toISOString()
                   };
 
                   setMessages((prev) => [...prev, assistantMessage]);
                   return [];
                 });
-                return "";
+                return '';
               });
               setIsStreaming(false);
               queryClient.invalidateQueries({
-                queryKey: ["ai-chat", currentChatIdRef.current],
+                queryKey: ['ai-chat', currentChatIdRef.current]
               });
               break;
             }
-            case "error":
+            case 'error':
               setError(event.message);
               setErrorCode(event.code || null);
               setIsRetryable(event.retryable || false);
@@ -178,12 +183,12 @@ export function useChatStream(
         },
         () => {
           setIsStreaming(false);
-        },
+        }
       );
 
       abortRef.current = abortController;
     },
-    [isStreaming, navigate, queryClient],
+    [isStreaming, navigate, queryClient]
   );
 
   const stopGeneration = useCallback(() => {
@@ -195,18 +200,18 @@ export function useChatStream(
         if (currentContent || currentToolCalls.length > 0) {
           const partialMessage: AiChatMessage = {
             id: `stopped-${Date.now()}`,
-            chatId: currentChatIdRef.current || "",
-            role: "assistant",
+            chatId: currentChatIdRef.current || '',
+            role: 'assistant',
             content: currentContent || null,
             toolCalls: currentToolCalls.length ? currentToolCalls : null,
             metadata: null,
-            createdAt: new Date().toISOString(),
+            createdAt: new Date().toISOString()
           };
           setMessages((prev) => [...prev, partialMessage]);
         }
         return [];
       });
-      return "";
+      return '';
     });
 
     setIsStreaming(false);
@@ -222,6 +227,6 @@ export function useChatStream(
     isRetryable,
     sendMessage,
     stopGeneration,
-    hydrateFromServer,
+    hydrateFromServer
   };
 }

@@ -1,17 +1,17 @@
-import { useAtom } from "jotai";
-import { z } from "zod/v4";
-import { useForm } from "@mantine/form";
-import { zod4Resolver } from "mantine-form-zod-resolver";
-import { userAtom } from "@/features/user/atoms/current-user-atom.ts";
-import { updateUser } from "@/features/user/services/user-service.ts";
-import { IUser } from "@/features/user/types/user.types.ts";
-import { useState } from "react";
-import { TextInput, Button } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
-import { useTranslation } from "react-i18next";
+import { useAtom } from 'jotai';
+import { z } from 'zod/v4';
+import { useForm } from '@mantine/form';
+import { zod4Resolver } from 'mantine-form-zod-resolver';
+import { userAtom } from '@/features/user/atoms/current-user-atom.ts';
+import { updateUser } from '@/features/user/services/user-service.ts';
+import { IUser } from '@/features/user/types/user.types.ts';
+import { useState } from 'react';
+import { TextInput, Button } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
+import { useTranslation } from 'react-i18next';
 
 const formSchema = z.object({
-  name: z.string().min(1).max(40),
+  name: z.string().min(1).max(40)
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -24,8 +24,8 @@ export default function AccountNameForm() {
   const form = useForm<FormValues>({
     validate: zod4Resolver(formSchema),
     initialValues: {
-      name: user?.name,
-    },
+      name: user?.name
+    }
   });
 
   async function handleSubmit(data: Partial<IUser>) {
@@ -35,13 +35,13 @@ export default function AccountNameForm() {
       const updatedUser = await updateUser(data);
       setUser(updatedUser);
       notifications.show({
-        message: t("Updated successfully"),
+        message: t('Updated successfully')
       });
     } catch (err) {
       console.log(err);
       notifications.show({
-        message: t("Failed to update data"),
-        color: "red",
+        message: t('Failed to update data'),
+        color: 'red'
       });
     }
 
@@ -52,13 +52,13 @@ export default function AccountNameForm() {
     <form onSubmit={form.onSubmit(handleSubmit)}>
       <TextInput
         id="name"
-        label={t("Name")}
-        placeholder={t("Your name")}
+        label={t('Name')}
+        placeholder={t('Your name')}
         variant="filled"
-        {...form.getInputProps("name")}
+        {...form.getInputProps('name')}
       />
       <Button type="submit" mt="sm" disabled={isLoading} loading={isLoading}>
-        {t("Save")}
+        {t('Save')}
       </Button>
     </form>
   );

@@ -1,7 +1,7 @@
 import {
   BadRequestException,
   Injectable,
-  NotFoundException,
+  NotFoundException
 } from '@nestjs/common';
 import { InjectKysely } from 'nestjs-kysely';
 import { KyselyDB, KyselyTransaction } from '@docmost/db/types/kysely.types';
@@ -18,13 +18,13 @@ export class GroupUserRepo {
   constructor(
     @InjectKysely() private readonly db: KyselyDB,
     private readonly groupRepo: GroupRepo,
-    private readonly userRepo: UserRepo,
+    private readonly userRepo: UserRepo
   ) {}
 
   async getGroupUserById(
     userId: string,
     groupId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ) {
     const db = dbOrTx(this.db, trx);
     return db
@@ -37,7 +37,7 @@ export class GroupUserRepo {
 
   async insertGroupUser(
     insertableGroupUser: InsertableGroupUser,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<GroupUser> {
     const db = dbOrTx(this.db, trx);
     return db
@@ -59,12 +59,12 @@ export class GroupUserRepo {
         eb(
           sql`f_unaccent(users.name)`,
           'ilike',
-          sql`f_unaccent(${'%' + pagination.query + '%'})`,
+          sql`f_unaccent(${'%' + pagination.query + '%'})`
         ).or(
           sql`users.email`,
           'ilike',
-          sql`f_unaccent(${'%' + pagination.query + '%'})`,
-        ),
+          sql`f_unaccent(${'%' + pagination.query + '%'})`
+        )
       );
     }
 
@@ -73,7 +73,7 @@ export class GroupUserRepo {
       cursor: pagination.cursor,
       beforeCursor: pagination.beforeCursor,
       fields: [{ expression: 'users.id', direction: 'asc', key: 'id' }],
-      parseCursor: (cursor) => ({ id: cursor.id }),
+      parseCursor: (cursor) => ({ id: cursor.id })
     });
 
     result.items.map((user) => {
@@ -87,20 +87,20 @@ export class GroupUserRepo {
     userId: string,
     groupId: string,
     workspaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<void> {
     await executeTx(
       this.db,
       async (trx) => {
         const group = await this.groupRepo.findById(groupId, workspaceId, {
-          trx,
+          trx
         });
         if (!group) {
           throw new NotFoundException('Group not found');
         }
 
         const user = await this.userRepo.findById(userId, workspaceId, {
-          trx: trx,
+          trx: trx
         });
 
         if (!user) {
@@ -110,48 +110,48 @@ export class GroupUserRepo {
         const groupUserExists = await this.getGroupUserById(
           userId,
           groupId,
-          trx,
+          trx
         );
 
         if (groupUserExists) {
           throw new BadRequestException(
-            'User is already a member of this group',
+            'User is already a member of this group'
           );
         }
 
         await this.insertGroupUser(
           {
             userId,
-            groupId,
+            groupId
           },
-          trx,
+          trx
         );
       },
-      trx,
+      trx
     );
   }
 
   async addUserToDefaultGroup(
     userId: string,
     workspaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<void> {
     await executeTx(
       this.db,
       async (trx) => {
         const defaultGroup = await this.groupRepo.getDefaultGroup(
           workspaceId,
-          trx,
+          trx
         );
         await this.insertGroupUser(
           {
             userId,
-            groupId: defaultGroup.id,
+            groupId: defaultGroup.id
           },
-          trx,
+          trx
         );
       },
-      trx,
+      trx
     );
   }
 
@@ -168,7 +168,7 @@ export class GroupUserRepo {
   async delete(
     userId: string,
     groupId: string,
-    opts?: { trx?: KyselyTransaction },
+    opts?: { trx?: KyselyTransaction }
   ): Promise<void> {
     const { trx } = opts;
     const db = dbOrTx(this.db, trx);

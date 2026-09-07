@@ -1,17 +1,17 @@
-import { Text, Card, rem, Group, Button, Skeleton, Title } from "@mantine/core";
+import { Text, Card, rem, Group, Button, Skeleton, Title } from '@mantine/core';
 import {
   prefetchSpace,
-  useGetSpacesQuery,
-} from "@/features/space/queries/space-query.ts";
-import { getSpaceUrl } from "@/lib/config.ts";
-import { Link } from "react-router-dom";
-import classes from "./space-carousel.module.css";
-import { formatMemberCount } from "@/lib";
-import { useTranslation } from "react-i18next";
-import { IconArrowRight } from "@tabler/icons-react";
-import { CustomAvatar } from "@/components/ui/custom-avatar.tsx";
-import { AvatarIconType } from "@/features/attachments/types/attachment.types.ts";
-import CardCarousel from "@/components/ui/card-carousel";
+  useGetSpacesQuery
+} from '@/features/space/queries/space-query.ts';
+import { getSpaceUrl } from '@/lib/config.ts';
+import { Link } from 'react-router-dom';
+import classes from './space-carousel.module.css';
+import { formatMemberCount } from '@/lib';
+import { useTranslation } from 'react-i18next';
+import { IconArrowRight } from '@tabler/icons-react';
+import { CustomAvatar } from '@/components/ui/custom-avatar.tsx';
+import { AvatarIconType } from '@/features/attachments/types/attachment.types.ts';
+import CardCarousel from '@/components/ui/card-carousel';
 
 function SpaceCardSkeleton() {
   return (
@@ -33,10 +33,10 @@ export default function SpaceCarousel() {
       <>
         <Group justify="space-between" align="center" mb="md">
           <Title order={2} size="h6" fw={500}>
-            {t("Spaces you belong to")}
+            {t('Spaces you belong to')}
           </Title>
         </Group>
-        <CardCarousel ariaLabel={t("Spaces you belong to")}>
+        <CardCarousel ariaLabel={t('Spaces you belong to')}>
           {Array.from({ length: 4 }, (_, i) => (
             <SpaceCardSkeleton key={i} />
           ))}
@@ -81,11 +81,11 @@ export default function SpaceCarousel() {
     <>
       <Group justify="space-between" align="center" mb="md">
         <Title order={2} size="h6" fw={500}>
-          {t("Spaces you belong to")}
+          {t('Spaces you belong to')}
         </Title>
       </Group>
 
-      <CardCarousel ariaLabel={t("Spaces you belong to")}>{cards}</CardCarousel>
+      <CardCarousel ariaLabel={t('Spaces you belong to')}>{cards}</CardCarousel>
 
       {data?.items && data.items.length > 1 && (
         <Group justify="flex-end" mt="lg">
@@ -96,7 +96,7 @@ export default function SpaceCarousel() {
             rightSection={<IconArrowRight size={16} />}
             size="sm"
           >
-            {t("View all spaces")}
+            {t('View all spaces')}
           </Button>
         </Group>
       )}

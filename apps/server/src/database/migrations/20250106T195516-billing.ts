@@ -4,7 +4,7 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable('billing')
     .addColumn('id', 'uuid', (col) =>
-      col.primaryKey().defaultTo(sql`gen_uuid_v7()`),
+      col.primaryKey().defaultTo(sql`gen_uuid_v7()`)
     )
     .addColumn('stripe_subscription_id', 'varchar', (col) => col.notNull())
     .addColumn('stripe_customer_id', 'varchar', (col) => col)
@@ -28,13 +28,13 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('ended_at', 'timestamptz', (col) => col)
 
     .addColumn('workspace_id', 'uuid', (col) =>
-      col.references('workspaces.id').onDelete('cascade').notNull(),
+      col.references('workspaces.id').onDelete('cascade').notNull()
     )
     .addColumn('created_at', 'timestamptz', (col) =>
-      col.notNull().defaultTo(sql`now()`),
+      col.notNull().defaultTo(sql`now()`)
     )
     .addColumn('updated_at', 'timestamptz', (col) =>
-      col.notNull().defaultTo(sql`now()`),
+      col.notNull().defaultTo(sql`now()`)
     )
     .addColumn('deleted_at', 'timestamptz', (col) => col)
     .execute();
@@ -42,7 +42,7 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .alterTable('billing')
     .addUniqueConstraint('billing_stripe_subscription_id_unique', [
-      'stripe_subscription_id',
+      'stripe_subscription_id'
     ])
     .execute();
 
@@ -59,7 +59,7 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .alterTable('workspaces')
     .addUniqueConstraint('workspaces_stripe_customer_id_unique', [
-      'stripe_customer_id',
+      'stripe_customer_id'
     ])
     .execute();
 }

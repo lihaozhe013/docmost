@@ -12,14 +12,14 @@ import { TokenService } from './services/token.service';
           secret: environmentService.getAppSecret(),
           signOptions: {
             expiresIn: environmentService.getJwtTokenExpiresIn() as StringValue,
-            issuer: 'Docmost',
-          },
+            issuer: 'Docmost'
+          }
         };
       },
-      inject: [EnvironmentService],
-    }),
+      inject: [EnvironmentService]
+    })
   ],
   providers: [TokenService],
-  exports: [TokenService],
+  exports: [TokenService]
 })
 export class TokenModule {}

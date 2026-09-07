@@ -5,6 +5,6 @@ import { VersionService } from './version.service';
 
 @Module({
   controllers: [RobotsTxtController, VersionController],
-  providers: [VersionService],
+  providers: [VersionService]
 })
 export class SecurityModule {}

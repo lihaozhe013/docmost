@@ -1,7 +1,7 @@
-import { BubbleMenu, BubbleMenuProps } from "@tiptap/react/menus";
-import { isNodeSelection, useEditorState } from "@tiptap/react";
-import type { Editor } from "@tiptap/react";
-import { FC, useEffect, useRef, useState } from "react";
+import { BubbleMenu, BubbleMenuProps } from '@tiptap/react/menus';
+import { isNodeSelection, useEditorState } from '@tiptap/react';
+import type { Editor } from '@tiptap/react';
+import { FC, useEffect, useRef, useState } from 'react';
 import {
   IconBold,
   IconCode,
@@ -9,35 +9,35 @@ import {
   IconStrikethrough,
   IconUnderline,
   IconMessage,
-  IconSparkles,
-} from "@tabler/icons-react";
-import clsx from "clsx";
-import classes from "./bubble-menu.module.css";
-import { ActionIcon, Button, rem, Tooltip } from "@mantine/core";
-import { ColorSelector } from "./color-selector";
-import { NodeSelector } from "./node-selector";
-import { TextAlignmentSelector } from "./text-alignment-selector";
+  IconSparkles
+} from '@tabler/icons-react';
+import clsx from 'clsx';
+import classes from './bubble-menu.module.css';
+import { ActionIcon, Button, rem, Tooltip } from '@mantine/core';
+import { ColorSelector } from './color-selector';
+import { NodeSelector } from './node-selector';
+import { TextAlignmentSelector } from './text-alignment-selector';
 import {
   draftCommentIdAtom,
-  showCommentPopupAtom,
-} from "@/features/comment/atoms/comment-atom";
-import { useAtom, useAtomValue } from "jotai";
-import { v7 as uuid7 } from "uuid";
+  showCommentPopupAtom
+} from '@/features/comment/atoms/comment-atom';
+import { useAtom, useAtomValue } from 'jotai';
+import { v7 as uuid7 } from 'uuid';
 import {
   isCellSelection,
   isEditorReady,
-  isTextSelected,
-} from "@docmost/editor-ext";
-import { LinkSelector } from "@/features/editor/components/bubble-menu/link-selector.tsx";
-import { useTranslation } from "react-i18next";
+  isTextSelected
+} from '@docmost/editor-ext';
+import { LinkSelector } from '@/features/editor/components/bubble-menu/link-selector.tsx';
+import { useTranslation } from 'react-i18next';
 import {
   showAiMenuAtom,
-  showLinkMenuAtom,
-} from "@/features/editor/atoms/editor-atoms";
+  showLinkMenuAtom
+} from '@/features/editor/atoms/editor-atoms';
 import {
   userAtom,
-  workspaceAtom,
-} from "@/features/user/atoms/current-user-atom";
+  workspaceAtom
+} from '@/features/user/atoms/current-user-atom';
 
 export interface BubbleMenuItem {
   name: string;
@@ -46,7 +46,7 @@ export interface BubbleMenuItem {
   icon: typeof IconBold;
 }
 
-type EditorBubbleMenuProps = Omit<BubbleMenuProps, "children" | "editor"> & {
+type EditorBubbleMenuProps = Omit<BubbleMenuProps, 'children' | 'editor'> & {
   editor: Editor | null;
   templateMode?: boolean;
 };
@@ -87,51 +87,51 @@ export const EditorBubbleMenu: FC<EditorBubbleMenuProps> = (props) => {
       }
 
       return {
-        isBold: ctx.editor.isActive("bold"),
-        isItalic: ctx.editor.isActive("italic"),
-        isUnderline: ctx.editor.isActive("underline"),
-        isStrike: ctx.editor.isActive("strike"),
-        isCode: ctx.editor.isActive("code"),
-        isComment: ctx.editor.isActive("comment"),
+        isBold: ctx.editor.isActive('bold'),
+        isItalic: ctx.editor.isActive('italic'),
+        isUnderline: ctx.editor.isActive('underline'),
+        isStrike: ctx.editor.isActive('strike'),
+        isCode: ctx.editor.isActive('code'),
+        isComment: ctx.editor.isActive('comment')
       };
-    },
+    }
   });
 
   const items: BubbleMenuItem[] = [
     {
-      name: "Bold",
+      name: 'Bold',
       isActive: () => editorState?.isBold,
       command: () => props.editor.chain().focus().toggleBold().run(),
-      icon: IconBold,
+      icon: IconBold
     },
     {
-      name: "Italic",
+      name: 'Italic',
       isActive: () => editorState?.isItalic,
       command: () => props.editor.chain().focus().toggleItalic().run(),
-      icon: IconItalic,
+      icon: IconItalic
     },
     {
-      name: "Underline",
+      name: 'Underline',
       isActive: () => editorState?.isUnderline,
       command: () => props.editor.chain().focus().toggleUnderline().run(),
-      icon: IconUnderline,
+      icon: IconUnderline
     },
     {
-      name: "Strike",
+      name: 'Strike',
       isActive: () => editorState?.isStrike,
       command: () => props.editor.chain().focus().toggleStrike().run(),
-      icon: IconStrikethrough,
+      icon: IconStrikethrough
     },
     {
-      name: "Code",
+      name: 'Code',
       isActive: () => editorState?.isCode,
       command: () => props.editor.chain().focus().toggleCode().run(),
-      icon: IconCode,
-    },
+      icon: IconCode
+    }
   ];
 
   const commentItem: BubbleMenuItem = {
-    name: "Comment",
+    name: 'Comment',
     isActive: () => editorState?.isComment,
     command: () => {
       const commentId = uuid7();
@@ -140,7 +140,7 @@ export const EditorBubbleMenu: FC<EditorBubbleMenuProps> = (props) => {
       setDraftCommentId(commentId);
       setShowCommentPopup(true);
     },
-    icon: IconMessage,
+    icon: IconMessage
   };
 
   const bubbleMenuProps: EditorBubbleMenuProps = {
@@ -151,7 +151,7 @@ export const EditorBubbleMenu: FC<EditorBubbleMenuProps> = (props) => {
 
       if (
         !editor.isEditable ||
-        editor.isActive("image") ||
+        editor.isActive('image') ||
         empty ||
         isNodeSelection(selection) ||
         isCellSelection(selection) ||
@@ -164,14 +164,14 @@ export const EditorBubbleMenu: FC<EditorBubbleMenuProps> = (props) => {
       return isTextSelected(editor);
     },
     options: {
-      placement: editorToolbarEnabled ? "bottom" : "top",
+      placement: editorToolbarEnabled ? 'bottom' : 'top',
       offset: 8,
       onHide: () => {
         setIsNodeSelectorOpen(false);
         setIsTextAlignmentOpen(false);
         setIsColorSelectorOpen(false);
-      },
-    },
+      }
+    }
   };
 
   const [isNodeSelectorOpen, setIsNodeSelectorOpen] = useState(false);
@@ -184,7 +184,7 @@ export const EditorBubbleMenu: FC<EditorBubbleMenuProps> = (props) => {
   return (
     <BubbleMenu
       {...bubbleMenuProps}
-      style={{ zIndex: 199, position: "relative" }}
+      style={{ zIndex: 199, position: 'relative' }}
     >
       <div className={classes.bubbleMenu}>
         {isGenerativeAiEnabled && (
@@ -198,7 +198,7 @@ export const EditorBubbleMenu: FC<EditorBubbleMenuProps> = (props) => {
                 setShowAiMenu(true);
               }}
             >
-              {t("Ask AI")}
+              {t('Ask AI')}
             </Button>
             <div className={classes.divider} />
           </>
@@ -240,7 +240,7 @@ export const EditorBubbleMenu: FC<EditorBubbleMenuProps> = (props) => {
                     radius="0"
                     aria-label={t(item.name)}
                     className={clsx({ [classes.active]: item.isActive() })}
-                    style={{ border: "none" }}
+                    style={{ border: 'none' }}
                     onClick={() =>
                       isEditorReady(props.editor) && item.command()
                     }
@@ -272,7 +272,7 @@ export const EditorBubbleMenu: FC<EditorBubbleMenuProps> = (props) => {
               size="lg"
               radius="6px"
               aria-label={t(commentItem.name)}
-              style={{ border: "none" }}
+              style={{ border: 'none' }}
               onClick={() =>
                 isEditorReady(props.editor) && commentItem.command()
               }

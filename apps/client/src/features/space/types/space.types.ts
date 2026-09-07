@@ -1,9 +1,9 @@
-import { SpaceRole } from "@/lib/types.ts";
+import { SpaceRole } from '@/lib/types.ts';
 import {
   SpaceCaslAction,
-  SpaceCaslSubject,
-} from "@/features/space/permissions/permissions.type.ts";
-import { ExportFormat } from "@/features/page/types/page.types.ts";
+  SpaceCaslSubject
+} from '@/features/space/permissions/permissions.type.ts';
+import { ExportFormat } from '@/features/page/types/page.types.ts';
 
 export interface ISpaceSharingSettings {
   disabled?: boolean;
@@ -75,7 +75,7 @@ export interface SpaceUserInfo {
   name: string;
   email: string;
   avatarUrl: string;
-  type: "user";
+  type: 'user';
 }
 
 export interface SpaceGroupInfo {
@@ -83,7 +83,7 @@ export interface SpaceGroupInfo {
   name: string;
   isDefault: boolean;
   memberCount: number;
-  type: "group";
+  type: 'group';
 }
 
 export type ISpaceMember = { role: string } & (SpaceUserInfo | SpaceGroupInfo);

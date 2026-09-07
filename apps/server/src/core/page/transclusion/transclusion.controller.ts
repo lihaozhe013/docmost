@@ -4,7 +4,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 import { AuthUser } from '../../../common/decorators/auth-user.decorator';
@@ -25,21 +25,18 @@ export class TransclusionController {
     return this.transclusionService.lookup(
       dto.references,
       user.id,
-      user.workspaceId,
+      user.workspaceId
     );
   }
 
   @HttpCode(HttpStatus.OK)
   @Post('references')
-  async references(
-    @Body() dto: ReferencesDto,
-    @AuthUser() user: User,
-  ) {
+  async references(@Body() dto: ReferencesDto, @AuthUser() user: User) {
     return this.transclusionService.listReferences({
       sourcePageId: dto.sourcePageId,
       transclusionId: dto.transclusionId,
       viewerUserId: user.id,
-      workspaceId: user.workspaceId,
+      workspaceId: user.workspaceId
     });
   }
 
@@ -47,13 +44,13 @@ export class TransclusionController {
   @Post('unsync-reference')
   async unsyncReference(
     @Body() dto: UnsyncReferenceDto,
-    @AuthUser() user: User,
+    @AuthUser() user: User
   ) {
     return this.transclusionService.unsyncReference(
       dto.referencePageId,
       dto.sourcePageId,
       dto.transclusionId,
-      user,
+      user
     );
   }
 }

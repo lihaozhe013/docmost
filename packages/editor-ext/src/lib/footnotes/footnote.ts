@@ -1,8 +1,8 @@
 //Source MIT - https://github.com/buttondown/tiptap-footnotes
-import { mergeAttributes } from "@tiptap/core";
-import ListItem, { ListItemOptions } from "@tiptap/extension-list-item";
+import { mergeAttributes } from '@tiptap/core';
+import ListItem, { ListItemOptions } from '@tiptap/extension-list-item';
 
-declare module "@tiptap/core" {
+declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     footnote: {
       /**
@@ -24,7 +24,7 @@ export interface FootnoteOptions extends ListItemOptions {
 }
 
 const Footnote = ListItem.extend<FootnoteOptions>({
-  name: "footnote",
+  name: 'footnote',
   content() {
     return this.options.content;
   },
@@ -38,7 +38,7 @@ const Footnote = ListItem.extend<FootnoteOptions>({
       bulletListTypeName: 'bulletList',
       orderedListTypeName: 'orderedList',
       ...this.parent?.(),
-      content: "paragraph+",
+      content: 'paragraph+',
     };
   },
 
@@ -49,7 +49,7 @@ const Footnote = ListItem.extend<FootnoteOptions>({
       },
       // the data-id field should match the data-id field of a footnote reference.
       // it's used to link footnotes and references together.
-      "data-id": {
+      'data-id': {
         isRequired: true,
       },
     };
@@ -57,12 +57,12 @@ const Footnote = ListItem.extend<FootnoteOptions>({
   parseHTML() {
     return [
       {
-        tag: "li",
+        tag: 'li',
         getAttrs(node) {
-          const id = node.getAttribute("data-id");
+          const id = node.getAttribute('data-id');
           if (id) {
             return {
-              "data-id": node.getAttribute("data-id"),
+              'data-id': node.getAttribute('data-id'),
             };
           }
           return false;
@@ -73,7 +73,7 @@ const Footnote = ListItem.extend<FootnoteOptions>({
   },
   renderHTML({ HTMLAttributes }) {
     return [
-      "li",
+      'li',
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
       0,
     ];
@@ -84,15 +84,15 @@ const Footnote = ListItem.extend<FootnoteOptions>({
       focusFootnote:
         (id: string) =>
         ({ editor, chain }) => {
-          const matchedFootnote = editor.$node("footnote", {
-            "data-id": id,
+          const matchedFootnote = editor.$node('footnote', {
+            'data-id': id,
           });
           if (matchedFootnote) {
             // sets the text selection to the end of the footnote definition and scroll to it.
             chain()
               .focus()
               .setTextSelection(
-                matchedFootnote.from + matchedFootnote.content.size
+                matchedFootnote.from + matchedFootnote.content.size,
               )
               .run();
 
@@ -106,14 +106,14 @@ const Footnote = ListItem.extend<FootnoteOptions>({
   addKeyboardShortcuts() {
     return {
       // when inside a footnote, Mod-a should select only the footnote content
-      "Mod-a": ({ editor }) => {
+      'Mod-a': ({ editor }) => {
         try {
           const { selection } = editor.state;
           const { $from } = selection;
 
           for (let depth = $from.depth; depth >= 0; depth--) {
             const node = $from.node(depth);
-            if (node.type.name === "footnote") {
+            if (node.type.name === 'footnote') {
               const start = $from.start(depth);
               const end = $from.end(depth);
 
@@ -137,7 +137,7 @@ const Footnote = ListItem.extend<FootnoteOptions>({
           const pos = editor.$pos(selection.anchor);
           if (!pos.after) return false;
           // if the next node  is "footnotes", place the text selection at the end of the first footnote
-          if (pos.after.node.type.name == "footnotes") {
+          if (pos.after.node.type.name == 'footnotes') {
             const firstChild = pos.after.node.child(0);
             editor
               .chain()
@@ -149,7 +149,7 @@ const Footnote = ListItem.extend<FootnoteOptions>({
             const startPos = selection.$from.start(2);
             if (Number.isNaN(startPos)) return false;
             const parent = editor.$pos(startPos);
-            if (parent.node.type.name != "footnote" || !parent.after) {
+            if (parent.node.type.name != 'footnote' || !parent.after) {
               return false;
             }
             // if the next node is a footnote, place the text selection at the end of it
@@ -165,12 +165,12 @@ const Footnote = ListItem.extend<FootnoteOptions>({
         }
       },
       // inverse of the tab command - place the text selection at the end of the previous footnote
-      "Shift-Tab": ({ editor }) => {
+      'Shift-Tab': ({ editor }) => {
         const { selection } = editor.state;
         const startPos = selection.$from.start(2);
         if (Number.isNaN(startPos)) return false;
         const parent = editor.$pos(startPos);
-        if (parent.node.type.name != "footnote" || !parent.before) {
+        if (parent.node.type.name != 'footnote' || !parent.before) {
           return false;
         }
 
@@ -183,7 +183,6 @@ const Footnote = ListItem.extend<FootnoteOptions>({
       },
     };
   },
-
 });
 
 export default Footnote;

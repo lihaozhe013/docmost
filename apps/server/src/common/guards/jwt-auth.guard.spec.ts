@@ -1,7 +1,7 @@
 import {
   ExecutionContext,
   ForbiddenException,
-  UnauthorizedException,
+  UnauthorizedException
 } from '@nestjs/common';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { OAUTH_SCOPE_KEY } from '../decorators/oauth-scope.decorator';
@@ -14,18 +14,18 @@ const classSentinel = class Controller {};
 function createCtx(): ExecutionContext {
   return {
     getHandler: () => handlerSentinel,
-    getClass: () => classSentinel,
+    getClass: () => classSentinel
   } as any;
 }
 
 function createGuard(scopeMetadata?: unknown, requireSession?: boolean) {
   const reflector = {
     getAllAndOverride: jest.fn((key: string) =>
-      key === REQUIRE_SESSION_AUTH_KEY ? requireSession : scopeMetadata,
-    ),
+      key === REQUIRE_SESSION_AUTH_KEY ? requireSession : scopeMetadata
+    )
   } as any;
   const environmentService = {
-    isCloud: jest.fn().mockReturnValue(false),
+    isCloud: jest.fn().mockReturnValue(false)
   } as any;
   const guard = new JwtAuthGuard(reflector, environmentService);
   return { guard, reflector };
@@ -35,7 +35,7 @@ function oauthUser(scopes: string[]) {
   return {
     user: { id: 'user_1' },
     workspace: { id: 'ws_1' },
-    oauth: { grantId: 'grant_1', scopes },
+    oauth: { grantId: 'grant_1', scopes }
   };
 }
 
@@ -44,14 +44,16 @@ describe('JwtAuthGuard.handleRequest', () => {
     const { guard } = createGuard();
     const err = new UnauthorizedException('bad token');
 
-    expect(() => guard.handleRequest(err, null, null, createCtx())).toThrow(err);
+    expect(() => guard.handleRequest(err, null, null, createCtx())).toThrow(
+      err
+    );
   });
 
   it('throws UnauthorizedException when there is no user', () => {
     const { guard } = createGuard();
 
     expect(() => guard.handleRequest(null, null, null, createCtx())).toThrow(
-      UnauthorizedException,
+      UnauthorizedException
     );
   });
 
@@ -62,7 +64,7 @@ describe('JwtAuthGuard.handleRequest', () => {
     expect(guard.handleRequest(null, user, null, createCtx())).toBe(user);
     expect(reflector.getAllAndOverride).not.toHaveBeenCalledWith(
       OAUTH_SCOPE_KEY,
-      expect.anything(),
+      expect.anything()
     );
   });
 
@@ -70,11 +72,11 @@ describe('JwtAuthGuard.handleRequest', () => {
     const { guard, reflector } = createGuard(undefined);
 
     expect(() =>
-      guard.handleRequest(null, oauthUser(['read', 'write']), null, createCtx()),
+      guard.handleRequest(null, oauthUser(['read', 'write']), null, createCtx())
     ).toThrow(ForbiddenException);
     expect(reflector.getAllAndOverride).toHaveBeenCalledWith(OAUTH_SCOPE_KEY, [
       handlerSentinel,
-      classSentinel,
+      classSentinel
     ]);
   });
 
@@ -89,7 +91,7 @@ describe('JwtAuthGuard.handleRequest', () => {
     const { guard } = createGuard('write');
 
     expect(() =>
-      guard.handleRequest(null, oauthUser(['read']), null, createCtx()),
+      guard.handleRequest(null, oauthUser(['read']), null, createCtx())
     ).toThrow('insufficient_scope');
   });
 
@@ -111,14 +113,14 @@ describe('JwtAuthGuard.handleRequest', () => {
     const sessionUser = {
       user: { id: 'user_1' },
       workspace: { id: 'ws_1' },
-      authType: JwtType.ACCESS,
+      authType: JwtType.ACCESS
     };
 
     it('allows a signed-in session', () => {
       const { guard } = createGuard(undefined, true);
 
       expect(guard.handleRequest(null, sessionUser, null, createCtx())).toBe(
-        sessionUser,
+        sessionUser
       );
     });
 
@@ -127,11 +129,11 @@ describe('JwtAuthGuard.handleRequest', () => {
       const apiKeyUser = {
         user: { id: 'user_1' },
         workspace: { id: 'ws_1' },
-        authType: JwtType.API_KEY,
+        authType: JwtType.API_KEY
       };
 
       expect(() =>
-        guard.handleRequest(null, apiKeyUser, null, createCtx()),
+        guard.handleRequest(null, apiKeyUser, null, createCtx())
       ).toThrow('This action requires an interactive user session');
     });
 
@@ -140,7 +142,7 @@ describe('JwtAuthGuard.handleRequest', () => {
       const user = { ...oauthUser(['write']), authType: JwtType.OAUTH_ACCESS };
 
       expect(() => guard.handleRequest(null, user, null, createCtx())).toThrow(
-        'This action requires an interactive user session',
+        'This action requires an interactive user session'
       );
     });
 
@@ -149,11 +151,11 @@ describe('JwtAuthGuard.handleRequest', () => {
       const apiKeyUser = {
         user: { id: 'user_1' },
         workspace: { id: 'ws_1' },
-        authType: JwtType.API_KEY,
+        authType: JwtType.API_KEY
       };
 
       expect(guard.handleRequest(null, apiKeyUser, null, createCtx())).toBe(
-        apiKeyUser,
+        apiKeyUser
       );
     });
   });
@@ -161,7 +163,7 @@ describe('JwtAuthGuard.handleRequest', () => {
   it('lets handler metadata override class metadata', () => {
     const metadataByTarget = new Map<unknown, string>([
       [handlerSentinel, 'write'],
-      [classSentinel, 'read'],
+      [classSentinel, 'read']
     ]);
     const reflector = {
       getAllAndOverride: jest.fn((key: string, targets: unknown[]) => {
@@ -174,13 +176,15 @@ describe('JwtAuthGuard.handleRequest', () => {
           }
         }
         return undefined;
-      }),
+      })
     } as any;
-    const environmentService = { isCloud: jest.fn().mockReturnValue(false) } as any;
+    const environmentService = {
+      isCloud: jest.fn().mockReturnValue(false)
+    } as any;
     const guard = new JwtAuthGuard(reflector, environmentService);
 
     expect(() =>
-      guard.handleRequest(null, oauthUser(['read']), null, createCtx()),
+      guard.handleRequest(null, oauthUser(['read']), null, createCtx())
     ).toThrow('insufficient_scope');
   });
 });

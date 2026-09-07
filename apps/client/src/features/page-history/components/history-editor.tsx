@@ -1,18 +1,18 @@
-import "@/features/editor/styles/index.css";
-import { useEffect } from "react";
-import { EditorContent, useEditor } from "@tiptap/react";
-import { mainExtensions } from "@/features/editor/extensions/extensions";
-import { Title } from "@mantine/core";
-import { Decoration, DecorationSet } from "@tiptap/pm/view";
-import historyClasses from "./css/history.module.css";
-import { recreateTransform } from "@docmost/editor-ext";
-import { DOMSerializer, Node } from "@tiptap/pm/model";
-import { ChangeSet, simplifyChanges } from "@tiptap/pm/changeset";
-import { useAtom } from "jotai";
+import '@/features/editor/styles/index.css';
+import { useEffect } from 'react';
+import { EditorContent, useEditor } from '@tiptap/react';
+import { mainExtensions } from '@/features/editor/extensions/extensions';
+import { Title } from '@mantine/core';
+import { Decoration, DecorationSet } from '@tiptap/pm/view';
+import historyClasses from './css/history.module.css';
+import { recreateTransform } from '@docmost/editor-ext';
+import { DOMSerializer, Node } from '@tiptap/pm/model';
+import { ChangeSet, simplifyChanges } from '@tiptap/pm/changeset';
+import { useAtom } from 'jotai';
 import {
   diffCountsAtom,
-  highlightChangesAtom,
-} from "@/features/page-history/atoms/history-atoms";
+  highlightChangesAtom
+} from '@/features/page-history/atoms/history-atoms';
 
 export interface HistoryEditorProps {
   title: string;
@@ -23,7 +23,7 @@ export interface HistoryEditorProps {
 export function HistoryEditor({
   title,
   content,
-  previousContent,
+  previousContent
 }: HistoryEditorProps) {
   const [highlightChanges] = useAtom(highlightChangesAtom);
   const [, setDiffCounts] = useAtom(diffCountsAtom);
@@ -31,7 +31,7 @@ export function HistoryEditor({
   const editor = useEditor({
     extensions: mainExtensions,
     editable: false,
-    textDirection: "auto",
+    textDirection: 'auto'
   });
 
   useEffect(() => {
@@ -50,30 +50,30 @@ export function HistoryEditor({
         const tr = recreateTransform(oldContent, newContent, {
           complexSteps: false,
           wordDiffs: true,
-          simplifyDiff: true,
+          simplifyDiff: true
         });
 
         const changeSet = ChangeSet.create(oldContent).addSteps(
           tr.doc,
           tr.mapping.maps,
-          [],
+          []
         );
         const changes = simplifyChanges(changeSet.changes, newContent);
 
         editor.commands.setContent(content);
 
         const specialNodeTypes = new Set([
-          "image",
-          "attachment",
-          "video",
-          "excalidraw",
-          "drawio",
-          "mermaid",
-          "mathBlock",
-          "mathInline",
-          "table",
-          "details",
-          "callout",
+          'image',
+          'attachment',
+          'video',
+          'excalidraw',
+          'drawio',
+          'mermaid',
+          'mathBlock',
+          'mathInline',
+          'table',
+          'details',
+          'callout'
         ]);
 
         const decorations: Decoration[] = [];
@@ -99,16 +99,16 @@ export function HistoryEditor({
                 foundSpecialNode.pos + foundSpecialNode.node.nodeSize;
               decorations.push(
                 Decoration.node(foundSpecialNode.pos, nodeEnd, {
-                  class: "history-diff-node-added",
-                  "data-diff-index": String(currentIndex),
-                }),
+                  class: 'history-diff-node-added',
+                  'data-diff-index': String(currentIndex)
+                })
               );
             } else {
               decorations.push(
                 Decoration.inline(change.fromB, change.toB, {
-                  class: "history-diff-added",
-                  "data-diff-index": String(currentIndex),
-                }),
+                  class: 'history-diff-added',
+                  'data-diff-index': String(currentIndex)
+                })
               );
             }
             addedCount += 1;
@@ -130,30 +130,30 @@ export function HistoryEditor({
             if (foundDeletedNode) {
               decorations.push(
                 Decoration.widget(change.fromB, () => {
-                  const wrapper = document.createElement("div");
-                  wrapper.className = "history-diff-node-deleted";
-                  wrapper.setAttribute("data-diff-index", String(currentIndex));
+                  const wrapper = document.createElement('div');
+                  wrapper.className = 'history-diff-node-deleted';
+                  wrapper.setAttribute('data-diff-index', String(currentIndex));
                   const serializer = DOMSerializer.fromSchema(schema);
                   const dom = serializer.serializeNode(foundDeletedNode!.node);
                   wrapper.appendChild(dom);
                   return wrapper;
-                }),
+                })
               );
             } else {
               const deletedText = oldContent.textBetween(
                 change.fromA,
                 change.toA,
-                "",
+                ''
               );
               if (deletedText) {
                 decorations.push(
                   Decoration.widget(change.fromB, () => {
-                    const span = document.createElement("span");
-                    span.className = "history-diff-deleted";
-                    span.setAttribute("data-diff-index", String(currentIndex));
+                    const span = document.createElement('span');
+                    span.className = 'history-diff-deleted';
+                    span.setAttribute('data-diff-index', String(currentIndex));
                     span.textContent = deletedText;
                     return span;
-                  }),
+                  })
                 );
               }
             }
@@ -163,7 +163,7 @@ export function HistoryEditor({
 
         decorationSet = DecorationSet.create(newContent, decorations);
       } catch (e) {
-        console.error("History diff failed:", e);
+        console.error('History diff failed:', e);
         editor.commands.setContent(content);
       }
     } else {
@@ -177,8 +177,8 @@ export function HistoryEditor({
       editorProps: {
         ...editor.options.editorProps,
         decorations: () =>
-          highlightChanges ? decorationSet : DecorationSet.empty,
-      },
+          highlightChanges ? decorationSet : DecorationSet.empty
+      }
     });
   }, [
     title,
@@ -186,7 +186,7 @@ export function HistoryEditor({
     editor,
     previousContent,
     highlightChanges,
-    setDiffCounts,
+    setDiffCounts
   ]);
 
   return (

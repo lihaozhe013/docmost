@@ -1,5 +1,5 @@
-import { Skeleton } from "@mantine/core";
-import classes from "@/features/label/label.module.css";
+import { Skeleton } from '@mantine/core';
+import classes from '@/features/label/label.module.css';
 
 type LabelPageRowSkeletonProps = {
   titleWidth?: number;
@@ -8,7 +8,7 @@ type LabelPageRowSkeletonProps = {
 
 export function LabelPageRowSkeleton({
   titleWidth = 220,
-  metaWidth = 180,
+  metaWidth = 180
 }: LabelPageRowSkeletonProps) {
   return (
     <div className={classes.row} aria-hidden="true">

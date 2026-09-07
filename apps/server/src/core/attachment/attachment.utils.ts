@@ -15,7 +15,7 @@ export interface PreparedFile {
 
 export async function prepareFile(
   filePromise: Promise<MultipartFile>,
-  options: { skipBuffer?: boolean } = {},
+  options: { skipBuffer?: boolean } = {}
 ): Promise<PreparedFile> {
   const file = await filePromise;
 
@@ -42,7 +42,7 @@ export async function prepareFile(
       fileSize,
       fileExtension,
       mimeType: getMimeType(file.filename),
-      multiPartFile: file,
+      multiPartFile: file
     };
   } catch (error) {
     throw error;
@@ -51,7 +51,7 @@ export async function prepareFile(
 
 export function validateFileType(
   fileExtension: string,
-  allowedTypes: string[],
+  allowedTypes: string[]
 ) {
   if (!allowedTypes.includes(fileExtension)) {
     throw new Error('Invalid file type');
@@ -60,7 +60,7 @@ export function validateFileType(
 
 export function getAttachmentFolderPath(
   type: AttachmentType,
-  workspaceId: string,
+  workspaceId: string
 ): string {
   switch (type) {
     case AttachmentType.Avatar:

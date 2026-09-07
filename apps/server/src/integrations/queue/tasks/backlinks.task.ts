@@ -9,7 +9,7 @@ const logger = new Logger('BacklinksTask');
 export async function processBacklinks(
   db: KyselyDB,
   backlinkRepo: BacklinkRepo,
-  data: IPageBacklinkJob,
+  data: IPageBacklinkJob
 ): Promise<void> {
   const { pageId, mentions, workspaceId, internalLinkSlugIds = [] } = data;
 
@@ -38,7 +38,7 @@ export async function processBacklinks(
     }
 
     const allTargetPageIds = [
-      ...new Set([...mentionTargetPageIds, ...resolvedLinkPageIds]),
+      ...new Set([...mentionTargetPageIds, ...resolvedLinkPageIds])
     ];
 
     if (existingBacklinks.length === 0 && allTargetPageIds.length === 0) {
@@ -46,7 +46,7 @@ export async function processBacklinks(
     }
 
     const existingTargetPageIds = existingBacklinks.map(
-      (backlink) => backlink.targetPageId,
+      (backlink) => backlink.targetPageId
     );
 
     let validTargetPages = [];
@@ -62,24 +62,22 @@ export async function processBacklinks(
     const validTargetPageIds = validTargetPages.map((page) => page.id);
 
     const backlinksToAdd = validTargetPageIds.filter(
-      (id) => !existingTargetPageIds.includes(id),
+      (id) => !existingTargetPageIds.includes(id)
     );
 
     const backlinksToRemove = existingTargetPageIds.filter(
-      (existingId) => !validTargetPageIds.includes(existingId),
+      (existingId) => !validTargetPageIds.includes(existingId)
     );
 
     if (backlinksToAdd.length > 0) {
       const newBacklinks = backlinksToAdd.map((targetPageId) => ({
         sourcePageId: pageId,
         targetPageId: targetPageId,
-        workspaceId: workspaceId,
+        workspaceId: workspaceId
       }));
 
       await backlinkRepo.insertBacklink(newBacklinks, trx);
-      logger.debug(
-        `Added ${newBacklinks.length} new backlinks to ${pageId}`,
-      );
+      logger.debug(`Added ${newBacklinks.length} new backlinks to ${pageId}`);
     }
 
     if (backlinksToRemove.length > 0) {
@@ -90,7 +88,7 @@ export async function processBacklinks(
         .execute();
 
       logger.debug(
-        `Removed ${backlinksToRemove.length} outdated backlinks from ${pageId}.`,
+        `Removed ${backlinksToRemove.length} outdated backlinks from ${pageId}.`
       );
     }
   });

@@ -1,7 +1,7 @@
 import { InjectKysely } from 'nestjs-kysely';
 import {
   HealthIndicatorResult,
-  HealthIndicatorService,
+  HealthIndicatorService
 } from '@nestjs/terminus';
 import { Injectable, Logger } from '@nestjs/common';
 import { sql } from 'kysely';
@@ -13,7 +13,7 @@ export class PostgresHealthIndicator {
 
   constructor(
     private readonly healthIndicatorService: HealthIndicatorService,
-    @InjectKysely() private readonly db: KyselyDB,
+    @InjectKysely() private readonly db: KyselyDB
   ) {}
 
   async pingCheck(key: string): Promise<HealthIndicatorResult> {

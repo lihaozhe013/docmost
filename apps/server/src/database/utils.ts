@@ -8,7 +8,7 @@ import { KyselyDB, KyselyTransaction } from './types/kysely.types';
 export async function executeTx<T>(
   db: KyselyDB,
   callback: (trx: KyselyTransaction) => Promise<T>,
-  existingTrx?: KyselyTransaction,
+  existingTrx?: KyselyTransaction
 ): Promise<T> {
   if (existingTrx) {
     return await callback(existingTrx); // Execute callback with existing transaction
@@ -23,7 +23,7 @@ export async function executeTx<T>(
  */
 export function dbOrTx(
   db: KyselyDB,
-  existingTrx?: KyselyTransaction,
+  existingTrx?: KyselyTransaction
 ): KyselyDB | KyselyTransaction {
   if (existingTrx) {
     return existingTrx; // Use existing transaction

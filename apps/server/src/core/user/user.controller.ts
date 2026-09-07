@@ -4,7 +4,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -20,7 +20,7 @@ import { WorkspaceRepo } from '@docmost/db/repos/workspace/workspace.repo';
 export class UserController {
   constructor(
     private readonly userService: UserService,
-    private readonly workspaceRepo: WorkspaceRepo,
+    private readonly workspaceRepo: WorkspaceRepo
   ) {}
 
   @HttpCode(HttpStatus.OK)
@@ -28,15 +28,15 @@ export class UserController {
   @OAuthScope('read')
   async getUserInfo(
     @AuthUser() authUser: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const memberCount = await this.workspaceRepo.getActiveUserCount(
-      workspace.id,
+      workspace.id
     );
 
     const workspaceInfo = {
       ...workspace,
-      memberCount,
+      memberCount
     };
 
     return { user: authUser, workspace: workspaceInfo };
@@ -47,7 +47,7 @@ export class UserController {
   async updateUser(
     @Body() updateUserDto: UpdateUserDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     return this.userService.update(updateUserDto, user.id, workspace);
   }

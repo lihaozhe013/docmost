@@ -86,7 +86,7 @@ export interface IWorkspaceSpaceSettings {
 export interface ICreateWorkspaceUser {
   name?: string;
   email: string;
-  role: "admin" | "member";
+  role: 'admin' | 'member';
 }
 
 export interface IResetUserPasswordResult {

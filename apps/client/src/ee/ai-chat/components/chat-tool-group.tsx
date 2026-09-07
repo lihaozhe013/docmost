@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   IconChevronRight,
   IconChevronDown,
-  IconLoader2,
-} from "@tabler/icons-react";
-import type { AiChatToolCall } from "../types/ai-chat.types";
-import ChatToolResult, { TOOL_LABELS } from "./chat-tool-result";
-import classes from "../styles/chat-message.module.css";
+  IconLoader2
+} from '@tabler/icons-react';
+import type { AiChatToolCall } from '../types/ai-chat.types';
+import ChatToolResult, { TOOL_LABELS } from './chat-tool-result';
+import classes from '../styles/chat-message.module.css';
 
 type Props = {
   toolCalls: AiChatToolCall[];
@@ -36,7 +36,7 @@ export default function ChatToolGroup({ toolCalls, isStreaming }: Props) {
         aria-expanded={expanded}
         onClick={() => setExpanded((prev) => !prev)}
         onKeyDown={(event) => {
-          if (event.key === "Enter" || event.key === " ") {
+          if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
             setExpanded((prev) => !prev);
           }

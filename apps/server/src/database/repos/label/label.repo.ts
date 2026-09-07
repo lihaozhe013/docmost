@@ -11,7 +11,7 @@ import { normalizeLabelName } from '../../../core/label/utils';
 
 export const LabelType = {
   PAGE: 'page',
-  SPACE: 'space',
+  SPACE: 'space'
 } as const;
 
 export type LabelType = (typeof LabelType)[keyof typeof LabelType];
@@ -20,12 +20,12 @@ export type LabelType = (typeof LabelType)[keyof typeof LabelType];
 export class LabelRepo {
   constructor(
     @InjectKysely() private readonly db: KyselyDB,
-    private readonly spaceMemberRepo: SpaceMemberRepo,
+    private readonly spaceMemberRepo: SpaceMemberRepo
   ) {}
 
   async findById(
     labelId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<Label | undefined> {
     const db = dbOrTx(this.db, trx);
     return db
@@ -39,7 +39,7 @@ export class LabelRepo {
     name: string,
     workspaceId: string,
     type: LabelType,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<Label | undefined> {
     const db = dbOrTx(this.db, trx);
     return db
@@ -55,7 +55,7 @@ export class LabelRepo {
     name: string,
     workspaceId: string,
     type: LabelType,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<Label> {
     const db = dbOrTx(this.db, trx);
     const normalizedName = normalizeLabelName(name);
@@ -69,7 +69,7 @@ export class LabelRepo {
       .onConflict((oc) =>
         oc
           .columns(['name', 'type', 'workspaceId'])
-          .doUpdateSet({ name: normalizedName }),
+          .doUpdateSet({ name: normalizedName })
       )
       .returningAll()
       .executeTakeFirstOrThrow();
@@ -86,7 +86,7 @@ export class LabelRepo {
         'labels.createdAt',
         'labels.updatedAt',
         'labels.workspaceId',
-        'pageLabels.id as joinId',
+        'pageLabels.id as joinId'
       ])
       .where('pageLabels.pageId', '=', pageId)
       .where('labels.type', '=', LabelType.PAGE);
@@ -96,17 +96,17 @@ export class LabelRepo {
       cursor: pagination.cursor,
       beforeCursor: pagination.beforeCursor,
       fields: [
-        { expression: 'pageLabels.id', direction: 'asc', key: 'joinId' },
+        { expression: 'pageLabels.id', direction: 'asc', key: 'joinId' }
       ],
       parseCursor: (cursor) => ({
-        joinId: cursor.joinId,
-      }),
+        joinId: cursor.joinId
+      })
     });
 
     // joinId is an internal pagination cursor; don't leak it to callers.
     return {
       ...result,
-      items: result.items.map(({ joinId: _joinId, ...rest }) => rest),
+      items: result.items.map(({ joinId: _joinId, ...rest }) => rest)
     };
   }
 
@@ -114,7 +114,7 @@ export class LabelRepo {
     workspaceId: string,
     userId: string,
     type: LabelType,
-    pagination: PaginationOptions,
+    pagination: PaginationOptions
   ) {
     // Label visibility is scoped to space membership: a label surfaces if it
     // is attached to any non-deleted page in a space the user belongs to.
@@ -136,15 +136,15 @@ export class LabelRepo {
           .where(
             'pages.spaceId',
             'in',
-            this.spaceMemberRepo.getUserSpaceIdsQuery(userId),
-          ),
+            this.spaceMemberRepo.getUserSpaceIdsQuery(userId)
+          )
       );
 
     if (pagination.query) {
       query = query.where(
         'name',
         'like',
-        `%${pagination.query.toLowerCase()}%`,
+        `%${pagination.query.toLowerCase()}%`
       );
     }
 
@@ -154,19 +154,19 @@ export class LabelRepo {
       beforeCursor: pagination.beforeCursor,
       fields: [
         { expression: 'name', direction: 'asc' },
-        { expression: 'id', direction: 'asc' },
+        { expression: 'id', direction: 'asc' }
       ],
       parseCursor: (cursor) => ({
         name: cursor.name,
-        id: cursor.id,
-      }),
+        id: cursor.id
+      })
     });
   }
 
   async addLabelToPage(
     pageId: string,
     labelId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<void> {
     const db = dbOrTx(this.db, trx);
     await db
@@ -180,7 +180,7 @@ export class LabelRepo {
     pageId: string,
     labelId: string,
     workspaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<void> {
     const db = dbOrTx(this.db, trx);
     await db
@@ -193,15 +193,15 @@ export class LabelRepo {
             .selectFrom('labels')
             .select('id')
             .whereRef('labels.id', '=', 'pageLabels.labelId')
-            .where('labels.workspaceId', '=', workspaceId),
-        ),
+            .where('labels.workspaceId', '=', workspaceId)
+        )
       )
       .execute();
   }
 
   async getPageLabelCount(
     pageId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<number> {
     const db = dbOrTx(this.db, trx);
     const result = await db
@@ -216,7 +216,7 @@ export class LabelRepo {
   async getLabelPageCount(
     labelId: string,
     workspaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<number> {
     const db = dbOrTx(this.db, trx);
     const result = await db
@@ -233,7 +233,7 @@ export class LabelRepo {
   async deleteLabel(
     labelId: string,
     workspaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<void> {
     const db = dbOrTx(this.db, trx);
     await db
@@ -250,7 +250,7 @@ export class LabelRepo {
       spaceId?: string;
       query?: string;
       pagination: PaginationOptions;
-    },
+    }
   ) {
     let query = this.db
       .selectFrom('pages')
@@ -267,13 +267,13 @@ export class LabelRepo {
           eb
             .selectFrom('spaces')
             .select(['spaces.id', 'spaces.name', 'spaces.slug', 'spaces.logo'])
-            .whereRef('spaces.id', '=', 'pages.spaceId'),
+            .whereRef('spaces.id', '=', 'pages.spaceId')
         ).as('space'),
         jsonObjectFrom(
           eb
             .selectFrom('users')
             .select(['users.id', 'users.name', 'users.avatarUrl'])
-            .whereRef('users.id', '=', 'pages.creatorId'),
+            .whereRef('users.id', '=', 'pages.creatorId')
         ).as('creator'),
         jsonArrayFrom(
           eb
@@ -282,8 +282,8 @@ export class LabelRepo {
             .select(['labels.id', 'labels.name'])
             .whereRef('pl.pageId', '=', 'pages.id')
             .where('labels.type', '=', LabelType.PAGE)
-            .orderBy('pl.id', 'asc'),
-        ).as('labels'),
+            .orderBy('pl.id', 'asc')
+        ).as('labels')
       ])
       .where('pageLabels.labelId', '=', labelId)
       .where('pages.deletedAt', 'is', null);
@@ -294,7 +294,7 @@ export class LabelRepo {
       query = query.where(
         'pages.spaceId',
         'in',
-        this.spaceMemberRepo.getUserSpaceIdsQuery(userId),
+        this.spaceMemberRepo.getUserSpaceIdsQuery(userId)
       );
     }
 
@@ -308,19 +308,19 @@ export class LabelRepo {
       beforeCursor: opts.pagination.beforeCursor,
       fields: [
         { expression: 'pages.updatedAt', direction: 'desc', key: 'updatedAt' },
-        { expression: 'pages.id', direction: 'desc', key: 'id' },
+        { expression: 'pages.id', direction: 'desc', key: 'id' }
       ],
       parseCursor: (cursor) => ({
         updatedAt: new Date(cursor.updatedAt),
-        id: cursor.id,
-      }),
+        id: cursor.id
+      })
     });
   }
 
   async getLabelPageCountForUser(
     labelId: string,
     userId: string,
-    spaceId?: string,
+    spaceId?: string
   ): Promise<number> {
     let query = this.db
       .selectFrom('pageLabels')
@@ -335,7 +335,7 @@ export class LabelRepo {
       query = query.where(
         'pages.spaceId',
         'in',
-        this.spaceMemberRepo.getUserSpaceIdsQuery(userId),
+        this.spaceMemberRepo.getUserSpaceIdsQuery(userId)
       );
     }
 

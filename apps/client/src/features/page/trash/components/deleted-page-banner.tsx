@@ -1,22 +1,22 @@
-import { ActionIcon, Button, Group, Paper, Text, Tooltip } from "@mantine/core";
-import { IconRestore, IconTrash } from "@tabler/icons-react";
-import { useNavigate } from "react-router-dom";
-import { Trans, useTranslation } from "react-i18next";
-import { useTimeAgo } from "@/hooks/use-time-ago.tsx";
-import { useRestorePageModal } from "@/features/page/hooks/use-restore-page-modal.tsx";
-import { useDeletePageModal } from "@/features/page/hooks/use-delete-page-modal.tsx";
+import { ActionIcon, Button, Group, Paper, Text, Tooltip } from '@mantine/core';
+import { IconRestore, IconTrash } from '@tabler/icons-react';
+import { useNavigate } from 'react-router-dom';
+import { Trans, useTranslation } from 'react-i18next';
+import { useTimeAgo } from '@/hooks/use-time-ago.tsx';
+import { useRestorePageModal } from '@/features/page/hooks/use-restore-page-modal.tsx';
+import { useDeletePageModal } from '@/features/page/hooks/use-delete-page-modal.tsx';
 import {
   useDeletePageMutation,
   usePageQuery,
-  useRestorePageMutation,
-} from "@/features/page/queries/page-query.ts";
-import { getSpaceUrl } from "@/lib/config.ts";
-import { useGetSpaceBySlugQuery } from "@/features/space/queries/space-query.ts";
-import { useSpaceAbility } from "@/features/space/permissions/use-space-ability.ts";
+  useRestorePageMutation
+} from '@/features/page/queries/page-query.ts';
+import { getSpaceUrl } from '@/lib/config.ts';
+import { useGetSpaceBySlugQuery } from '@/features/space/queries/space-query.ts';
+import { useSpaceAbility } from '@/features/space/permissions/use-space-ability.ts';
 import {
   SpaceCaslAction,
-  SpaceCaslSubject,
-} from "@/features/space/permissions/permissions.type.ts";
+  SpaceCaslSubject
+} from '@/features/space/permissions/permissions.type.ts';
 
 type DeletedPageBannerProps = {
   slugId: string;
@@ -38,18 +38,18 @@ export function DeletedPageBanner({ slugId }: DeletedPageBannerProps) {
 
   const canRestore = spaceAbility.can(
     SpaceCaslAction.Edit,
-    SpaceCaslSubject.Page,
+    SpaceCaslSubject.Page
   );
   const canPermanentlyDelete = spaceAbility.can(
     SpaceCaslAction.Manage,
-    SpaceCaslSubject.Settings,
+    SpaceCaslSubject.Settings
   );
-  const actorName = page.deletedBy?.name ?? t("Someone");
+  const actorName = page.deletedBy?.name ?? t('Someone');
 
   const handleRestore = () => {
     openRestoreModal({
       title: page.title,
-      onConfirm: () => restorePageMutation.mutate(page.id),
+      onConfirm: () => restorePageMutation.mutate(page.id)
     });
   };
 
@@ -59,7 +59,7 @@ export function DeletedPageBanner({ slugId }: DeletedPageBannerProps) {
       onConfirm: async () => {
         await deletePageMutation.mutateAsync(page.id);
         navigate(getSpaceUrl(page.space?.slug));
-      },
+      }
     });
   };
 
@@ -87,7 +87,7 @@ export function DeletedPageBanner({ slugId }: DeletedPageBannerProps) {
                   onClick={handleRestore}
                   loading={restorePageMutation.isPending}
                 >
-                  {t("Restore page")}
+                  {t('Restore page')}
                 </Button>
               )}
               {canPermanentlyDelete && (
@@ -99,33 +99,33 @@ export function DeletedPageBanner({ slugId }: DeletedPageBannerProps) {
                   onClick={handlePermanentDelete}
                   loading={deletePageMutation.isPending}
                 >
-                  {t("Permanently delete")}
+                  {t('Permanently delete')}
                 </Button>
               )}
             </Group>
             <Group gap="xs" wrap="nowrap" hiddenFrom="sm">
               {canRestore && (
-                <Tooltip label={t("Restore page")} withArrow>
+                <Tooltip label={t('Restore page')} withArrow>
                   <ActionIcon
                     size="lg"
                     variant="default"
                     onClick={handleRestore}
                     loading={restorePageMutation.isPending}
-                    aria-label={t("Restore page")}
+                    aria-label={t('Restore page')}
                   >
                     <IconRestore size={18} />
                   </ActionIcon>
                 </Tooltip>
               )}
               {canPermanentlyDelete && (
-                <Tooltip label={t("Permanently delete")} withArrow>
+                <Tooltip label={t('Permanently delete')} withArrow>
                   <ActionIcon
                     size="lg"
                     variant="light"
                     color="red"
                     onClick={handlePermanentDelete}
                     loading={deletePageMutation.isPending}
-                    aria-label={t("Permanently delete")}
+                    aria-label={t('Permanently delete')}
                   >
                     <IconTrash size={18} />
                   </ActionIcon>

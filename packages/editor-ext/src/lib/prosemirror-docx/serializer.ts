@@ -32,7 +32,13 @@ import {
 import { imageDimensionsFromData } from 'image-dimensions';
 import { createNumbering, NumberingStyles } from './numbering';
 import { buildDoc, createShortId } from './utils';
-import { IFootnotes, INumbering, Mutable, SectionConfig, SerializationState } from './types';
+import {
+  IFootnotes,
+  INumbering,
+  Mutable,
+  SectionConfig,
+  SerializationState,
+} from './types';
 
 // This is duplicated from @curvenote/schema
 export type AlignOptions = 'left' | 'center' | 'right';
@@ -44,12 +50,21 @@ export type NodeSerializer = Record<
 
 export type NodeSerializerAsync = Record<
   string,
-  (state: DocxSerializerStateAsync, node: Node, parent: Node, index: number) => void | Promise<void>
+  (
+    state: DocxSerializerStateAsync,
+    node: Node,
+    parent: Node,
+    index: number,
+  ) => void | Promise<void>
 >;
 
 export type MarkSerializer = Record<
   string,
-  (state: DocxSerializerState | DocxSerializerStateAsync, node: Node, mark: Mark) => IRunOptions
+  (
+    state: DocxSerializerState | DocxSerializerStateAsync,
+    node: Node,
+    mark: Mark,
+  ) => IRunOptions
 >;
 
 export type Options = {
@@ -145,7 +160,9 @@ export class DocxSerializerState {
   render(node: Node, parent: Node, index: number) {
     if (typeof parent === 'number') throw new Error('!');
     if (!this.nodes[node.type.name])
-      throw new Error(`Token type \`${node.type.name}\` not supported by Word renderer`);
+      throw new Error(
+        `Token type \`${node.type.name}\` not supported by Word renderer`,
+      );
     this.nodes[node.type.name](this, node, parent, index);
   }
 
@@ -230,7 +247,8 @@ export class DocxSerializerState {
 
   // This is a pass through to the paragraphs, etc. underneath they will close the block
   renderListItem(node: Node) {
-    if (!this.currentNumbering) throw new Error('Trying to create a list item without a list?');
+    if (!this.currentNumbering)
+      throw new Error('Trying to create a list item without a list?');
     this.addParagraphOptions({ numbering: this.currentNumbering });
     this.renderContent(node);
   }
@@ -353,7 +371,9 @@ export class DocxSerializerState {
       row.content.forEach((cell) => {
         this.children = [];
         this.renderContent(cell);
-        const tableCellOpts: Mutable<ITableCellOptions> = { children: this.children };
+        const tableCellOpts: Mutable<ITableCellOptions> = {
+          children: this.children,
+        };
         const colspan = cell.attrs.colspan ?? 1;
         const rowspan = cell.attrs.rowspan ?? 1;
         if (colspan > 1) tableCellOpts.columnSpan = colspan;
@@ -365,7 +385,13 @@ export class DocxSerializerState {
           }),
         );
       });
-      rows.push(new TableRow({ ...(getRowOptions?.(row) || {}), children: cells, tableHeader }));
+      rows.push(
+        new TableRow({
+          ...(getRowOptions?.(row) || {}),
+          children: cells,
+          tableHeader,
+        }),
+      );
     });
     this.maxImageWidth = MAX_IMAGE_WIDTH;
     const table = new Table({ ...tableOptions, rows });
@@ -375,8 +401,14 @@ export class DocxSerializerState {
     this.children = actualChildren;
   }
 
-  captionLabel(id: string, kind: 'Figure' | 'Table', { suffix } = { suffix: ': ' }) {
-    this.current.push(...[createReferenceBookmark(id, kind, `${kind} `), new TextRun(suffix)]);
+  captionLabel(
+    id: string,
+    kind: 'Figure' | 'Table',
+    { suffix } = { suffix: ': ' },
+  ) {
+    this.current.push(
+      ...[createReferenceBookmark(id, kind, `${kind} `), new TextRun(suffix)],
+    );
   }
 
   $footnoteCounter = 0;
@@ -528,7 +560,11 @@ export class DocxSerializerStateAsync {
 
   currentNumbering?: { reference: string; level: number };
 
-  constructor(nodes: NodeSerializerAsync, marks: MarkSerializer, options: OptionsAsync) {
+  constructor(
+    nodes: NodeSerializerAsync,
+    marks: MarkSerializer,
+    options: OptionsAsync,
+  ) {
     this.nodes = nodes;
     this.marks = marks;
     this.options = options ?? ({} as OptionsAsync);
@@ -559,8 +595,12 @@ export class DocxSerializerStateAsync {
   async render(node: Node, parent: Node, index: number) {
     if (typeof parent === 'number') throw new Error('!');
     if (!this.nodes[node.type.name])
-      throw new Error(`Token type \`${node.type.name}\` not supported by Word renderer`);
-    await Promise.resolve(this.nodes[node.type.name](this, node, parent, index));
+      throw new Error(
+        `Token type \`${node.type.name}\` not supported by Word renderer`,
+      );
+    await Promise.resolve(
+      this.nodes[node.type.name](this, node, parent, index),
+    );
   }
 
   renderMarks(node: Node, marks: Mark[]): IRunOptions {
@@ -648,7 +688,8 @@ export class DocxSerializerStateAsync {
 
   // This is a pass through to the paragraphs, etc. underneath they will close the block
   async renderListItem(node: Node) {
-    if (!this.currentNumbering) throw new Error('Trying to create a list item without a list?');
+    if (!this.currentNumbering)
+      throw new Error('Trying to create a list item without a list?');
     this.addParagraphOptions({ numbering: this.currentNumbering });
     await this.renderContent(node);
   }
@@ -765,7 +806,11 @@ export class DocxSerializerStateAsync {
       let tableHeader = true;
 
       // Check if all cells in the row are headers
-      for (let cellIndex = 0; cellIndex < row.content.childCount; cellIndex += 1) {
+      for (
+        let cellIndex = 0;
+        cellIndex < row.content.childCount;
+        cellIndex += 1
+      ) {
         const cell = row.content.child(cellIndex);
         if (cell.type.name !== 'tableHeader') {
           tableHeader = false;
@@ -775,12 +820,18 @@ export class DocxSerializerStateAsync {
       this.maxImageWidth = MAX_IMAGE_WIDTH / row.content.childCount;
 
       // Iterate through cells and ensure order
-      for (let cellIndex = 0; cellIndex < row.content.childCount; cellIndex += 1) {
+      for (
+        let cellIndex = 0;
+        cellIndex < row.content.childCount;
+        cellIndex += 1
+      ) {
         const cell = row.content.child(cellIndex);
         this.children = [];
         // eslint-disable-next-line no-await-in-loop
         await this.renderContent(cell); // Ensure order
-        const tableCellOpts: Mutable<ITableCellOptions> = { children: this.children };
+        const tableCellOpts: Mutable<ITableCellOptions> = {
+          children: this.children,
+        };
         const colspan = cell.attrs.colspan ?? 1;
         const rowspan = cell.attrs.rowspan ?? 1;
         if (colspan > 1) tableCellOpts.columnSpan = colspan;
@@ -793,7 +844,13 @@ export class DocxSerializerStateAsync {
         );
       }
 
-      rows.push(new TableRow({ ...(getRowOptions?.(row) || {}), children: cells, tableHeader }));
+      rows.push(
+        new TableRow({
+          ...(getRowOptions?.(row) || {}),
+          children: cells,
+          tableHeader,
+        }),
+      );
     }
 
     this.maxImageWidth = MAX_IMAGE_WIDTH;
@@ -804,8 +861,14 @@ export class DocxSerializerStateAsync {
     this.children = actualChildren;
   }
 
-  captionLabel(id: string, kind: 'Figure' | 'Table', { suffix } = { suffix: ': ' }) {
-    this.current.push(...[createReferenceBookmark(id, kind, `${kind} `), new TextRun(suffix)]);
+  captionLabel(
+    id: string,
+    kind: 'Figure' | 'Table',
+    { suffix } = { suffix: ': ' },
+  ) {
+    this.current.push(
+      ...[createReferenceBookmark(id, kind, `${kind} `), new TextRun(suffix)],
+    );
   }
 
   $footnoteCounter = 0;

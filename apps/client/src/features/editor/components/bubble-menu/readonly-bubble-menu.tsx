@@ -1,17 +1,17 @@
-import type { Editor } from "@tiptap/react";
-import { TextSelection } from "@tiptap/pm/state";
-import { FC, useCallback, useEffect, useRef, useState } from "react";
-import { IconMessage } from "@tabler/icons-react";
-import classes from "./bubble-menu.module.css";
-import { ActionIcon, Tooltip } from "@mantine/core";
-import { useAtom } from "jotai";
+import type { Editor } from '@tiptap/react';
+import { TextSelection } from '@tiptap/pm/state';
+import { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { IconMessage } from '@tabler/icons-react';
+import classes from './bubble-menu.module.css';
+import { ActionIcon, Tooltip } from '@mantine/core';
+import { useAtom } from 'jotai';
 import {
   showReadOnlyCommentPopupAtom,
-  readOnlyCommentDataAtom,
-} from "@/features/comment/atoms/comment-atom";
-import { useTranslation } from "react-i18next";
-import { getRelativeSelection, ySyncPluginKey } from "@tiptap/y-tiptap";
-import { isEditorReady } from "@docmost/editor-ext";
+  readOnlyCommentDataAtom
+} from '@/features/comment/atoms/comment-atom';
+import { useTranslation } from 'react-i18next';
+import { getRelativeSelection, ySyncPluginKey } from '@tiptap/y-tiptap';
+import { isEditorReady } from '@docmost/editor-ext';
 
 type ReadonlyBubbleMenuProps = {
   editor: Editor;
@@ -20,7 +20,7 @@ type ReadonlyBubbleMenuProps = {
 export const ReadonlyBubbleMenu: FC<ReadonlyBubbleMenuProps> = ({ editor }) => {
   const { t } = useTranslation();
   const [showReadOnlyCommentPopup, setShowReadOnlyCommentPopup] = useAtom(
-    showReadOnlyCommentPopupAtom,
+    showReadOnlyCommentPopupAtom
   );
   const [, setReadOnlyCommentData] = useAtom(readOnlyCommentDataAtom);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -70,7 +70,7 @@ export const ReadonlyBubbleMenu: FC<ReadonlyBubbleMenuProps> = ({ editor }) => {
     }
 
     const editorRect = editorDom
-      .closest(".editor-container")
+      .closest('.editor-container')
       ?.getBoundingClientRect();
     if (!editorRect) {
       setVisible(false);
@@ -79,7 +79,7 @@ export const ReadonlyBubbleMenu: FC<ReadonlyBubbleMenuProps> = ({ editor }) => {
 
     setPosition({
       top: rect.top - editorRect.top - 44,
-      left: rect.left - editorRect.left + rect.width / 2,
+      left: rect.left - editorRect.left + rect.width / 2
     });
     setVisible(true);
   }, [editor, showReadOnlyCommentPopup]);
@@ -89,9 +89,9 @@ export const ReadonlyBubbleMenu: FC<ReadonlyBubbleMenuProps> = ({ editor }) => {
       updateMenuPosition();
     };
 
-    document.addEventListener("selectionchange", handleSelectionChange);
+    document.addEventListener('selectionchange', handleSelectionChange);
     return () => {
-      document.removeEventListener("selectionchange", handleSelectionChange);
+      document.removeEventListener('selectionchange', handleSelectionChange);
     };
   }, [updateMenuPosition]);
 
@@ -116,9 +116,9 @@ export const ReadonlyBubbleMenu: FC<ReadonlyBubbleMenuProps> = ({ editor }) => {
       setReadOnlyCommentData({
         yjsSelection: {
           anchor: selection.anchor,
-          head: selection.head,
+          head: selection.head
         },
-        selectedText,
+        selectedText
       });
 
       setShowReadOnlyCommentPopup(true);
@@ -132,21 +132,21 @@ export const ReadonlyBubbleMenu: FC<ReadonlyBubbleMenuProps> = ({ editor }) => {
     <div
       ref={menuRef}
       style={{
-        position: "absolute",
+        position: 'absolute',
         top: position.top,
         left: position.left,
-        transform: "translateX(-50%)",
-        zIndex: 199,
+        transform: 'translateX(-50%)',
+        zIndex: 199
       }}
     >
       <div className={classes.bubbleMenu}>
-        <Tooltip label={t("Comment")} withArrow withinPortal={false}>
+        <Tooltip label={t('Comment')} withArrow withinPortal={false}>
           <ActionIcon
             variant="default"
             size="lg"
             radius="6px"
-            aria-label={t("Comment")}
-            style={{ border: "none" }}
+            aria-label={t('Comment')}
+            style={{ border: 'none' }}
             onMouseDown={(e) => {
               e.preventDefault();
               e.stopPropagation();

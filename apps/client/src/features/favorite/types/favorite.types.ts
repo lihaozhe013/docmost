@@ -1,4 +1,4 @@
-export type FavoriteType = "page" | "space" | "template";
+export type FavoriteType = 'page' | 'space' | 'template';
 
 export type IFavorite = {
   id: string;

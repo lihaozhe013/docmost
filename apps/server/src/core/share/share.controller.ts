@@ -8,7 +8,7 @@ import {
   Inject,
   NotFoundException,
   Post,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { AuthUser } from '../../common/decorators/auth-user.decorator';
 import { User, Workspace } from '@docmost/db/types/entity.types';
@@ -19,7 +19,7 @@ import {
   ShareIdDto,
   ShareInfoDto,
   SharePageIdDto,
-  UpdateShareDto,
+  UpdateShareDto
 } from './dto/share.dto';
 import { ShareTransclusionLookupDto } from './dto/share-transclusion-lookup.dto';
 import { PageRepo } from '@docmost/db/repos/page/page.repo';
@@ -33,7 +33,7 @@ import { LicenseCheckService } from '../../integrations/environment/license-chec
 import { AuditEvent, AuditResource } from '../../common/events/audit-events';
 import {
   AUDIT_SERVICE,
-  IAuditService,
+  IAuditService
 } from '../../integrations/audit/audit.service';
 
 @UseGuards(JwtAuthGuard)
@@ -46,14 +46,14 @@ export class ShareController {
     private readonly pagePermissionRepo: PagePermissionRepo,
     private readonly pageAccessService: PageAccessService,
     private readonly licenseCheckService: LicenseCheckService,
-    @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService,
+    @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService
   ) {}
 
   @HttpCode(HttpStatus.OK)
   @Post('/')
   async getShares(
     @AuthUser() user: User,
-    @Body() pagination: PaginationOptions,
+    @Body() pagination: PaginationOptions
   ) {
     return this.shareRepo.getShares(user.id, pagination);
   }
@@ -63,7 +63,7 @@ export class ShareController {
   @Post('/page-info')
   async getSharedPageInfo(
     @Body() dto: ShareInfoDto,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     if (!dto.pageId && !dto.shareId) {
       throw new BadRequestException();
@@ -73,7 +73,7 @@ export class ShareController {
 
     const sharingAllowed = await this.shareService.isSharingAllowed(
       workspace.id,
-      shareData.share.spaceId,
+      shareData.share.spaceId
     );
     if (!sharingAllowed) {
       throw new NotFoundException('Shared page not found');
@@ -83,8 +83,8 @@ export class ShareController {
       ...shareData,
       features: this.licenseCheckService.resolveFeatures(
         workspace.licenseKey,
-        workspace.plan,
-      ),
+        workspace.plan
+      )
     };
   }
 
@@ -93,7 +93,7 @@ export class ShareController {
   @Post('/info')
   async getShare(@Body() dto: ShareIdDto) {
     const share = await this.shareRepo.findById(dto.shareId, {
-      includeSharedPage: true,
+      includeSharedPage: true
     });
 
     if (!share) {
@@ -102,7 +102,7 @@ export class ShareController {
 
     const sharingAllowed = await this.shareService.isSharingAllowed(
       share.workspaceId,
-      share.spaceId,
+      share.spaceId
     );
     if (!sharingAllowed) {
       throw new NotFoundException('Share not found');
@@ -116,12 +116,12 @@ export class ShareController {
   @Post('/transclusion/lookup')
   async transclusionLookup(
     @Body() dto: ShareTransclusionLookupDto,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     return this.shareService.lookupTransclusionForShare(
       dto.shareId,
       dto.references,
-      workspace.id,
+      workspace.id
     );
   }
 
@@ -130,7 +130,7 @@ export class ShareController {
   async getShareForPage(
     @Body() dto: SharePageIdDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const page = await this.pageRepo.findById(dto.pageId);
     if (!page) {
@@ -147,7 +147,7 @@ export class ShareController {
   async create(
     @Body() createShareDto: CreateShareDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const page = await this.pageRepo.findById(createShareDto.pageId);
 
@@ -162,7 +162,7 @@ export class ShareController {
 
     // Prevent sharing restricted pages
     const isRestricted = await this.pagePermissionRepo.hasRestrictedAncestor(
-      page.id,
+      page.id
     );
     if (isRestricted) {
       throw new BadRequestException('Cannot share a restricted page');
@@ -170,7 +170,7 @@ export class ShareController {
 
     const sharingAllowed = await this.shareService.isSharingAllowed(
       workspace.id,
-      page.spaceId,
+      page.spaceId
     );
     if (!sharingAllowed) {
       throw new ForbiddenException('Public sharing is disabled');
@@ -180,7 +180,7 @@ export class ShareController {
       page,
       authUserId: user.id,
       workspaceId: workspace.id,
-      createShareDto,
+      createShareDto
     });
 
     this.auditService.log({
@@ -190,8 +190,8 @@ export class ShareController {
       spaceId: page.spaceId,
       metadata: {
         pageId: page.id,
-        spaceId: page.spaceId,
-      },
+        spaceId: page.spaceId
+      }
     });
 
     return share;
@@ -244,9 +244,9 @@ export class ShareController {
       changes: {
         before: {
           pageId: share.pageId,
-          spaceId: share.spaceId,
-        },
-      },
+          spaceId: share.spaceId
+        }
+      }
     });
   }
 
@@ -255,16 +255,16 @@ export class ShareController {
   @Post('/tree')
   async getSharePageTree(
     @Body() dto: ShareIdDto,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const treeData = await this.shareService.getShareTree(
       dto.shareId,
-      workspace.id,
+      workspace.id
     );
 
     const sharingAllowed = await this.shareService.isSharingAllowed(
       workspace.id,
-      treeData.share.spaceId,
+      treeData.share.spaceId
     );
     if (!sharingAllowed) {
       throw new NotFoundException('Share not found');
@@ -274,8 +274,8 @@ export class ShareController {
       ...treeData,
       features: this.licenseCheckService.resolveFeatures(
         workspace.licenseKey,
-        workspace.plan,
-      ),
+        workspace.plan
+      )
     };
   }
 }

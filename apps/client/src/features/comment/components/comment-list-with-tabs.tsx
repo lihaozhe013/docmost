@@ -1,5 +1,5 @@
-import React, { useState, useRef, useCallback, memo, useMemo } from "react";
-import { useParams } from "react-router-dom";
+import React, { useState, useRef, useCallback, memo, useMemo } from 'react';
+import { useParams } from 'react-router-dom';
 import {
   ActionIcon,
   Center,
@@ -10,26 +10,26 @@ import {
   Tabs,
   Badge,
   Text,
-  ScrollArea,
-} from "@mantine/core";
-import CommentListItem from "@/features/comment/components/comment-list-item";
+  ScrollArea
+} from '@mantine/core';
+import CommentListItem from '@/features/comment/components/comment-list-item';
 import {
   useCommentsQuery,
-  useCreateCommentMutation,
-} from "@/features/comment/queries/comment-query";
-import CommentEditor from "@/features/comment/components/comment-editor";
-import CommentActions from "@/features/comment/components/comment-actions";
-import { useFocusWithin } from "@mantine/hooks";
-import { IComment } from "@/features/comment/types/comment.types.ts";
-import { usePageQuery } from "@/features/page/queries/page-query.ts";
-import { IPagination } from "@/lib/types.ts";
-import { extractPageSlugId } from "@/lib";
-import { useTranslation } from "react-i18next";
-import { useGetSpaceBySlugQuery } from "@/features/space/queries/space-query.ts";
-import { IconArrowUp, IconMessageOff } from "@tabler/icons-react";
-import { useAtom } from "jotai";
-import { currentUserAtom } from "@/features/user/atoms/current-user-atom";
-import { CustomAvatar } from "@/components/ui/custom-avatar.tsx";
+  useCreateCommentMutation
+} from '@/features/comment/queries/comment-query';
+import CommentEditor from '@/features/comment/components/comment-editor';
+import CommentActions from '@/features/comment/components/comment-actions';
+import { useFocusWithin } from '@mantine/hooks';
+import { IComment } from '@/features/comment/types/comment.types.ts';
+import { usePageQuery } from '@/features/page/queries/page-query.ts';
+import { IPagination } from '@/lib/types.ts';
+import { extractPageSlugId } from '@/lib';
+import { useTranslation } from 'react-i18next';
+import { useGetSpaceBySlugQuery } from '@/features/space/queries/space-query.ts';
+import { IconArrowUp, IconMessageOff } from '@tabler/icons-react';
+import { useAtom } from 'jotai';
+import { currentUserAtom } from '@/features/user/atoms/current-user-atom';
+import { CustomAvatar } from '@/components/ui/custom-avatar.tsx';
 
 function CommentListWithTabs() {
   const { t } = useTranslation();
@@ -38,7 +38,7 @@ function CommentListWithTabs() {
   const {
     data: comments,
     isLoading: isCommentsLoading,
-    isError,
+    isError
   } = useCommentsQuery({ pageId: page?.id });
   const createCommentMutation = useCreateCommentMutation();
   const [isLoading, setIsLoading] = useState(false);
@@ -46,7 +46,7 @@ function CommentListWithTabs() {
 
   const canComment =
     (page?.permissions?.canEdit ?? false) ||
-    (space?.settings?.comments?.allowViewerComments === true);
+    space?.settings?.comments?.allowViewerComments === true;
 
   // Separate active and resolved comments
   const { activeComments, resolvedComments } = useMemo(() => {
@@ -55,14 +55,14 @@ function CommentListWithTabs() {
     }
 
     const parentComments = comments.items.filter(
-      (comment: IComment) => comment.parentCommentId === null,
+      (comment: IComment) => comment.parentCommentId === null
     );
 
     const active = parentComments.filter(
-      (comment: IComment) => !comment.resolvedAt,
+      (comment: IComment) => !comment.resolvedAt
     );
     const resolved = parentComments.filter(
-      (comment: IComment) => comment.resolvedAt,
+      (comment: IComment) => comment.resolvedAt
     );
 
     return { activeComments: active, resolvedComments: resolved };
@@ -76,24 +76,24 @@ function CommentListWithTabs() {
         setIsPageCommentLoading(true);
         const createdComment = await createCommentMutation.mutateAsync({
           pageId: page?.id,
-          content: JSON.stringify(content),
+          content: JSON.stringify(content)
         });
 
         setTimeout(() => {
           const selector = `div[data-comment-id="${createdComment.id}"]`;
           const commentElement = document.querySelector(selector);
           commentElement?.scrollIntoView({
-            behavior: "smooth",
-            block: "center",
+            behavior: 'smooth',
+            block: 'center'
           });
         }, 400);
       } catch (error) {
-        console.error("Failed to post comment:", error);
+        console.error('Failed to post comment:', error);
       } finally {
         setIsPageCommentLoading(false);
       }
     },
-    [createCommentMutation, page?.id],
+    [createCommentMutation, page?.id]
   );
 
   const handleAddReply = useCallback(
@@ -103,17 +103,17 @@ function CommentListWithTabs() {
         const commentData = {
           pageId: page?.id,
           parentCommentId: commentId,
-          content: JSON.stringify(content),
+          content: JSON.stringify(content)
         };
 
         await createCommentMutation.mutateAsync(commentData);
       } catch (error) {
-        console.error("Failed to post comment:", error);
+        console.error('Failed to post comment:', error);
       } finally {
         setIsLoading(false);
       }
     },
-    [createCommentMutation, page?.id],
+    [createCommentMutation, page?.id]
   );
 
   const renderComments = useCallback(
@@ -155,7 +155,7 @@ function CommentListWithTabs() {
         )}
       </Paper>
     ),
-    [comments, handleAddReply, isLoading, space?.membership?.role, canComment],
+    [comments, handleAddReply, isLoading, space?.membership?.role, canComment]
   );
 
   if (isCommentsLoading) {
@@ -163,7 +163,7 @@ function CommentListWithTabs() {
   }
 
   if (isError) {
-    return <div>{t("Error loading comments.")}</div>;
+    return <div>{t('Error loading comments.')}</div>;
   }
 
   const totalComments = activeComments.length + resolvedComments.length;
@@ -180,18 +180,18 @@ function CommentListWithTabs() {
       style={{
         flex: 1,
         minHeight: 0,
-        display: "flex",
-        flexDirection: "column",
+        display: 'flex',
+        flexDirection: 'column'
       }}
     >
       <Tabs
         defaultValue="open"
         variant="default"
         style={{
-          flex: "1 1 auto",
-          display: "flex",
-          flexDirection: "column",
-          overflow: "hidden",
+          flex: '1 1 auto',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden'
         }}
       >
         <Tabs.List justify="center">
@@ -203,7 +203,7 @@ function CommentListWithTabs() {
               </Badge>
             }
           >
-            {t("Open")}
+            {t('Open')}
           </Tabs.Tab>
           <Tabs.Tab
             value="resolved"
@@ -213,16 +213,16 @@ function CommentListWithTabs() {
               </Badge>
             }
           >
-            {t("Resolved")}
+            {t('Resolved')}
           </Tabs.Tab>
         </Tabs.List>
 
         <ScrollArea
-          style={{ flex: "1 1 auto" }}
+          style={{ flex: '1 1 auto' }}
           scrollbarSize={5}
           type="scroll"
         >
-          <div style={{ paddingBottom: "8px" }}>
+          <div style={{ paddingBottom: '8px' }}>
             <Tabs.Panel value="open" pt="xs">
               {activeComments.length === 0 ? (
                 <Center py="xl">
@@ -233,7 +233,7 @@ function CommentListWithTabs() {
                       color="var(--mantine-color-dimmed)"
                     />
                     <Text size="sm" c="dimmed">
-                      {t("No open comments.")}
+                      {t('No open comments.')}
                     </Text>
                   </Stack>
                 </Center>
@@ -252,7 +252,7 @@ function CommentListWithTabs() {
                       color="var(--mantine-color-dimmed)"
                     />
                     <Text size="sm" c="dimmed">
-                      {t("No resolved comments.")}
+                      {t('No resolved comments.')}
                     </Text>
                   </Stack>
                 </Center>
@@ -280,14 +280,14 @@ const ChildComments = ({
   parentId,
   pageId,
   canComment,
-  userSpaceRole,
+  userSpaceRole
 }: ChildCommentsProps) => {
   const getChildComments = useCallback(
     (parentId: string) =>
       comments.items.filter(
-        (comment: IComment) => comment.parentCommentId === parentId,
+        (comment: IComment) => comment.parentCommentId === parentId
       ),
-    [comments.items],
+    [comments.items]
   );
 
   return (
@@ -319,15 +319,15 @@ const CommentEditorWithActions = ({
   commentId,
   onSave,
   isLoading,
-  placeholder = undefined,
+  placeholder = undefined
 }) => {
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState('');
   const { ref, focused } = useFocusWithin();
   const commentEditorRef = useRef(null);
 
   const handleSave = useCallback(() => {
     onSave(commentId, content);
-    setContent("");
+    setContent('');
     commentEditorRef.current?.clearContent();
   }, [commentId, content, onSave]);
 
@@ -347,14 +347,14 @@ const CommentEditorWithActions = ({
 
 const PageCommentInput = ({ onSave, isLoading }) => {
   const { t } = useTranslation();
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState('');
   const { ref, focused } = useFocusWithin();
   const commentEditorRef = useRef(null);
   const [currentUser] = useAtom(currentUserAtom);
 
   const handleSave = useCallback(() => {
     onSave(null, content);
-    setContent("");
+    setContent('');
     commentEditorRef.current?.clearContent();
   }, [content, onSave]);
 
@@ -362,11 +362,11 @@ const PageCommentInput = ({ onSave, isLoading }) => {
     <div
       ref={ref}
       style={{
-        flex: "0 0 auto",
-        borderTop: "1px solid var(--mantine-color-default-border)",
-        paddingTop: "var(--mantine-spacing-sm)",
+        flex: '0 0 auto',
+        borderTop: '1px solid var(--mantine-color-default-border)',
+        paddingTop: 'var(--mantine-spacing-sm)',
         paddingBottom: 25,
-        position: "relative",
+        position: 'relative'
       }}
     >
       <Group wrap="nowrap" align="flex-start" gap="xs">
@@ -382,7 +382,7 @@ const PageCommentInput = ({ onSave, isLoading }) => {
             onUpdate={setContent}
             onSave={handleSave}
             editable={true}
-            placeholder={t("Add a comment...")}
+            placeholder={t('Add a comment...')}
             surface="muted"
           />
         </div>
@@ -392,11 +392,11 @@ const PageCommentInput = ({ onSave, isLoading }) => {
           variant="filled"
           radius="xl"
           size="sm"
-          aria-label={t("Send comment")}
+          aria-label={t('Send comment')}
           onClick={handleSave}
           onMouseDown={(e) => e.preventDefault()}
           loading={isLoading}
-          style={{ position: "absolute", right: 8, bottom: 30 }}
+          style={{ position: 'absolute', right: 8, bottom: 30 }}
         >
           <IconArrowUp size={16} />
         </ActionIcon>

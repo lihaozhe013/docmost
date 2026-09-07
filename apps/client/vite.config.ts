@@ -1,8 +1,8 @@
-import { defineConfig, loadEnv } from "vite";
-import react from "@vitejs/plugin-react";
-import * as path from "path";
+import { defineConfig, loadEnv } from 'vite';
+import react from '@vitejs/plugin-react';
+import * as path from 'path';
 
-const envPath = path.resolve(process.cwd(), "..", "..");
+const envPath = path.resolve(process.cwd(), '..', '..');
 
 export default defineConfig(({ mode }) => {
   const {
@@ -16,12 +16,12 @@ export default defineConfig(({ mode }) => {
     BILLING_TRIAL_DAYS,
     POSTHOG_HOST,
     POSTHOG_KEY,
-    AI_VECTOR_DRIVER,
-  } = loadEnv(mode, envPath, "");
+    AI_VECTOR_DRIVER
+  } = loadEnv(mode, envPath, '');
 
   return {
     define: {
-      "process.env": {
+      'process.env': {
         APP_URL,
         FILE_UPLOAD_SIZE_LIMIT,
         FILE_IMPORT_SIZE_LIMIT,
@@ -32,9 +32,9 @@ export default defineConfig(({ mode }) => {
         BILLING_TRIAL_DAYS,
         POSTHOG_HOST,
         POSTHOG_KEY,
-        AI_VECTOR_DRIVER,
+        AI_VECTOR_DRIVER
       },
-      APP_VERSION: JSON.stringify(process.env.npm_package_version),
+      APP_VERSION: JSON.stringify(process.env.npm_package_version)
     },
     plugins: [react()],
     build: {
@@ -43,37 +43,37 @@ export default defineConfig(({ mode }) => {
           advancedChunks: {
             groups: [
               {
-                name: "vendor-mantine",
-                test: /[\\/]node_modules[\\/]@mantine[\\/]/,
-              },
-            ],
-          },
-        },
-      },
+                name: 'vendor-mantine',
+                test: /[\\/]node_modules[\\/]@mantine[\\/]/
+              }
+            ]
+          }
+        }
+      }
     },
     resolve: {
       alias: {
-        "@": "/src",
-      },
+        '@': '/src'
+      }
     },
     server: {
-      host: "0.0.0.0",
+      host: '0.0.0.0',
       proxy: {
-        "/api": {
+        '/api': {
           target: APP_URL,
-          changeOrigin: false,
+          changeOrigin: false
         },
-        "/socket.io": {
-          target: APP_URL,
-          ws: true,
-          rewriteWsOrigin: true,
-        },
-        "/collab": {
+        '/socket.io': {
           target: APP_URL,
           ws: true,
-          rewriteWsOrigin: true,
+          rewriteWsOrigin: true
         },
-      },
-    },
+        '/collab': {
+          target: APP_URL,
+          ws: true,
+          rewriteWsOrigin: true
+        }
+      }
+    }
   };
 });

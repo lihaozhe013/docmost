@@ -1,11 +1,11 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { Loader } from "@mantine/core";
-import { useTranslation } from "react-i18next";
-import { getSidebarPages } from "@/features/page/services/page-service";
-import { IPage } from "@/features/page/types/page.types";
-import { IPagination } from "@/lib/types";
-import { PageRow } from "./page-row";
-import classes from "./destination-picker.module.css";
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { Loader } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
+import { getSidebarPages } from '@/features/page/services/page-service';
+import { IPage } from '@/features/page/types/page.types';
+import { IPagination } from '@/lib/types';
+import { PageRow } from './page-row';
+import classes from './destination-picker.module.css';
 
 type PageChildrenProps = {
   spaceId: string;
@@ -24,22 +24,22 @@ export function PageChildren({
   limit,
   selectedId,
   excludePageId,
-  onSelectPage,
+  onSelectPage
 }: PageChildrenProps) {
   const { t } = useTranslation();
 
   const { data, isLoading, hasNextPage, fetchNextPage } = useInfiniteQuery({
-    queryKey: ["destination-pages", spaceId, pageId ?? "root"],
+    queryKey: ['destination-pages', spaceId, pageId ?? 'root'],
     queryFn: ({ pageParam }) =>
       getSidebarPages({
         spaceId,
         pageId,
         limit,
-        cursor: pageParam,
+        cursor: pageParam
       }),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage: IPagination<IPage>) =>
-      lastPage.meta?.nextCursor ?? undefined,
+      lastPage.meta?.nextCursor ?? undefined
   });
 
   const pages = data?.pages.flatMap((page) => page.items) ?? [];
@@ -55,7 +55,7 @@ export function PageChildren({
   if (pages.length === 0) {
     return (
       <div className={classes.emptyState}>
-        {pageId ? t("No pages inside") : t("No pages in this space")}
+        {pageId ? t('No pages inside') : t('No pages in this space')}
       </div>
     );
   }
@@ -78,7 +78,7 @@ export function PageChildren({
           className={classes.loadMore}
           onClick={() => fetchNextPage()}
           onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
+            if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
               fetchNextPage();
             }
@@ -86,7 +86,7 @@ export function PageChildren({
           role="button"
           tabIndex={0}
         >
-          {t("Load more")}
+          {t('Load more')}
         </div>
       )}
     </>

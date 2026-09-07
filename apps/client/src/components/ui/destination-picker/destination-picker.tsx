@@ -1,15 +1,15 @@
-import { useState, useCallback, useEffect, useMemo, useRef } from "react";
-import { ActionIcon, TextInput, ScrollArea, Loader } from "@mantine/core";
-import { useDebouncedValue } from "@mantine/hooks";
-import { IconSearch, IconFileDescription } from "@tabler/icons-react";
-import { useTranslation } from "react-i18next";
-import { useGetSpacesQuery } from "@/features/space/queries/space-query";
-import { useSearchSuggestionsQuery } from "@/features/search/queries/search-query";
-import { ISpace } from "@/features/space/types/space.types";
-import { IPage } from "@/features/page/types/page.types";
-import { DestinationSelection } from "./destination-picker.types";
-import { SpaceRow } from "./space-row";
-import classes from "./destination-picker.module.css";
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { ActionIcon, TextInput, ScrollArea, Loader } from '@mantine/core';
+import { useDebouncedValue } from '@mantine/hooks';
+import { IconSearch, IconFileDescription } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
+import { useGetSpacesQuery } from '@/features/space/queries/space-query';
+import { useSearchSuggestionsQuery } from '@/features/search/queries/search-query';
+import { ISpace } from '@/features/space/types/space.types';
+import { IPage } from '@/features/page/types/page.types';
+import { DestinationSelection } from './destination-picker.types';
+import { SpaceRow } from './space-row';
+import classes from './destination-picker.module.css';
 
 type DestinationPickerProps = {
   onSelectionChange: (selection: DestinationSelection | null) => void;
@@ -24,16 +24,16 @@ export function DestinationPicker({
   excludePageId,
   pageLimit = 15,
   initialSpaceId,
-  searchSpacesOnly,
+  searchSpacesOnly
 }: DestinationPickerProps) {
   const { t } = useTranslation();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [selection, setSelection] = useState<DestinationSelection | null>(null);
   const [debouncedQuery] = useDebouncedValue(searchQuery, 300);
   const viewportRef = useRef<HTMLDivElement>(null);
 
   const { data: spacesData, isLoading: spacesLoading } = useGetSpacesQuery({
-    limit: 100,
+    limit: 100
   });
 
   const searchEnabled =
@@ -41,9 +41,9 @@ export function DestinationPicker({
 
   const { data: searchData, isLoading: searchLoading } =
     useSearchSuggestionsQuery({
-      query: searchEnabled ? debouncedQuery : "",
+      query: searchEnabled ? debouncedQuery : '',
       includePages: true,
-      limit: 20,
+      limit: 20
     });
 
   const isSearching = !!searchEnabled;
@@ -52,57 +52,56 @@ export function DestinationPicker({
     const items = spacesData?.items ?? [];
     if (!searchSpacesOnly || !debouncedQuery) return items;
     const fold = (s: string) =>
-      s
-        .normalize("NFD")
-        .replace(/[̀-ͯ]/g, "")
-        .toLocaleLowerCase();
+      s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLocaleLowerCase();
     const term = fold(debouncedQuery);
     return items.filter((s) => fold(s.name).includes(term));
   }, [spacesData, searchSpacesOnly, debouncedQuery]);
 
   const selectedId =
-    selection?.type === "space" ? selection.spaceId : selection?.pageId ?? null;
+    selection?.type === 'space'
+      ? selection.spaceId
+      : (selection?.pageId ?? null);
 
   const updateSelection = useCallback(
     (next: DestinationSelection | null) => {
       setSelection(next);
       onSelectionChange(next);
     },
-    [onSelectionChange],
+    [onSelectionChange]
   );
 
   const handleSearchResultClick = (page: Partial<IPage>) => {
     if (!page.space || !page.id) return;
 
     updateSelection({
-      type: "page",
+      type: 'page',
       spaceId: page.space.id,
       pageId: page.id,
       page,
-      space: page.space,
+      space: page.space
     });
-    setSearchQuery("");
+    setSearchQuery('');
   };
 
   const handleSelectSpace = useCallback(
     (space: ISpace) => {
-      updateSelection({ type: "space", spaceId: space.id, space });
+      updateSelection({ type: 'space', spaceId: space.id, space });
     },
-    [updateSelection],
+    [updateSelection]
   );
 
   const handleSelectPage = useCallback(
     (page: Partial<IPage>, space: ISpace) => {
       if (!page.id) return;
       updateSelection({
-        type: "page",
+        type: 'page',
         spaceId: page.spaceId ?? space.id,
         pageId: page.id,
         page,
-        space,
+        space
       });
     },
-    [updateSelection],
+    [updateSelection]
   );
 
   // Pre-select space when initialSpaceId is set and spaces have loaded.
@@ -111,12 +110,12 @@ export function DestinationPicker({
     if (!initialSpaceId || selection) return;
     const match = spacesData?.items?.find((s) => s.id === initialSpaceId);
     if (match) {
-      updateSelection({ type: "space", spaceId: match.id, space: match });
+      updateSelection({ type: 'space', spaceId: match.id, space: match });
       requestAnimationFrame(() => {
         const el = viewportRef.current?.querySelector<HTMLElement>(
-          `[data-space-id="${match.id}"]`,
+          `[data-space-id="${match.id}"]`
         );
-        el?.scrollIntoView({ block: "nearest" });
+        el?.scrollIntoView({ block: 'nearest' });
       });
     }
   }, [initialSpaceId, selection, spacesData, updateSelection]);
@@ -127,13 +126,13 @@ export function DestinationPicker({
         leftSection={<IconSearch size={16} />}
         placeholder={
           searchSpacesOnly
-            ? t("Search spaces...")
-            : t("Search pages and spaces...")
+            ? t('Search spaces...')
+            : t('Search pages and spaces...')
         }
         aria-label={
           searchSpacesOnly
-            ? t("Search spaces...")
-            : t("Search pages and spaces...")
+            ? t('Search spaces...')
+            : t('Search pages and spaces...')
         }
         variant="filled"
         value={searchQuery}
@@ -163,7 +162,7 @@ export function DestinationPicker({
                     tabIndex={0}
                     onClick={() => handleSearchResultClick(page)}
                     onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
+                      if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
                         handleSearchResultClick(page);
                       }
@@ -184,18 +183,16 @@ export function DestinationPicker({
                       )}
                     </div>
                     <div className={classes.pageTitle}>
-                      {page.title || t("Untitled")}
+                      {page.title || t('Untitled')}
                     </div>
                     {page.space && (
-                      <div className={classes.spaceName}>
-                        {page.space.name}
-                      </div>
+                      <div className={classes.spaceName}>{page.space.name}</div>
                     )}
                   </div>
-                ),
+                )
             )
           ) : (
-            <div className={classes.emptyState}>{t("No results found")}</div>
+            <div className={classes.emptyState}>{t('No results found')}</div>
           )
         ) : spacesLoading ? (
           <div className={classes.emptyState}>
@@ -204,8 +201,8 @@ export function DestinationPicker({
         ) : filteredSpaces.length === 0 ? (
           <div className={classes.emptyState}>
             {searchSpacesOnly && debouncedQuery
-              ? t("No spaces found")
-              : t("No results found")}
+              ? t('No spaces found')
+              : t('No results found')}
           </div>
         ) : (
           filteredSpaces.map((space) => (

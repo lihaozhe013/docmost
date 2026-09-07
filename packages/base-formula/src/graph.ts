@@ -6,7 +6,7 @@ export class BaseFormulaGraph {
 
   constructor(properties: PropLike[]) {
     for (const p of properties) {
-      if (p.type !== "formula") continue;
+      if (p.type !== 'formula') continue;
       const deps: string[] = Array.isArray((p.typeOptions as any)?.dependencies)
         ? ((p.typeOptions as any).dependencies as string[])
         : [];
@@ -18,9 +18,13 @@ export class BaseFormulaGraph {
     }
   }
 
-  directDeps(propId: string): string[] { return this.direct.get(propId) ?? []; }
+  directDeps(propId: string): string[] {
+    return this.direct.get(propId) ?? [];
+  }
 
-  dependents(propId: string): string[] { return Array.from(this.reverse.get(propId) ?? []); }
+  dependents(propId: string): string[] {
+    return Array.from(this.reverse.get(propId) ?? []);
+  }
 
   affectedFormulas(changedPropIds: string[]): string[] {
     const out = new Set<string>();
@@ -28,7 +32,10 @@ export class BaseFormulaGraph {
     while (stack.length) {
       const id = stack.pop()!;
       for (const d of this.reverse.get(id) ?? []) {
-        if (!out.has(d)) { out.add(d); stack.push(d); }
+        if (!out.has(d)) {
+          out.add(d);
+          stack.push(d);
+        }
       }
     }
     return Array.from(out).sort();
@@ -59,10 +66,12 @@ export class BaseFormulaGraph {
    */
   detectCycle(newProp: PropLike): string[] | null {
     const local = new Map(this.direct);
-    if (newProp.type === "formula") {
+    if (newProp.type === 'formula') {
       local.set(newProp.id, (newProp.typeOptions as any)?.dependencies ?? []);
     }
-    const WHITE = 0, GRAY = 1, BLACK = 2;
+    const WHITE = 0,
+      GRAY = 1,
+      BLACK = 2;
     const color = new Map<string, number>();
     const path: string[] = [];
     const dfs = (id: string): string[] | null => {
@@ -70,8 +79,13 @@ export class BaseFormulaGraph {
       path.push(id);
       for (const d of local.get(id) ?? []) {
         const c = color.get(d) ?? WHITE;
-        if (c === GRAY) { return [...path.slice(path.indexOf(d)), d]; }
-        if (c === WHITE) { const r = dfs(d); if (r) return r; }
+        if (c === GRAY) {
+          return [...path.slice(path.indexOf(d)), d];
+        }
+        if (c === WHITE) {
+          const r = dfs(d);
+          if (r) return r;
+        }
       }
       path.pop();
       color.set(id, BLACK);

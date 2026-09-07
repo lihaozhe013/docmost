@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { useDebouncedValue } from "@mantine/hooks";
-import { Group, MultiSelect, MultiSelectProps, Text } from "@mantine/core";
-import { useGetGroupsQuery } from "@/features/group/queries/group-query.ts";
-import { IGroup } from "@/features/group/types/group.types.ts";
-import { IconUsersGroup } from "@tabler/icons-react";
-import { useTranslation } from "react-i18next";
+import React, { useEffect, useState } from 'react';
+import { useDebouncedValue } from '@mantine/hooks';
+import { Group, MultiSelect, MultiSelectProps, Text } from '@mantine/core';
+import { useGetGroupsQuery } from '@/features/group/queries/group-query.ts';
+import { IGroup } from '@/features/group/types/group.types.ts';
+import { IconUsersGroup } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 
 interface MultiGroupSelectProps {
   onChange: (value: string[]) => void;
@@ -13,8 +13,8 @@ interface MultiGroupSelectProps {
   mt?: string;
 }
 
-const renderMultiSelectOption: MultiSelectProps["renderOption"] = ({
-  option,
+const renderMultiSelectOption: MultiSelectProps['renderOption'] = ({
+  option
 }) => (
   <Group gap="sm">
     {<IconUsersGroup size={18} />}
@@ -28,14 +28,14 @@ export function MultiGroupSelect({
   onChange,
   label,
   description,
-  mt,
+  mt
 }: MultiGroupSelectProps) {
   const { t } = useTranslation();
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState('');
   const [debouncedQuery] = useDebouncedValue(searchValue, 500);
   const { data: groups, isLoading } = useGetGroupsQuery({
     query: debouncedQuery,
-    limit: 25,
+    limit: 25
   });
   const [data, setData] = useState([]);
 
@@ -46,18 +46,18 @@ export function MultiGroupSelect({
         .map((group: IGroup) => {
           return {
             value: group.id,
-            label: group.name,
+            label: group.name
           };
         });
 
       // Filter out existing groups by their ids
       const filteredGroupData = groupsData.filter(
         (group) =>
-          !data.find((existingGroup) => existingGroup.value === group.value),
+          !data.find((existingGroup) => existingGroup.value === group.value)
       );
 
       // Combine existing data with new search data
-      setData((prevData) => [... prevData, ... filteredGroupData]);
+      setData((prevData) => [...prevData, ...filteredGroupData]);
     }
   }, [groups]);
 
@@ -68,8 +68,8 @@ export function MultiGroupSelect({
       hidePickedOptions
       maxDropdownHeight={300}
       description={description}
-      label={label || t("Add groups")}
-      placeholder={t("Search for groups")}
+      label={label || t('Add groups')}
+      placeholder={t('Search for groups')}
       mt={mt}
       searchable
       searchValue={searchValue}
@@ -77,7 +77,7 @@ export function MultiGroupSelect({
       clearable
       variant="filled"
       onChange={onChange}
-      nothingFoundMessage={t("No group found")}
+      nothingFoundMessage={t('No group found')}
       maxValues={50}
     />
   );

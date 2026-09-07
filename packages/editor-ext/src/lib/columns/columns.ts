@@ -1,31 +1,31 @@
-import { Node, mergeAttributes, findParentNode } from "@tiptap/core";
-import { Fragment, Node as PMNode } from "@tiptap/pm/model";
-import { Plugin, PluginKey, TextSelection } from "@tiptap/pm/state";
-import { Decoration, DecorationSet } from "@tiptap/pm/view";
+import { Node, mergeAttributes, findParentNode } from '@tiptap/core';
+import { Fragment, Node as PMNode } from '@tiptap/pm/model';
+import { Plugin, PluginKey, TextSelection } from '@tiptap/pm/state';
+import { Decoration, DecorationSet } from '@tiptap/pm/view';
 
 export type ColumnsLayout =
-  | "two_equal"
-  | "two_left_sidebar"
-  | "two_right_sidebar"
-  | "three_equal"
-  | "three_left_wide"
-  | "three_right_wide"
-  | "three_with_sidebars"
-  | "four_equal"
-  | "five_equal";
+  | 'two_equal'
+  | 'two_left_sidebar'
+  | 'two_right_sidebar'
+  | 'three_equal'
+  | 'three_left_wide'
+  | 'three_right_wide'
+  | 'three_with_sidebars'
+  | 'four_equal'
+  | 'five_equal';
 
 export interface ColumnsOptions {
   HTMLAttributes: Record<string, any>;
 }
 
-export type WidthMode = "normal" | "wide";
+export type WidthMode = 'normal' | 'wide';
 
 export interface ColumnsAttributes {
   layout?: ColumnsLayout;
   widthMode?: WidthMode;
 }
 
-declare module "@tiptap/core" {
+declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     columns: {
       insertColumns: (attributes?: ColumnsAttributes) => ReturnType;
@@ -37,23 +37,23 @@ declare module "@tiptap/core" {
 }
 
 function columnCountFromLayout(layout: string): number {
-  if (layout.startsWith("five")) return 5;
-  if (layout.startsWith("four")) return 4;
-  if (layout.startsWith("three")) return 3;
+  if (layout.startsWith('five')) return 5;
+  if (layout.startsWith('four')) return 4;
+  if (layout.startsWith('three')) return 3;
   return 2;
 }
 
 function defaultLayoutForCount(count: number): ColumnsLayout {
-  if (count === 3) return "three_equal";
-  if (count === 4) return "four_equal";
-  if (count === 5) return "five_equal";
-  return "two_equal";
+  if (count === 3) return 'three_equal';
+  if (count === 4) return 'four_equal';
+  if (count === 5) return 'five_equal';
+  return 'two_equal';
 }
 
 export const Columns = Node.create<ColumnsOptions>({
-  name: "columns",
-  group: "block",
-  content: "column+",
+  name: 'columns',
+  group: 'block',
+  content: 'column+',
   defining: true,
   isolating: true,
 
@@ -66,20 +66,20 @@ export const Columns = Node.create<ColumnsOptions>({
   addAttributes() {
     return {
       layout: {
-        default: "two_equal",
-        parseHTML: (element) => element.getAttribute("data-layout"),
+        default: 'two_equal',
+        parseHTML: (element) => element.getAttribute('data-layout'),
         renderHTML: (attributes: ColumnsAttributes) => ({
-          "data-layout": attributes.layout,
+          'data-layout': attributes.layout,
         }),
       },
       widthMode: {
-        default: "normal",
+        default: 'normal',
         parseHTML: (element) =>
-          element.getAttribute("data-width-mode") || "normal",
+          element.getAttribute('data-width-mode') || 'normal',
         renderHTML: (attributes: ColumnsAttributes) => {
-          if (!attributes.widthMode || attributes.widthMode === "normal")
+          if (!attributes.widthMode || attributes.widthMode === 'normal')
             return {};
-          return { "data-width-mode": attributes.widthMode };
+          return { 'data-width-mode': attributes.widthMode };
         },
       },
     };
@@ -95,9 +95,9 @@ export const Columns = Node.create<ColumnsOptions>({
 
   renderHTML({ HTMLAttributes }) {
     return [
-      "div",
+      'div',
       mergeAttributes(
-        { "data-type": this.name },
+        { 'data-type': this.name },
         this.options.HTMLAttributes,
         HTMLAttributes,
       ),
@@ -110,7 +110,7 @@ export const Columns = Node.create<ColumnsOptions>({
       insertColumns:
         (attributes) =>
         ({ tr, state, dispatch }) => {
-          const layout = attributes?.layout || "two_equal";
+          const layout = attributes?.layout || 'two_equal';
           const count = columnCountFromLayout(layout);
 
           const columnType = state.schema.nodes.column;
@@ -144,12 +144,12 @@ export const Columns = Node.create<ColumnsOptions>({
       setColumnsWidthMode:
         (widthMode) =>
         ({ commands }) =>
-          commands.updateAttributes("columns", { widthMode }),
+          commands.updateAttributes('columns', { widthMode }),
 
       setColumnCount:
         (count: number) =>
         ({ tr, state }) => {
-          const predicate = (node: PMNode) => node.type.name === "columns";
+          const predicate = (node: PMNode) => node.type.name === 'columns';
           const parent = findParentNode(predicate)(state.selection);
           if (!parent) return false;
 
@@ -177,17 +177,12 @@ export const Columns = Node.create<ColumnsOptions>({
               const col = columnsNode.child(j);
               const nonEmpty: PMNode[] = [];
               col.content.forEach((child) => {
-                if (
-                  child.type.name !== "paragraph" ||
-                  child.content.size > 0
-                ) {
+                if (child.type.name !== 'paragraph' || child.content.size > 0) {
                   nonEmpty.push(child);
                 }
               });
               if (nonEmpty.length > 0) {
-                mergedContent = mergedContent.append(
-                  Fragment.from(nonEmpty),
-                );
+                mergedContent = mergedContent.append(Fragment.from(nonEmpty));
               }
             }
             newChildren.push(columnType.create(null, mergedContent));
@@ -199,35 +194,31 @@ export const Columns = Node.create<ColumnsOptions>({
             Fragment.from(newChildren),
           );
           tr.replaceWith(parentPos, parentPos + columnsNode.nodeSize, newNode);
-          tr.setSelection(
-            TextSelection.near(tr.doc.resolve(parentPos + 1), 1),
-          );
+          tr.setSelection(TextSelection.near(tr.doc.resolve(parentPos + 1), 1));
           return true;
         },
 
       setColumnsLayout:
         (layout) =>
         ({ commands }) =>
-          commands.updateAttributes("columns", { layout }),
+          commands.updateAttributes('columns', { layout }),
     };
   },
 
   addProseMirrorPlugins() {
     return [
       new Plugin({
-        key: new PluginKey("columnsFocus"),
+        key: new PluginKey('columnsFocus'),
         props: {
           decorations: (state) => {
             const parent = findParentNode(
-              (node) => node.type.name === "columns",
+              (node) => node.type.name === 'columns',
             )(state.selection);
             if (!parent) return DecorationSet.empty;
             return DecorationSet.create(state.doc, [
-              Decoration.node(
-                parent.pos,
-                parent.pos + parent.node.nodeSize,
-                { class: "has-focus" },
-              ),
+              Decoration.node(parent.pos, parent.pos + parent.node.nodeSize, {
+                class: 'has-focus',
+              }),
             ]);
           },
         },

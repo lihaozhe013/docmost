@@ -1,12 +1,12 @@
-import { useRef, useState, ReactNode } from "react";
-import { Text, TextProps, Tooltip } from "@mantine/core";
+import { useRef, useState, ReactNode } from 'react';
+import { Text, TextProps, Tooltip } from '@mantine/core';
 
 type AutoTooltipTextProps = TextProps & {
   children: ReactNode;
   tooltipLabel?: string;
   tooltipProps?: Omit<
     React.ComponentProps<typeof Tooltip>,
-    "children" | "label"
+    'children' | 'label'
   >;
 };
 
@@ -26,7 +26,7 @@ export function AutoTooltipText({
     }
   };
 
-  const label = tooltipLabel ?? (typeof children === "string" ? children : "");
+  const label = tooltipLabel ?? (typeof children === 'string' ? children : '');
 
   return (
     <Tooltip

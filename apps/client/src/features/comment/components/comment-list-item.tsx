@@ -1,24 +1,24 @@
-import { Group, Text, Box, Badge } from "@mantine/core";
-import React, { useEffect, useRef, useState } from "react";
-import classes from "./comment.module.css";
-import { useAtom, useAtomValue } from "jotai";
-import { useTimeAgo } from "@/hooks/use-time-ago";
-import CommentEditor from "@/features/comment/components/comment-editor";
-import { pageEditorAtom } from "@/features/editor/atoms/editor-atoms";
-import { isEditorReady } from "@docmost/editor-ext";
-import CommentActions from "@/features/comment/components/comment-actions";
-import CommentMenu from "@/features/comment/components/comment-menu";
-import ResolveComment from "@/features/comment/components/resolve-comment";
-import { useHover } from "@mantine/hooks";
+import { Group, Text, Box, Badge } from '@mantine/core';
+import React, { useEffect, useRef, useState } from 'react';
+import classes from './comment.module.css';
+import { useAtom, useAtomValue } from 'jotai';
+import { useTimeAgo } from '@/hooks/use-time-ago';
+import CommentEditor from '@/features/comment/components/comment-editor';
+import { pageEditorAtom } from '@/features/editor/atoms/editor-atoms';
+import { isEditorReady } from '@docmost/editor-ext';
+import CommentActions from '@/features/comment/components/comment-actions';
+import CommentMenu from '@/features/comment/components/comment-menu';
+import ResolveComment from '@/features/comment/components/resolve-comment';
+import { useHover } from '@mantine/hooks';
 import {
   useDeleteCommentMutation,
   useUpdateCommentMutation,
-  useResolveCommentMutation,
-} from "@/features/comment/queries/comment-query";
-import { IComment } from "@/features/comment/types/comment.types";
-import { CustomAvatar } from "@/components/ui/custom-avatar.tsx";
-import { currentUserAtom } from "@/features/user/atoms/current-user-atom.ts";
-import { useTranslation } from "react-i18next";
+  useResolveCommentMutation
+} from '@/features/comment/queries/comment-query';
+import { IComment } from '@/features/comment/types/comment.types';
+import { CustomAvatar } from '@/components/ui/custom-avatar.tsx';
+import { currentUserAtom } from '@/features/user/atoms/current-user-atom.ts';
+import { useTranslation } from 'react-i18next';
 
 interface CommentListItemProps {
   comment: IComment;
@@ -31,7 +31,7 @@ function CommentListItem({
   comment,
   pageId,
   canComment,
-  userSpaceRole,
+  userSpaceRole
 }: CommentListItemProps) {
   const { t } = useTranslation();
   const { hovered, ref } = useHover();
@@ -55,7 +55,7 @@ function CommentListItem({
       setIsLoading(true);
       const commentToUpdate = {
         commentId: comment.id,
-        content: JSON.stringify(editContentRef.current ?? content),
+        content: JSON.stringify(editContentRef.current ?? content)
       };
       await updateCommentMutation.mutateAsync(commentToUpdate);
       if (editContentRef.current) {
@@ -64,7 +64,7 @@ function CommentListItem({
       }
       setIsEditing(false);
     } catch (error) {
-      console.error("Failed to update comment:", error);
+      console.error('Failed to update comment:', error);
     } finally {
       setIsLoading(false);
     }
@@ -77,37 +77,37 @@ function CommentListItem({
         editor.commands.unsetComment(comment.id);
       }
     } catch (error) {
-      console.error("Failed to delete comment:", error);
+      console.error('Failed to delete comment:', error);
     }
   }
 
   async function handleResolveComment() {
     try {
       const isResolved = comment.resolvedAt != null;
-      
+
       await resolveCommentMutation.mutateAsync({
         commentId: comment.id,
         pageId: comment.pageId,
-        resolved: !isResolved,
+        resolved: !isResolved
       });
 
       if (isEditorReady(editor)) {
         editor.commands.setCommentResolved(comment.id, !isResolved);
       }
     } catch (error) {
-      console.error("Failed to toggle resolved state:", error);
+      console.error('Failed to toggle resolved state:', error);
     }
   }
 
   function handleCommentClick(comment: IComment) {
     const el = document.querySelector(
-      `.comment-mark[data-comment-id="${comment.id}"]`,
+      `.comment-mark[data-comment-id="${comment.id}"]`
     );
     if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "center" });
-      el.classList.add("comment-highlight");
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.classList.add('comment-highlight');
       setTimeout(() => {
-        el.classList.remove("comment-highlight");
+        el.classList.remove('comment-highlight');
       }, 3000);
     }
   }
@@ -135,7 +135,7 @@ function CommentListItem({
               {comment.creator.name}
             </Text>
 
-            <div style={{ visibility: hovered ? "visible" : "hidden" }}>
+            <div style={{ visibility: hovered ? 'visible' : 'hidden' }}>
               {!comment.parentCommentId && canComment && (
                 <ResolveComment
                   editor={editor}
@@ -145,7 +145,8 @@ function CommentListItem({
                 />
               )}
 
-              {(currentUser?.user?.id === comment.creatorId || userSpaceRole === 'admin') && (
+              {(currentUser?.user?.id === comment.creatorId ||
+                userSpaceRole === 'admin') && (
                 <CommentMenu
                   onEditComment={handleEditToggle}
                   onDeleteComment={handleDeleteComment}
@@ -172,14 +173,14 @@ function CommentListItem({
             className={classes.textSelection}
             onClick={() => handleCommentClick(comment)}
             onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
+              if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 handleCommentClick(comment);
               }
             }}
             role="button"
             tabIndex={0}
-            aria-label={t("Jump to comment selection")}
+            aria-label={t('Jump to comment selection')}
           >
             <Text size="sm">{comment?.selection}</Text>
           </Box>
@@ -192,7 +193,9 @@ function CommentListItem({
             <CommentEditor
               defaultContent={content}
               editable={true}
-              onUpdate={(newContent: any) => { editContentRef.current = newContent; }}
+              onUpdate={(newContent: any) => {
+                editContentRef.current = newContent;
+              }}
               onSave={handleUpdateComment}
               autofocus={true}
             />

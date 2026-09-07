@@ -5,14 +5,14 @@ import * as path from 'path';
 import {
   htmlToJson,
   jsonToText,
-  tiptapExtensions,
+  tiptapExtensions
 } from '../../../collaboration/collaboration.util';
 import { InjectKysely } from 'nestjs-kysely';
 import { KyselyDB } from '@docmost/db/types/kysely.types';
 import {
   generateSlugId,
   sanitizeFileName,
-  createByteCountingStream,
+  createByteCountingStream
 } from '../../../common/helpers';
 import { generateJitteredKeyBetween } from 'fractional-indexing-jittered';
 import { TiptapTransformer } from '@hocuspocus/transformer';
@@ -21,7 +21,7 @@ import { markdownToHtml } from '@docmost/editor-ext';
 import {
   FileTaskStatus,
   FileTaskType,
-  getFileTaskFolderPath,
+  getFileTaskFolderPath
 } from '../utils/file.utils';
 import { v7 as uuid7 } from 'uuid';
 import { StorageService } from '../../storage/storage.service';
@@ -42,20 +42,20 @@ export class ImportService {
     @InjectKysely() private readonly db: KyselyDB,
     @InjectQueue(QueueName.FILE_TASK_QUEUE)
     private readonly fileTaskQueue: Queue,
-    private moduleRef: ModuleRef,
+    private moduleRef: ModuleRef
   ) {}
 
   async importPage(
     filePromise: Promise<MultipartFile>,
     userId: string,
     spaceId: string,
-    workspaceId: string,
+    workspaceId: string
   ) {
     const file = await filePromise;
     const fileBuffer = await file.toBuffer();
     const fileExtension = path.extname(file.filename).toLowerCase();
     const fileName = sanitizeFileName(
-      path.basename(file.filename, fileExtension),
+      path.basename(file.filename, fileExtension)
     );
     const fileContent = fileBuffer.toString();
 
@@ -79,7 +79,7 @@ export class ImportService {
           workspaceId,
           spaceId,
           pageId,
-          userId,
+          userId
         );
       } else if (fileExtension.endsWith('.pdf')) {
         prosemirrorState = await this.processPdf(
@@ -87,7 +87,7 @@ export class ImportService {
           workspaceId,
           spaceId,
           pageId,
-          userId,
+          userId
         );
       }
     } catch (err) {
@@ -104,7 +104,7 @@ export class ImportService {
 
     const { title, prosemirrorJson } = this.extractTitleAndRemoveHeading(
       prosemirrorState,
-      { anyHeadingLevel: true },
+      { anyHeadingLevel: true }
     );
 
     const pageTitle = title || fileName;
@@ -124,11 +124,11 @@ export class ImportService {
           spaceId: spaceId,
           creatorId: userId,
           workspaceId: workspaceId,
-          lastUpdatedById: userId,
+          lastUpdatedById: userId
         });
 
         this.logger.debug(
-          `Successfully imported "${title}${fileExtension}. ID: ${createdPage.id} - SlugId: ${createdPage.slugId}"`,
+          `Successfully imported "${title}${fileExtension}. ID: ${createdPage.id} - SlugId: ${createdPage.slugId}"`
         );
       } catch (err) {
         const message = 'Failed to create imported page';
@@ -164,7 +164,7 @@ export class ImportService {
     workspaceId: string,
     spaceId: string,
     pageId: string,
-    userId: string,
+    userId: string
   ): Promise<any> {
     let DocxImportModule: any;
     try {
@@ -172,16 +172,16 @@ export class ImportService {
       DocxImportModule = require('./../../../ee/document-import/docx-import.service');
     } catch (err) {
       this.logger.error(
-        'DOCX import requested but EE module not bundled in this build',
+        'DOCX import requested but EE module not bundled in this build'
       );
       throw new BadRequestException(
-        'This feature requires a valid enterprise license.',
+        'This feature requires a valid enterprise license.'
       );
     }
 
     const docxImportService = this.moduleRef.get(
       DocxImportModule.DocxImportService,
-      { strict: false },
+      { strict: false }
     );
 
     const html = await docxImportService.convertDocxToHtml(
@@ -189,7 +189,7 @@ export class ImportService {
       workspaceId,
       spaceId,
       pageId,
-      userId,
+      userId
     );
 
     return this.processHTML(html);
@@ -200,7 +200,7 @@ export class ImportService {
     workspaceId: string,
     spaceId: string,
     pageId: string,
-    userId: string,
+    userId: string
   ): Promise<any> {
     let PdfImportModule: any;
     try {
@@ -208,16 +208,16 @@ export class ImportService {
       PdfImportModule = require('./../../../ee/document-import/pdf-import.service');
     } catch (err) {
       this.logger.error(
-        'PDF import requested but EE module not bundled in this build',
+        'PDF import requested but EE module not bundled in this build'
       );
       throw new BadRequestException(
-        'This feature requires a valid enterprise license.',
+        'This feature requires a valid enterprise license.'
       );
     }
 
     const pdfImportService = this.moduleRef.get(
       PdfImportModule.PdfImportService,
-      { strict: false },
+      { strict: false }
     );
 
     const html = await pdfImportService.convertPdfToHtml(
@@ -225,7 +225,7 @@ export class ImportService {
       workspaceId,
       spaceId,
       pageId,
-      userId,
+      userId
     );
 
     return this.processHTML(html);
@@ -238,7 +238,7 @@ export class ImportService {
       const ydoc = TiptapTransformer.toYdoc(
         prosemirrorJson,
         'default',
-        tiptapExtensions,
+        tiptapExtensions
       );
 
       Y.encodeStateAsUpdate(ydoc);
@@ -250,7 +250,7 @@ export class ImportService {
 
   extractTitleAndRemoveHeading(
     prosemirrorState: any,
-    opts?: { anyHeadingLevel?: boolean },
+    opts?: { anyHeadingLevel?: boolean }
   ) {
     let title: string | null = null;
 
@@ -277,7 +277,7 @@ export class ImportService {
     if (content.length === 0) {
       content.push({
         type: 'paragraph',
-        content: [],
+        content: []
       });
     }
 
@@ -285,14 +285,14 @@ export class ImportService {
       title,
       prosemirrorJson: {
         ...prosemirrorState,
-        content,
-      },
+        content
+      }
     };
   }
 
   async getNewPagePosition(
     spaceId: string,
-    parentPageId?: string,
+    parentPageId?: string
   ): Promise<string> {
     let query = this.db
       .selectFrom('pages')
@@ -321,12 +321,12 @@ export class ImportService {
     source: string,
     userId: string,
     spaceId: string,
-    workspaceId: string,
+    workspaceId: string
   ) {
     const file = await filePromise;
     const fileExtension = path.extname(file.filename).toLowerCase();
     const fileName = sanitizeFileName(
-      path.basename(file.filename, fileExtension),
+      path.basename(file.filename, fileExtension)
     );
     const fileNameWithExt = fileName + fileExtension;
 
@@ -353,13 +353,13 @@ export class ImportService {
         fileExt: 'zip',
         creatorId: userId,
         spaceId: spaceId,
-        workspaceId: workspaceId,
+        workspaceId: workspaceId
       })
       .returningAll()
       .executeTakeFirst();
 
     await this.fileTaskQueue.add(QueueJob.IMPORT_TASK, {
-      fileTaskId: fileTaskId,
+      fileTaskId: fileTaskId
     });
 
     return fileTask;

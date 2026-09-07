@@ -11,7 +11,7 @@ export function DocTreeDropIndicator({ instruction, indentPx }: Props) {
   const inst = blocked ? instruction.desired : instruction;
 
   const style = {
-    ['--drop-line-indent' as never]: `${indentPx}px`,
+    ['--drop-line-indent' as never]: `${indentPx}px`
   } as React.CSSProperties;
 
   if (inst.type === 'reorder-above') {

@@ -3,24 +3,24 @@ import {
   Group,
   Text,
   Tooltip,
-  UnstyledButton,
-} from "@mantine/core";
+  UnstyledButton
+} from '@mantine/core';
 import {
   IconBell,
   IconCheck,
   IconFileDescription,
-  IconPointFilled,
-} from "@tabler/icons-react";
-import { Avatar } from "@mantine/core";
-import { CustomAvatar } from "@/components/ui/custom-avatar";
-import { INotification } from "../types/notification.types";
-import { Trans, useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
-import { useState } from "react";
-import { useMarkReadMutation } from "../queries/notification-query";
-import { buildPageUrl, getPageTitle } from "@/features/page/page.utils";
-import { formatRelativeTime } from "../notification.utils";
-import classes from "../notification.module.css";
+  IconPointFilled
+} from '@tabler/icons-react';
+import { Avatar } from '@mantine/core';
+import { CustomAvatar } from '@/components/ui/custom-avatar';
+import { INotification } from '../types/notification.types';
+import { Trans, useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { useMarkReadMutation } from '../queries/notification-query';
+import { buildPageUrl, getPageTitle } from '@/features/page/page.utils';
+import { formatRelativeTime } from '../notification.utils';
+import classes from '../notification.module.css';
 
 type NotificationItemProps = {
   notification: INotification;
@@ -29,7 +29,7 @@ type NotificationItemProps = {
 
 export function NotificationItem({
   notification,
-  onNavigate,
+  onNavigate
 }: NotificationItemProps) {
   const { t } = useTranslation();
   const markRead = useMarkReadMutation();
@@ -39,38 +39,38 @@ export function NotificationItem({
 
   const getNotificationMessageKey = (): string => {
     switch (notification.type) {
-      case "comment.user_mention":
-        return "<bold>{{name}}</bold> mentioned you in a comment";
-      case "comment.created":
-        return "<bold>{{name}}</bold> commented on a page";
-      case "comment.resolved":
-        return "<bold>{{name}}</bold> resolved a comment";
-      case "page.user_mention":
-        return "<bold>{{name}}</bold> mentioned you on a page";
-      case "page.permission_granted":
-        return notification.data?.role === "writer"
-          ? "<bold>{{name}}</bold> gave you edit access to a page"
-          : "<bold>{{name}}</bold> gave you view access to a page";
-      case "page.updated":
-        return "<bold>{{name}}</bold> updated a page";
-      case "page.verified":
-        return "<bold>{{name}}</bold> verified a page";
-      case "page.approval_requested":
-        return "<bold>{{name}}</bold> submitted a page for your approval";
-      case "page.approval_rejected":
-        return "<bold>{{name}}</bold> returned a page for revision";
-      case "page.verification_expiring":
-        return "Page verification expires soon";
-      case "page.verification_expired":
-        return "Page verification has expired";
-      case "siem_destination.failing":
-        return "SIEM destination <bold>{{name}}</bold> is failing";
-      case "siem_destination.disabled":
-        return "SIEM destination <bold>{{name}}</bold> was disabled after 24 hours of failures";
-      case "siem_destination.recovered":
-        return "SIEM destination <bold>{{name}}</bold> recovered";
+      case 'comment.user_mention':
+        return '<bold>{{name}}</bold> mentioned you in a comment';
+      case 'comment.created':
+        return '<bold>{{name}}</bold> commented on a page';
+      case 'comment.resolved':
+        return '<bold>{{name}}</bold> resolved a comment';
+      case 'page.user_mention':
+        return '<bold>{{name}}</bold> mentioned you on a page';
+      case 'page.permission_granted':
+        return notification.data?.role === 'writer'
+          ? '<bold>{{name}}</bold> gave you edit access to a page'
+          : '<bold>{{name}}</bold> gave you view access to a page';
+      case 'page.updated':
+        return '<bold>{{name}}</bold> updated a page';
+      case 'page.verified':
+        return '<bold>{{name}}</bold> verified a page';
+      case 'page.approval_requested':
+        return '<bold>{{name}}</bold> submitted a page for your approval';
+      case 'page.approval_rejected':
+        return '<bold>{{name}}</bold> returned a page for revision';
+      case 'page.verification_expiring':
+        return 'Page verification expires soon';
+      case 'page.verification_expired':
+        return 'Page verification has expired';
+      case 'siem_destination.failing':
+        return 'SIEM destination <bold>{{name}}</bold> is failing';
+      case 'siem_destination.disabled':
+        return 'SIEM destination <bold>{{name}}</bold> was disabled after 24 hours of failures';
+      case 'siem_destination.recovered':
+        return 'SIEM destination <bold>{{name}}</bold> recovered';
       default:
-        return "";
+        return '';
     }
   };
 
@@ -79,22 +79,22 @@ export function NotificationItem({
       ? buildPageUrl(
           notification.space.slug,
           notification.page.slugId,
-          notification.page.title,
+          notification.page.title
         )
       : undefined;
 
-  const isSiemDestination = notification.type.startsWith("siem_destination.");
+  const isSiemDestination = notification.type.startsWith('siem_destination.');
   const destinationName =
-    typeof notification.data?.destinationName === "string"
+    typeof notification.data?.destinationName === 'string'
       ? notification.data.destinationName
-      : "";
+      : '';
   const lastError =
-    (notification.type === "siem_destination.failing" ||
-      notification.type === "siem_destination.disabled") &&
-    typeof notification.data?.lastError === "string"
+    (notification.type === 'siem_destination.failing' ||
+      notification.type === 'siem_destination.disabled') &&
+    typeof notification.data?.lastError === 'string'
       ? notification.data.lastError
       : null;
-  const linkUrl = isSiemDestination ? "/settings/audit/siem" : pageUrl;
+  const linkUrl = isSiemDestination ? '/settings/audit/siem' : pageUrl;
 
   const markReadIfNeeded = () => {
     if (isUnread) {
@@ -116,7 +116,7 @@ export function NotificationItem({
   return (
     <UnstyledButton
       component={Link}
-      to={linkUrl ?? ""}
+      to={linkUrl ?? ''}
       onClick={handleClick}
       // auxclick fires for all non-primary buttons; guard to middle-click only (button 1)
       // so that right-click (button 2, context menu) does not mark as read
@@ -146,7 +146,7 @@ export function NotificationItem({
               values={{
                 name: isSiemDestination
                   ? destinationName
-                  : notification.actor?.name,
+                  : notification.actor?.name
               }}
               components={{ bold: <Text span fw={600} /> }}
             />
@@ -168,7 +168,10 @@ export function NotificationItem({
                 <IconFileDescription
                   size={14}
                   stroke={1.5}
-                  style={{ flexShrink: 0, color: "var(--mantine-color-dimmed)" }}
+                  style={{
+                    flexShrink: 0,
+                    color: 'var(--mantine-color-dimmed)'
+                  }}
                 />
               )}
               <Text size="xs" c="dimmed" lineClamp={1}>
@@ -180,17 +183,13 @@ export function NotificationItem({
 
         <Group gap={4} wrap="nowrap" align="center" style={{ flexShrink: 0 }}>
           {hovered && isUnread ? (
-            <Tooltip label={t("Mark as read")} withArrow>
-              <ActionIcon
-                variant="subtle"
-                size="sm"
-                onClick={handleMarkRead}
-              >
+            <Tooltip label={t('Mark as read')} withArrow>
+              <ActionIcon variant="subtle" size="sm" onClick={handleMarkRead}>
                 <IconCheck size={14} />
               </ActionIcon>
             </Tooltip>
           ) : (
-            <Text size="xs" c="dimmed" style={{ whiteSpace: "nowrap" }}>
+            <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>
               {formatRelativeTime(notification.createdAt)}
             </Text>
           )}

@@ -13,7 +13,7 @@ export async function hashPassword(password: string) {
 
 export async function comparePasswordHash(
   plainPassword: string,
-  passwordHash: string,
+  passwordHash: string
 ): Promise<boolean> {
   return bcrypt.compare(plainPassword, passwordHash);
 }
@@ -44,7 +44,7 @@ export function parseRedisUrl(redisUrl: string): RedisConfig {
     password,
     pathname,
     protocol,
-    searchParams,
+    searchParams
   } = url;
   const portInt = port ? parseInt(port, 10) : 6379;
 
@@ -78,7 +78,7 @@ export function parseRedisUrl(redisUrl: string): RedisConfig {
     password: password ? decodeURIComponent(password) : undefined,
     db,
     family,
-    tls,
+    tls
   };
 }
 
@@ -105,7 +105,7 @@ export type SanitizeFileNameOptions = {
 
 export function sanitizeFileName(
   fileName: string,
-  options: SanitizeFileNameOptions = {},
+  options: SanitizeFileNameOptions = {}
 ): string {
   // Decode percent-encoded sequences so that bypasses like "..%2F" reach
   // sanitize() as literal "../" and get stripped. sanitize-filename only
@@ -132,7 +132,7 @@ export function removeAccent(str: string): string {
 }
 
 export function extractBearerTokenFromHeader(
-  request: FastifyRequest,
+  request: FastifyRequest
 ): string | undefined {
   const [type, token] = request.headers.authorization?.split(' ') ?? [];
   return type?.toLowerCase() === 'bearer' ? token : undefined;
@@ -162,7 +162,7 @@ export function diffAuditTrackedFields(
   fields: readonly string[],
   dto: Record<string, any>,
   before: Record<string, any> | undefined | null,
-  after: Record<string, any> | undefined | null,
+  after: Record<string, any> | undefined | null
 ): { before: Record<string, any>; after: Record<string, any> } | null {
   const beforeDiff: Record<string, any> = {};
   const afterDiff: Record<string, any> = {};
@@ -207,7 +207,7 @@ export function createByteCountingStream(source: Readable) {
     transform(chunk, encoding, callback) {
       bytesRead += chunk.length;
       callback(null, chunk);
-    },
+    }
   });
 
   source.pipe(stream);

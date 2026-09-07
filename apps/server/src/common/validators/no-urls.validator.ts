@@ -27,7 +27,7 @@ export function NoUrls(validationOptions?: ValidationOptions) {
       propertyName,
       options: {
         message: 'Must not contain URLs or domain names',
-        ...validationOptions,
+        ...validationOptions
       },
       validator: {
         validate(value: unknown) {
@@ -35,8 +35,8 @@ export function NoUrls(validationOptions?: ValidationOptions) {
           if (URL_PATTERN.test(value)) return false;
           if (containsDomain(value)) return false;
           return true;
-        },
-      },
+        }
+      }
     });
   };
 }

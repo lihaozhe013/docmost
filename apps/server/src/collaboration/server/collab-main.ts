@@ -2,7 +2,7 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { CollabAppModule } from './collab-app.module';
 import {
   FastifyAdapter,
-  NestFastifyApplication,
+  NestFastifyApplication
 } from '@nestjs/platform-fastify';
 import { TransformHttpResponseInterceptor } from '../../common/interceptors/http-response.interceptor';
 import { Logger } from '@nestjs/common';
@@ -16,13 +16,13 @@ async function bootstrap() {
       routerOptions: {
         maxParamLength: 1000,
         ignoreTrailingSlash: true,
-        ignoreDuplicateSlashes: true,
-      },
+        ignoreDuplicateSlashes: true
+      }
     }),
     {
       logger: new InternalLogFilter(),
-      bufferLogs: false,
-    },
+      bufferLogs: false
+    }
   );
 
   app.useLogger(app.get(PinoLogger));

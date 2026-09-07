@@ -1,5 +1,5 @@
-import { FormulaParseError } from "./error";
-import type { FormulaAST, RawFormulaAST } from "./ast";
+import { FormulaParseError } from './error';
+import type { FormulaAST, RawFormulaAST } from './ast';
 
 export type ResolveResult = {
   ast: FormulaAST;
@@ -8,7 +8,7 @@ export type ResolveResult = {
 
 export function resolve(
   raw: RawFormulaAST,
-  nameToId: ReadonlyMap<string, string>,
+  nameToId: ReadonlyMap<string, string>
 ): ResolveResult {
   const deps = new Set<string>();
   const ast = walk(raw, nameToId, deps);
@@ -18,51 +18,64 @@ export function resolve(
 function walk(
   node: RawFormulaAST,
   nameToId: ReadonlyMap<string, string>,
-  deps: Set<string>,
+  deps: Set<string>
 ): FormulaAST {
   switch (node.t) {
-    case "num": case "str": case "bool": case "null":
+    case 'num':
+    case 'str':
+    case 'bool':
+    case 'null':
       return node as FormulaAST;
-    case "propName": {
+    case 'propName': {
       const id = nameToId.get(node.name);
       if (!id) {
-        throw new FormulaParseError([{
-          code: "UNKNOWN_PROPERTY",
-          message: `Unknown property '${node.name}'`,
-          span: { start: 0, end: 0 }, // parser carries real spans; resolver is post-parse
-        }]);
+        throw new FormulaParseError([
+          {
+            code: 'UNKNOWN_PROPERTY',
+            message: `Unknown property '${node.name}'`,
+            span: { start: 0, end: 0 } // parser carries real spans; resolver is post-parse
+          }
+        ]);
       }
       deps.add(id);
-      return { t: "prop", id };
+      return { t: 'prop', id };
     }
-    case "op":
+    case 'op':
       return {
-        t: "op",
+        t: 'op',
         op: (node as any).op,
-        args: (node as any).args.map((a: RawFormulaAST) => walk(a, nameToId, deps)),
+        args: (node as any).args.map((a: RawFormulaAST) =>
+          walk(a, nameToId, deps)
+        )
       };
-    case "if":
+    case 'if':
       return {
-        t: "if",
+        t: 'if',
         cond: walk((node as any).cond, nameToId, deps),
         then: walk((node as any).then, nameToId, deps),
-        else: walk((node as any).else, nameToId, deps),
+        else: walk((node as any).else, nameToId, deps)
       };
-    case "and":
+    case 'and':
       return {
-        t: "and",
-        args: (node as any).args.map((a: RawFormulaAST) => walk(a, nameToId, deps)),
+        t: 'and',
+        args: (node as any).args.map((a: RawFormulaAST) =>
+          walk(a, nameToId, deps)
+        )
       };
-    case "or":
+    case 'or':
       return {
-        t: "or",
-        args: (node as any).args.map((a: RawFormulaAST) => walk(a, nameToId, deps)),
+        t: 'or',
+        args: (node as any).args.map((a: RawFormulaAST) =>
+          walk(a, nameToId, deps)
+        )
       };
-    case "call":
+    case 'call':
       return {
-        t: "call",
+        t: 'call',
         fn: (node as any).fn,
-        args: (node as any).args.map((a: RawFormulaAST) => walk(a, nameToId, deps)),
+        args: (node as any).args.map((a: RawFormulaAST) =>
+          walk(a, nameToId, deps)
+        )
       };
   }
 }

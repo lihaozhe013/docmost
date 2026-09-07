@@ -8,7 +8,7 @@ import {
   WS_SPACE_RESTRICTION_CACHE_PREFIX,
   WS_CACHE_TTL_MS,
   getSpaceRoomName,
-  getUserRoomName,
+  getUserRoomName
 } from './ws.utils';
 
 @Injectable()
@@ -17,7 +17,7 @@ export class WsService {
 
   constructor(
     private readonly pagePermissionRepo: PagePermissionRepo,
-    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
   ) {}
 
   setServer(server: Server): void {
@@ -59,14 +59,14 @@ export class WsService {
 
   async invalidateSpaceRestrictionCache(spaceId: string): Promise<void> {
     await this.cacheManager.del(
-      `${WS_SPACE_RESTRICTION_CACHE_PREFIX}${spaceId}`,
+      `${WS_SPACE_RESTRICTION_CACHE_PREFIX}${spaceId}`
     );
   }
 
   async emitCommentEvent(
     spaceId: string,
     pageId: string,
-    data: any,
+    data: any
   ): Promise<void> {
     const room = getSpaceRoomName(spaceId);
 
@@ -95,7 +95,7 @@ export class WsService {
   async emitToSpaceExceptUsers(
     spaceId: string,
     excludeUserIds: string[],
-    data: any,
+    data: any
   ): Promise<void> {
     const room = getSpaceRoomName(spaceId);
     const sockets = await this.server.in(room).fetchSockets();
@@ -117,7 +117,7 @@ export class WsService {
     room: string,
     excludeSocketId: string | null,
     pageId: string,
-    data: any,
+    data: any
   ): Promise<void> {
     const sockets = await this.server.in(room).fetchSockets();
 
@@ -147,7 +147,7 @@ export class WsService {
     const authorizedUserIds =
       await this.pagePermissionRepo.getUserIdsWithPageAccess(
         pageId,
-        candidateUserIds,
+        candidateUserIds
       );
 
     const authorizedSet = new Set(authorizedUserIds);

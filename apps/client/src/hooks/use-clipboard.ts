@@ -1,7 +1,7 @@
 // Source: https://github.com/mantinedev/mantine/blob/master/packages/@mantine/hooks/src/use-clipboard/use-clipboard.ts
 // polyfilled to support execCommand fallback
-import { useState } from "react";
-import { execCommandCopy } from "@docmost/editor-ext";
+import { useState } from 'react';
+import { execCommandCopy } from '@docmost/editor-ext';
 
 export type UseClipboardOptions = {
   timeout?: number;
@@ -15,7 +15,7 @@ export type UseClipboardReturnValue = {
 };
 
 export function useClipboard(
-  options: UseClipboardOptions = { timeout: 2000 },
+  options: UseClipboardOptions = { timeout: 2000 }
 ): UseClipboardReturnValue {
   const [error, setError] = useState<Error | null>(null);
   const [copied, setCopied] = useState(false);
@@ -28,7 +28,7 @@ export function useClipboard(
   };
 
   const copy = (value: string) => {
-    if ("clipboard" in navigator) {
+    if ('clipboard' in navigator) {
       navigator.clipboard
         .writeText(value)
         .then(() => handleCopyResult(true))
@@ -37,7 +37,7 @@ export function useClipboard(
             execCommandCopy(value);
             handleCopyResult(true);
           } catch (err) {
-            setError(err instanceof Error ? err : new Error("Failed to copy"));
+            setError(err instanceof Error ? err : new Error('Failed to copy'));
           }
         });
     } else {
@@ -45,7 +45,7 @@ export function useClipboard(
         execCommandCopy(value);
         handleCopyResult(true);
       } catch (err) {
-        setError(err instanceof Error ? err : new Error("Failed to copy"));
+        setError(err instanceof Error ? err : new Error('Failed to copy'));
       }
     }
   };

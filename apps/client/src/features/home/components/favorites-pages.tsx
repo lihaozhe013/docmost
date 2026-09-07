@@ -4,20 +4,20 @@ import {
   UnstyledButton,
   Badge,
   Table,
-  Button,
-} from "@mantine/core";
-import { Link } from "react-router-dom";
-import PageListSkeleton from "@/components/ui/page-list-skeleton";
-import { buildPageUrl, getPageTitle } from "@/features/page/page.utils";
-import { formattedDate } from "@/lib/time";
-import { useFavoritesQuery } from "@/features/favorite/queries/favorite-query";
-import { PageListIcon } from "@/components/common/page-list-icon";
-import { IconStar } from "@tabler/icons-react";
-import { EmptyState } from "@/components/ui/empty-state";
-import { getSpaceUrl } from "@/lib/config";
-import { useTranslation } from "react-i18next";
-import { getInitialsColor } from "@/lib/get-initials-color";
-import rowClasses from "@/components/ui/clickable-table-row.module.css";
+  Button
+} from '@mantine/core';
+import { Link } from 'react-router-dom';
+import PageListSkeleton from '@/components/ui/page-list-skeleton';
+import { buildPageUrl, getPageTitle } from '@/features/page/page.utils';
+import { formattedDate } from '@/lib/time';
+import { useFavoritesQuery } from '@/features/favorite/queries/favorite-query';
+import { PageListIcon } from '@/components/common/page-list-icon';
+import { IconStar } from '@tabler/icons-react';
+import { EmptyState } from '@/components/ui/empty-state';
+import { getSpaceUrl } from '@/lib/config';
+import { useTranslation } from 'react-i18next';
+import { getInitialsColor } from '@/lib/get-initials-color';
+import rowClasses from '@/components/ui/clickable-table-row.module.css';
 
 interface Props {
   spaceId?: string;
@@ -31,8 +31,8 @@ export default function FavoritesPages({ spaceId }: Props) {
     isError,
     hasNextPage,
     fetchNextPage,
-    isFetchingNextPage,
-  } = useFavoritesQuery("page", spaceId);
+    isFetchingNextPage
+  } = useFavoritesQuery('page', spaceId);
 
   const favorites = data?.pages.flatMap((p) => p.items) ?? [];
 
@@ -41,7 +41,7 @@ export default function FavoritesPages({ spaceId }: Props) {
   }
 
   if (isError) {
-    return <Text>{t("Failed to fetch starred pages")}</Text>;
+    return <Text>{t('Failed to fetch starred pages')}</Text>;
   }
 
   return favorites.length > 0 ? (
@@ -59,7 +59,7 @@ export default function FavoritesPages({ spaceId }: Props) {
                       to={buildPageUrl(
                         fav.space?.slug,
                         fav.page.slugId,
-                        fav.page.title,
+                        fav.page.title
                       )}
                     >
                       <Group wrap="nowrap">
@@ -81,7 +81,7 @@ export default function FavoritesPages({ spaceId }: Props) {
                           variant="light"
                           component={Link}
                           to={getSpaceUrl(fav.space.slug)}
-                          style={{ cursor: "pointer" }}
+                          style={{ cursor: 'pointer' }}
                         >
                           {fav.space.name}
                         </Badge>
@@ -91,7 +91,7 @@ export default function FavoritesPages({ spaceId }: Props) {
                   <Table.Td>
                     <Text
                       c="dimmed"
-                      style={{ whiteSpace: "nowrap" }}
+                      style={{ whiteSpace: 'nowrap' }}
                       size="xs"
                       fw={500}
                     >
@@ -99,7 +99,7 @@ export default function FavoritesPages({ spaceId }: Props) {
                     </Text>
                   </Table.Td>
                 </Table.Tr>
-              ) : null,
+              ) : null
             )}
           </Table.Tbody>
         </Table>
@@ -113,15 +113,15 @@ export default function FavoritesPages({ spaceId }: Props) {
           onClick={() => fetchNextPage()}
           loading={isFetchingNextPage}
         >
-          {t("Load more")}
+          {t('Load more')}
         </Button>
       )}
     </>
   ) : (
     <EmptyState
       icon={IconStar}
-      title={t("No favorites yet")}
-      description={t("Pages you star will show up here.")}
+      title={t('No favorites yet')}
+      description={t('Pages you star will show up here.')}
     />
   );
 }

@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Group,
   Center,
@@ -6,20 +6,20 @@ import {
   Badge,
   ActionIcon,
   Tooltip,
-  getDefaultZIndex,
-} from "@mantine/core";
-import { Spotlight } from "@mantine/spotlight";
-import { Link } from "react-router-dom";
-import { IconFile, IconDownload } from "@tabler/icons-react";
-import { buildPageUrl } from "@/features/page/page.utils";
-import { getPageIcon } from "@/lib";
+  getDefaultZIndex
+} from '@mantine/core';
+import { Spotlight } from '@mantine/spotlight';
+import { Link } from 'react-router-dom';
+import { IconFile, IconDownload } from '@tabler/icons-react';
+import { buildPageUrl } from '@/features/page/page.utils';
+import { getPageIcon } from '@/lib';
 import {
   IAttachmentSearch,
-  IPageSearch,
-} from "@/features/search/types/search.types";
-import DOMPurify from "dompurify";
-import { useTranslation } from "react-i18next";
-import { timeAgo } from "@/lib/time.ts";
+  IPageSearch
+} from '@/features/search/types/search.types';
+import DOMPurify from 'dompurify';
+import { useTranslation } from 'react-i18next';
+import { timeAgo } from '@/lib/time.ts';
 
 interface SearchResultItemProps {
   result: IPageSearch | IAttachmentSearch;
@@ -38,7 +38,7 @@ const makeActionTabbable = (el: HTMLElement | null) => {
 export function SearchResultItem({
   result,
   isAttachmentResult,
-  showSpace,
+  showSpace
 }: SearchResultItemProps) {
   const { t } = useTranslation();
 
@@ -49,7 +49,7 @@ export function SearchResultItem({
       e.preventDefault();
       e.stopPropagation();
       const downloadUrl = `/api/files/${attachmentResult.id}/${attachmentResult.fileName}`;
-      window.open(downloadUrl, "_blank");
+      window.open(downloadUrl, '_blank');
     };
 
     return (
@@ -60,9 +60,9 @@ export function SearchResultItem({
         to={buildPageUrl(
           attachmentResult.space.slug,
           attachmentResult.page.slugId,
-          attachmentResult.page.title,
+          attachmentResult.page.title
         )}
-        style={{ userSelect: "none" }}
+        style={{ userSelect: 'none' }}
       >
         <Group wrap="nowrap" w="100%">
           <Center>
@@ -86,17 +86,17 @@ export function SearchResultItem({
                 size="xs"
                 dangerouslySetInnerHTML={{
                   __html: DOMPurify.sanitize(attachmentResult.highlight, {
-                    ALLOWED_TAGS: ["mark", "em", "strong", "b"],
-                    ALLOWED_ATTR: [],
-                  }),
+                    ALLOWED_TAGS: ['mark', 'em', 'strong', 'b'],
+                    ALLOWED_ATTR: []
+                  })
                 }}
               />
             )}
           </div>
 
           <Tooltip
-            label={t("Download attachment")}
-            zIndex={getDefaultZIndex("max")}
+            label={t('Download attachment')}
+            zIndex={getDefaultZIndex('max')}
             withArrow
           >
             <ActionIcon variant="subtle" color="gray" onClick={handleDownload}>
@@ -116,16 +116,16 @@ export function SearchResultItem({
         to={buildPageUrl(
           pageResult.space.slug,
           pageResult.slugId,
-          pageResult.title,
+          pageResult.title
         )}
-        style={{ userSelect: "none" }}
+        style={{ userSelect: 'none' }}
       >
         <Group wrap="nowrap" w="100%">
           <Center>{getPageIcon(pageResult?.icon)}</Center>
 
           <div style={{ flex: 1, minWidth: 0 }}>
             <Group justify="space-between" wrap="nowrap" gap="xs">
-              <Text truncate>{pageResult.title || t("Untitled")}</Text>
+              <Text truncate>{pageResult.title || t('Untitled')}</Text>
               <Text size="xs" c="dimmed" style={{ flexShrink: 0 }}>
                 {timeAgo(pageResult.updatedAt)}
               </Text>
@@ -143,9 +143,9 @@ export function SearchResultItem({
                 size="xs"
                 dangerouslySetInnerHTML={{
                   __html: DOMPurify.sanitize(pageResult.highlight, {
-                    ALLOWED_TAGS: ["mark", "em", "strong", "b"],
-                    ALLOWED_ATTR: [],
-                  }),
+                    ALLOWED_TAGS: ['mark', 'em', 'strong', 'b'],
+                    ALLOWED_ATTR: []
+                  })
                 }}
               />
             )}

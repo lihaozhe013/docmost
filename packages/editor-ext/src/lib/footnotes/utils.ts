@@ -1,6 +1,6 @@
 //Source MIT - https://github.com/buttondown/tiptap-footnotes
-import { EditorState, Transaction } from "@tiptap/pm/state";
-import { Fragment, Node } from "@tiptap/pm/model";
+import { EditorState, Transaction } from '@tiptap/pm/state';
+import { Fragment, Node } from '@tiptap/pm/model';
 
 // update the reference number of all the footnote references in the document
 export function updateFootnoteReferences(tr: Transaction) {
@@ -9,8 +9,8 @@ export function updateFootnoteReferences(tr: Transaction) {
   const nodes: any[] = [];
 
   tr.doc.descendants((node, pos) => {
-    if (node.type.name == "footnoteReference") {
-      tr.setNodeAttribute(pos, "referenceNumber", `${count}`);
+    if (node.type.name == 'footnoteReference') {
+      tr.setNodeAttribute(pos, 'referenceNumber', `${count}`);
 
       nodes.push(node);
       count += 1;
@@ -24,9 +24,9 @@ function getFootnotes(tr: Transaction) {
   let footnotesRange: { from: number; to: number } | undefined;
   const footnotes: Node[] = [];
   tr.doc.descendants((node, pos) => {
-    if (node.type.name == "footnote") {
+    if (node.type.name == 'footnote') {
       footnotes.push(node);
-    } else if (node.type.name == "footnotes") {
+    } else if (node.type.name == 'footnotes') {
       footnotesRange = { from: pos, to: pos + node.nodeSize };
     } else {
       return false;
@@ -43,7 +43,7 @@ export function updateFootnotesList(tr: Transaction, state: EditorState) {
   const footnotesType = state.schema.nodes.footnotes;
 
   const emptyParagraph = state.schema.nodeFromJSON({
-    type: "paragraph",
+    type: 'paragraph',
     content: [],
   });
 
@@ -52,7 +52,7 @@ export function updateFootnotesList(tr: Transaction, state: EditorState) {
   // a mapping of footnote id -> footnote node
   const footnoteIds: { [key: string]: Node } = footnotes.reduce(
     (obj, footnote) => {
-      obj[footnote.attrs["data-id"]] = footnote;
+      obj[footnote.attrs['data-id']] = footnote;
       return obj;
     },
     {} as any,
@@ -61,24 +61,24 @@ export function updateFootnotesList(tr: Transaction, state: EditorState) {
   const newFootnotes: Node[] = [];
 
   let footnoteRefIds = new Set(
-    footnoteReferences.map((ref) => ref.attrs["data-id"]),
+    footnoteReferences.map((ref) => ref.attrs['data-id']),
   );
   const deleteFootnoteIds: Set<string> = new Set();
   for (let footnote of footnotes) {
-    const id = footnote.attrs["data-id"];
+    const id = footnote.attrs['data-id'];
     if (!footnoteRefIds.has(id) || deleteFootnoteIds.has(id)) {
       deleteFootnoteIds.add(id);
       // we traverse through this footnote's content because it may contain footnote references.
       // we want to delete the footnotes associated with these references, so we add them to the delete set.
       footnote.content.descendants((node) => {
-        if (node.type.name == "footnoteReference")
-          deleteFootnoteIds.add(node.attrs["data-id"]);
+        if (node.type.name == 'footnoteReference')
+          deleteFootnoteIds.add(node.attrs['data-id']);
       });
     }
   }
 
   for (let i = 0; i < footnoteReferences.length; i++) {
-    let refId = footnoteReferences[i].attrs["data-id"];
+    let refId = footnoteReferences[i].attrs['data-id'];
 
     if (deleteFootnoteIds.has(refId)) continue;
     // if there is a footnote w/ the same id as this `ref`, we preserve its content and update its id attribute
@@ -93,7 +93,7 @@ export function updateFootnotesList(tr: Transaction, state: EditorState) {
     } else {
       let newNode = footnoteType.create(
         {
-          "data-id": refId,
+          'data-id': refId,
           id: `fn:${i + 1}`,
         },
         [emptyParagraph],

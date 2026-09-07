@@ -1,7 +1,7 @@
 import {
   Backlink,
   InsertableBacklink,
-  UpdatableBacklink,
+  UpdatableBacklink
 } from '@docmost/db/types/entity.types';
 import { KyselyDB, KyselyTransaction } from '@docmost/db/types/kysely.types';
 import { dbOrTx } from '@docmost/db/utils';
@@ -10,7 +10,7 @@ import { InjectKysely } from 'nestjs-kysely';
 import { PaginationOptions } from '@docmost/db/pagination/pagination-options';
 import {
   executeWithCursorPagination,
-  emptyCursorPaginationResult,
+  emptyCursorPaginationResult
 } from '@docmost/db/pagination/cursor-pagination';
 import { SpaceMemberRepo } from '@docmost/db/repos/space/space-member.repo';
 import { jsonObjectFrom } from 'kysely/helpers/postgres';
@@ -19,13 +19,13 @@ import { jsonObjectFrom } from 'kysely/helpers/postgres';
 export class BacklinkRepo {
   constructor(
     @InjectKysely() private readonly db: KyselyDB,
-    private readonly spaceMemberRepo: SpaceMemberRepo,
+    private readonly spaceMemberRepo: SpaceMemberRepo
   ) {}
 
   async findById(
     backlinkId: string,
     workspaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<Backlink> {
     const db = dbOrTx(this.db, trx);
 
@@ -37,7 +37,7 @@ export class BacklinkRepo {
         'targetPageId',
         'workspaceId',
         'createdAt',
-        'updatedAt',
+        'updatedAt'
       ])
       .where('id', '=', backlinkId)
       .where('workspaceId', '=', workspaceId)
@@ -46,14 +46,14 @@ export class BacklinkRepo {
 
   async insertBacklink(
     insertableBacklink: InsertableBacklink,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ) {
     const db = dbOrTx(this.db, trx);
     return db
       .insertInto('backlinks')
       .values(insertableBacklink)
       .onConflict((oc) =>
-        oc.columns(['sourcePageId', 'targetPageId']).doNothing(),
+        oc.columns(['sourcePageId', 'targetPageId']).doNothing()
       )
       .returningAll()
       .executeTakeFirst();
@@ -62,7 +62,7 @@ export class BacklinkRepo {
   async updateBacklink(
     updatableBacklink: UpdatableBacklink,
     backlinkId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ) {
     const db = dbOrTx(this.db, trx);
     return db
@@ -74,7 +74,7 @@ export class BacklinkRepo {
 
   async deleteBacklink(
     backlinkId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<void> {
     const db = dbOrTx(this.db, trx);
     await db.deleteFrom('backlinks').where('id', '=', backlinkId).execute();
@@ -83,7 +83,7 @@ export class BacklinkRepo {
   async findRelatedPageIds(
     pageId: string,
     direction: 'incoming' | 'outgoing',
-    userId: string,
+    userId: string
   ): Promise<string[]> {
     const userSpaceIds = this.spaceMemberRepo.getUserSpaceIdsQuery(userId);
 
@@ -112,7 +112,7 @@ export class BacklinkRepo {
 
   async findPagesByIdsPaginated(
     pageIds: string[],
-    pagination: PaginationOptions,
+    pagination: PaginationOptions
   ) {
     if (pageIds.length === 0) {
       return emptyCursorPaginationResult<{
@@ -139,8 +139,8 @@ export class BacklinkRepo {
           eb
             .selectFrom('spaces')
             .select(['spaces.id', 'spaces.slug', 'spaces.name'])
-            .whereRef('spaces.id', '=', 'pages.spaceId'),
-        ).as('space'),
+            .whereRef('spaces.id', '=', 'pages.spaceId')
+        ).as('space')
       ])
       .where('pages.deletedAt', 'is', null)
       .where('pages.id', 'in', pageIds);
@@ -151,12 +151,12 @@ export class BacklinkRepo {
       beforeCursor: pagination.beforeCursor,
       fields: [
         { expression: 'pages.updatedAt', direction: 'desc', key: 'updatedAt' },
-        { expression: 'pages.id', direction: 'desc', key: 'id' },
+        { expression: 'pages.id', direction: 'desc', key: 'id' }
       ],
       parseCursor: (cursor) => ({
         updatedAt: new Date(cursor.updatedAt),
-        id: cursor.id,
-      }),
+        id: cursor.id
+      })
     });
   }
 }

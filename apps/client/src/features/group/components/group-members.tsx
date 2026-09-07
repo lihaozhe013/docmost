@@ -1,20 +1,20 @@
-import { Group, Table, Text, Badge, Menu, ActionIcon } from "@mantine/core";
+import { Group, Table, Text, Badge, Menu, ActionIcon } from '@mantine/core';
 import {
   useGroupMembersQuery,
-  useRemoveGroupMemberMutation,
-} from "@/features/group/queries/group-query";
-import { useParams } from "react-router-dom";
-import React from "react";
-import { IconDots } from "@tabler/icons-react";
-import { modals } from "@mantine/modals";
-import { CustomAvatar } from "@/components/ui/custom-avatar.tsx";
-import useUserRole from "@/hooks/use-user-role.tsx";
-import { useTranslation } from "react-i18next";
-import { IUser } from "@/features/user/types/user.types.ts";
-import Paginate from "@/components/common/paginate.tsx";
-import { SearchInput } from "@/components/common/search-input.tsx";
-import NoTableResults from "@/components/common/no-table-results.tsx";
-import { usePaginateAndSearch } from "@/hooks/use-paginate-and-search.tsx";
+  useRemoveGroupMemberMutation
+} from '@/features/group/queries/group-query';
+import { useParams } from 'react-router-dom';
+import React from 'react';
+import { IconDots } from '@tabler/icons-react';
+import { modals } from '@mantine/modals';
+import { CustomAvatar } from '@/components/ui/custom-avatar.tsx';
+import useUserRole from '@/hooks/use-user-role.tsx';
+import { useTranslation } from 'react-i18next';
+import { IUser } from '@/features/user/types/user.types.ts';
+import Paginate from '@/components/common/paginate.tsx';
+import { SearchInput } from '@/components/common/search-input.tsx';
+import NoTableResults from '@/components/common/no-table-results.tsx';
+import { usePaginateAndSearch } from '@/hooks/use-paginate-and-search.tsx';
 
 export default function GroupMembersList() {
   const { t } = useTranslation();
@@ -23,7 +23,7 @@ export default function GroupMembersList() {
     usePaginateAndSearch();
   const { data, isLoading } = useGroupMembersQuery(groupId, {
     cursor,
-    query: search,
+    query: search
   });
   const removeGroupMember = useRemoveGroupMemberMutation();
   const { isAdmin } = useUserRole();
@@ -31,25 +31,25 @@ export default function GroupMembersList() {
   const onRemove = async (userId: string) => {
     const memberToRemove = {
       groupId: groupId,
-      userId: userId,
+      userId: userId
     };
     await removeGroupMember.mutateAsync(memberToRemove);
   };
 
   const openRemoveModal = (userId: string) =>
     modals.openConfirmModal({
-      title: t("Remove group member"),
+      title: t('Remove group member'),
       children: (
         <Text size="sm">
           {t(
-            "Are you sure you want to remove this user from the group? The user will lose access to resources this group has access to.",
+            'Are you sure you want to remove this user from the group? The user will lose access to resources this group has access to.'
           )}
         </Text>
       ),
       centered: true,
-      labels: { confirm: t("Delete"), cancel: t("Cancel") },
-      confirmProps: { color: "red" },
-      onConfirm: () => onRemove(userId),
+      labels: { confirm: t('Delete'), cancel: t('Cancel') },
+      confirmProps: { color: 'red' },
+      onConfirm: () => onRemove(userId)
     });
 
   return (
@@ -59,9 +59,9 @@ export default function GroupMembersList() {
         <Table highlightOnHover verticalSpacing="sm">
           <Table.Thead>
             <Table.Tr>
-              <Table.Th>{t("User")}</Table.Th>
-              <Table.Th>{t("Status")}</Table.Th>
-              <Table.Th aria-label={t("Action")} />
+              <Table.Th>{t('User')}</Table.Th>
+              <Table.Th>{t('Status')}</Table.Th>
+              <Table.Th aria-label={t('Action')} />
             </Table.Tr>
           </Table.Thead>
 
@@ -86,7 +86,7 @@ export default function GroupMembersList() {
                     </Group>
                   </Table.Td>
                   <Table.Td>
-                    <Badge variant="light">{t("Active")}</Badge>
+                    <Badge variant="light">{t('Active')}</Badge>
                   </Table.Td>
                   <Table.Td>
                     {isAdmin && (
@@ -102,8 +102,8 @@ export default function GroupMembersList() {
                           <ActionIcon
                             variant="subtle"
                             c="gray"
-                            aria-label={t("Member actions for {{name}}", {
-                              name: user.name,
+                            aria-label={t('Member actions for {{name}}', {
+                              name: user.name
                             })}
                           >
                             <IconDots size={20} stroke={2} />
@@ -111,7 +111,7 @@ export default function GroupMembersList() {
                         </Menu.Target>
                         <Menu.Dropdown>
                           <Menu.Item onClick={() => openRemoveModal(user.id)}>
-                            {t("Remove group member")}
+                            {t('Remove group member')}
                           </Menu.Item>
                         </Menu.Dropdown>
                       </Menu>

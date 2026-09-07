@@ -1,15 +1,15 @@
-import { MarkViewContent, MarkViewProps } from "@tiptap/react";
-import { useNavigate, useLocation, useParams } from "react-router-dom";
+import { MarkViewContent, MarkViewProps } from '@tiptap/react';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import {
   IconFileDescription,
   IconCopy,
   IconExternalLink,
   IconLinkOff,
   IconPencil,
-  IconWorld,
-} from "@tabler/icons-react";
-import { useState, useCallback, useRef, useEffect } from "react";
-import { notifications } from "@mantine/notifications";
+  IconWorld
+} from '@tabler/icons-react';
+import { useState, useCallback, useRef, useEffect } from 'react';
+import { notifications } from '@mantine/notifications';
 import {
   Divider,
   Group,
@@ -18,24 +18,28 @@ import {
   TextInput,
   ActionIcon,
   Tooltip,
-  UnstyledButton,
-} from "@mantine/core";
-import classes from "./link.module.css";
-import { useTranslation } from "react-i18next";
-import { INTERNAL_LINK_REGEX } from "@/lib/constants";
-import { LinkEditorPanel } from "@/features/editor/components/link/link-editor-panel.tsx";
-import { usePageQuery } from "@/features/page/queries/page-query.ts";
-import { useSharePageQuery } from "@/features/share/queries/share-query.ts";
-import { buildSharedPageUrl } from "@/features/page/page.utils.ts";
-import { extractPageSlugId } from "@/lib";
-import { sanitizeUrl, copyToClipboard, isEditorReady } from "@docmost/editor-ext";
-import { normalizeUrl } from "@/lib/utils";
+  UnstyledButton
+} from '@mantine/core';
+import classes from './link.module.css';
+import { useTranslation } from 'react-i18next';
+import { INTERNAL_LINK_REGEX } from '@/lib/constants';
+import { LinkEditorPanel } from '@/features/editor/components/link/link-editor-panel.tsx';
+import { usePageQuery } from '@/features/page/queries/page-query.ts';
+import { useSharePageQuery } from '@/features/share/queries/share-query.ts';
+import { buildSharedPageUrl } from '@/features/page/page.utils.ts';
+import { extractPageSlugId } from '@/lib';
+import {
+  sanitizeUrl,
+  copyToClipboard,
+  isEditorReady
+} from '@docmost/editor-ext';
+import { normalizeUrl } from '@/lib/utils';
 
 const parseInternalLink = (
   href: string,
-  internalAttr?: boolean,
+  internalAttr?: boolean
 ): { isInternal: boolean; slugId: string | null; label: string } => {
-  if (!href) return { isInternal: !!internalAttr, slugId: null, label: "" };
+  if (!href) return { isInternal: !!internalAttr, slugId: null, label: '' };
 
   const match = INTERNAL_LINK_REGEX.exec(href);
   if (!match) {
@@ -46,12 +50,12 @@ const parseInternalLink = (
   const isExternal = match[2] && match[2] !== window.location.host;
   const slug = match[5];
   const slugId = extractPageSlugId(slug);
-  const namePart = slug.split("-").slice(0, -1).join("-");
+  const namePart = slug.split('-').slice(0, -1).join('-');
 
   return {
     isInternal: !isExternal,
     slugId,
-    label: namePart || slug,
+    label: namePart || slug
   };
 };
 
@@ -62,33 +66,33 @@ export default function LinkView(props: MarkViewProps) {
   const location = useLocation();
   const { shareId, pageSlug } = useParams();
   const { t } = useTranslation();
-  const isShareRoute = location.pathname.startsWith("/share");
+  const isShareRoute = location.pathname.startsWith('/share');
 
   const [popoverState, setPopoverState] = useState<
-    "closed" | "preview" | "edit"
-  >("closed");
-  const [linkTitle, setLinkTitle] = useState("");
-  const [linkUrl, setLinkUrl] = useState("");
+    'closed' | 'preview' | 'edit'
+  >('closed');
+  const [linkTitle, setLinkTitle] = useState('');
+  const [linkUrl, setLinkUrl] = useState('');
   const [showSearch, setShowSearch] = useState(false);
-  const lastOpenState = useRef<"preview" | "edit">("preview");
+  const lastOpenState = useRef<'preview' | 'edit'>('preview');
   const wrapperRef = useRef<HTMLSpanElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const isEditable = editor.isEditable;
   const {
     isInternal,
     slugId,
-    label: linkLabel,
+    label: linkLabel
   } = parseInternalLink(href, mark.attrs.internal);
 
-  const isPopoverVisible = popoverState !== "closed";
+  const isPopoverVisible = popoverState !== 'closed';
   const activeView = isPopoverVisible ? popoverState : lastOpenState.current;
 
   const { data: linkedPage } = usePageQuery({
-    pageId: isPopoverVisible && slugId && !isShareRoute ? slugId : null,
+    pageId: isPopoverVisible && slugId && !isShareRoute ? slugId : null
   });
 
   const { data: sharedPageData } = useSharePageQuery({
-    pageId: isPopoverVisible && slugId && isShareRoute ? slugId : null,
+    pageId: isPopoverVisible && slugId && isShareRoute ? slugId : null
   });
 
   const pageTitle = isShareRoute
@@ -120,7 +124,7 @@ export default function LinkView(props: MarkViewProps) {
       if (!node?.isText) return;
 
       const linkMark = node.marks.find(
-        (m) => m.type.name === "link" && m.attrs.href === href,
+        (m) => m.type.name === 'link' && m.attrs.href === href
       );
       if (!linkMark || node.text === newTitle) return;
 
@@ -131,7 +135,7 @@ export default function LinkView(props: MarkViewProps) {
       tr.addMark(from, from + newTitle.length, linkMark);
       editor.view.dispatch(tr);
     },
-    [editor, href, getLinkPos],
+    [editor, href, getLinkPos]
   );
 
   const handleEditLink = useCallback(
@@ -140,7 +144,7 @@ export default function LinkView(props: MarkViewProps) {
 
       const pos = getLinkPos();
       if (pos === null) {
-        setPopoverState("closed");
+        setPopoverState('closed');
         return;
       }
 
@@ -148,12 +152,12 @@ export default function LinkView(props: MarkViewProps) {
       const resolved = state.doc.resolve(pos);
       const node = resolved.nodeAfter;
       if (!node?.isText) {
-        setPopoverState("closed");
+        setPopoverState('closed');
         return;
       }
 
       const linkMark = node.marks.find(
-        (m) => m.type.name === "link" && m.attrs.href === href,
+        (m) => m.type.name === 'link' && m.attrs.href === href
       );
       if (linkMark) {
         const from = pos;
@@ -163,25 +167,25 @@ export default function LinkView(props: MarkViewProps) {
         tr.addMark(
           from,
           to,
-          linkMark.type.create({ href: normalizedUrl, internal: !!internal }),
+          linkMark.type.create({ href: normalizedUrl, internal: !!internal })
         );
         editor.view.dispatch(tr);
       }
 
-      setPopoverState("closed");
+      setPopoverState('closed');
     },
-    [editor, href, getLinkPos],
+    [editor, href, getLinkPos]
   );
 
   useEffect(() => {
-    if (popoverState === "edit") {
-      const text = wrapperRef.current?.querySelector("a")?.textContent || "";
+    if (popoverState === 'edit') {
+      const text = wrapperRef.current?.querySelector('a')?.textContent || '';
       setLinkTitle(text);
       setLinkUrl(href);
       pendingTitleRef.current = null;
       requestAnimationFrame(() => titleInputRef.current?.focus());
     }
-    if (popoverState === "closed") {
+    if (popoverState === 'closed') {
       if (pendingTitleRef.current !== null) {
         handleUpdateLinkTitle(pendingTitleRef.current);
         pendingTitleRef.current = null;
@@ -191,7 +195,7 @@ export default function LinkView(props: MarkViewProps) {
   }, [popoverState, href, isInternal, handleUpdateLinkTitle]);
 
   useEffect(() => {
-    if (popoverState !== "closed") {
+    if (popoverState !== 'closed') {
       lastOpenState.current = popoverState;
     }
   }, [popoverState]);
@@ -206,18 +210,18 @@ export default function LinkView(props: MarkViewProps) {
       ) {
         return;
       }
-      setPopoverState("closed");
+      setPopoverState('closed');
     };
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setPopoverState("closed");
+      if (e.key === 'Escape') {
+        setPopoverState('closed');
       }
     };
-    document.addEventListener("mousedown", handleClickOutside, true);
-    document.addEventListener("keydown", handleEscape, true);
+    document.addEventListener('mousedown', handleClickOutside, true);
+    document.addEventListener('keydown', handleEscape, true);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside, true);
-      document.removeEventListener("keydown", handleEscape, true);
+      document.removeEventListener('mousedown', handleClickOutside, true);
+      document.removeEventListener('keydown', handleEscape, true);
     };
   }, [isPopoverVisible]);
 
@@ -226,15 +230,15 @@ export default function LinkView(props: MarkViewProps) {
 
     if (isInternal) {
       let targetPath = href;
-      let anchor = "";
+      let anchor = '';
 
       try {
         const url = new URL(href);
         targetPath = url.pathname;
         anchor = url.hash.slice(1);
       } catch {
-        if (href.includes("#")) {
-          [targetPath, anchor] = href.split("#");
+        if (href.includes('#')) {
+          [targetPath, anchor] = href.split('#');
         }
       }
 
@@ -245,7 +249,7 @@ export default function LinkView(props: MarkViewProps) {
             document.querySelector(`[id="${anchor}"]`) ||
             document.querySelector(`[data-id="${anchor}"]`);
           if (element) {
-            element.scrollIntoView({ behavior: "smooth", block: "start" });
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
             navigate(`${location.pathname}#${anchor}`, { replace: true });
             return;
           }
@@ -257,7 +261,7 @@ export default function LinkView(props: MarkViewProps) {
           shareId,
           pageSlugId: slugId,
           pageTitle: pageTitle,
-          anchorId: anchor || undefined,
+          anchorId: anchor || undefined
         });
         navigate(sharedUrl);
       } else {
@@ -266,8 +270,8 @@ export default function LinkView(props: MarkViewProps) {
     } else {
       window.open(
         sanitizeUrl(normalizeUrl(href)),
-        "_blank",
-        "noopener,noreferrer",
+        '_blank',
+        'noopener,noreferrer'
       );
     }
   }, [
@@ -279,7 +283,7 @@ export default function LinkView(props: MarkViewProps) {
     slugId,
     shareId,
     pageTitle,
-    pageSlug,
+    pageSlug
   ]);
 
   const handleClick = useCallback(
@@ -287,12 +291,12 @@ export default function LinkView(props: MarkViewProps) {
       e.preventDefault();
       e.stopPropagation();
       if (isEditable) {
-        setPopoverState("preview");
+        setPopoverState('preview');
       } else {
         handleNavigate();
       }
     },
-    [handleNavigate, isEditable],
+    [handleNavigate, isEditable]
   );
 
   const handleCopy = useCallback(
@@ -301,22 +305,22 @@ export default function LinkView(props: MarkViewProps) {
       e.stopPropagation();
 
       const fullUrl = sanitizeUrl(
-        isInternal ? `${window.location.origin}${href}` : href,
+        isInternal ? `${window.location.origin}${href}` : href
       );
       copyToClipboard(fullUrl);
       notifications.show({
-        message: t("Link copied"),
+        message: t('Link copied')
       });
-      setPopoverState("closed");
+      setPopoverState('closed');
     },
-    [href, isInternal, t],
+    [href, isInternal, t]
   );
 
   const handleRemoveLink = useCallback(() => {
     if (isEditorReady(editor)) {
-      editor.chain().focus().extendMarkRange("link").unsetLink().run();
+      editor.chain().focus().extendMarkRange('link').unsetLink().run();
     }
-    setPopoverState("closed");
+    setPopoverState('closed');
   }, [editor]);
 
   const displayHref = sanitizeUrl(
@@ -324,13 +328,13 @@ export default function LinkView(props: MarkViewProps) {
       ? isShareRoute && slugId
         ? buildSharedPageUrl({ shareId, pageSlugId: slugId, pageTitle })
         : href
-      : normalizeUrl(href),
+      : normalizeUrl(href)
   );
 
   const linkTitleInput = (
     <>
       <Text size="xs" fw={600} c="dimmed" mt="sm" mb={4}>
-        {t("Link title")}
+        {t('Link title')}
       </Text>
       <TextInput
         ref={titleInputRef}
@@ -340,11 +344,11 @@ export default function LinkView(props: MarkViewProps) {
           const val = e.currentTarget.value;
           setLinkTitle(val);
           pendingTitleRef.current = val;
-          const anchor = wrapperRef.current?.querySelector("a");
+          const anchor = wrapperRef.current?.querySelector('a');
           if (anchor && val) {
             const walker = document.createTreeWalker(
               anchor,
-              NodeFilter.SHOW_TEXT,
+              NodeFilter.SHOW_TEXT
             );
             const textNode = walker.nextNode();
             if (textNode && isEditorReady(editor)) {
@@ -362,11 +366,11 @@ export default function LinkView(props: MarkViewProps) {
           }
         }}
         onKeyDown={(e) => {
-          if (e.key === "Enter") {
+          if (e.key === 'Enter') {
             e.preventDefault();
             handleUpdateLinkTitle(linkTitle);
             pendingTitleRef.current = null;
-            setPopoverState("closed");
+            setPopoverState('closed');
           }
         }}
         size="sm"
@@ -377,7 +381,7 @@ export default function LinkView(props: MarkViewProps) {
   return (
     <Popover
       opened={isPopoverVisible}
-      width={activeView === "edit" ? 320 : undefined}
+      width={activeView === 'edit' ? 320 : undefined}
       position="bottom"
       withArrow
       shadow="md"
@@ -394,8 +398,8 @@ export default function LinkView(props: MarkViewProps) {
             href={displayHref}
             spellCheck={false}
             onClick={(e) => e.preventDefault()}
-            target={isInternal ? undefined : "_blank"}
-            rel={isInternal ? undefined : "noopener noreferrer"}
+            target={isInternal ? undefined : '_blank'}
+            rel={isInternal ? undefined : 'noopener noreferrer'}
           >
             <MarkViewContent />
           </a>
@@ -404,13 +408,13 @@ export default function LinkView(props: MarkViewProps) {
 
       <Popover.Dropdown
         ref={dropdownRef}
-        p={activeView === "edit" ? "sm" : 6}
+        p={activeView === 'edit' ? 'sm' : 6}
         onMouseDown={(e) => e.stopPropagation()}
       >
-        {activeView === "edit" ? (
+        {activeView === 'edit' ? (
           <>
             <Text size="xs" fw={600} c="dimmed" mb={4}>
-              {t("Page or URL")}
+              {t('Page or URL')}
             </Text>
 
             {isInternal ? (
@@ -441,7 +445,7 @@ export default function LinkView(props: MarkViewProps) {
                   >
                     <Group gap={8}>
                       <IconLinkOff size={16} stroke={1.5} />
-                      <Text size="sm">{t("Remove link")}</Text>
+                      <Text size="sm">{t('Remove link')}</Text>
                     </Group>
                   </UnstyledButton>
                 </>
@@ -470,7 +474,7 @@ export default function LinkView(props: MarkViewProps) {
                     }
                   }}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") {
+                    if (e.key === 'Enter') {
                       e.preventDefault();
                       if (linkUrl && linkUrl !== href) {
                         handleEditLink(linkUrl, false);
@@ -490,7 +494,7 @@ export default function LinkView(props: MarkViewProps) {
                 >
                   <Group gap={8}>
                     <IconLinkOff size={16} stroke={1.5} />
-                    <Text size="sm">{t("Remove link")}</Text>
+                    <Text size="sm">{t('Remove link')}</Text>
                   </Group>
                 </UnstyledButton>
               </>
@@ -502,16 +506,16 @@ export default function LinkView(props: MarkViewProps) {
               component="a"
               //@ts-ignore
               href={displayHref}
-              target={isInternal ? undefined : "_blank"}
-              rel={isInternal ? undefined : "noopener noreferrer"}
+              target={isInternal ? undefined : '_blank'}
+              rel={isInternal ? undefined : 'noopener noreferrer'}
               gap={6}
               wrap="nowrap"
               style={{
-                cursor: "pointer",
+                cursor: 'pointer',
                 maxWidth: 250,
-                textDecoration: "none",
-                color: "inherit",
-                userSelect: "none",
+                textDecoration: 'none',
+                color: 'inherit',
+                userSelect: 'none'
               }}
               onClick={(e: React.MouseEvent) => {
                 e.preventDefault();
@@ -530,7 +534,7 @@ export default function LinkView(props: MarkViewProps) {
 
             <Divider orientation="vertical" />
 
-            <Tooltip label={t("Edit link")} withArrow withinPortal={false}>
+            <Tooltip label={t('Edit link')} withArrow withinPortal={false}>
               <ActionIcon
                 variant="subtle"
                 color="gray"
@@ -538,14 +542,14 @@ export default function LinkView(props: MarkViewProps) {
                   e.preventDefault();
                   e.stopPropagation();
                   setShowSearch(false);
-                  setPopoverState("edit");
+                  setPopoverState('edit');
                 }}
               >
                 <IconPencil size={18} />
               </ActionIcon>
             </Tooltip>
 
-            <Tooltip label={t("Copy link")} withArrow withinPortal={false}>
+            <Tooltip label={t('Copy link')} withArrow withinPortal={false}>
               <ActionIcon
                 variant="subtle"
                 color="gray"
@@ -559,7 +563,7 @@ export default function LinkView(props: MarkViewProps) {
               </ActionIcon>
             </Tooltip>
 
-            <Tooltip label={t("Remove link")} withArrow withinPortal={false}>
+            <Tooltip label={t('Remove link')} withArrow withinPortal={false}>
               <ActionIcon
                 variant="subtle"
                 color="gray"

@@ -1,14 +1,14 @@
-import { Node, defaultBlockAt, mergeAttributes } from "@tiptap/core";
-import { Selection } from "@tiptap/pm/state";
+import { Node, defaultBlockAt, mergeAttributes } from '@tiptap/core';
+import { Selection } from '@tiptap/pm/state';
 
 export interface DetailsSummaryOptions {
   HTMLAttributes: Record<string, any>;
 }
 
 export const DetailsSummary = Node.create<DetailsSummaryOptions>({
-  name: "detailsSummary",
-  group: "block",
-  content: "inline*",
+  name: 'detailsSummary',
+  group: 'block',
+  content: 'inline*',
   defining: true,
   isolating: true,
   selectable: false,
@@ -20,15 +20,15 @@ export const DetailsSummary = Node.create<DetailsSummaryOptions>({
   parseHTML() {
     return [
       {
-        tag: "summary",
+        tag: 'summary',
       },
     ];
   },
   renderHTML({ HTMLAttributes }) {
     return [
-      "summary",
+      'summary',
       mergeAttributes(
-        { "data-type": this.name },
+        { 'data-type': this.name },
         this.options.HTMLAttributes,
         HTMLAttributes,
       ),

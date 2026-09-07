@@ -1,13 +1,13 @@
-import classes from "./switch-space.module.css";
-import { useNavigate } from "react-router-dom";
-import { SpaceSelect } from "./space-select";
-import { getSpaceUrl } from "@/lib/config";
-import { Button, Popover, Text } from "@mantine/core";
-import { IconChevronDown, IconChevronUp } from "@tabler/icons-react";
-import { useDisclosure } from "@mantine/hooks";
-import { CustomAvatar } from "@/components/ui/custom-avatar.tsx";
-import { AvatarIconType } from "@/features/attachments/types/attachment.types.ts";
-import React from "react";
+import classes from './switch-space.module.css';
+import { useNavigate } from 'react-router-dom';
+import { SpaceSelect } from './space-select';
+import { getSpaceUrl } from '@/lib/config';
+import { Button, Popover, Text } from '@mantine/core';
+import { IconChevronDown, IconChevronUp } from '@tabler/icons-react';
+import { useDisclosure } from '@mantine/hooks';
+import { CustomAvatar } from '@/components/ui/custom-avatar.tsx';
+import { AvatarIconType } from '@/features/attachments/types/attachment.types.ts';
+import React from 'react';
 
 interface SwitchSpaceProps {
   spaceName: string;
@@ -18,7 +18,7 @@ interface SwitchSpaceProps {
 export function SwitchSpace({
   spaceName,
   spaceSlug,
-  spaceIcon,
+  spaceIcon
 }: SwitchSpaceProps) {
   const navigate = useNavigate();
   const [opened, { close, toggle }] = useDisclosure(false);
@@ -46,7 +46,9 @@ export function SwitchSpace({
           variant="subtle"
           fullWidth
           justify="space-between"
-          rightSection={opened ? <IconChevronUp size={18} /> : <IconChevronDown size={18} />}
+          rightSection={
+            opened ? <IconChevronUp size={18} /> : <IconChevronDown size={18} />
+          }
           color="gray"
           onClick={toggle}
         >

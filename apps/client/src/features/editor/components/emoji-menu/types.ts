@@ -1,5 +1,5 @@
-import { Range } from "@tiptap/core";
-import { useEditor } from "@tiptap/react";
+import { Range } from '@tiptap/core';
+import { useEditor } from '@tiptap/react';
 
 export type EmojiMartFrequentlyType = Record<string, number>;
 

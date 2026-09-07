@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import {
   AbilityBuilder,
   createMongoAbility,
-  MongoAbility,
+  MongoAbility
 } from '@casl/ability';
 import { SpaceRole } from '../../../common/helpers/types/permission';
 import { User } from '@docmost/db/types/entity.types';
@@ -10,7 +10,7 @@ import { SpaceMemberRepo } from '@docmost/db/repos/space/space-member.repo';
 import {
   SpaceCaslAction,
   ISpaceAbility,
-  SpaceCaslSubject,
+  SpaceCaslSubject
 } from '../interfaces/space-ability.type';
 import { findHighestUserSpaceRole } from '@docmost/db/repos/space/utils';
 
@@ -20,7 +20,7 @@ export default class SpaceAbilityFactory {
   async createForUser(user: User, spaceId: string) {
     const userSpaceRoles = await this.spaceMemberRepo.getUserSpaceRoles(
       user.id,
-      spaceId,
+      spaceId
     );
 
     const userSpaceRole = findHighestUserSpaceRole(userSpaceRoles);
@@ -40,7 +40,7 @@ export default class SpaceAbilityFactory {
 
 function buildSpaceAdminAbility() {
   const { can, build } = new AbilityBuilder<MongoAbility<ISpaceAbility>>(
-    createMongoAbility,
+    createMongoAbility
   );
   can(SpaceCaslAction.Manage, SpaceCaslSubject.Settings);
   can(SpaceCaslAction.Manage, SpaceCaslSubject.Member);
@@ -51,7 +51,7 @@ function buildSpaceAdminAbility() {
 
 function buildSpaceWriterAbility() {
   const { can, build } = new AbilityBuilder<MongoAbility<ISpaceAbility>>(
-    createMongoAbility,
+    createMongoAbility
   );
   can(SpaceCaslAction.Read, SpaceCaslSubject.Settings);
   can(SpaceCaslAction.Read, SpaceCaslSubject.Member);
@@ -62,7 +62,7 @@ function buildSpaceWriterAbility() {
 
 function buildSpaceReaderAbility() {
   const { can, build } = new AbilityBuilder<MongoAbility<ISpaceAbility>>(
-    createMongoAbility,
+    createMongoAbility
   );
   can(SpaceCaslAction.Read, SpaceCaslSubject.Settings);
   can(SpaceCaslAction.Read, SpaceCaslSubject.Member);

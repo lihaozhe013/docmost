@@ -3,10 +3,10 @@ import {
   mergeAttributes,
   Node,
   wrappingInputRule,
-} from "@tiptap/core";
-import { TextSelection } from "@tiptap/pm/state";
-import { ReactNodeViewRenderer } from "@tiptap/react";
-import { CalloutType, getValidCalloutType } from "./utils";
+} from '@tiptap/core';
+import { TextSelection } from '@tiptap/pm/state';
+import { ReactNodeViewRenderer } from '@tiptap/react';
+import { CalloutType, getValidCalloutType } from './utils';
 
 export interface CalloutOptions {
   HTMLAttributes: Record<string, any>;
@@ -24,7 +24,7 @@ export interface CalloutAttributes {
   icon?: string;
 }
 
-declare module "@tiptap/core" {
+declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     callout: {
       setCallout: (attributes?: CalloutAttributes) => ReturnType;
@@ -41,7 +41,7 @@ declare module "@tiptap/core" {
 export const inputRegex = /^:::([a-z]+)?[\s\n]$/;
 
 export const Callout = Node.create<CalloutOptions>({
-  name: "callout",
+  name: 'callout',
 
   addOptions() {
     return {
@@ -50,25 +50,25 @@ export const Callout = Node.create<CalloutOptions>({
     };
   },
 
-  content: "block+",
-  group: "block",
+  content: 'block+',
+  group: 'block',
   defining: true,
   isolating: true,
 
   addAttributes() {
     return {
       type: {
-        default: "info",
-        parseHTML: (element) => element.getAttribute("data-callout-type"),
+        default: 'info',
+        parseHTML: (element) => element.getAttribute('data-callout-type'),
         renderHTML: (attributes) => ({
-          "data-callout-type": attributes.type,
+          'data-callout-type': attributes.type,
         }),
       },
       icon: {
         default: null,
-        parseHTML: (element) => element.getAttribute("data-callout-icon"),
+        parseHTML: (element) => element.getAttribute('data-callout-icon'),
         renderHTML: (attributes) => ({
-          "data-callout-icon": attributes.icon,
+          'data-callout-icon': attributes.icon,
         }),
       },
     };
@@ -84,11 +84,11 @@ export const Callout = Node.create<CalloutOptions>({
 
   renderHTML({ HTMLAttributes }) {
     return [
-      "div",
+      'div',
       mergeAttributes(
-        { "data-type": this.name },
+        { 'data-type': this.name },
         this.options.HTMLAttributes,
-        HTMLAttributes
+        HTMLAttributes,
       ),
       0,
     ];
@@ -117,14 +117,14 @@ export const Callout = Node.create<CalloutOptions>({
       updateCalloutType:
         (type: string) =>
         ({ commands }) =>
-          commands.updateAttributes("callout", {
+          commands.updateAttributes('callout', {
             type: getValidCalloutType(type),
           }),
 
       updateCalloutIcon:
         (icon: string) =>
         ({ commands }) =>
-          commands.updateAttributes("callout", {
+          commands.updateAttributes('callout', {
             icon: icon || null,
           }),
     };
@@ -176,9 +176,7 @@ export const Callout = Node.create<CalloutOptions>({
             const calloutPos = $from.before(calloutDepth);
             const { tr } = state;
             tr.delete(calloutPos, calloutPos + calloutNode.nodeSize);
-            tr.setSelection(
-              TextSelection.near(tr.doc.resolve(calloutPos), -1),
-            );
+            tr.setSelection(TextSelection.near(tr.doc.resolve(calloutPos), -1));
             view.dispatch(tr);
             return true;
           }
@@ -219,7 +217,7 @@ export const Callout = Node.create<CalloutOptions>({
 
           tr.delete(pos, pos + nodeSize);
           tr.setSelection(
-            TextSelection.near(tr.doc.resolve(previousPosition - 1))
+            TextSelection.near(tr.doc.resolve(previousPosition - 1)),
           );
           tr.insert(previousPosition - 1, content);
 
@@ -256,9 +254,7 @@ export const Callout = Node.create<CalloutOptions>({
         const containerDepth = calloutDepth - 1;
         const container = $from.node(containerDepth);
         const indexAfter = $from.indexAfter(containerDepth);
-        if (
-          !container.canReplaceWith(indexAfter, indexAfter, paragraphType)
-        ) {
+        if (!container.canReplaceWith(indexAfter, indexAfter, paragraphType)) {
           return false;
         }
 

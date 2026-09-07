@@ -4,7 +4,7 @@ import {
   IsOptional,
   IsString,
   IsUUID,
-  ValidateIf,
+  ValidateIf
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 

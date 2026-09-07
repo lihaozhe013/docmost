@@ -12,7 +12,7 @@ export async function up(db: Kysely<any>): Promise<void> {
 
   await sql`CREATE OR REPLACE TRIGGER pages_tsvector_update BEFORE INSERT OR UPDATE
                 ON pages FOR EACH ROW EXECUTE FUNCTION pages_tsvector_trigger();`.execute(
-    db,
+    db
   );
 }
 

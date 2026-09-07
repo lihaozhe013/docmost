@@ -1,28 +1,26 @@
-import { z } from "zod/v4";
-import { useForm } from "@mantine/form";
-import { zod4Resolver } from "mantine-form-zod-resolver";
-import useAuth from "@/features/auth/hooks/use-auth";
+import { z } from 'zod/v4';
+import { useForm } from '@mantine/form';
+import { zod4Resolver } from 'mantine-form-zod-resolver';
+import useAuth from '@/features/auth/hooks/use-auth';
 import {
   Container,
   Title,
   TextInput,
   Button,
   PasswordInput,
-  Box,
-} from "@mantine/core";
-import classes from "./auth.module.css";
-import { useRedirectIfAuthenticated } from "@/features/auth/hooks/use-redirect-if-authenticated.ts";
-import { useTranslation } from "react-i18next";
-import { useWorkspacePublicDataQuery } from "@/features/workspace/queries/workspace-query.ts";
-import { Error404 } from "@/components/ui/error-404.tsx";
-import React from "react";
-import { AuthLayout } from "./auth-layout.tsx";
+  Box
+} from '@mantine/core';
+import classes from './auth.module.css';
+import { useRedirectIfAuthenticated } from '@/features/auth/hooks/use-redirect-if-authenticated.ts';
+import { useTranslation } from 'react-i18next';
+import { useWorkspacePublicDataQuery } from '@/features/workspace/queries/workspace-query.ts';
+import { Error404 } from '@/components/ui/error-404.tsx';
+import React from 'react';
+import { AuthLayout } from './auth-layout.tsx';
 
 const formSchema = z.object({
-  email: z
-    .email()
-    .min(1, { message: "email is required" }),
-  password: z.string().min(1, { message: "Password is required" }),
+  email: z.email().min(1, { message: 'email is required' }),
+  password: z.string().min(1, { message: 'Password is required' })
 });
 type FormValues = z.infer<typeof formSchema>;
 
@@ -34,15 +32,15 @@ export function LoginForm() {
     data,
     isLoading: isDataLoading,
     isError,
-    error,
+    error
   } = useWorkspacePublicDataQuery();
 
   const form = useForm<FormValues>({
     validate: zod4Resolver(formSchema),
     initialValues: {
-      email: "",
-      password: "",
-    },
+      email: '',
+      password: ''
+    }
   });
 
   async function onSubmit(data: FormValues) {
@@ -57,10 +55,10 @@ export function LoginForm() {
   }
 
   if (isDataLoading) {
-   return null;
+    return null;
   }
 
-  if (isError && error?.["response"]?.status === 404) {
+  if (isError && error?.['response']?.status === 404) {
     return <Error404 />;
   }
 
@@ -69,7 +67,7 @@ export function LoginForm() {
       <Container size={420} className={classes.container}>
         <Box p="xl" className={classes.containerBox}>
           <Title order={1} size="h2" ta="center" fw={500} mb="md">
-            {t("Login")}
+            {t('Login')}
           </Title>
 
           {!data?.enforceSso && (
@@ -78,32 +76,32 @@ export function LoginForm() {
                 <TextInput
                   id="email"
                   type="email"
-                  label={t("Email")}
+                  label={t('Email')}
                   placeholder="email@example.com"
                   variant="filled"
                   autoComplete="email"
-                  errorProps={{ role: "alert" }}
-                  {...form.getInputProps("email")}
+                  errorProps={{ role: 'alert' }}
+                  {...form.getInputProps('email')}
                 />
 
                 <PasswordInput
                   id="password"
-                  label={t("Password")}
-                  placeholder={t("Your password")}
+                  label={t('Password')}
+                  placeholder={t('Your password')}
                   variant="filled"
                   mt="md"
                   autoComplete="current-password"
-                  errorProps={{ role: "alert" }}
+                  errorProps={{ role: 'alert' }}
                   visibilityToggleButtonProps={{
-                    "aria-label": t("Toggle password visibility"),
-                    "aria-hidden": false,
-                    tabIndex: 0,
+                    'aria-label': t('Toggle password visibility'),
+                    'aria-hidden': false,
+                    tabIndex: 0
                   }}
-                  {...form.getInputProps("password")}
+                  {...form.getInputProps('password')}
                 />
 
                 <Button type="submit" fullWidth mt="md" loading={isLoading}>
-                  {t("Sign In")}
+                  {t('Sign In')}
                 </Button>
               </form>
             </>

@@ -9,6 +9,6 @@ import { TransclusionModule } from '../page/transclusion/transclusion.module';
   imports: [TokenModule, TransclusionModule],
   controllers: [ShareController, ShareSeoController],
   providers: [ShareService],
-  exports: [ShareService],
+  exports: [ShareService]
 })
 export class ShareModule {}

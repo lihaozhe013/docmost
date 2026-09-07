@@ -1,13 +1,13 @@
-import { isTextSelection } from "@tiptap/core";
-import { Editor } from "@tiptap/react";
+import { isTextSelection } from '@tiptap/core';
+import { Editor } from '@tiptap/react';
 
 export const isTextSelected = ({ editor }: { editor: Editor }) => {
   const {
     state: {
       doc,
       selection,
-      selection: { empty, from, to },
-    },
+      selection: { empty, from, to }
+    }
   } = editor;
 
   // Sometime check for `empty` is not enough.

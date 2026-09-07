@@ -1,33 +1,33 @@
-import "@/features/editor/styles/index.css";
-import React, { useCallback, useEffect, useState } from "react";
-import { EditorContent, useEditor } from "@tiptap/react";
-import { Document } from "@tiptap/extension-document";
-import { Heading } from "@tiptap/extension-heading";
-import { Text } from "@tiptap/extension-text";
-import { Placeholder } from "@tiptap/extension-placeholder";
-import { useAtomValue } from "jotai";
+import '@/features/editor/styles/index.css';
+import React, { useCallback, useEffect, useState } from 'react';
+import { EditorContent, useEditor } from '@tiptap/react';
+import { Document } from '@tiptap/extension-document';
+import { Heading } from '@tiptap/extension-heading';
+import { Text } from '@tiptap/extension-text';
+import { Placeholder } from '@tiptap/extension-placeholder';
+import { useAtomValue } from 'jotai';
 import {
   currentPageEditModeAtom,
   pageEditorAtom,
-  titleEditorAtom,
-} from "@/features/editor/atoms/editor-atoms";
+  titleEditorAtom
+} from '@/features/editor/atoms/editor-atoms';
 import {
   updatePageData,
-  useUpdateTitlePageMutation,
-} from "@/features/page/queries/page-query";
-import { useDebouncedCallback, getHotkeyHandler } from "@mantine/hooks";
-import { useAtom } from "jotai";
-import { useQueryEmit } from "@/features/websocket/use-query-emit.ts";
-import { History } from "@tiptap/extension-history";
-import { buildPageUrl } from "@/features/page/page.utils.ts";
-import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import EmojiCommand from "@/features/editor/extensions/emoji-command.ts";
-import { UpdateEvent } from "@/features/websocket/types";
-import localEmitter from "@/lib/local-emitter.ts";
-import { PageEditMode } from "@/features/user/types/user.types.ts";
-import { searchSpotlight } from "@/features/search/constants.ts";
-import { platformModifierKey } from "@/lib";
+  useUpdateTitlePageMutation
+} from '@/features/page/queries/page-query';
+import { useDebouncedCallback, getHotkeyHandler } from '@mantine/hooks';
+import { useAtom } from 'jotai';
+import { useQueryEmit } from '@/features/websocket/use-query-emit.ts';
+import { History } from '@tiptap/extension-history';
+import { buildPageUrl } from '@/features/page/page.utils.ts';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import EmojiCommand from '@/features/editor/extensions/emoji-command.ts';
+import { UpdateEvent } from '@/features/websocket/types';
+import localEmitter from '@/lib/local-emitter.ts';
+import { PageEditMode } from '@/features/user/types/user.types.ts';
+import { searchSpotlight } from '@/features/search/constants.ts';
+import { platformModifierKey } from '@/lib';
 
 export interface TitleEditorProps {
   pageId: string;
@@ -44,7 +44,7 @@ export function TitleEditor({
   title,
   spaceSlug,
   editable,
-  isBase,
+  isBase
 }: TitleEditorProps) {
   const { t } = useTranslation();
   const { mutateAsync: updateTitlePageMutationAsync } =
@@ -59,20 +59,20 @@ export function TitleEditor({
   const titleEditor = useEditor({
     extensions: [
       Document.extend({
-        content: "heading",
+        content: 'heading'
       }),
       Heading.configure({
-        levels: [1],
+        levels: [1]
       }),
       Text,
       Placeholder.configure({
-        placeholder: isBase ? t("Untitled base") : t("Untitled"),
-        showOnlyWhenEditable: false,
+        placeholder: isBase ? t('Untitled base') : t('Untitled'),
+        showOnlyWhenEditable: false
       }),
       History.configure({
-        depth: 20,
+        depth: 20
       }),
-      EmojiCommand,
+      EmojiCommand
     ],
     onCreate({ editor }) {
       if (editor) {
@@ -86,26 +86,26 @@ export function TitleEditor({
     },
     editable: editable,
     content: title,
-    textDirection: "auto",
+    textDirection: 'auto',
     immediatelyRender: true,
     shouldRerenderOnTransaction: false,
     editorProps: {
       attributes: {
-        "aria-label": t("Page title"),
+        'aria-label': t('Page title')
       },
       handleDOMEvents: {
         keydown: (_view, event) => {
-          if (platformModifierKey(event) && event.code === "KeyS") {
+          if (platformModifierKey(event) && event.code === 'KeyS') {
             event.preventDefault();
             return true;
           }
-          if (platformModifierKey(event) && event.code === "KeyK") {
+          if (platformModifierKey(event) && event.code === 'KeyK') {
             searchSpotlight.open();
             return true;
           }
-        },
-      },
-    },
+        }
+      }
+    }
   });
 
   useEffect(() => {
@@ -116,9 +116,9 @@ export function TitleEditor({
       {
         pathname: pageSlug,
         search: window.location.search,
-        hash: window.location.hash,
+        hash: window.location.hash
       },
-      { replace: true },
+      { replace: true }
     );
   }, [title]);
 
@@ -127,33 +127,33 @@ export function TitleEditor({
 
     if (
       titleEditor.getText() === title ||
-      (titleEditor.getText() === "" && title === null)
+      (titleEditor.getText() === '' && title === null)
     ) {
       return;
     }
 
     updateTitlePageMutationAsync({
       pageId: pageId,
-      title: titleEditor.getText(),
+      title: titleEditor.getText()
     }).then((page) => {
       const event: UpdateEvent = {
-        operation: "updateOne",
+        operation: 'updateOne',
         spaceId: page.spaceId,
-        entity: ["pages"],
+        entity: ['pages'],
         id: page.id,
         payload: {
           title: page.title,
           slugId: page.slugId,
           parentPageId: page.parentPageId,
-          icon: page.icon,
-        },
+          icon: page.icon
+        }
       };
 
       if (page.title !== titleEditor.getText()) return;
 
       updatePageData(page);
 
-      localEmitter.emit("message", event);
+      localEmitter.emit('message', event);
       emit(event);
     });
   }, [pageId, title, titleEditor]);
@@ -174,7 +174,7 @@ export function TitleEditor({
     setTimeout(() => {
       // guard against Cannot access view['hasFocus'] error
       if (!titleEditor?.isInitialized) return;
-      titleEditor?.commands?.focus("end");
+      titleEditor?.commands?.focus('end');
     }, 300);
   }, [titleEditor]);
 
@@ -187,11 +187,13 @@ export function TitleEditor({
 
   useEffect(() => {
     if (!titleEditor) return;
-    titleEditor.setEditable(editable && currentPageEditMode === PageEditMode.Edit);
+    titleEditor.setEditable(
+      editable && currentPageEditMode === PageEditMode.Edit
+    );
   }, [currentPageEditMode, titleEditor, editable]);
 
   const openSearchDialog = () => {
-    const event = new CustomEvent("openFindDialogFromEditor", {});
+    const event = new CustomEvent('openFindDialogFromEditor', {});
     document.dispatchEvent(event);
   };
 
@@ -206,7 +208,7 @@ export function TitleEditor({
     const { key } = event;
     const { $head } = titleEditor.state.selection;
 
-    if (key === "Enter") {
+    if (key === 'Enter') {
       event.preventDefault();
 
       const { $from } = titleEditor.state.selection;
@@ -227,25 +229,25 @@ export function TitleEditor({
       pageEditor
         .chain()
         .command(({ tr }) => {
-          tr.setMeta("addToHistory", false);
+          tr.setMeta('addToHistory', false);
           return true;
         })
         .insertContentAt(0, {
-          type: "paragraph",
+          type: 'paragraph',
           content: textAfterCursor
-            ? [{ type: "text", text: textAfterCursor }]
-            : undefined,
+            ? [{ type: 'text', text: textAfterCursor }]
+            : undefined
         })
-        .focus("start")
+        .focus('start')
         .run();
       return;
     }
 
     const shouldFocusEditor =
-      key === "ArrowDown" || (key === "ArrowRight" && !$head.nodeAfter);
+      key === 'ArrowDown' || (key === 'ArrowRight' && !$head.nodeAfter);
 
     if (shouldFocusEditor) {
-      pageEditor.commands.focus("start");
+      pageEditor.commands.focus('start');
     }
   }
 
@@ -255,7 +257,7 @@ export function TitleEditor({
         editor={titleEditor}
         onKeyDown={(event) => {
           // First handle the search hotkey
-          getHotkeyHandler([["mod+F", openSearchDialog]])(event);
+          getHotkeyHandler([['mod+F', openSearchDialog]])(event);
 
           // Then handle other key events
           handleTitleKeyDown(event);

@@ -1,6 +1,6 @@
-import { IconEyeOff } from "@tabler/icons-react";
-import { useTranslation } from "react-i18next";
-import classes from "./transclusion.module.css";
+import { IconEyeOff } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
+import classes from './transclusion.module.css';
 
 export default function NoAccessPlaceholder() {
   const { t } = useTranslation();

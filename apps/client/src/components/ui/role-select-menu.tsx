@@ -1,10 +1,10 @@
-import React, { forwardRef } from "react";
-import { IconCheck, IconChevronDown } from "@tabler/icons-react";
-import { Group, Text, Menu, Button } from "@mantine/core";
-import { IRoleData } from "@/lib/types.ts";
-import { useTranslation } from "react-i18next";
+import React, { forwardRef } from 'react';
+import { IconCheck, IconChevronDown } from '@tabler/icons-react';
+import { Group, Text, Menu, Button } from '@mantine/core';
+import { IRoleData } from '@/lib/types.ts';
+import { useTranslation } from 'react-i18next';
 
-interface RoleButtonProps extends React.ComponentPropsWithoutRef<"button"> {
+interface RoleButtonProps extends React.ComponentPropsWithoutRef<'button'> {
   name: string;
 }
 
@@ -14,14 +14,14 @@ const RoleButton = forwardRef<HTMLButtonElement, RoleButtonProps>(
       variant="default"
       ref={ref}
       style={{
-        border: "none",
+        border: 'none'
       }}
       rightSection={<IconChevronDown size="1rem" />}
       {...others}
     >
       {name}
     </Button>
-  ),
+  )
 );
 
 interface RoleMenuProps {
@@ -35,7 +35,7 @@ export default function RoleSelectMenu({
   roles,
   roleName,
   onChange,
-  disabled,
+  disabled
 }: RoleMenuProps) {
   const { t } = useTranslation();
 

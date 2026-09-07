@@ -9,7 +9,7 @@ export function findHighestUserSpaceRole(userSpaceRoles: UserSpaceRole[]) {
   const roleOrder: { [key in SpaceRole]: number } = {
     [SpaceRole.ADMIN]: 3,
     [SpaceRole.WRITER]: 2,
-    [SpaceRole.READER]: 1,
+    [SpaceRole.READER]: 1
   };
   let highestRole: string;
 

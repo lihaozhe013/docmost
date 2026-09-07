@@ -1,10 +1,10 @@
-import { useState, useRef, useEffect, useMemo, useCallback } from "react";
-import { ActionIcon, Menu, TextInput } from "@mantine/core";
-import { IconDots, IconTrash, IconEdit } from "@tabler/icons-react";
-import { Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import type { AiChat } from "../types/ai-chat.types";
-import classes from "../styles/chat-sidebar.module.css";
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import { ActionIcon, Menu, TextInput } from '@mantine/core';
+import { IconDots, IconTrash, IconEdit } from '@tabler/icons-react';
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import type { AiChat } from '../types/ai-chat.types';
+import classes from '../styles/chat-sidebar.module.css';
 
 type Props = {
   chat: AiChat;
@@ -15,38 +15,38 @@ type Props = {
 
 function formatChatDate(
   isoString: string | Date,
-  locale: string | undefined,
+  locale: string | undefined
 ): string {
   const date = new Date(isoString);
-  if (Number.isNaN(date.getTime())) return "";
+  if (Number.isNaN(date.getTime())) return '';
 
   const now = new Date();
   const startOfToday = new Date(
     now.getFullYear(),
     now.getMonth(),
-    now.getDate(),
+    now.getDate()
   ).getTime();
   const ts = date.getTime();
   const sameYear = date.getFullYear() === now.getFullYear();
 
   if (ts >= startOfToday) {
     return date.toLocaleTimeString(locale, {
-      hour: "numeric",
-      minute: "2-digit",
+      hour: 'numeric',
+      minute: '2-digit'
     });
   }
 
   if (sameYear) {
     return date.toLocaleDateString(locale, {
-      month: "short",
-      day: "numeric",
+      month: 'short',
+      day: 'numeric'
     });
   }
 
   return date.toLocaleDateString(locale, {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
   });
 }
 
@@ -54,19 +54,19 @@ export default function AiChatSidebarItem({
   chat,
   isActive,
   onDelete,
-  onRename,
+  onRename
 }: Props) {
   const { t, i18n } = useTranslation();
   const [renaming, setRenaming] = useState(false);
-  const [renameValue, setRenameValue] = useState("");
+  const [renameValue, setRenameValue] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
   const formattedDate = useMemo(
     () => formatChatDate(chat.updatedAt, i18n.language),
-    [chat.updatedAt, i18n.language],
+    [chat.updatedAt, i18n.language]
   );
 
-  const chatTitle = chat.title || t("Untitled chat");
+  const chatTitle = chat.title || t('Untitled chat');
 
   useEffect(() => {
     if (renaming) {
@@ -77,7 +77,7 @@ export default function AiChatSidebarItem({
   }, [renaming]);
 
   const startRename = useCallback(() => {
-    setRenameValue(chat.title || "");
+    setRenameValue(chat.title || '');
     setRenaming(true);
   }, [chat.title]);
 
@@ -96,14 +96,14 @@ export default function AiChatSidebarItem({
           ref={inputRef}
           size="xs"
           variant="unstyled"
-          placeholder={t("Chat name")}
+          placeholder={t('Chat name')}
           value={renameValue}
           onChange={(e) => setRenameValue(e.currentTarget.value)}
           onKeyDown={(e) => {
-            if (e.key === "Enter") {
+            if (e.key === 'Enter') {
               e.preventDefault();
               submitRename();
-            } else if (e.key === "Escape") {
+            } else if (e.key === 'Escape') {
               e.preventDefault();
               setRenaming(false);
             }
@@ -132,7 +132,7 @@ export default function AiChatSidebarItem({
               size="xs"
               color="gray"
               onClick={(e) => e.preventDefault()}
-              aria-label={t("Chat menu for {{title}}", { title: chatTitle })}
+              aria-label={t('Chat menu for {{title}}', { title: chatTitle })}
             >
               <IconDots size={14} />
             </ActionIcon>
@@ -146,7 +146,7 @@ export default function AiChatSidebarItem({
                 startRename();
               }}
             >
-              {t("Rename")}
+              {t('Rename')}
             </Menu.Item>
             <Menu.Item
               leftSection={<IconTrash size={14} />}
@@ -157,7 +157,7 @@ export default function AiChatSidebarItem({
                 onDelete(chat.id, chat.title);
               }}
             >
-              {t("Delete")}
+              {t('Delete')}
             </Menu.Item>
           </Menu.Dropdown>
         </Menu>

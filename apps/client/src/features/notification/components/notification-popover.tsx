@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useId, useState } from 'react';
 import {
   ActionIcon,
   Group,
@@ -8,33 +8,33 @@ import {
   ScrollArea,
   Tabs,
   Title,
-  Tooltip,
-} from "@mantine/core";
+  Tooltip
+} from '@mantine/core';
 import {
   IconBell,
   IconCheck,
   IconChecks,
   IconDots,
-  IconFilter,
-} from "@tabler/icons-react";
-import { useTranslation } from "react-i18next";
-import { NotificationList } from "./notification-list";
+  IconFilter
+} from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
+import { NotificationList } from './notification-list';
 import {
   NotificationFilter,
-  NotificationTab,
-} from "../types/notification.types";
+  NotificationTab
+} from '../types/notification.types';
 import {
   useMarkAllReadMutation,
-  useUnreadCountQuery,
-} from "../queries/notification-query";
-import classes from "../notification.module.css";
+  useUnreadCountQuery
+} from '../queries/notification-query';
+import classes from '../notification.module.css';
 
 export function NotificationPopover() {
   const { t } = useTranslation();
   const titleId = useId();
   const [opened, setOpened] = useState(false);
-  const [tab, setTab] = useState<NotificationTab>("direct");
-  const [filter, setFilter] = useState<NotificationFilter>("all");
+  const [tab, setTab] = useState<NotificationTab>('direct');
+  const [filter, setFilter] = useState<NotificationFilter>('all');
   const [filterMenuOpened, setFilterMenuOpened] = useState(false);
   const [moreMenuOpened, setMoreMenuOpened] = useState(false);
 
@@ -60,12 +60,12 @@ export function NotificationPopover() {
       closeOnEscape={!isSubMenuOpen}
     >
       <Popover.Target>
-        <Tooltip label={t("Notifications")} withArrow>
+        <Tooltip label={t('Notifications')} withArrow>
           <ActionIcon
             variant="subtle"
             color="dark"
             size="sm"
-            aria-label={t("Notifications")}
+            aria-label={t('Notifications')}
             aria-haspopup="dialog"
             aria-expanded={opened}
             onClick={() => setOpened((o) => !o)}
@@ -85,11 +85,11 @@ export function NotificationPopover() {
       <Popover.Dropdown
         p={0}
         aria-labelledby={titleId}
-        style={{ width: "min(420px, calc(100vw - 24px))" }}
+        style={{ width: 'min(420px, calc(100vw - 24px))' }}
       >
         <Group justify="space-between" px="md" py="sm">
           <Title id={titleId} order={2} fz="sm" fw={600}>
-            {t("Notifications")}
+            {t('Notifications')}
           </Title>
           <Group gap={4}>
             <Menu
@@ -100,34 +100,34 @@ export function NotificationPopover() {
               onChange={setFilterMenuOpened}
             >
               <Menu.Target>
-                <Tooltip label={t("Filter")} withArrow>
+                <Tooltip label={t('Filter')} withArrow>
                   <ActionIcon
                     variant="subtle"
                     color="dark"
                     size="sm"
-                    aria-label={t("Filter")}
+                    aria-label={t('Filter')}
                   >
                     <IconFilter size={16} />
                   </ActionIcon>
                 </Tooltip>
               </Menu.Target>
               <Menu.Dropdown>
-                <Menu.Label>{t("Filter")}</Menu.Label>
+                <Menu.Label>{t('Filter')}</Menu.Label>
                 <Menu.Item
-                  onClick={() => setFilter("all")}
+                  onClick={() => setFilter('all')}
                   rightSection={
-                    filter === "all" ? <IconCheck size={14} /> : null
+                    filter === 'all' ? <IconCheck size={14} /> : null
                   }
                 >
-                  {t("All notifications")}
+                  {t('All notifications')}
                 </Menu.Item>
                 <Menu.Item
-                  onClick={() => setFilter("unread")}
+                  onClick={() => setFilter('unread')}
                   rightSection={
-                    filter === "unread" ? <IconCheck size={14} /> : null
+                    filter === 'unread' ? <IconCheck size={14} /> : null
                   }
                 >
-                  {t("Unread only")}
+                  {t('Unread only')}
                 </Menu.Item>
               </Menu.Dropdown>
             </Menu>
@@ -140,12 +140,12 @@ export function NotificationPopover() {
               onChange={setMoreMenuOpened}
             >
               <Menu.Target>
-                <Tooltip label={t("More options")} withArrow>
+                <Tooltip label={t('More options')} withArrow>
                   <ActionIcon
                     variant="subtle"
                     color="dark"
                     size="sm"
-                    aria-label={t("More options")}
+                    aria-label={t('More options')}
                   >
                     <IconDots size={16} />
                   </ActionIcon>
@@ -157,7 +157,7 @@ export function NotificationPopover() {
                   onClick={handleMarkAllRead}
                   disabled={unreadCount === 0}
                 >
-                  {t("Mark all as read")}
+                  {t('Mark all as read')}
                 </Menu.Item>
               </Menu.Dropdown>
             </Menu>
@@ -171,8 +171,8 @@ export function NotificationPopover() {
           color="dark"
         >
           <Tabs.List px="md">
-            <Tabs.Tab value="direct">{t("Direct")}</Tabs.Tab>
-            <Tabs.Tab value="updates">{t("Updates")}</Tabs.Tab>
+            <Tabs.Tab value="direct">{t('Direct')}</Tabs.Tab>
+            <Tabs.Tab value="updates">{t('Updates')}</Tabs.Tab>
           </Tabs.List>
         </Tabs>
 
@@ -181,7 +181,7 @@ export function NotificationPopover() {
           type="auto"
           offsetScrollbars
           scrollbarSize={6}
-          style={{ overscrollBehavior: "contain" }}
+          style={{ overscrollBehavior: 'contain' }}
         >
           <NotificationList
             tab={tab}

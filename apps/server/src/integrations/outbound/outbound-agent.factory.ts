@@ -39,17 +39,17 @@ export class OutboundAgentFactory implements IOutboundAgentFactory {
         ca: tls?.caCert || undefined,
         rejectUnauthorized: tls?.rejectUnauthorized ?? true,
         lookup: lookup as any,
-        timeout: OUTBOUND_REQUEST_TIMEOUT_MS,
+        timeout: OUTBOUND_REQUEST_TIMEOUT_MS
       },
       headersTimeout: OUTBOUND_REQUEST_TIMEOUT_MS,
-      bodyTimeout: OUTBOUND_REQUEST_TIMEOUT_MS,
+      bodyTimeout: OUTBOUND_REQUEST_TIMEOUT_MS
     });
 
     return {
       dispatcher: agent,
       release: async () => {
         await agent.close();
-      },
+      }
     };
   }
 }

@@ -1,8 +1,11 @@
-import { useCallback } from "react";
-import type { Editor } from "@tiptap/react";
-import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
-import { isEditorReady } from "@docmost/editor-ext";
-import { buildRowOrColumnSelection, Orientation } from "../lib/select-row-column";
+import { useCallback } from 'react';
+import type { Editor } from '@tiptap/react';
+import type { Node as ProseMirrorNode } from '@tiptap/pm/model';
+import { isEditorReady } from '@docmost/editor-ext';
+import {
+  buildRowOrColumnSelection,
+  Orientation
+} from '../lib/select-row-column';
 
 interface Args {
   editor: Editor;
@@ -17,7 +20,7 @@ export function useColumnRowMenuLifecycle({
   orientation,
   index,
   tableNode,
-  tablePos,
+  tablePos
 }: Args) {
   const onOpen = useCallback(() => {
     if (!isEditorReady(editor)) return;
@@ -26,7 +29,7 @@ export function useColumnRowMenuLifecycle({
       tableNode,
       tablePos,
       orientation,
-      index,
+      index
     );
     const tr = editor.state.tr;
     if (selection) tr.setSelection(selection);

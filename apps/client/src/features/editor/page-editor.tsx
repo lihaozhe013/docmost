@@ -1,91 +1,88 @@
-import "@/features/editor/styles/index.css";
+import '@/features/editor/styles/index.css';
 import React, {
   useCallback,
   useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
-  useState,
-} from "react";
-import { IndexeddbPersistence } from "y-indexeddb";
-import {
-  WebSocketStatus,
-  onStatelessParameters,
-} from "@hocuspocus/provider";
+  useState
+} from 'react';
+import { IndexeddbPersistence } from 'y-indexeddb';
+import { WebSocketStatus, onStatelessParameters } from '@hocuspocus/provider';
 import {
   HocuspocusProviderWebsocketComponent,
   HocuspocusRoom,
   useHocuspocusEvent,
-  useHocuspocusProvider,
-} from "@hocuspocus/provider-react";
+  useHocuspocusProvider
+} from '@hocuspocus/provider-react';
 import {
   Editor,
   EditorContent,
   EditorProvider,
   useEditor,
-  useEditorState,
-} from "@tiptap/react";
+  useEditorState
+} from '@tiptap/react';
 import {
   collabExtensions,
-  mainExtensions,
-} from "@/features/editor/extensions/extensions";
-import { useAtom, useAtomValue } from "jotai";
-import { currentUserAtom } from "@/features/user/atoms/current-user-atom";
+  mainExtensions
+} from '@/features/editor/extensions/extensions';
+import { useAtom, useAtomValue } from 'jotai';
+import { currentUserAtom } from '@/features/user/atoms/current-user-atom';
 import {
   currentPageEditModeAtom,
   lightboxRequestAtom,
   pageEditorAtom,
   yjsConnectionStatusAtom,
-  yjsSyncedAtom,
-} from "@/features/editor/atoms/editor-atoms";
-import { asideStateAtom } from "@/components/layouts/global/hooks/atoms/sidebar-atom";
+  yjsSyncedAtom
+} from '@/features/editor/atoms/editor-atoms';
+import { asideStateAtom } from '@/components/layouts/global/hooks/atoms/sidebar-atom';
 import {
   activeCommentIdAtom,
   showCommentPopupAtom,
-  showReadOnlyCommentPopupAtom,
-} from "@/features/comment/atoms/comment-atom";
-import CommentDialog from "@/features/comment/components/comment-dialog";
-import { EditorBubbleMenu } from "@/features/editor/components/bubble-menu/bubble-menu";
-import { ReadonlyBubbleMenu } from "@/features/editor/components/bubble-menu/readonly-bubble-menu";
-import TableMenu from "@/features/editor/components/table/table-menu.tsx";
-import { TableHandlesLayer } from "@/features/editor/components/table/handle/table-handles-layer";
-import ImageMenu from "@/features/editor/components/image/image-menu.tsx";
-import CalloutMenu from "@/features/editor/components/callout/callout-menu.tsx";
-import VideoMenu from "@/features/editor/components/video/video-menu.tsx";
-import PdfMenu from "@/features/editor/components/pdf/pdf-menu.tsx";
-import SubpagesMenu from "@/features/editor/components/subpages/subpages-menu.tsx";
+  showReadOnlyCommentPopupAtom
+} from '@/features/comment/atoms/comment-atom';
+import CommentDialog from '@/features/comment/components/comment-dialog';
+import { EditorBubbleMenu } from '@/features/editor/components/bubble-menu/bubble-menu';
+import { ReadonlyBubbleMenu } from '@/features/editor/components/bubble-menu/readonly-bubble-menu';
+import TableMenu from '@/features/editor/components/table/table-menu.tsx';
+import { TableHandlesLayer } from '@/features/editor/components/table/handle/table-handles-layer';
+import ImageMenu from '@/features/editor/components/image/image-menu.tsx';
+import CalloutMenu from '@/features/editor/components/callout/callout-menu.tsx';
+import VideoMenu from '@/features/editor/components/video/video-menu.tsx';
+import PdfMenu from '@/features/editor/components/pdf/pdf-menu.tsx';
+import SubpagesMenu from '@/features/editor/components/subpages/subpages-menu.tsx';
 import LightboxView, {
-  getLightboxClickRequest,
-} from "@/features/editor/components/common/lightbox-view";
+  getLightboxClickRequest
+} from '@/features/editor/components/common/lightbox-view';
 import {
   handleFileDrop,
-  handlePaste,
-} from "@/features/editor/components/common/editor-paste-handler.tsx";
-import ExcalidrawMenu from "./components/excalidraw/excalidraw-menu-lazy";
-import DrawioMenu from "./components/drawio/drawio-menu";
-import { useCollabToken } from "@/features/auth/queries/auth-query.tsx";
-import SearchAndReplaceDialog from "@/features/editor/components/search-and-replace/search-and-replace-dialog.tsx";
-import { useDebouncedCallback, useDocumentVisibility } from "@mantine/hooks";
-import { useIdle } from "@/hooks/use-idle.ts";
-import { queryClient } from "@/main.tsx";
-import { IPage } from "@/features/page/types/page.types.ts";
-import { useParams } from "react-router-dom";
-import { extractPageSlugId, platformModifierKey } from "@/lib";
-import { FIVE_MINUTES } from "@/lib/constants.ts";
-import { PageEditMode } from "@/features/user/types/user.types.ts";
-import { jwtDecode } from "jwt-decode";
-import { searchSpotlight } from "@/features/search/constants.ts";
-import { useEditorScroll } from "./hooks/use-editor-scroll";
-import { EditorAiMenu } from "@/ee/ai/components/editor/ai-menu/ai-menu";
-import { EditorLinkMenu } from "@/features/editor/components/link/link-menu";
-import ColumnsMenu from "@/features/editor/components/columns/columns-menu.tsx";
-import { TransclusionLookupProvider } from "@/features/editor/components/transclusion/transclusion-lookup-context";
-import { useTranslation } from "react-i18next";
+  handlePaste
+} from '@/features/editor/components/common/editor-paste-handler.tsx';
+import ExcalidrawMenu from './components/excalidraw/excalidraw-menu-lazy';
+import DrawioMenu from './components/drawio/drawio-menu';
+import { useCollabToken } from '@/features/auth/queries/auth-query.tsx';
+import SearchAndReplaceDialog from '@/features/editor/components/search-and-replace/search-and-replace-dialog.tsx';
+import { useDebouncedCallback, useDocumentVisibility } from '@mantine/hooks';
+import { useIdle } from '@/hooks/use-idle.ts';
+import { queryClient } from '@/main.tsx';
+import { IPage } from '@/features/page/types/page.types.ts';
+import { useParams } from 'react-router-dom';
+import { extractPageSlugId, platformModifierKey } from '@/lib';
+import { FIVE_MINUTES } from '@/lib/constants.ts';
+import { PageEditMode } from '@/features/user/types/user.types.ts';
+import { jwtDecode } from 'jwt-decode';
+import { searchSpotlight } from '@/features/search/constants.ts';
+import { useEditorScroll } from './hooks/use-editor-scroll';
+import { EditorAiMenu } from '@/ee/ai/components/editor/ai-menu/ai-menu';
+import { EditorLinkMenu } from '@/features/editor/components/link/link-menu';
+import ColumnsMenu from '@/features/editor/components/columns/columns-menu.tsx';
+import { TransclusionLookupProvider } from '@/features/editor/components/transclusion/transclusion-lookup-context';
+import { useTranslation } from 'react-i18next';
 import {
   acquireCollabSocket,
   getCollabSocket,
-  releaseCollabSocket,
-} from "@/features/editor/collab-socket";
+  releaseCollabSocket
+} from '@/features/editor/collab-socket';
 
 interface PageEditorProps {
   pageId: string;
@@ -98,7 +95,7 @@ export default function PageEditor({
   pageId,
   editable,
   content,
-  canComment,
+  canComment
 }: PageEditorProps) {
   const { t } = useTranslation();
   const { data: collabQuery, refetch: refetchCollabToken } = useCollabToken();
@@ -116,15 +113,15 @@ export default function PageEditor({
   const handleStateless = ({ payload }: onStatelessParameters) => {
     try {
       const message = JSON.parse(payload);
-      if (message?.type !== "page.updated" || !message.updatedAt) return;
-      const pageData = queryClient.getQueryData<IPage>(["pages", slugId]);
+      if (message?.type !== 'page.updated' || !message.updatedAt) return;
+      const pageData = queryClient.getQueryData<IPage>(['pages', slugId]);
       if (pageData) {
-        queryClient.setQueryData(["pages", slugId], {
+        queryClient.setQueryData(['pages', slugId], {
           ...pageData,
           updatedAt: message.updatedAt,
           ...(message.lastUpdatedBy && {
-            lastUpdatedBy: message.lastUpdatedBy,
-          }),
+            lastUpdatedBy: message.lastUpdatedBy
+          })
         });
       }
     } catch {
@@ -161,7 +158,7 @@ export default function PageEditor({
           </HocuspocusRoom>
         </HocuspocusProviderWebsocketComponent>
       ) : (
-        <StaticPageEditor content={content} ariaLabel={t("Page content")} />
+        <StaticPageEditor content={content} ariaLabel={t('Page content')} />
       )}
     </TransclusionLookupProvider>
   );
@@ -171,7 +168,7 @@ function CollabPageEditor({
   pageId,
   editable,
   content,
-  canComment,
+  canComment
 }: PageEditorProps) {
   const { t } = useTranslation();
   const provider = useHocuspocusProvider();
@@ -192,7 +189,7 @@ function CollabPageEditor({
   const [isLocalSynced, setIsLocalSynced] = useState(false);
   const [isRemoteSynced, setIsRemoteSynced] = useState(false);
   const [yjsConnectionStatus, setYjsConnectionStatus] = useAtom(
-    yjsConnectionStatusAtom,
+    yjsConnectionStatusAtom
   );
   const [, setYjsSynced] = useAtom(yjsSyncedAtom);
   const menuContainerRef = useRef(null);
@@ -203,23 +200,23 @@ function CollabPageEditor({
   const currentPageEditMode = useAtomValue(currentPageEditModeAtom);
   const canScroll = useCallback(
     () => Boolean(isComponentMounted.current && editorRef.current),
-    [isComponentMounted],
+    [isComponentMounted]
   );
   const { handleScrollTo } = useEditorScroll({ canScroll });
 
   useEffect(() => {
     const local = new IndexeddbPersistence(
       provider.configuration.name,
-      provider.document,
+      provider.document
     );
-    local.on("synced", () => setIsLocalSynced(true));
+    local.on('synced', () => setIsLocalSynced(true));
     return () => {
       local.destroy();
     };
   }, [provider]);
 
-  useHocuspocusEvent("synced", ({ state }) => setIsRemoteSynced(state));
-  useHocuspocusEvent("status", ({ status }) => setYjsConnectionStatus(status));
+  useHocuspocusEvent('synced', ({ state }) => setIsRemoteSynced(state));
+  useHocuspocusEvent('status', ({ status }) => setYjsConnectionStatus(status));
 
   // Only connect/disconnect on tab/idle, not destroy
   useEffect(() => {
@@ -227,14 +224,14 @@ function CollabPageEditor({
 
     if (
       isIdle &&
-      documentState === "hidden" &&
+      documentState === 'hidden' &&
       yjsConnectionStatus === WebSocketStatus.Connected
     ) {
       socket.disconnect();
       return;
     }
     if (
-      documentState === "visible" &&
+      documentState === 'visible' &&
       yjsConnectionStatus === WebSocketStatus.Disconnected
     ) {
       resetIdle();
@@ -251,12 +248,12 @@ function CollabPageEditor({
   }, [provider, currentUser?.user]);
 
   const debouncedUpdateContent = useDebouncedCallback((newContent: any) => {
-    const pageData = queryClient.getQueryData<IPage>(["pages", slugId]);
+    const pageData = queryClient.getQueryData<IPage>(['pages', slugId]);
 
     if (pageData) {
-      queryClient.setQueryData(["pages", slugId], {
+      queryClient.setQueryData(['pages', slugId], {
         ...pageData,
-        content: newContent,
+        content: newContent
       });
     }
   }, 3000);
@@ -265,46 +262,46 @@ function CollabPageEditor({
     {
       extensions,
       editable,
-      textDirection: "auto",
+      textDirection: 'auto',
       immediatelyRender: true,
       shouldRerenderOnTransaction: false,
       editorProps: {
         scrollThreshold: 80,
         scrollMargin: 80,
         attributes: {
-          "aria-label": t("Page content"),
+          'aria-label': t('Page content')
         },
         handleDOMEvents: {
           keydown: (_view, event) => {
-            if (platformModifierKey(event) && event.code === "KeyS") {
+            if (platformModifierKey(event) && event.code === 'KeyS') {
               event.preventDefault();
               return true;
             }
-            if (platformModifierKey(event) && event.code === "KeyK") {
+            if (platformModifierKey(event) && event.code === 'KeyK') {
               searchSpotlight.open();
               return true;
             }
-            if (["ArrowUp", "ArrowDown", "Enter"].includes(event.key)) {
-              const slashCommand = document.querySelector("#slash-command");
+            if (['ArrowUp', 'ArrowDown', 'Enter'].includes(event.key)) {
+              const slashCommand = document.querySelector('#slash-command');
               if (slashCommand) {
                 return true;
               }
             }
             if (
               [
-                "ArrowUp",
-                "ArrowDown",
-                "ArrowLeft",
-                "ArrowRight",
-                "Enter",
+                'ArrowUp',
+                'ArrowDown',
+                'ArrowLeft',
+                'ArrowRight',
+                'Enter'
               ].includes(event.key)
             ) {
-              const emojiCommand = document.querySelector("#emoji-command");
+              const emojiCommand = document.querySelector('#emoji-command');
               if (emojiCommand) {
                 return true;
               }
             }
-          },
+          }
         },
         handlePaste: (_view, event) => {
           if (!editorRef.current) return false;
@@ -313,7 +310,7 @@ function CollabPageEditor({
             editorRef.current,
             event,
             pageId,
-            currentUser?.user.id,
+            currentUser?.user.id
           );
         },
         handleDrop: (_view, event, _slice, moved) => {
@@ -336,7 +333,7 @@ function CollabPageEditor({
 
           setLightboxRequest(request);
           return true;
-        },
+        }
       },
       onCreate({ editor }) {
         if (editor) {
@@ -353,9 +350,9 @@ function CollabPageEditor({
         const editorJson = editor.getJSON();
         //update local page cache to reduce flickers
         debouncedUpdateContent(editorJson);
-      },
+      }
     },
-    [pageId, editable, extensions],
+    [pageId, editable, extensions]
   );
 
   useLayoutEffect(() => {
@@ -372,7 +369,7 @@ function CollabPageEditor({
     editor,
     selector: (ctx) => {
       return ctx.editor?.isEditable ?? false;
-    },
+    }
   });
 
   const handleActiveCommentEvent = (event) => {
@@ -383,22 +380,22 @@ function CollabPageEditor({
     }
 
     setActiveCommentId(commentId);
-    setAsideState({ tab: "comments", isAsideOpen: true });
+    setAsideState({ tab: 'comments', isAsideOpen: true });
 
     //wait if aside is closed
     setTimeout(() => {
       const selector = `div[data-comment-id="${commentId}"]`;
       const commentElement = document.querySelector(selector);
-      commentElement?.scrollIntoView({ behavior: "smooth", block: "center" });
+      commentElement?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 400);
   };
 
   useEffect(() => {
-    document.addEventListener("ACTIVE_COMMENT_EVENT", handleActiveCommentEvent);
+    document.addEventListener('ACTIVE_COMMENT_EVENT', handleActiveCommentEvent);
     return () => {
       document.removeEventListener(
-        "ACTIVE_COMMENT_EVENT",
-        handleActiveCommentEvent,
+        'ACTIVE_COMMENT_EVENT',
+        handleActiveCommentEvent
       );
     };
   }, []);
@@ -406,7 +403,7 @@ function CollabPageEditor({
   useEffect(() => {
     setActiveCommentId(null);
     setShowCommentPopup(false);
-    setAsideState({ tab: "", isAsideOpen: false });
+    setAsideState({ tab: '', isAsideOpen: false });
     setLightboxRequest(null);
   }, [pageId]);
 
@@ -449,11 +446,11 @@ function CollabPageEditor({
   }, [yjsConnectionStatus, isSynced]);
 
   if (showStatic) {
-    return <StaticPageEditor content={content} ariaLabel={t("Page content")} />;
+    return <StaticPageEditor content={content} ariaLabel={t('Page content')} />;
   }
 
   return (
-    <div className="editor-container" style={{ position: "relative" }}>
+    <div className="editor-container" style={{ position: 'relative' }}>
       <div ref={menuContainerRef}>
         <EditorContent editor={editor} />
 
@@ -485,8 +482,8 @@ function CollabPageEditor({
           <LightboxView
             editor={editor}
             open={!!lightboxRequest}
-            src={lightboxRequest?.src ?? ""}
-            type={lightboxRequest?.type ?? "image"}
+            src={lightboxRequest?.src ?? ''}
+            type={lightboxRequest?.type ?? 'image'}
             onClose={() => setLightboxRequest(null)}
           />
         )}
@@ -497,9 +494,9 @@ function CollabPageEditor({
       </div>
       <div
         onClick={() => {
-          if (editor && !editor.isDestroyed) editor.commands.focus("end");
+          if (editor && !editor.isDestroyed) editor.commands.focus('end');
         }}
-        style={{ paddingBottom: "20vh" }}
+        style={{ paddingBottom: '20vh' }}
       ></div>
     </div>
   );
@@ -507,7 +504,7 @@ function CollabPageEditor({
 
 function StaticPageEditor({
   content,
-  ariaLabel,
+  ariaLabel
 }: {
   content: any;
   ariaLabel: string;
@@ -521,8 +518,8 @@ function StaticPageEditor({
       content={content}
       editorProps={{
         attributes: {
-          "aria-label": ariaLabel,
-        },
+          'aria-label': ariaLabel
+        }
       }}
     />
   );

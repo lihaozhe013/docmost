@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import {
   RedisModuleOptions,
-  RedisOptionsFactory,
+  RedisOptionsFactory
 } from '@nestjs-labs/nestjs-ioredis';
 import { createRetryStrategy, parseRedisUrl } from '../../common/helpers';
 import { EnvironmentService } from '../environment/environment.service';
@@ -21,8 +21,8 @@ export class RedisConfigService implements RedisOptionsFactory {
         db: redisConfig.db,
         family: redisConfig.family,
         tls: redisConfig.tls,
-        retryStrategy: createRetryStrategy(),
-      },
+        retryStrategy: createRetryStrategy()
+      }
     };
   }
 }

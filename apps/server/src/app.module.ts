@@ -48,7 +48,7 @@ try {
   imports: [
     ClsModule.forRoot({
       global: true,
-      middleware: { mount: true },
+      middleware: { mount: true }
     }),
     LoggerModule,
     ...(enterpriseModules.length > 0 ? [] : [NoopAuditModule]),
@@ -57,7 +57,7 @@ try {
     EnvironmentModule,
     EncryptionModule,
     RedisModule.forRootAsync({
-      useClass: RedisConfigService,
+      useClass: RedisConfigService
     }),
     CacheModule.registerAsync({
       isGlobal: true,
@@ -73,13 +73,13 @@ try {
               socket: {
                 family,
                 reconnectStrategy: defaultReconnectStrategy,
-                ...tls,
-              },
-            }),
-          ],
+                ...tls
+              }
+            })
+          ]
         };
       },
-      inject: [EnvironmentService],
+      inject: [EnvironmentService]
     }),
     CollaborationModule,
     WsModule,
@@ -89,22 +89,22 @@ try {
     ImportModule,
     ExportModule,
     StorageModule.forRootAsync({
-      imports: [EnvironmentModule],
+      imports: [EnvironmentModule]
     }),
     EventEmitterModule.forRoot(),
     SecurityModule,
     TelemetryModule,
     ThrottleModule,
     OutboundModule,
-    ...enterpriseModules,
+    ...enterpriseModules
   ],
   controllers: [AppController],
   providers: [
     AppService,
     {
       provide: APP_INTERCEPTOR,
-      useClass: AuditActorInterceptor,
-    },
-  ],
+      useClass: AuditActorInterceptor
+    }
+  ]
 })
 export class AppModule {}

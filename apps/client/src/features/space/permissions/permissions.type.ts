@@ -1,14 +1,14 @@
 export enum SpaceCaslAction {
-  Manage = "manage",
-  Create = "create",
-  Read = "read",
-  Edit = "edit",
-  Delete = "delete",
+  Manage = 'manage',
+  Create = 'create',
+  Read = 'read',
+  Edit = 'edit',
+  Delete = 'delete'
 }
 export enum SpaceCaslSubject {
-  Settings = "settings",
-  Member = "member",
-  Page = "page",
+  Settings = 'settings',
+  Member = 'member',
+  Page = 'page'
 }
 
 // Bases are pages and inherit Page permissions — a separate Base

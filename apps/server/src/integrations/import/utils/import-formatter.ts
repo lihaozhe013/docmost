@@ -36,7 +36,7 @@ export async function formatImportHtml(opts: {
     filePathToPageMetaMap,
     creatorId,
     sourcePageId,
-    workspaceId,
+    workspaceId
   } = opts;
   const $: CheerioAPI = load(html);
   const $root: Cheerio<any> = $.root();
@@ -62,13 +62,13 @@ export async function formatImportHtml(opts: {
     creatorId,
     sourcePageId,
     workspaceId,
-    opts.spaceSlug,
+    opts.spaceSlug
   );
 
   return {
     html: $root.html() || '',
     backlinks,
-    pageIcon: pageIcon || undefined,
+    pageIcon: pageIcon || undefined
   };
 }
 
@@ -80,10 +80,7 @@ export async function formatImportHtml(opts: {
  *
  * Does NOT run rewriteInternalLinksToMentionHtml — that requires zip context.
  */
-export function normalizeImportHtml(
-  $: CheerioAPI,
-  $root: Cheerio<any>,
-): void {
+export function normalizeImportHtml($: CheerioAPI, $root: Cheerio<any>): void {
   notionFormatter($, $root);
   xwikiFormatter($, $root);
   defaultHtmlFormatter($, $root);
@@ -98,10 +95,10 @@ export function xwikiFormatter($: CheerioAPI, $root: Cheerio<any>) {
 }
 
 function isBareLink($el: Cheerio<any>): boolean {
-  const href = $el.attr("href")?.trim();
+  const href = $el.attr('href')?.trim();
   const text = $el.text().trim();
 
-  if(!text || !href) return false
+  if (!text || !href) return false;
 
   return text === href;
 }
@@ -137,7 +134,7 @@ const COLUMN_LAYOUTS = [
   'two_equal',
   'three_equal',
   'four_equal',
-  'five_equal',
+  'five_equal'
 ] as const;
 
 export function notionFormatter($: CheerioAPI, $root: Cheerio<any>) {
@@ -171,7 +168,7 @@ export function notionFormatter($: CheerioAPI, $root: Cheerio<any>) {
     });
 
     $list.replaceWith(
-      `<div data-type="columns" data-layout="${layout}">${cells}</div>`,
+      `<div data-type="columns" data-layout="${layout}">${cells}</div>`
     );
   });
 
@@ -348,7 +345,7 @@ export async function rewriteInternalLinksToMentionHtml(
   creatorId: string,
   sourcePageId: string,
   workspaceId: string,
-  spaceSlug?: string,
+  spaceSlug?: string
 ): Promise<InsertableBacklink[]> {
   const normalize = (p: string) => p.replace(/\\/g, '/');
   const backlinks: InsertableBacklink[] = [];
@@ -363,20 +360,19 @@ export async function rewriteInternalLinksToMentionHtml(
     } catch (err) {
       Logger.warn(
         `URI malformed in page ${currentFilePath}: ${raw}. Falling back to raw path.`,
-        'ImportFormatter',
+        'ImportFormatter'
       );
     }
 
     const resolved = normalize(
-      path.join(path.dirname(currentFilePath), decodedRaw),
+      path.join(path.dirname(currentFilePath), decodedRaw)
     );
     const meta = filePathToPageMetaMap.get(resolved);
     if (!meta) return;
 
     const linkText = $a.text().trim();
     const titleMatch =
-      linkText === meta.title ||
-      linkText === meta.title?.trim();
+      linkText === meta.title || linkText === meta.title?.trim();
 
     if (titleMatch) {
       const mentionId = v7();
@@ -388,7 +384,7 @@ export async function rewriteInternalLinksToMentionHtml(
           'data-entity-id': meta.id,
           'data-label': meta.title,
           'data-slug-id': meta.slugId,
-          'data-creator-id': creatorId,
+          'data-creator-id': creatorId
         })
         .text(meta.title);
       $a.replaceWith($mention);

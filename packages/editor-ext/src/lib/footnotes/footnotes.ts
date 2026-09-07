@@ -1,28 +1,28 @@
 //Source MIT - https://github.com/buttondown/tiptap-footnotes
-import OrderedList from "@tiptap/extension-ordered-list";
-import FootnoteRules from "./rules";
+import OrderedList from '@tiptap/extension-ordered-list';
+import FootnoteRules from './rules';
 
 const Footnotes = OrderedList.extend({
-  name: "footnotes",
-  group: "", // removed the default group of the ordered list extension
+  name: 'footnotes',
+  group: '', // removed the default group of the ordered list extension
   isolating: true,
   defining: true,
   draggable: false,
 
   content() {
-    return "footnote*";
+    return 'footnote*';
   },
   addAttributes() {
     return {
       class: {
-        default: "footnotes",
+        default: 'footnotes',
       },
     };
   },
   parseHTML() {
     return [
       {
-        tag: "ol.footnotes",
+        tag: 'ol.footnotes',
         priority: 1000,
       },
     ];

@@ -7,15 +7,15 @@ export interface QueryParams {
 }
 
 export enum UserRole {
-  OWNER = "owner",
-  ADMIN = "admin",
-  MEMBER = "member",
+  OWNER = 'owner',
+  ADMIN = 'admin',
+  MEMBER = 'member'
 }
 
 export enum SpaceRole {
-  ADMIN = "admin",
-  WRITER = "writer",
-  READER = "reader",
+  ADMIN = 'admin',
+  WRITER = 'writer',
+  READER = 'reader'
 }
 
 export interface IRoleData {

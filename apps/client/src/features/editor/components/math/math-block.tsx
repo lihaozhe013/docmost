@@ -1,14 +1,14 @@
-import "katex/dist/katex.min.css";
-import katex from "katex";
+import 'katex/dist/katex.min.css';
+import katex from 'katex';
 //import "katex/dist/contrib/mhchem.min.js";
-import { useEffect, useRef, useState } from "react";
-import { NodeViewProps, NodeViewWrapper } from "@tiptap/react";
-import { ActionIcon, Flex, Popover, Stack, Textarea } from "@mantine/core";
-import classes from "./math.module.css";
-import { v4 } from "uuid";
-import { IconTrashX } from "@tabler/icons-react";
-import { useDebouncedValue } from "@mantine/hooks";
-import { useTranslation } from "react-i18next";
+import { useEffect, useRef, useState } from 'react';
+import { NodeViewProps, NodeViewWrapper } from '@tiptap/react';
+import { ActionIcon, Flex, Popover, Stack, Textarea } from '@mantine/core';
+import classes from './math.module.css';
+import { v4 } from 'uuid';
+import { IconTrashX } from '@tabler/icons-react';
+import { useDebouncedValue } from '@mantine/hooks';
+import { useTranslation } from 'react-i18next';
 
 export default function MathBlockView(props: NodeViewProps) {
   const { t } = useTranslation();
@@ -23,12 +23,12 @@ export default function MathBlockView(props: NodeViewProps) {
 
   const renderMath = (
     katexString: string,
-    container: HTMLDivElement | null,
+    container: HTMLDivElement | null
   ) => {
     try {
       katex.render(katexString, container!, {
         displayMode: true,
-        strict: false,
+        strict: false
       });
       setError(null);
     } catch (e) {
@@ -43,7 +43,7 @@ export default function MathBlockView(props: NodeViewProps) {
 
   useEffect(() => {
     if (isEditing) {
-      renderMath(preview || "", mathPreviewContainer.current);
+      renderMath(preview || '', mathPreviewContainer.current);
     }
   }, [preview, isEditing]);
 
@@ -58,7 +58,8 @@ export default function MathBlockView(props: NodeViewProps) {
   useEffect(() => {
     const pos = getPos();
     const { from, to } = editor.state.selection;
-    const nodeSelected = props.selected && from === pos && to === pos + node.nodeSize;
+    const nodeSelected =
+      props.selected && from === pos && to === pos + node.nodeSize;
     setIsEditing(nodeSelected);
     if (nodeSelected) setPreview(node.attrs.text);
   }, [props.selected]);
@@ -79,29 +80,29 @@ export default function MathBlockView(props: NodeViewProps) {
           data-katex="true"
           className={[
             classes.mathBlock,
-            props.selected ? classes.selected : "",
-            error ? classes.error : "",
+            props.selected ? classes.selected : '',
+            error ? classes.error : '',
             (isEditing && !preview?.trim().length) ||
             (!isEditing && !node.attrs.text.trim().length)
               ? classes.empty
-              : "",
-          ].join(" ")}
+              : ''
+          ].join(' ')}
         >
           <div
             style={{
-              display: isEditing && preview?.length ? undefined : "none",
+              display: isEditing && preview?.length ? undefined : 'none'
             }}
             ref={mathPreviewContainer}
           ></div>
           <div
-            style={{ display: isEditing ? "none" : undefined }}
+            style={{ display: isEditing ? 'none' : undefined }}
             ref={mathResultContainer}
           ></div>
           {((isEditing && !preview?.trim().length) ||
             (!isEditing && !node.attrs.text.trim().length)) && (
-            <div>{t("Empty equation")}</div>
+            <div>{t('Empty equation')}</div>
           )}
-          {error && <div>{t("Invalid equation")}</div>}
+          {error && <div>{t('Invalid equation')}</div>}
         </NodeViewWrapper>
       </Popover.Target>
       <Popover.Dropdown>
@@ -112,14 +113,14 @@ export default function MathBlockView(props: NodeViewProps) {
             autosize
             ref={textAreaRef}
             draggable="false"
-            value={preview ?? ""}
-            placeholder={"E = mc^2"}
+            value={preview ?? ''}
+            placeholder={'E = mc^2'}
             classNames={{ input: classes.textInput }}
             onBlur={(e) => {
               e.preventDefault();
             }}
             onKeyDown={(e) => {
-              if (e.key === "Escape" || (e.key === "Enter" && !e.shiftKey)) {
+              if (e.key === 'Escape' || (e.key === 'Enter' && !e.shiftKey)) {
                 return editor.commands.focus(getPos() + node.nodeSize);
               }
 
@@ -128,7 +129,7 @@ export default function MathBlockView(props: NodeViewProps) {
               const { selectionStart, selectionEnd } = textAreaRef.current;
 
               if (
-                (e.key === "ArrowLeft" || e.key === "ArrowUp") &&
+                (e.key === 'ArrowLeft' || e.key === 'ArrowUp') &&
                 selectionStart === selectionEnd &&
                 selectionStart === 0
               ) {
@@ -136,7 +137,7 @@ export default function MathBlockView(props: NodeViewProps) {
               }
 
               if (
-                (e.key === "ArrowRight" || e.key === "ArrowDown") &&
+                (e.key === 'ArrowRight' || e.key === 'ArrowDown') &&
                 selectionStart === selectionEnd &&
                 selectionStart === textAreaRef.current?.value.length
               ) {
@@ -152,7 +153,7 @@ export default function MathBlockView(props: NodeViewProps) {
             <ActionIcon
               variant="light"
               color="red"
-              aria-label={t("Delete equation")}
+              aria-label={t('Delete equation')}
               onClick={() => props.deleteNode()}
             >
               <IconTrashX size={18} />

@@ -1,6 +1,6 @@
 import {
   collectReferencesFromPmJson,
-  collectTransclusionsFromPmJson,
+  collectTransclusionsFromPmJson
 } from '../utils/transclusion-prosemirror.util';
 
 describe('collectTransclusionsFromPmJson', () => {
@@ -12,7 +12,7 @@ describe('collectTransclusionsFromPmJson', () => {
   it('returns [] for a doc with no transclusion nodes', () => {
     const doc = {
       type: 'doc',
-      content: [{ type: 'paragraph', content: [{ type: 'text', text: 'hi' }] }],
+      content: [{ type: 'paragraph', content: [{ type: 'text', text: 'hi' }] }]
     };
     expect(collectTransclusionsFromPmJson(doc)).toEqual([]);
   });
@@ -24,16 +24,20 @@ describe('collectTransclusionsFromPmJson', () => {
         {
           type: 'transclusionSource',
           attrs: { id: 'abc123' },
-          content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Body' }] }],
-        },
-      ],
+          content: [
+            { type: 'paragraph', content: [{ type: 'text', text: 'Body' }] }
+          ]
+        }
+      ]
     };
     const got = collectTransclusionsFromPmJson(doc);
     expect(got).toHaveLength(1);
     expect(got[0].transclusionId).toBe('abc123');
     expect(got[0].content).toEqual({
       type: 'doc',
-      content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Body' }] }],
+      content: [
+        { type: 'paragraph', content: [{ type: 'text', text: 'Body' }] }
+      ]
     });
   });
 
@@ -41,8 +45,12 @@ describe('collectTransclusionsFromPmJson', () => {
     const doc = {
       type: 'doc',
       content: [
-        { type: 'transclusionSource', attrs: {}, content: [{ type: 'paragraph' }] },
-      ],
+        {
+          type: 'transclusionSource',
+          attrs: {},
+          content: [{ type: 'paragraph' }]
+        }
+      ]
     };
     expect(collectTransclusionsFromPmJson(doc)).toEqual([]);
   });
@@ -51,9 +59,17 @@ describe('collectTransclusionsFromPmJson', () => {
     const doc = {
       type: 'doc',
       content: [
-        { type: 'transclusionSource', attrs: { id: 'a' }, content: [{ type: 'paragraph' }] },
-        { type: 'transclusionSource', attrs: { id: 'b' }, content: [{ type: 'paragraph' }] },
-      ],
+        {
+          type: 'transclusionSource',
+          attrs: { id: 'a' },
+          content: [{ type: 'paragraph' }]
+        },
+        {
+          type: 'transclusionSource',
+          attrs: { id: 'b' },
+          content: [{ type: 'paragraph' }]
+        }
+      ]
     };
     const got = collectTransclusionsFromPmJson(doc);
     expect(got.map((e) => e.transclusionId)).toEqual(['a', 'b']);
@@ -70,11 +86,11 @@ describe('collectTransclusionsFromPmJson', () => {
             {
               type: 'transclusionSource',
               attrs: { id: 'inner' },
-              content: [{ type: 'paragraph' }],
-            },
-          ],
-        },
-      ],
+              content: [{ type: 'paragraph' }]
+            }
+          ]
+        }
+      ]
     };
     const got = collectTransclusionsFromPmJson(doc);
     expect(got.map((e) => e.transclusionId)).toEqual(['outer']);
@@ -87,14 +103,18 @@ describe('collectTransclusionsFromPmJson', () => {
         {
           type: 'column',
           content: [
-            { type: 'transclusionSource', attrs: { id: 'inCol' }, content: [{ type: 'paragraph' }] },
-          ],
-        },
-      ],
+            {
+              type: 'transclusionSource',
+              attrs: { id: 'inCol' },
+              content: [{ type: 'paragraph' }]
+            }
+          ]
+        }
+      ]
     };
-    expect(collectTransclusionsFromPmJson(doc).map((e) => e.transclusionId)).toEqual([
-      'inCol',
-    ]);
+    expect(
+      collectTransclusionsFromPmJson(doc).map((e) => e.transclusionId)
+    ).toEqual(['inCol']);
   });
 
   it('uses the last id when duplicate ids appear (later wins, deterministic)', () => {
@@ -104,20 +124,26 @@ describe('collectTransclusionsFromPmJson', () => {
         {
           type: 'transclusionSource',
           attrs: { id: 'dup' },
-          content: [{ type: 'paragraph', content: [{ type: 'text', text: 'first' }] }],
+          content: [
+            { type: 'paragraph', content: [{ type: 'text', text: 'first' }] }
+          ]
         },
         {
           type: 'transclusionSource',
           attrs: { id: 'dup' },
-          content: [{ type: 'paragraph', content: [{ type: 'text', text: 'second' }] }],
-        },
-      ],
+          content: [
+            { type: 'paragraph', content: [{ type: 'text', text: 'second' }] }
+          ]
+        }
+      ]
     };
     const got = collectTransclusionsFromPmJson(doc);
     expect(got).toHaveLength(1);
     expect(got[0].content).toEqual({
       type: 'doc',
-      content: [{ type: 'paragraph', content: [{ type: 'text', text: 'second' }] }],
+      content: [
+        { type: 'paragraph', content: [{ type: 'text', text: 'second' }] }
+      ]
     });
   });
 });
@@ -131,9 +157,7 @@ describe('collectReferencesFromPmJson', () => {
   it('returns [] for a doc with no transclusionReference nodes', () => {
     const doc = {
       type: 'doc',
-      content: [
-        { type: 'paragraph', content: [{ type: 'text', text: 'hi' }] },
-      ],
+      content: [{ type: 'paragraph', content: [{ type: 'text', text: 'hi' }] }]
     };
     expect(collectReferencesFromPmJson(doc)).toEqual([]);
   });
@@ -144,12 +168,12 @@ describe('collectReferencesFromPmJson', () => {
       content: [
         {
           type: 'transclusionReference',
-          attrs: { sourcePageId: 'p1', transclusionId: 'e1' },
-        },
-      ],
+          attrs: { sourcePageId: 'p1', transclusionId: 'e1' }
+        }
+      ]
     };
     expect(collectReferencesFromPmJson(doc)).toEqual([
-      { sourcePageId: 'p1', transclusionId: 'e1' },
+      { sourcePageId: 'p1', transclusionId: 'e1' }
     ]);
   });
 
@@ -159,8 +183,8 @@ describe('collectReferencesFromPmJson', () => {
       content: [
         { type: 'transclusionReference', attrs: { transclusionId: 'e1' } },
         { type: 'transclusionReference', attrs: { sourcePageId: 'p1' } },
-        { type: 'transclusionReference', attrs: {} },
-      ],
+        { type: 'transclusionReference', attrs: {} }
+      ]
     };
     expect(collectReferencesFromPmJson(doc)).toEqual([]);
   });
@@ -174,24 +198,24 @@ describe('collectReferencesFromPmJson', () => {
           content: [
             {
               type: 'transclusionReference',
-              attrs: { sourcePageId: 'p1', transclusionId: 'e1' },
-            },
-          ],
+              attrs: { sourcePageId: 'p1', transclusionId: 'e1' }
+            }
+          ]
         },
         {
           type: 'callout',
           content: [
             {
               type: 'transclusionReference',
-              attrs: { sourcePageId: 'p2', transclusionId: 'e2' },
-            },
-          ],
-        },
-      ],
+              attrs: { sourcePageId: 'p2', transclusionId: 'e2' }
+            }
+          ]
+        }
+      ]
     };
     expect(collectReferencesFromPmJson(doc)).toEqual([
       { sourcePageId: 'p1', transclusionId: 'e1' },
-      { sourcePageId: 'p2', transclusionId: 'e2' },
+      { sourcePageId: 'p2', transclusionId: 'e2' }
     ]);
   });
 
@@ -205,11 +229,11 @@ describe('collectReferencesFromPmJson', () => {
           content: [
             {
               type: 'transclusionReference',
-              attrs: { sourcePageId: 'p1', transclusionId: 'e1' },
-            },
-          ],
-        },
-      ],
+              attrs: { sourcePageId: 'p1', transclusionId: 'e1' }
+            }
+          ]
+        }
+      ]
     };
     expect(collectReferencesFromPmJson(doc)).toEqual([]);
   });
@@ -220,21 +244,21 @@ describe('collectReferencesFromPmJson', () => {
       content: [
         {
           type: 'transclusionReference',
-          attrs: { sourcePageId: 'p1', transclusionId: 'e1' },
+          attrs: { sourcePageId: 'p1', transclusionId: 'e1' }
         },
         {
           type: 'transclusionReference',
-          attrs: { sourcePageId: 'p1', transclusionId: 'e1' },
+          attrs: { sourcePageId: 'p1', transclusionId: 'e1' }
         },
         {
           type: 'transclusionReference',
-          attrs: { sourcePageId: 'p2', transclusionId: 'e2' },
-        },
-      ],
+          attrs: { sourcePageId: 'p2', transclusionId: 'e2' }
+        }
+      ]
     };
     expect(collectReferencesFromPmJson(doc)).toEqual([
       { sourcePageId: 'p1', transclusionId: 'e1' },
-      { sourcePageId: 'p2', transclusionId: 'e2' },
+      { sourcePageId: 'p2', transclusionId: 'e2' }
     ]);
   });
 });

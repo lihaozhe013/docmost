@@ -4,7 +4,7 @@ import { KyselyDB } from '@docmost/db/types/kysely.types';
 import {
   IPageMentionNotificationJob,
   IPageUpdateNotificationJob,
-  IPermissionGrantedNotificationJob,
+  IPermissionGrantedNotificationJob
 } from '../../../integrations/queue/constants/queue.interface';
 import { NotificationService } from '../notification.service';
 import { NotificationType } from '../notification.constants';
@@ -23,7 +23,7 @@ export class PageNotificationService {
     private readonly notificationRepo: NotificationRepo,
     private readonly spaceMemberRepo: SpaceMemberRepo,
     private readonly pagePermissionRepo: PagePermissionRepo,
-    private readonly watcherRepo: WatcherRepo,
+    private readonly watcherRepo: WatcherRepo
   ) {}
 
   async processPageMention(data: IPageMentionNotificationJob) {
@@ -32,7 +32,7 @@ export class PageNotificationService {
 
     const oldIds = new Set(oldMentionedUserIds);
     const newMentions = userMentions.filter(
-      (m) => !oldIds.has(m.userId) && m.creatorId !== m.userId,
+      (m) => !oldIds.has(m.userId) && m.creatorId !== m.userId
     );
 
     if (newMentions.length === 0) return;
@@ -41,17 +41,17 @@ export class PageNotificationService {
     const usersWithSpaceAccess =
       await this.spaceMemberRepo.getUserIdsWithSpaceAccess(
         candidateUserIds,
-        spaceId,
+        spaceId
       );
 
     const usersWithPageAccess =
       await this.pagePermissionRepo.getUserIdsWithPageAccess(pageId, [
-        ...usersWithSpaceAccess,
+        ...usersWithSpaceAccess
       ]);
     const usersWithAccess = new Set(usersWithPageAccess);
 
     const accessibleMentions = newMentions.filter((m) =>
-      usersWithAccess.has(m.userId),
+      usersWithAccess.has(m.userId)
     );
     if (accessibleMentions.length === 0) return;
 
@@ -74,7 +74,7 @@ export class PageNotificationService {
           actorId,
           pageId,
           spaceId,
-          data: { mentionId },
+          data: { mentionId }
         });
       }
     }
@@ -98,7 +98,7 @@ export class PageNotificationService {
         actorId,
         pageId,
         spaceId,
-        data: { role },
+        data: { role }
       });
     }
   }
@@ -108,7 +108,7 @@ export class PageNotificationService {
 
     const watcherIds = await this.watcherRepo.getPageUpdateRecipientIds(
       pageId,
-      spaceId,
+      spaceId
     );
 
     if (watcherIds.length === 0) return;
@@ -127,7 +127,7 @@ export class PageNotificationService {
         afterPrefs,
         pageId,
         NotificationType.PAGE_UPDATED,
-        PAGE_UPDATE_COOLDOWN_HOURS,
+        PAGE_UPDATE_COOLDOWN_HOURS
       );
     const afterCooldown = afterPrefs.filter((id) => !recentlyNotified.has(id));
     if (afterCooldown.length === 0) return;
@@ -135,12 +135,12 @@ export class PageNotificationService {
     const usersWithSpaceAccess =
       await this.spaceMemberRepo.getUserIdsWithSpaceAccess(
         afterCooldown,
-        spaceId,
+        spaceId
       );
 
     const usersWithPageAccess =
       await this.pagePermissionRepo.getUserIdsWithPageAccess(pageId, [
-        ...usersWithSpaceAccess,
+        ...usersWithSpaceAccess
       ]);
     if (usersWithPageAccess.length === 0) return;
 
@@ -154,13 +154,13 @@ export class PageNotificationService {
         type: NotificationType.PAGE_UPDATED,
         actorId,
         pageId,
-        spaceId,
+        spaceId
       });
     }
   }
 
   private async getEligiblePageUpdateUsers(
-    userIds: string[],
+    userIds: string[]
   ): Promise<Map<string, string>> {
     if (userIds.length === 0) return new Map();
 

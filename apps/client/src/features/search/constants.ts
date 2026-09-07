@@ -4,4 +4,3 @@ export const [searchSpotlightStore, searchSpotlight] = createSpotlight();
 
 export const [shareSearchSpotlightStore, shareSearchSpotlight] =
   createSpotlight();
-

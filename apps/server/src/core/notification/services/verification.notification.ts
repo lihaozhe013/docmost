@@ -6,7 +6,7 @@ import {
   IApprovalRequestedNotificationJob,
   IPageVerifiedNotificationJob,
   IVerificationExpiringNotificationJob,
-  IVerificationExpiredNotificationJob,
+  IVerificationExpiredNotificationJob
 } from '../../../integrations/queue/constants/queue.interface';
 import { NotificationService } from '../notification.service';
 import { NotificationType } from '../notification.constants';
@@ -19,12 +19,12 @@ export class VerificationNotificationService {
     @InjectKysely() private readonly db: KyselyDB,
     private readonly notificationService: NotificationService,
     private readonly spaceMemberRepo: SpaceMemberRepo,
-    private readonly pagePermissionRepo: PagePermissionRepo,
+    private readonly pagePermissionRepo: PagePermissionRepo
   ) {}
 
   private async getAlreadyNotifiedUserIds(
     pageVerificationId: string,
-    type: string,
+    type: string
   ): Promise<Set<string>> {
     const rows = await this.db
       .selectFrom('notifications')
@@ -38,21 +38,21 @@ export class VerificationNotificationService {
   private async filterAccessibleRecipients(
     userIds: string[],
     pageId: string,
-    spaceId: string,
+    spaceId: string
   ): Promise<string[]> {
     if (userIds.length === 0) return [];
     const inSpace = await this.spaceMemberRepo.getUserIdsWithSpaceAccess(
       userIds,
-      spaceId,
+      spaceId
     );
     if (inSpace.size === 0) return [];
     return this.pagePermissionRepo.getUserIdsWithPageAccess(pageId, [
-      ...inSpace,
+      ...inSpace
     ]);
   }
 
   async processVerificationExpiring(
-    data: IVerificationExpiringNotificationJob,
+    data: IVerificationExpiringNotificationJob
   ) {
     const verification = await this.db
       .selectFrom('pageVerifications')
@@ -77,16 +77,16 @@ export class VerificationNotificationService {
     const accessibleVerifierIds = await this.filterAccessibleRecipients(
       verifierIds,
       verification.pageId,
-      verification.spaceId,
+      verification.spaceId
     );
     if (accessibleVerifierIds.length === 0) return;
 
     const alreadyNotified = await this.getAlreadyNotifiedUserIds(
       verification.id,
-      NotificationType.PAGE_VERIFICATION_EXPIRING,
+      NotificationType.PAGE_VERIFICATION_EXPIRING
     );
     const recipients = accessibleVerifierIds.filter(
-      (id) => !alreadyNotified.has(id),
+      (id) => !alreadyNotified.has(id)
     );
     if (recipients.length === 0) return;
 
@@ -100,14 +100,12 @@ export class VerificationNotificationService {
         pageId: verification.pageId,
         spaceId: verification.spaceId,
         pageVerificationId: verification.id,
-        data: { expiresAt: expiresAtIso },
+        data: { expiresAt: expiresAtIso }
       });
     }
   }
 
-  async processVerificationExpired(
-    data: IVerificationExpiredNotificationJob,
-  ) {
+  async processVerificationExpired(data: IVerificationExpiredNotificationJob) {
     const verification = await this.db
       .selectFrom('pageVerifications')
       .selectAll()
@@ -130,16 +128,16 @@ export class VerificationNotificationService {
     const accessibleVerifierIds = await this.filterAccessibleRecipients(
       verifierIds,
       verification.pageId,
-      verification.spaceId,
+      verification.spaceId
     );
     if (accessibleVerifierIds.length === 0) return;
 
     const alreadyNotified = await this.getAlreadyNotifiedUserIds(
       verification.id,
-      NotificationType.PAGE_VERIFICATION_EXPIRED,
+      NotificationType.PAGE_VERIFICATION_EXPIRED
     );
     const recipients = accessibleVerifierIds.filter(
-      (id) => !alreadyNotified.has(id),
+      (id) => !alreadyNotified.has(id)
     );
     if (recipients.length === 0) return;
 
@@ -150,7 +148,7 @@ export class VerificationNotificationService {
         type: NotificationType.PAGE_VERIFICATION_EXPIRED,
         pageId: verification.pageId,
         spaceId: verification.spaceId,
-        pageVerificationId: verification.id,
+        pageVerificationId: verification.id
       });
     }
   }
@@ -162,7 +160,7 @@ export class VerificationNotificationService {
     const accessibleVerifierIds = await this.filterAccessibleRecipients(
       verifierIds,
       pageId,
-      spaceId,
+      spaceId
     );
     if (accessibleVerifierIds.length === 0) return;
 
@@ -173,21 +171,19 @@ export class VerificationNotificationService {
         type: NotificationType.PAGE_VERIFIED,
         actorId,
         pageId,
-        spaceId,
+        spaceId
       });
     }
   }
 
-  async processApprovalRequested(
-    data: IApprovalRequestedNotificationJob,
-  ) {
+  async processApprovalRequested(data: IApprovalRequestedNotificationJob) {
     const { verifierIds, pageId, spaceId, workspaceId, actorId } = data;
     if (verifierIds.length === 0) return;
 
     const accessibleVerifierIds = await this.filterAccessibleRecipients(
       verifierIds,
       pageId,
-      spaceId,
+      spaceId
     );
     if (accessibleVerifierIds.length === 0) return;
 
@@ -198,20 +194,18 @@ export class VerificationNotificationService {
         type: NotificationType.PAGE_APPROVAL_REQUESTED,
         actorId,
         pageId,
-        spaceId,
+        spaceId
       });
     }
   }
 
-  async processApprovalRejected(
-    data: IApprovalRejectedNotificationJob,
-  ) {
+  async processApprovalRejected(data: IApprovalRejectedNotificationJob) {
     const { pageId, spaceId, workspaceId, actorId, requestedById } = data;
 
     const recipients = await this.filterAccessibleRecipients(
       [requestedById],
       pageId,
-      spaceId,
+      spaceId
     );
     if (recipients.length === 0) return;
 
@@ -221,7 +215,7 @@ export class VerificationNotificationService {
       type: NotificationType.PAGE_APPROVAL_REJECTED,
       actorId,
       pageId,
-      spaceId,
+      spaceId
     });
   }
 }

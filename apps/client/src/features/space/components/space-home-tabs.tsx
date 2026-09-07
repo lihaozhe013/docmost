@@ -1,13 +1,13 @@
-import { Text, Tabs, Space } from "@mantine/core";
-import { IconClockHour3, IconStar, IconUser } from "@tabler/icons-react";
-import RecentChanges from "@/components/common/recent-changes";
-import FavoritesPages from "@/features/home/components/favorites-pages";
-import CreatedByMe from "@/features/home/components/created-by-me";
-import { useParams } from "react-router-dom";
-import { useGetSpaceBySlugQuery } from "@/features/space/queries/space-query";
-import { useTranslation } from "react-i18next";
-import { useAtom } from "jotai";
-import { homeTabAtom } from "@/features/home/atoms/home-tab-atom";
+import { Text, Tabs, Space } from '@mantine/core';
+import { IconClockHour3, IconStar, IconUser } from '@tabler/icons-react';
+import RecentChanges from '@/components/common/recent-changes';
+import FavoritesPages from '@/features/home/components/favorites-pages';
+import CreatedByMe from '@/features/home/components/created-by-me';
+import { useParams } from 'react-router-dom';
+import { useGetSpaceBySlugQuery } from '@/features/space/queries/space-query';
+import { useTranslation } from 'react-i18next';
+import { useAtom } from 'jotai';
+import { homeTabAtom } from '@/features/home/atoms/home-tab-atom';
 
 export default function SpaceHomeTabs() {
   const { t } = useTranslation();
@@ -23,20 +23,20 @@ export default function SpaceHomeTabs() {
         if (value) setActiveTab(value);
       }}
     >
-      <Tabs.List style={{ flexWrap: "nowrap", overflowX: "auto" }}>
+      <Tabs.List style={{ flexWrap: 'nowrap', overflowX: 'auto' }}>
         <Tabs.Tab value="recent" leftSection={<IconClockHour3 size={18} />}>
           <Text size="sm" fw={500}>
-            {t("Recently updated")}
+            {t('Recently updated')}
           </Text>
         </Tabs.Tab>
         <Tabs.Tab value="favorites" leftSection={<IconStar size={18} />}>
           <Text size="sm" fw={500}>
-            {t("Favorites")}
+            {t('Favorites')}
           </Text>
         </Tabs.Tab>
         <Tabs.Tab value="created" leftSection={<IconUser size={18} />}>
           <Text size="sm" fw={500}>
-            {t("Created by me")}
+            {t('Created by me')}
           </Text>
         </Tabs.Tab>
       </Tabs.List>

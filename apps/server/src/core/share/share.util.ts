@@ -3,7 +3,7 @@ import { Node } from '@tiptap/pm/model';
 export function updateAttachmentAttr(
   node: Node,
   attr: 'src' | 'url',
-  token: string,
+  token: string
 ) {
   const attrVal = node.attrs[attr];
   if (

@@ -7,13 +7,13 @@ import {
   HttpStatus,
   Logger,
   Post,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { SearchService } from './search.service';
 import {
   SearchDTO,
   SearchShareDTO,
-  SearchSuggestionDTO,
+  SearchSuggestionDTO
 } from './dto/search.dto';
 import { AuthWorkspace } from '../../common/decorators/auth-workspace.decorator';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -22,7 +22,7 @@ import { User, Workspace } from '@docmost/db/types/entity.types';
 import SpaceAbilityFactory from '../casl/abilities/space-ability.factory';
 import {
   SpaceCaslAction,
-  SpaceCaslSubject,
+  SpaceCaslSubject
 } from '../casl/interfaces/space-ability.type';
 import { AuthUser } from '../../common/decorators/auth-user.decorator';
 import { Public } from '../../common/decorators/public.decorator';
@@ -38,7 +38,7 @@ export class SearchController {
     private readonly searchService: SearchService,
     private readonly spaceAbility: SpaceAbilityFactory,
     private readonly environmentService: EnvironmentService,
-    private moduleRef: ModuleRef,
+    private moduleRef: ModuleRef
   ) {}
 
   @HttpCode(HttpStatus.OK)
@@ -47,14 +47,14 @@ export class SearchController {
   async pageSearch(
     @Body() searchDto: SearchDTO,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     delete searchDto.shareId;
 
     if (searchDto.spaceId) {
       const ability = await this.spaceAbility.createForUser(
         user,
-        searchDto.spaceId,
+        searchDto.spaceId
       );
 
       if (ability.cannot(SpaceCaslAction.Read, SpaceCaslSubject.Page)) {
@@ -65,13 +65,13 @@ export class SearchController {
     if (this.environmentService.getSearchDriver() === 'typesense') {
       return this.searchTypesense(searchDto, {
         userId: user.id,
-        workspaceId: workspace.id,
+        workspaceId: workspace.id
       });
     }
 
     return this.searchService.searchPage(searchDto, {
       userId: user.id,
-      workspaceId: workspace.id,
+      workspaceId: workspace.id
     });
   }
 
@@ -81,7 +81,7 @@ export class SearchController {
   async searchSuggestions(
     @Body() dto: SearchSuggestionDTO,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     return this.searchService.searchSuggestions(dto, user.id, workspace.id);
   }
@@ -91,7 +91,7 @@ export class SearchController {
   @Post('share-search')
   async searchShare(
     @Body() searchDto: SearchShareDTO,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     delete searchDto.spaceId;
     if (!searchDto.shareId) {
@@ -100,12 +100,12 @@ export class SearchController {
 
     if (this.environmentService.getSearchDriver() === 'typesense') {
       return this.searchTypesense(searchDto, {
-        workspaceId: workspace.id,
+        workspaceId: workspace.id
       });
     }
 
     return this.searchService.searchPage(searchDto, {
-      workspaceId: workspace.id,
+      workspaceId: workspace.id
     });
   }
 
@@ -114,7 +114,7 @@ export class SearchController {
     opts: {
       userId?: string;
       workspaceId: string;
-    },
+    }
   ) {
     const { userId, workspaceId } = opts;
     let TypesenseModule: any;
@@ -125,17 +125,17 @@ export class SearchController {
       const PageSearchService = this.moduleRef.get(
         TypesenseModule.PageSearchService,
         {
-          strict: false,
-        },
+          strict: false
+        }
       );
 
       return PageSearchService.searchPage(searchParams, {
         userId: userId,
-        workspaceId,
+        workspaceId
       });
     } catch (err) {
       this.logger.debug(
-        'Typesense module requested but enterprise module not bundled in this build',
+        'Typesense module requested but enterprise module not bundled in this build'
       );
     }
 

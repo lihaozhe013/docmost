@@ -6,7 +6,7 @@ import {
   HttpStatus,
   NotFoundException,
   Post,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { WatcherService } from './watcher.service';
 import { AuthUser } from '../../common/decorators/auth-user.decorator';
@@ -18,7 +18,7 @@ import { SpaceRepo } from '@docmost/db/repos/space/space.repo';
 import SpaceAbilityFactory from '../casl/abilities/space-ability.factory';
 import {
   SpaceCaslAction,
-  SpaceCaslSubject,
+  SpaceCaslSubject
 } from '../casl/interfaces/space-ability.type';
 
 @UseGuards(JwtAuthGuard)
@@ -27,13 +27,13 @@ export class SpaceWatcherController {
   constructor(
     private readonly watcherService: WatcherService,
     private readonly spaceRepo: SpaceRepo,
-    private readonly spaceAbility: SpaceAbilityFactory,
+    private readonly spaceAbility: SpaceAbilityFactory
   ) {}
 
   private async loadSpaceAndAuthorize(
     spaceId: string,
     user: User,
-    workspace: Workspace,
+    workspace: Workspace
   ) {
     const space = await this.spaceRepo.findById(spaceId, workspace.id);
     if (!space) {
@@ -52,7 +52,7 @@ export class SpaceWatcherController {
   @Post('watched-ids')
   async getWatchedSpaceIds(
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     return this.watcherService.getWatchedSpaceIds(user.id, workspace.id);
   }
@@ -62,9 +62,13 @@ export class SpaceWatcherController {
   async watchSpace(
     @Body() dto: SpaceWatcherDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
-    const space = await this.loadSpaceAndAuthorize(dto.spaceId, user, workspace);
+    const space = await this.loadSpaceAndAuthorize(
+      dto.spaceId,
+      user,
+      workspace
+    );
 
     await this.watcherService.watchSpace(user.id, space.id, workspace.id);
 
@@ -76,9 +80,13 @@ export class SpaceWatcherController {
   async unwatchSpace(
     @Body() dto: SpaceWatcherDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
-    const space = await this.loadSpaceAndAuthorize(dto.spaceId, user, workspace);
+    const space = await this.loadSpaceAndAuthorize(
+      dto.spaceId,
+      user,
+      workspace
+    );
 
     await this.watcherService.unwatchSpace(user.id, space.id);
 
@@ -90,13 +98,17 @@ export class SpaceWatcherController {
   async getWatchStatus(
     @Body() dto: SpaceWatcherDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
-    const space = await this.loadSpaceAndAuthorize(dto.spaceId, user, workspace);
+    const space = await this.loadSpaceAndAuthorize(
+      dto.spaceId,
+      user,
+      workspace
+    );
 
     const watching = await this.watcherService.isWatchingSpace(
       user.id,
-      space.id,
+      space.id
     );
 
     return { watching };

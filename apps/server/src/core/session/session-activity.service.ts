@@ -13,7 +13,7 @@ export class SessionActivityService {
   constructor(
     private readonly redisService: RedisService,
     private readonly userSessionRepo: UserSessionRepo,
-    private readonly userRepo: UserRepo,
+    private readonly userRepo: UserRepo
   ) {
     this.redis = this.redisService.getOrThrow();
   }

@@ -1,17 +1,17 @@
-import React, { useCallback, useEffect } from "react";
-import type { Editor } from "@tiptap/react";
-import { useEditorState } from "@tiptap/react";
-import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
-import { TextSelection } from "@tiptap/pm/state";
-import { columnResizingPluginKey } from "@tiptap/pm/tables";
-import { useFloating, offset, autoUpdate, hide } from "@floating-ui/react";
-import { Menu, UnstyledButton } from "@mantine/core";
-import { IconChevronDown } from "@tabler/icons-react";
-import clsx from "clsx";
-import { useTranslation } from "react-i18next";
-import { isCellSelection, isEditorReady } from "@docmost/editor-ext";
-import { CellChevronMenu } from "./menus/cell-chevron-menu";
-import classes from "./handle.module.css";
+import React, { useCallback, useEffect } from 'react';
+import type { Editor } from '@tiptap/react';
+import { useEditorState } from '@tiptap/react';
+import type { Node as ProseMirrorNode } from '@tiptap/pm/model';
+import { TextSelection } from '@tiptap/pm/state';
+import { columnResizingPluginKey } from '@tiptap/pm/tables';
+import { useFloating, offset, autoUpdate, hide } from '@floating-ui/react';
+import { Menu, UnstyledButton } from '@mantine/core';
+import { IconChevronDown } from '@tabler/icons-react';
+import clsx from 'clsx';
+import { useTranslation } from 'react-i18next';
+import { isCellSelection, isEditorReady } from '@docmost/editor-ext';
+import { CellChevronMenu } from './menus/cell-chevron-menu';
+import classes from './handle.module.css';
 
 interface CellChevronProps {
   editor: Editor;
@@ -24,7 +24,7 @@ export const CellChevron = React.memo(function CellChevron({
   editor,
   cellPos,
   tableNode,
-  tablePos,
+  tablePos
 }: CellChevronProps) {
   const { t } = useTranslation();
   const cellDom = isEditorReady(editor)
@@ -32,7 +32,7 @@ export const CellChevron = React.memo(function CellChevron({
     : null;
 
   const { refs, floatingStyles, middlewareData } = useFloating({
-    placement: "top-end",
+    placement: 'top-end',
     // crossAxis pulls the chevron INWARD from the cell's right edge. We need
     // enough inset that we don't overlap PM-tables' column-resize hot zone
     // (~5px wide around the column boundary). Without this, hovering near the
@@ -40,7 +40,7 @@ export const CellChevron = React.memo(function CellChevron({
     // `col-resize`, and a drag near the edge clicks the chevron.
     middleware: [offset({ mainAxis: -22, crossAxis: -10 }), hide()],
     whileElementsMounted: autoUpdate,
-    strategy: "absolute",
+    strategy: 'absolute'
   });
   const isReferenceHidden = !!middlewareData.hide?.referenceHidden;
 
@@ -59,7 +59,7 @@ export const CellChevron = React.memo(function CellChevron({
         | { activeHandle: number }
         | undefined;
       return !!state && state.activeHandle > -1;
-    },
+    }
   });
 
   const onOpen = useCallback(() => {
@@ -109,10 +109,10 @@ export const CellChevron = React.memo(function CellChevron({
           ref={refs.setFloating}
           style={{
             ...floatingStyles,
-            ...(isReferenceHidden ? { visibility: "hidden" as const } : {}),
+            ...(isReferenceHidden ? { visibility: 'hidden' as const } : {})
           }}
           className={clsx(classes.cellChevron)}
-          aria-label={t("Cell actions")}
+          aria-label={t('Cell actions')}
         >
           <IconChevronDown size={14} />
         </UnstyledButton>

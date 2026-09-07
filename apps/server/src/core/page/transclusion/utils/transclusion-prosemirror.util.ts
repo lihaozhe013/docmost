@@ -16,7 +16,7 @@ export type TransclusionReferenceSnapshot = {
  * deterministic.
  */
 export function collectTransclusionsFromPmJson(
-  doc: unknown,
+  doc: unknown
 ): TransclusionNodeSnapshot[] {
   if (!doc || typeof doc !== 'object') return [];
 
@@ -30,7 +30,7 @@ export function collectTransclusionsFromPmJson(
       if (typeof id === 'string' && id.length > 0) {
         byId.set(id, {
           transclusionId: id,
-          content: { type: 'doc', content: node.content ?? [] },
+          content: { type: 'doc', content: node.content ?? [] }
         });
       }
       return; // do not recurse into transclusion children
@@ -53,7 +53,7 @@ export function collectTransclusionsFromPmJson(
  * Order preserved by first-seen.
  */
 export function collectReferencesFromPmJson(
-  doc: unknown,
+  doc: unknown
 ): TransclusionReferenceSnapshot[] {
   if (!doc || typeof doc !== 'object') return [];
 

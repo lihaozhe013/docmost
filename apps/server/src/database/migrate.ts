@@ -13,8 +13,8 @@ const migrationFolder = path.join(__dirname, './migrations');
 
 const db = new Kysely<any>({
   dialect: new PostgresJSDialect({
-    postgres: postgres(normalizePostgresUrl(process.env.DATABASE_URL)),
-  }),
+    postgres: postgres(normalizePostgresUrl(process.env.DATABASE_URL))
+  })
 });
 
 const migrator = new Migrator({
@@ -22,8 +22,8 @@ const migrator = new Migrator({
   provider: new FileMigrationProvider({
     fs,
     path,
-    migrationFolder,
-  }),
+    migrationFolder
+  })
 });
 
 run(db, migrator, migrationFolder);

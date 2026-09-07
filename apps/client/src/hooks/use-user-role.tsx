@@ -1,6 +1,6 @@
-import { useAtom } from "jotai";
-import { UserRole } from "@/lib/types.ts";
-import { currentUserAtom } from "@/features/user/atoms/current-user-atom.ts";
+import { useAtom } from 'jotai';
+import { UserRole } from '@/lib/types.ts';
+import { currentUserAtom } from '@/features/user/atoms/current-user-atom.ts';
 
 export const useUserRole = () => {
   const [currentUser] = useAtom(currentUserAtom);

@@ -6,7 +6,7 @@ import {
   InsertableTemplate,
   Page,
   Template,
-  UpdatableTemplate,
+  UpdatableTemplate
 } from '@docmost/db/types/entity.types';
 import { PaginationOptions } from '../../pagination/pagination-options';
 import { executeWithCursorPagination } from '@docmost/db/pagination/cursor-pagination';
@@ -26,7 +26,7 @@ export class TemplateRepo {
     'creatorId',
     'lastUpdatedById',
     'createdAt',
-    'updatedAt',
+    'updatedAt'
   ];
 
   constructor(@InjectKysely() private readonly db: KyselyDB) {}
@@ -34,7 +34,7 @@ export class TemplateRepo {
   async findById(
     templateId: string,
     workspaceId: string,
-    opts?: { includeContent?: boolean; trx?: KyselyTransaction },
+    opts?: { includeContent?: boolean; trx?: KyselyTransaction }
   ): Promise<Template> {
     const db = dbOrTx(this.db, opts?.trx);
 
@@ -53,7 +53,7 @@ export class TemplateRepo {
     workspaceId: string,
     accessibleSpaceIds: string[],
     pagination: PaginationOptions,
-    opts?: { spaceId?: string },
+    opts?: { spaceId?: string }
   ) {
     let query = this.db
       .selectFrom('templates')
@@ -73,8 +73,8 @@ export class TemplateRepo {
           eb('spaceId', 'is', null),
           ...(accessibleSpaceIds.length > 0
             ? [eb('spaceId', 'in', accessibleSpaceIds)]
-            : []),
-        ]),
+            : [])
+        ])
       );
     }
 
@@ -86,9 +86,9 @@ export class TemplateRepo {
           eb(
             sql`f_unaccent(description)`,
             'ilike',
-            sql`f_unaccent(${searchTerm})`,
-          ),
-        ]),
+            sql`f_unaccent(${searchTerm})`
+          )
+        ])
       );
     }
 
@@ -98,18 +98,18 @@ export class TemplateRepo {
       beforeCursor: pagination.beforeCursor,
       fields: [
         { expression: 'title', direction: 'asc' },
-        { expression: 'id', direction: 'asc' },
+        { expression: 'id', direction: 'asc' }
       ],
       parseCursor: (cursor) => ({
         title: cursor.title,
-        id: cursor.id,
-      }),
+        id: cursor.id
+      })
     });
   }
 
   async insertTemplate(
     insertableTemplate: InsertableTemplate,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<{ id: string }> {
     const db = dbOrTx(this.db, trx);
     return db
@@ -123,7 +123,7 @@ export class TemplateRepo {
     updatableTemplate: UpdatableTemplate,
     templateId: string,
     workspaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<void> {
     const db = dbOrTx(this.db, trx);
     await db
@@ -137,7 +137,7 @@ export class TemplateRepo {
   async deleteTemplate(
     templateId: string,
     workspaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<void> {
     const db = dbOrTx(this.db, trx);
     await db
@@ -152,7 +152,7 @@ export class TemplateRepo {
       eb
         .selectFrom('users')
         .select(['users.id', 'users.name', 'users.avatarUrl'])
-        .whereRef('users.id', '=', 'templates.creatorId'),
+        .whereRef('users.id', '=', 'templates.creatorId')
     ).as('creator');
   }
 }

@@ -1,11 +1,11 @@
-import React, { useCallback, useMemo, useState } from "react";
-import { LinkEditorPanelProps } from "@/features/editor/components/link/types.ts";
+import React, { useCallback, useMemo, useState } from 'react';
+import { LinkEditorPanelProps } from '@/features/editor/components/link/types.ts';
 
 export const useLinkEditorState = ({
   initialUrl,
-  onSetLink,
+  onSetLink
 }: LinkEditorPanelProps) => {
-  const [url, setUrl] = useState(initialUrl || "");
+  const [url, setUrl] = useState(initialUrl || '');
 
   const onChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setUrl(event.target.value);
@@ -15,7 +15,7 @@ export const useLinkEditorState = ({
 
   const isSearchQuery = useMemo(
     () => url.length > 0 && !isValidUrl,
-    [url, isValidUrl],
+    [url, isValidUrl]
   );
 
   const handleSubmit = useCallback(
@@ -25,7 +25,7 @@ export const useLinkEditorState = ({
         onSetLink(url, false);
       }
     },
-    [url, isValidUrl, onSetLink],
+    [url, isValidUrl, onSetLink]
   );
 
   return {
@@ -34,6 +34,6 @@ export const useLinkEditorState = ({
     onChange,
     handleSubmit,
     isValidUrl,
-    isSearchQuery,
+    isSearchQuery
   };
 };

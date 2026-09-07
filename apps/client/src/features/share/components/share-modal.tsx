@@ -7,27 +7,27 @@ import {
   Popover,
   Switch,
   Text,
-  TextInput,
-} from "@mantine/core";
-import { IconExternalLink, IconWorld, IconLock } from "@tabler/icons-react";
-import React, { useEffect, useMemo, useState } from "react";
+  TextInput
+} from '@mantine/core';
+import { IconExternalLink, IconWorld, IconLock } from '@tabler/icons-react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   useCreateShareMutation,
   useDeleteShareMutation,
   useShareForPageQuery,
-  useUpdateShareMutation,
-} from "@/features/share/queries/share-query.ts";
-import { Link, useParams } from "react-router-dom";
-import { extractPageSlugId, getPageIcon } from "@/lib";
-import { useTranslation } from "react-i18next";
-import { usePageQuery } from "@/features/page/queries/page-query.ts";
-import CopyTextButton from "@/components/common/copy.tsx";
-import { getAppUrl } from "@/lib/config.ts";
-import { buildPageUrl } from "@/features/page/page.utils.ts";
-import classes from "@/features/share/components/share.module.css";
-import { useAtom } from "jotai";
-import { workspaceAtom } from "@/features/user/atoms/current-user-atom.ts";
-import { useSpaceQuery } from "@/features/space/queries/space-query.ts";
+  useUpdateShareMutation
+} from '@/features/share/queries/share-query.ts';
+import { Link, useParams } from 'react-router-dom';
+import { extractPageSlugId, getPageIcon } from '@/lib';
+import { useTranslation } from 'react-i18next';
+import { usePageQuery } from '@/features/page/queries/page-query.ts';
+import CopyTextButton from '@/components/common/copy.tsx';
+import { getAppUrl } from '@/lib/config.ts';
+import { buildPageUrl } from '@/features/page/page.utils.ts';
+import classes from '@/features/share/components/share.module.css';
+import { useAtom } from 'jotai';
+import { workspaceAtom } from '@/features/user/atoms/current-user-atom.ts';
+import { useSpaceQuery } from '@/features/space/queries/space-query.ts';
 
 interface ShareModalProps {
   readOnly: boolean;
@@ -73,7 +73,7 @@ export default function ShareModal({ readOnly }: ShareModalProps) {
         await createShareMutation.mutateAsync({
           pageId: pageId,
           includeSubPages: true,
-          searchIndexing: false,
+          searchIndexing: false
         });
       } else if (share && share.id) {
         await deleteShareMutation.mutateAsync(share.id);
@@ -84,13 +84,13 @@ export default function ShareModal({ readOnly }: ShareModalProps) {
   };
 
   const handleSubPagesChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
+    event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const value = event.currentTarget.checked;
     try {
       await updateShareMutation.mutateAsync({
         shareId: share.id,
-        includeSubPages: value,
+        includeSubPages: value
       });
     } catch {
       // query invalidation will revert the UI
@@ -98,13 +98,13 @@ export default function ShareModal({ readOnly }: ShareModalProps) {
   };
 
   const handleIndexSearchChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
+    event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const value = event.currentTarget.checked;
     try {
       await updateShareMutation.mutateAsync({
         shareId: share.id,
-        searchIndexing: value,
+        searchIndexing: value
       });
     } catch {
       // query invalidation will revert the UI
@@ -119,7 +119,7 @@ export default function ShareModal({ readOnly }: ShareModalProps) {
           value={publicLink}
           readOnly
           rightSection={<CopyTextButton text={publicLink} />}
-          style={{ width: "100%" }}
+          style={{ width: '100%' }}
         />
         <ActionIcon
           component="a"
@@ -132,7 +132,7 @@ export default function ShareModal({ readOnly }: ShareModalProps) {
         </ActionIcon>
       </Group>
     ),
-    [publicLink],
+    [publicLink]
   );
 
   return (
@@ -153,46 +153,46 @@ export default function ShareModal({ readOnly }: ShareModalProps) {
           color="dark"
           variant="subtle"
         >
-          {t("Share")}
+          {t('Share')}
         </Button>
       </Popover.Target>
-      <Popover.Dropdown style={{ userSelect: "none" }}>
+      <Popover.Dropdown style={{ userSelect: 'none' }}>
         {sharingDisabled ? (
           <>
             <Group justify="center" mb="sm">
               <IconLock size={20} stroke={1.5} />
             </Group>
             <Text size="sm" ta="center" fw={500} mb="xs">
-              {t("Public sharing is disabled")}
+              {t('Public sharing is disabled')}
             </Text>
             <Text size="sm" c="dimmed" ta="center">
               {workspaceDisabled
-                ? t("Public sharing has been disabled at the workspace level.")
-                : t("Public sharing has been disabled for this space.")}
+                ? t('Public sharing has been disabled at the workspace level.')
+                : t('Public sharing has been disabled for this space.')}
             </Text>
           </>
         ) : isDescendantShared ? (
           <>
-            <Text size="sm">{t("Inherits public sharing from")}</Text>
+            <Text size="sm">{t('Inherits public sharing from')}</Text>
             <Anchor
               size="sm"
               underline="never"
               style={{
-                cursor: "pointer",
-                color: "var(--mantine-color-text)",
+                cursor: 'pointer',
+                color: 'var(--mantine-color-text)'
               }}
               component={Link}
               to={buildPageUrl(
                 spaceSlug,
                 share.sharedPage.slugId,
-                share.sharedPage.title,
+                share.sharedPage.title
               )}
             >
               <Group gap="4" wrap="nowrap" my="sm">
                 {getPageIcon(share.sharedPage.icon)}
                 <div className={classes.shareLinkText}>
                   <Text fz="sm" fw={500} lineClamp={1}>
-                    {share.sharedPage.title || t("untitled")}
+                    {share.sharedPage.title || t('untitled')}
                   </Text>
                 </div>
               </Group>
@@ -205,12 +205,12 @@ export default function ShareModal({ readOnly }: ShareModalProps) {
             <Group justify="space-between" wrap="nowrap" gap="xl">
               <div>
                 <Text size="sm">
-                  {isPagePublic ? t("Shared to web") : t("Share to web")}
+                  {isPagePublic ? t('Shared to web') : t('Share to web')}
                 </Text>
                 <Text size="xs" c="dimmed">
                   {isPagePublic
-                    ? t("Anyone with the link can view this page")
-                    : t("Make this page publicly accessible")}
+                    ? t('Anyone with the link can view this page')
+                    : t('Make this page publicly accessible')}
                 </Text>
               </div>
               <Switch
@@ -226,9 +226,9 @@ export default function ShareModal({ readOnly }: ShareModalProps) {
                 {shareLink}
                 <Group justify="space-between" wrap="nowrap" gap="xl">
                   <div>
-                    <Text size="sm">{t("Include sub-pages")}</Text>
+                    <Text size="sm">{t('Include sub-pages')}</Text>
                     <Text size="xs" c="dimmed">
-                      {t("Make sub-pages public too")}
+                      {t('Make sub-pages public too')}
                     </Text>
                   </div>
 
@@ -241,9 +241,9 @@ export default function ShareModal({ readOnly }: ShareModalProps) {
                 </Group>
                 <Group justify="space-between" wrap="nowrap" gap="xl" mt="sm">
                   <div>
-                    <Text size="sm">{t("Search engine indexing")}</Text>
+                    <Text size="sm">{t('Search engine indexing')}</Text>
                     <Text size="xs" c="dimmed">
-                      {t("Allow search engines to index page")}
+                      {t('Allow search engines to index page')}
                     </Text>
                   </div>
                   <Switch

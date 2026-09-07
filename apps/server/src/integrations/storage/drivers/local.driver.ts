@@ -1,7 +1,7 @@
 import {
   StorageDriver,
   LocalStorageConfig,
-  StorageOption,
+  StorageOption
 } from '../interfaces';
 import { dirname, resolve, sep } from 'path';
 import * as fs from 'fs-extra';
@@ -39,7 +39,11 @@ export class LocalDriver implements StorageDriver {
     }
   }
 
-  async uploadStream(filePath: string, file: Readable, options?: { recreateClient?: boolean }): Promise<void> {
+  async uploadStream(
+    filePath: string,
+    file: Readable,
+    options?: { recreateClient?: boolean }
+  ): Promise<void> {
     try {
       const fullPath = this._fullPath(filePath);
       await fs.mkdir(dirname(fullPath), { recursive: true });
@@ -80,7 +84,7 @@ export class LocalDriver implements StorageDriver {
 
   async readRangeStream(
     filePath: string,
-    range: { start: number; end: number },
+    range: { start: number; end: number }
   ): Promise<Readable> {
     const fullPath = this._fullPath(filePath);
     if (!(await fs.pathExists(fullPath))) {
@@ -88,7 +92,7 @@ export class LocalDriver implements StorageDriver {
     }
     return createReadStream(fullPath, {
       start: range.start,
-      end: range.end,
+      end: range.end
     });
   }
 
@@ -97,7 +101,7 @@ export class LocalDriver implements StorageDriver {
       return await fs.pathExists(this._fullPath(filePath));
     } catch (err) {
       throw new Error(
-        `Failed to check file existence: ${(err as Error).message}`,
+        `Failed to check file existence: ${(err as Error).message}`
       );
     }
   }

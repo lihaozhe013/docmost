@@ -1,4 +1,4 @@
-import { ReactNode, useMemo, useState } from "react";
+import { ReactNode, useMemo, useState } from 'react';
 import {
   Avatar,
   Divider,
@@ -7,13 +7,13 @@ import {
   ScrollArea,
   Text,
   TextInput,
-  getDefaultZIndex,
-} from "@mantine/core";
-import { useDebouncedValue } from "@mantine/hooks";
-import { IconCheck, IconSearch } from "@tabler/icons-react";
-import { useTranslation } from "react-i18next";
-import { useGetSpacesQuery } from "@/features/space/queries/space-query";
-import { RadioMenuItem } from "@/components/ui/radio-menu-item";
+  getDefaultZIndex
+} from '@mantine/core';
+import { useDebouncedValue } from '@mantine/hooks';
+import { IconCheck, IconSearch } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
+import { useGetSpacesQuery } from '@/features/space/queries/space-query';
+import { RadioMenuItem } from '@/components/ui/radio-menu-item';
 
 type SpaceFilterMenuProps = {
   value: string | null;
@@ -21,12 +21,12 @@ type SpaceFilterMenuProps = {
   children: ReactNode;
   width?: number;
   position?:
-    | "bottom-start"
-    | "bottom-end"
-    | "bottom"
-    | "top-start"
-    | "top-end"
-    | "top";
+    | 'bottom-start'
+    | 'bottom-end'
+    | 'bottom'
+    | 'top-start'
+    | 'top-end'
+    | 'top';
   zIndex?: number;
 };
 
@@ -35,16 +35,16 @@ export function SpaceFilterMenu({
   onChange,
   children,
   width = 280,
-  position = "bottom-end",
-  zIndex,
+  position = 'bottom-end',
+  zIndex
 }: SpaceFilterMenuProps) {
   const { t } = useTranslation();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery] = useDebouncedValue(searchQuery, 300);
 
   const { data: spacesData } = useGetSpacesQuery({
     limit: 100,
-    query: debouncedQuery,
+    query: debouncedQuery
   });
   const spaces = spacesData?.items ?? [];
 
@@ -62,7 +62,7 @@ export function SpaceFilterMenu({
       <Menu.Target>{children}</Menu.Target>
       <Menu.Dropdown>
         <TextInput
-          placeholder={t("Find a space")}
+          placeholder={t('Find a space')}
           data-autofocus
           autoFocus
           leftSection={<IconSearch size={16} />}
@@ -84,15 +84,15 @@ export function SpaceFilterMenu({
               <Avatar
                 color="initials"
                 variant="filled"
-                name={t("All spaces")}
+                name={t('All spaces')}
                 size={20}
               />
               <div style={{ flex: 1 }}>
                 <Text size="sm" fw={500}>
-                  {t("All spaces")}
+                  {t('All spaces')}
                 </Text>
                 <Text size="xs" c="dimmed">
-                  {t("Search in all your spaces")}
+                  {t('Search in all your spaces')}
                 </Text>
               </div>
               {!value && <IconCheck size={20} aria-hidden />}
@@ -128,4 +128,4 @@ export function SpaceFilterMenu({
   );
 }
 
-export const SPACE_FILTER_MENU_MAX_Z = getDefaultZIndex("max");
+export const SPACE_FILTER_MENU_MAX_Z = getDefaultZIndex('max');

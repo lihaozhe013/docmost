@@ -1,4 +1,4 @@
-import { MantineColor } from "@mantine/core";
+import { MantineColor } from '@mantine/core';
 
 function hashCode(input: string) {
   let hash = 0;
@@ -11,22 +11,22 @@ function hashCode(input: string) {
 }
 
 const defaultColors: MantineColor[] = [
-  "blue",
-  "cyan",
-  "grape",
-  "green",
-  "indigo",
-  "lime",
-  "orange",
-  "pink",
-  "red",
-  "teal",
-  "violet",
+  'blue',
+  'cyan',
+  'grape',
+  'green',
+  'indigo',
+  'lime',
+  'orange',
+  'pink',
+  'red',
+  'teal',
+  'violet'
 ];
 
 export function getInitialsColor(
   name: string,
-  colors: MantineColor[] = defaultColors,
+  colors: MantineColor[] = defaultColors
 ) {
   const hash = hashCode(name);
   const index = Math.abs(hash) % colors.length;

@@ -1,5 +1,5 @@
-import { mergeAttributes, Node } from "@tiptap/core";
-import { ReactNodeViewRenderer } from "@tiptap/react";
+import { mergeAttributes, Node } from '@tiptap/core';
+import { ReactNodeViewRenderer } from '@tiptap/react';
 
 export interface TransclusionReferenceOptions {
   HTMLAttributes: Record<string, any>;
@@ -11,7 +11,7 @@ export interface TransclusionReferenceAttributes {
   transclusionId?: string | null;
 }
 
-declare module "@tiptap/core" {
+declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     transclusionReference: {
       insertTransclusionReference: (
@@ -22,7 +22,7 @@ declare module "@tiptap/core" {
 }
 
 export const TransclusionReference = Node.create<TransclusionReferenceOptions>({
-  name: "transclusionReference",
+  name: 'transclusionReference',
 
   addOptions() {
     return {
@@ -31,7 +31,7 @@ export const TransclusionReference = Node.create<TransclusionReferenceOptions>({
     };
   },
 
-  group: "block",
+  group: 'block',
   atom: true,
   selectable: true,
   draggable: false,
@@ -40,18 +40,18 @@ export const TransclusionReference = Node.create<TransclusionReferenceOptions>({
     return {
       sourcePageId: {
         default: null,
-        parseHTML: (el) => el.getAttribute("data-source-page-id"),
+        parseHTML: (el) => el.getAttribute('data-source-page-id'),
         renderHTML: (attrs) =>
           attrs.sourcePageId
-            ? { "data-source-page-id": attrs.sourcePageId }
+            ? { 'data-source-page-id': attrs.sourcePageId }
             : {},
       },
       transclusionId: {
         default: null,
-        parseHTML: (el) => el.getAttribute("data-transclusion-id"),
+        parseHTML: (el) => el.getAttribute('data-transclusion-id'),
         renderHTML: (attrs) =>
           attrs.transclusionId
-            ? { "data-transclusion-id": attrs.transclusionId }
+            ? { 'data-transclusion-id': attrs.transclusionId }
             : {},
       },
     };
@@ -63,9 +63,9 @@ export const TransclusionReference = Node.create<TransclusionReferenceOptions>({
 
   renderHTML({ HTMLAttributes }) {
     return [
-      "div",
+      'div',
       mergeAttributes(
-        { "data-type": this.name },
+        { 'data-type': this.name },
         this.options.HTMLAttributes,
         HTMLAttributes,
       ),

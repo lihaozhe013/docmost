@@ -1,4 +1,4 @@
-import { ComparePair } from "@/features/page-history/atoms/history-atoms";
+import { ComparePair } from '@/features/page-history/atoms/history-atoms';
 
 /**
  * Resolves which of the two selected versions is newer using their position
@@ -6,7 +6,7 @@ import { ComparePair } from "@/features/page-history/atoms/history-atoms";
  */
 export function resolveComparePair(
   historyItems: { id: string }[],
-  selection: string[],
+  selection: string[]
 ): ComparePair | null {
   if (selection.length !== 2) return null;
   const indexA = historyItems.findIndex((item) => item.id === selection[0]);

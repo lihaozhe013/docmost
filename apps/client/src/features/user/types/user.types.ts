@@ -1,4 +1,4 @@
-import { IWorkspace } from "@/features/workspace/types/workspace.types";
+import { IWorkspace } from '@/features/workspace/types/workspace.types';
 
 export interface IUser {
   id: string;
@@ -41,15 +41,15 @@ export interface IUserSettings {
     editorToolbar: boolean;
   };
   notifications?: {
-    "page.updated"?: boolean;
-    "page.userMention"?: boolean;
-    "comment.userMention"?: boolean;
-    "comment.created"?: boolean;
-    "comment.resolved"?: boolean;
+    'page.updated'?: boolean;
+    'page.userMention'?: boolean;
+    'comment.userMention'?: boolean;
+    'comment.created'?: boolean;
+    'comment.resolved'?: boolean;
   };
 }
 
 export enum PageEditMode {
-  Read = "read",
-  Edit = "edit",
+  Read = 'read',
+  Edit = 'edit'
 }

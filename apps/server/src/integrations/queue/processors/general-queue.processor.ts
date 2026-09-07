@@ -4,14 +4,14 @@ import { Job } from 'bullmq';
 import { QueueJob, QueueName } from '../constants';
 import {
   IAddPageWatchersJob,
-  IPageBacklinkJob,
+  IPageBacklinkJob
 } from '../constants/queue.interface';
 import { InjectKysely } from 'nestjs-kysely';
 import { KyselyDB } from '@docmost/db/types/kysely.types';
 import { BacklinkRepo } from '@docmost/db/repos/backlink/backlink.repo';
 import {
   WatcherRepo,
-  WatcherType,
+  WatcherType
 } from '@docmost/db/repos/watcher/watcher.repo';
 import { InsertableWatcher } from '@docmost/db/types/entity.types';
 import { processBacklinks } from '../tasks/backlinks.task';
@@ -25,7 +25,7 @@ export class GeneralQueueProcessor
   constructor(
     @InjectKysely() private readonly db: KyselyDB,
     private readonly backlinkRepo: BacklinkRepo,
-    private readonly watcherRepo: WatcherRepo,
+    private readonly watcherRepo: WatcherRepo
   ) {
     super();
   }
@@ -42,7 +42,7 @@ export class GeneralQueueProcessor
             spaceId,
             workspaceId,
             type: WatcherType.PAGE,
-            addedById: userId,
+            addedById: userId
           }));
           await this.watcherRepo.insertMany(watchers);
           break;
@@ -52,7 +52,7 @@ export class GeneralQueueProcessor
           await processBacklinks(
             this.db,
             this.backlinkRepo,
-            job.data as IPageBacklinkJob,
+            job.data as IPageBacklinkJob
           );
           break;
         }
@@ -70,7 +70,7 @@ export class GeneralQueueProcessor
   @OnWorkerEvent('failed')
   onError(job: Job) {
     this.logger.error(
-      `Error processing ${job.name} job. Reason: ${job.failedReason}`,
+      `Error processing ${job.name} job. Reason: ${job.failedReason}`
     );
   }
 

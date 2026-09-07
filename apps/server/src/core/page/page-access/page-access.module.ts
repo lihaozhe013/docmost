@@ -4,6 +4,6 @@ import { PageAccessService } from './page-access.service';
 @Global()
 @Module({
   providers: [PageAccessService],
-  exports: [PageAccessService],
+  exports: [PageAccessService]
 })
 export class PageAccessModule {}

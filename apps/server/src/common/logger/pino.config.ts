@@ -7,7 +7,7 @@ const CONTEXTS_TO_IGNORE = [
   'RoutesResolver',
   'RouterExplorer',
   'LegacyRouteConverter',
-  'WebSocketsController',
+  'WebSocketsController'
 ];
 
 export function createPinoConfig(): Params {
@@ -28,12 +28,12 @@ export function createPinoConfig(): Params {
               colorize: true,
               singleLine: true,
               translateTime: 'SYS:standard',
-              ignore: 'pid,hostname',
-            },
+              ignore: 'pid,hostname'
+            }
           }
         : undefined,
       formatters: {
-        level: (label) => ({ level: label }),
+        level: (label) => ({ level: label })
       },
       hooks: {
         logMethod(inputArgs, method) {
@@ -41,25 +41,28 @@ export function createPinoConfig(): Params {
             for (const arg of inputArgs) {
               if (typeof arg === 'object' && arg !== null && 'context' in arg) {
                 const context = (arg as Record<string, unknown>)['context'];
-                if (typeof context === 'string' && CONTEXTS_TO_IGNORE.includes(context)) {
+                if (
+                  typeof context === 'string' &&
+                  CONTEXTS_TO_IGNORE.includes(context)
+                ) {
                   return;
                 }
               }
             }
           }
           return method.apply(this, inputArgs);
-        },
+        }
       },
       serializers: {
         req: (req) => ({
           method: req.method,
           url: redactSensitiveUrl(req.url),
           ip: req.ip || req.remoteAddress,
-          userAgent: req.headers?.['user-agent'],
+          userAgent: req.headers?.['user-agent']
         }),
         res: (res) => ({
-          statusCode: res.statusCode,
-        }),
+          statusCode: res.statusCode
+        })
       },
       customLogLevel: (_req, res, err) => {
         if (res.statusCode >= 500 || err) return 'error';
@@ -69,9 +72,9 @@ export function createPinoConfig(): Params {
       autoLogging: logHttp
         ? {
             ignore: (req) =>
-              req.url === '/api/health' || req.url === '/api/health/live',
+              req.url === '/api/health' || req.url === '/api/health/live'
           }
-        : false,
-    },
+        : false
+    }
   };
 }

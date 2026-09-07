@@ -5,14 +5,14 @@ export async function up(db: Kysely<any>): Promise<void> {
     .createTable('audit')
     .ifNotExists()
     .addColumn('id', 'uuid', (col) =>
-      col.primaryKey().defaultTo(sql`gen_uuid_v7()`),
+      col.primaryKey().defaultTo(sql`gen_uuid_v7()`)
     )
     .addColumn('workspace_id', 'uuid', (col) =>
-      col.notNull().references('workspaces.id').onDelete('cascade'),
+      col.notNull().references('workspaces.id').onDelete('cascade')
     )
     .addColumn('actor_id', 'uuid')
     .addColumn('actor_type', 'varchar', (col) =>
-      col.notNull().defaultTo('user'),
+      col.notNull().defaultTo('user')
     )
     .addColumn('event', 'varchar', (col) => col.notNull())
     .addColumn('resource_type', 'varchar', (col) => col.notNull())
@@ -22,7 +22,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('metadata', 'jsonb')
     .addColumn('ip_address', sql`inet`)
     .addColumn('created_at', 'timestamptz', (col) =>
-      col.notNull().defaultTo(sql`now()`),
+      col.notNull().defaultTo(sql`now()`)
     )
     .execute();
 

@@ -16,7 +16,7 @@ import {
   IPermissionGrantedNotificationJob,
   IVerificationExpiringNotificationJob,
   IVerificationExpiredNotificationJob,
-  IVerificationReconcileJob,
+  IVerificationReconcileJob
 } from '../../integrations/queue/constants/queue.interface';
 import { CommentNotificationService } from './services/comment.notification';
 import { PageNotificationService } from './services/page.notification';
@@ -34,7 +34,7 @@ export class NotificationProcessor
     private readonly pageNotificationService: PageNotificationService,
     private readonly verificationNotificationService: VerificationNotificationService,
     private readonly moduleRef: ModuleRef,
-    @InjectKysely() private readonly db: KyselyDB,
+    @InjectKysely() private readonly db: KyselyDB
   ) {
     super();
   }
@@ -53,7 +53,7 @@ export class NotificationProcessor
       | IApprovalRequestedNotificationJob
       | IApprovalRejectedNotificationJob,
       void
-    >,
+    >
   ): Promise<void> {
     try {
       if (job.name === QueueJob.VERIFICATION_RECONCILE) {
@@ -66,70 +66,70 @@ export class NotificationProcessor
       switch (job.name) {
         case QueueJob.COMMENT_NOTIFICATION: {
           await this.commentNotificationService.processComment(
-            job.data as ICommentNotificationJob,
+            job.data as ICommentNotificationJob
           );
           break;
         }
 
         case QueueJob.COMMENT_RESOLVED_NOTIFICATION: {
           await this.commentNotificationService.processResolved(
-            job.data as ICommentResolvedNotificationJob,
+            job.data as ICommentResolvedNotificationJob
           );
           break;
         }
 
         case QueueJob.PAGE_MENTION_NOTIFICATION: {
           await this.pageNotificationService.processPageMention(
-            job.data as IPageMentionNotificationJob,
+            job.data as IPageMentionNotificationJob
           );
           break;
         }
 
         case QueueJob.PAGE_PERMISSION_GRANTED: {
           await this.pageNotificationService.processPermissionGranted(
-            job.data as IPermissionGrantedNotificationJob,
+            job.data as IPermissionGrantedNotificationJob
           );
           break;
         }
 
         case QueueJob.PAGE_UPDATED: {
           await this.pageNotificationService.processPageUpdate(
-            job.data as IPageUpdateNotificationJob,
+            job.data as IPageUpdateNotificationJob
           );
           break;
         }
 
         case QueueJob.PAGE_VERIFICATION_EXPIRING: {
           await this.verificationNotificationService.processVerificationExpiring(
-            job.data as IVerificationExpiringNotificationJob,
+            job.data as IVerificationExpiringNotificationJob
           );
           break;
         }
 
         case QueueJob.PAGE_VERIFICATION_EXPIRED: {
           await this.verificationNotificationService.processVerificationExpired(
-            job.data as IVerificationExpiredNotificationJob,
+            job.data as IVerificationExpiredNotificationJob
           );
           break;
         }
 
         case QueueJob.PAGE_VERIFIED_NOTIFICATION: {
           await this.verificationNotificationService.processPageVerified(
-            job.data as IPageVerifiedNotificationJob,
+            job.data as IPageVerifiedNotificationJob
           );
           break;
         }
 
         case QueueJob.PAGE_APPROVAL_REQUESTED_NOTIFICATION: {
           await this.verificationNotificationService.processApprovalRequested(
-            job.data as IApprovalRequestedNotificationJob,
+            job.data as IApprovalRequestedNotificationJob
           );
           break;
         }
 
         case QueueJob.PAGE_APPROVAL_REJECTED_NOTIFICATION: {
           await this.verificationNotificationService.processApprovalRejected(
-            job.data as IApprovalRejectedNotificationJob,
+            job.data as IApprovalRejectedNotificationJob
           );
           break;
         }
@@ -167,7 +167,7 @@ export class NotificationProcessor
       eeModule = require('../../ee/page-verification/page-verification-scheduler.service');
     } catch {
       this.logger.debug(
-        'VERIFICATION_RECONCILE fired but EE scheduler not bundled in this build',
+        'VERIFICATION_RECONCILE fired but EE scheduler not bundled in this build'
       );
       return;
     }
@@ -180,7 +180,7 @@ export class NotificationProcessor
     const scheduler = this.moduleRef.get(schedulerClass, { strict: false });
     if (!scheduler) {
       this.logger.warn(
-        'VERIFICATION_RECONCILE fired but scheduler service not resolvable',
+        'VERIFICATION_RECONCILE fired but scheduler service not resolvable'
       );
       return;
     }
@@ -190,7 +190,7 @@ export class NotificationProcessor
   @OnWorkerEvent('failed')
   onError(job: Job) {
     this.logger.error(
-      `Error processing ${job.name} job. Reason: ${job.failedReason}`,
+      `Error processing ${job.name} job. Reason: ${job.failedReason}`
     );
   }
 

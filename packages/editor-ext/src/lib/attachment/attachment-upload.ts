@@ -1,8 +1,8 @@
-import { Node } from "@tiptap/pm/model";
-import { MediaUploadOptions, UploadFn } from "../media-utils";
-import { IAttachment } from "../types";
-import { generateNodeId } from "../utils";
-import { Command } from "@tiptap/core";
+import { Node } from '@tiptap/pm/model';
+import { MediaUploadOptions, UploadFn } from '../media-utils';
+import { IAttachment } from '../types';
+import { generateNodeId } from '../utils';
+import { Command } from '@tiptap/core';
 
 const findAttachmentNodeByPlaceholderId = (
   doc: Node,
@@ -13,7 +13,7 @@ const findAttachmentNodeByPlaceholderId = (
   doc.descendants((node, pos) => {
     if (result) return false;
     if (
-      node.type.name === "attachment" &&
+      node.type.name === 'attachment' &&
       node.attrs.placeholder?.id === placeholderId
     ) {
       result = { node, pos };

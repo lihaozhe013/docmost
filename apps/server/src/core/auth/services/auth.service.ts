@@ -3,7 +3,7 @@ import {
   Inject,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
+  UnauthorizedException
 } from '@nestjs/common';
 import { LoginDto } from '../dto/login.dto';
 import { CreateUserDto } from '../dto/create-user.dto';
@@ -16,7 +16,7 @@ import { UserRepo } from '@docmost/db/repos/user/user.repo';
 import {
   comparePasswordHash,
   hashPassword,
-  isUserDisabled,
+  isUserDisabled
 } from '../../../common/helpers';
 import { throwIfEmailNotVerified } from '../auth.util';
 import { ChangePasswordDto } from '../dto/change-password.dto';
@@ -26,7 +26,7 @@ import { InjectKysely } from 'nestjs-kysely';
 import { AuditEvent, AuditResource } from '../../../common/events/audit-events';
 import {
   AUDIT_SERVICE,
-  IAuditService,
+  IAuditService
 } from '../../../integrations/audit/audit.service';
 import { EnvironmentService } from '../../../integrations/environment/environment.service';
 
@@ -40,12 +40,12 @@ export class AuthService {
     private userRepo: UserRepo,
     private environmentService: EnvironmentService,
     @InjectKysely() private readonly db: KyselyDB,
-    @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService,
+    @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService
   ) {}
 
   async login(loginDto: LoginDto, workspaceId: string) {
     const user = await this.userRepo.findByEmail(loginDto.email, workspaceId, {
-      includePassword: true,
+      includePassword: true
     });
 
     const errorMessage = 'Email or password does not match';
@@ -55,7 +55,7 @@ export class AuthService {
 
     const isPasswordMatch = await comparePasswordHash(
       loginDto.password,
-      user.password,
+      user.password
     );
 
     if (!isPasswordMatch) {
@@ -67,7 +67,7 @@ export class AuthService {
       emailVerifiedAt: user.emailVerifiedAt,
       email: user.email,
       workspaceId,
-      appSecret: this.environmentService.getAppSecret(),
+      appSecret: this.environmentService.getAppSecret()
     });
 
     user.lastLoginAt = new Date();
@@ -77,7 +77,7 @@ export class AuthService {
       event: AuditEvent.USER_LOGIN,
       resourceType: AuditResource.USER,
       resourceId: user.id,
-      metadata: { source: 'password' },
+      metadata: { source: 'password' }
     });
 
     return this.sessionService.createSessionAndToken(user);
@@ -100,10 +100,10 @@ export class AuthService {
     dto: ChangePasswordDto,
     userId: string,
     workspaceId: string,
-    currentSessionId?: string,
+    currentSessionId?: string
   ): Promise<void> {
     const user = await this.userRepo.findById(userId, workspaceId, {
-      includePassword: true,
+      includePassword: true
     });
 
     if (!user || isUserDisabled(user)) {
@@ -112,7 +112,7 @@ export class AuthService {
 
     const comparePasswords = await comparePasswordHash(
       dto.oldPassword,
-      user.password,
+      user.password
     );
 
     if (!comparePasswords) {
@@ -123,17 +123,17 @@ export class AuthService {
     await this.userRepo.updateUser(
       {
         password: newPasswordHash,
-        hasGeneratedPassword: false,
+        hasGeneratedPassword: false
       },
       userId,
-      workspaceId,
+      workspaceId
     );
 
     if (currentSessionId) {
       await this.userSessionRepo.deleteAllExceptCurrent(
         currentSessionId,
         userId,
-        workspaceId,
+        workspaceId
       );
     } else {
       await this.userSessionRepo.deleteByUserId(userId, workspaceId);
@@ -142,14 +142,14 @@ export class AuthService {
     this.auditService.log({
       event: AuditEvent.USER_PASSWORD_CHANGED,
       resourceType: AuditResource.USER,
-      resourceId: userId,
+      resourceId: userId
     });
   }
 
   async getCollabToken(user: User, workspaceId: string) {
     const token = await this.tokenService.generateCollabToken(
       user,
-      workspaceId,
+      workspaceId
     );
     return { token };
   }

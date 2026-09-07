@@ -1,5 +1,5 @@
-import { IconSearch } from "@tabler/icons-react";
-import cx from "clsx";
+import { IconSearch } from '@tabler/icons-react';
+import cx from 'clsx';
 import {
   ActionIcon,
   BoxProps,
@@ -8,14 +8,14 @@ import {
   rem,
   Text,
   Tooltip,
-  UnstyledButton,
-} from "@mantine/core";
-import classes from "./search-control.module.css";
-import React from "react";
-import { useTranslation } from "react-i18next";
-import { platformModifierLabel } from "@/lib";
+  UnstyledButton
+} from '@mantine/core';
+import classes from './search-control.module.css';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { platformModifierLabel } from '@/lib';
 
-interface SearchControlProps extends BoxProps, ElementProps<"button"> {}
+interface SearchControlProps extends BoxProps, ElementProps<'button'> {}
 
 export function SearchControl({ className, ...others }: SearchControlProps) {
   const { t } = useTranslation();
@@ -25,7 +25,7 @@ export function SearchControl({ className, ...others }: SearchControlProps) {
       <Group gap="xs" wrap="nowrap">
         <IconSearch style={{ width: rem(15), height: rem(15) }} stroke={1.5} />
         <Text fz="sm" c="dimmed" pr={80}>
-          {t("Search")}
+          {t('Search')}
         </Text>
         <Text fw={700} className={classes.shortcut}>
           {platformModifierLabel} + K
@@ -43,11 +43,11 @@ export function SearchMobileControl({ onSearch }: SearchMobileControlProps) {
   const { t } = useTranslation();
 
   return (
-    <Tooltip label={t("Search")} withArrow>
+    <Tooltip label={t('Search')} withArrow>
       <ActionIcon
         variant="subtle"
         color="dark"
-        aria-label={t("Search")}
+        aria-label={t('Search')}
         onClick={onSearch}
         size="sm"
       >

@@ -4,6 +4,6 @@ import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   providers: [TelemetryService],
-  imports: [ScheduleModule.forRoot()],
+  imports: [ScheduleModule.forRoot()]
 })
 export class TelemetryModule {}

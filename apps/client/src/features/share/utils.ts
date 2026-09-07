@@ -1,5 +1,5 @@
-import { IPage } from "@/features/page/types/page.types.ts";
-import { sortPositionKeys } from "@/features/page/tree/utils";
+import { IPage } from '@/features/page/types/page.types.ts';
+import { sortPositionKeys } from '@/features/page/tree/utils';
 
 export type SharedPageTreeNode = {
   id: string;
@@ -16,7 +16,7 @@ export type SharedPageTreeNode = {
 };
 
 export function buildSharedPageTree(
-  pages: Partial<IPage[]>,
+  pages: Partial<IPage[]>
 ): SharedPageTreeNode[] {
   const pageMap: Record<string, SharedPageTreeNode> = {};
 
@@ -32,9 +32,9 @@ export function buildSharedPageTree(
       hasChildren: false,
       spaceId: page.spaceId,
       parentPageId: page.parentPageId,
-      label: page.title || "untitled",
+      label: page.title || 'untitled',
       value: page.id,
-      children: [],
+      children: []
     };
   });
 
@@ -60,18 +60,17 @@ export function buildSharedPageTree(
   function sortTree(nodes: SharedPageTreeNode[]): SharedPageTreeNode[] {
     return sortPositionKeys(nodes).map((node: SharedPageTreeNode) => ({
       ...node,
-      children: sortTree(node.children),
+      children: sortTree(node.children)
     }));
   }
 
   return sortTree(tree);
 }
 
-
 // Recursively checks if a page exists in the shared page tree.
 export function isPageInTree(
   tree: SharedPageTreeNode[],
-  pageSlugId: string,
+  pageSlugId: string
 ): boolean {
   for (const node of tree) {
     if (node.slugId === pageSlugId) {

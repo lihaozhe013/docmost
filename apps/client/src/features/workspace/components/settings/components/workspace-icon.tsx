@@ -1,15 +1,15 @@
-import { useState } from "react";
-import { useAtom } from "jotai";
-import { Text } from "@mantine/core";
-import { useTranslation } from "react-i18next";
-import AvatarUploader from "@/components/common/avatar-uploader.tsx";
+import { useState } from 'react';
+import { useAtom } from 'jotai';
+import { Text } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
+import AvatarUploader from '@/components/common/avatar-uploader.tsx';
 import {
   uploadWorkspaceIcon,
-  removeWorkspaceIcon,
-} from "@/features/attachments/services/attachment-service.ts";
-import { AvatarIconType } from "@/features/attachments/types/attachment.types.ts";
-import { workspaceAtom } from "@/features/user/atoms/current-user-atom.ts";
-import useUserRole from "@/hooks/use-user-role.tsx";
+  removeWorkspaceIcon
+} from '@/features/attachments/services/attachment-service.ts';
+import { AvatarIconType } from '@/features/attachments/types/attachment.types.ts';
+import { workspaceAtom } from '@/features/user/atoms/current-user-atom.ts';
+import useUserRole from '@/hooks/use-user-role.tsx';
 
 export default function WorkspaceIcon() {
   const { t } = useTranslation();
@@ -46,9 +46,9 @@ export default function WorkspaceIcon() {
   };
 
   return (
-    <div style={{ marginBottom: "24px" }}>
+    <div style={{ marginBottom: '24px' }}>
       <Text size="sm" fw={500} mb="xs">
-        {t("Icon")}
+        {t('Icon')}
       </Text>
       <AvatarUploader
         currentImageUrl={workspace?.logo}

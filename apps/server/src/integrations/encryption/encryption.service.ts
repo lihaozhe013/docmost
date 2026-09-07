@@ -4,7 +4,7 @@ import {
   createCipheriv,
   createDecipheriv,
   createHash,
-  randomBytes,
+  randomBytes
 } from 'node:crypto';
 import { UnableToDecrypt, UnableToInitialize } from './encryption.errors';
 import { EnvironmentService } from '../environment/environment.service';
@@ -40,14 +40,14 @@ export class EncryptionService {
     const cipher = createCipheriv(ALGORITHM, this.key, iv);
     const cipherText = Buffer.concat([
       cipher.update(plaintext, 'utf8'),
-      cipher.final(),
+      cipher.final()
     ]);
     const authTag = cipher.getAuthTag();
 
     const aead: AEADPayload<string> = {
       iv: iv.toString('base64'),
       authTag: authTag.toString('base64'),
-      cipherText: cipherText.toString('base64'),
+      cipherText: cipherText.toString('base64')
     };
 
     return Buffer.from(JSON.stringify(aead)).toString('base64');
@@ -60,7 +60,7 @@ export class EncryptionService {
       decipher.setAuthTag(authTag);
       const decrypted = Buffer.concat([
         decipher.update(cipherText),
-        decipher.final(),
+        decipher.final()
       ]);
       return decrypted.toString('utf8');
     } catch (e: unknown) {
@@ -87,20 +87,20 @@ export class EncryptionService {
     const iv = Buffer.from(deserializedPkg.iv as string, 'base64');
     if (iv.length !== IV_LENGTH) {
       throw new Error(
-        `The decoded IV is not the correct length. Expected ${IV_LENGTH} bytes, got ${iv.length} bytes.`,
+        `The decoded IV is not the correct length. Expected ${IV_LENGTH} bytes, got ${iv.length} bytes.`
       );
     }
 
     const authTag = Buffer.from(deserializedPkg.authTag as string, 'base64');
     if (authTag.length !== AUTH_TAG_LENGTH) {
       throw new Error(
-        `The decoded auth tag is not the correct length. Expected ${AUTH_TAG_LENGTH} bytes, got ${authTag.length} bytes.`,
+        `The decoded auth tag is not the correct length. Expected ${AUTH_TAG_LENGTH} bytes, got ${authTag.length} bytes.`
       );
     }
 
     const cipherText = Buffer.from(
       deserializedPkg.cipherText as string,
-      'base64',
+      'base64'
     );
 
     return { iv, authTag, cipherText };

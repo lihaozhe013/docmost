@@ -4,7 +4,7 @@ import { KyselyDB, KyselyTransaction } from '@docmost/db/types/kysely.types';
 import { dbOrTx } from '@docmost/db/utils';
 import {
   InsertablePageTransclusionReference,
-  PageTransclusionReference,
+  PageTransclusionReference
 } from '@docmost/db/types/entity.types';
 
 export type TransclusionReferenceKey = {
@@ -18,7 +18,7 @@ export class PageTransclusionReferencesRepo {
 
   async findByReferencePageId(
     referencePageId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<PageTransclusionReference[]> {
     return dbOrTx(this.db, trx)
       .selectFrom('pageTransclusionReferences')
@@ -31,7 +31,7 @@ export class PageTransclusionReferencesRepo {
     sourcePageId: string,
     transclusionId: string,
     workspaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<string[]> {
     const rows = await dbOrTx(this.db, trx)
       .selectFrom('pageTransclusionReferences')
@@ -46,7 +46,7 @@ export class PageTransclusionReferencesRepo {
 
   async insertMany(
     rows: InsertablePageTransclusionReference[],
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<void> {
     if (rows.length === 0) return;
     await dbOrTx(this.db, trx)
@@ -55,7 +55,7 @@ export class PageTransclusionReferencesRepo {
       .onConflict((oc) =>
         oc
           .columns(['referencePageId', 'sourcePageId', 'transclusionId'])
-          .doNothing(),
+          .doNothing()
       )
       .execute();
   }
@@ -63,7 +63,7 @@ export class PageTransclusionReferencesRepo {
   async deleteByReferenceAndKeys(
     referencePageId: string,
     keys: TransclusionReferenceKey[],
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<void> {
     if (keys.length === 0) return;
     await dbOrTx(this.db, trx)
@@ -74,10 +74,10 @@ export class PageTransclusionReferencesRepo {
           keys.map((k) =>
             eb.and([
               eb('sourcePageId', '=', k.sourcePageId),
-              eb('transclusionId', '=', k.transclusionId),
-            ]),
-          ),
-        ),
+              eb('transclusionId', '=', k.transclusionId)
+            ])
+          )
+        )
       )
       .execute();
   }
@@ -86,7 +86,7 @@ export class PageTransclusionReferencesRepo {
     referencePageId: string,
     sourcePageId: string,
     transclusionId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<void> {
     await dbOrTx(this.db, trx)
       .deleteFrom('pageTransclusionReferences')

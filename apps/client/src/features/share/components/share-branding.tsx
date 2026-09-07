@@ -1,4 +1,4 @@
-import { Affix, Button } from "@mantine/core";
+import { Affix, Button } from '@mantine/core';
 
 export default function ShareBranding() {
   return (

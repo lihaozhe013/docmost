@@ -15,7 +15,7 @@ import {
   Req,
   Res,
   UseGuards,
-  UseInterceptors,
+  UseInterceptors
 } from '@nestjs/common';
 import { AttachmentService } from './services/attachment.service';
 import { FastifyReply, FastifyRequest } from 'fastify';
@@ -29,22 +29,22 @@ import { Attachment, User, Workspace } from '@docmost/db/types/entity.types';
 import { StorageService } from '../../integrations/storage/storage.service';
 import {
   getAttachmentFolderPath,
-  validAttachmentTypes,
+  validAttachmentTypes
 } from './attachment.utils';
 import { getMimeType } from '../../common/helpers';
 import {
   AttachmentType,
   inlineFileExtensions,
-  MAX_AVATAR_SIZE,
+  MAX_AVATAR_SIZE
 } from './attachment.constants';
 import {
   SpaceCaslAction,
-  SpaceCaslSubject,
+  SpaceCaslSubject
 } from '../casl/interfaces/space-ability.type';
 import SpaceAbilityFactory from '../casl/abilities/space-ability.factory';
 import {
   WorkspaceCaslAction,
-  WorkspaceCaslSubject,
+  WorkspaceCaslSubject
 } from '../casl/interfaces/workspace-ability.type';
 import WorkspaceAbilityFactory from '../casl/abilities/workspace-ability.factory';
 import { PageRepo } from '@docmost/db/repos/page/page.repo';
@@ -57,7 +57,7 @@ import * as path from 'path';
 import {
   AttachmentInfoDto,
   PageIdDto,
-  RemoveIconDto,
+  RemoveIconDto
 } from './dto/attachment.dto';
 import { PaginationOptions } from '@docmost/db/pagination/pagination-options';
 import { PageAccessService } from '../page/page-access/page-access.service';
@@ -65,7 +65,7 @@ import { DomainService } from '../../integrations/environment/domain.service';
 import { AuditEvent, AuditResource } from '../../common/events/audit-events';
 import {
   AUDIT_SERVICE,
-  IAuditService,
+  IAuditService
 } from '../../integrations/audit/audit.service';
 
 @Controller()
@@ -83,7 +83,7 @@ export class AttachmentController {
     private readonly tokenService: TokenService,
     private readonly pageAccessService: PageAccessService,
     private readonly domainService: DomainService,
-    @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService,
+    @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -94,20 +94,20 @@ export class AttachmentController {
     @Req() req: any,
     @Res() res: FastifyReply,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const maxFileSize = bytes(this.environmentService.getFileUploadSizeLimit());
 
     let file = null;
     try {
       file = await req.file({
-        limits: { fileSize: maxFileSize, fields: 3, files: 1 },
+        limits: { fileSize: maxFileSize, fields: 3, files: 1 }
       });
     } catch (err: any) {
       this.logger.error(err.message);
       if (err?.statusCode === 413) {
         throw new BadRequestException(
-          `File too large. Exceeds the ${this.environmentService.getFileUploadSizeLimit()} limit`,
+          `File too large. Exceeds the ${this.environmentService.getFileUploadSizeLimit()} limit`
         );
       }
     }
@@ -144,7 +144,7 @@ export class AttachmentController {
         spaceId: spaceId,
         userId: user.id,
         workspaceId: workspace.id,
-        attachmentId: attachmentId,
+        attachmentId: attachmentId
       });
 
       this.auditService.log({
@@ -155,13 +155,13 @@ export class AttachmentController {
         metadata: {
           fileName: fileResponse?.fileName,
           pageId,
-          spaceId,
-        },
+          spaceId
+        }
       });
 
       return res.send({
         ...fileResponse,
-        url: this.buildFileUrl(workspace, fileResponse),
+        url: this.buildFileUrl(workspace, fileResponse)
       });
     } catch (err: any) {
       if (err?.statusCode === 413) {
@@ -183,7 +183,7 @@ export class AttachmentController {
     @AuthUser() user: User,
     @AuthWorkspace() workspace: Workspace,
     @Param('fileId') fileId: string,
-    @Param('fileName') fileName?: string,
+    @Param('fileName') fileName?: string
   ) {
     if (!isValidUUID(fileId)) {
       throw new NotFoundException('Invalid file id');
@@ -229,17 +229,17 @@ export class AttachmentController {
     @AuthWorkspace() workspace: Workspace,
     @Param('fileId') fileId: string,
     @Param('fileName') fileName?: string,
-    @Query('jwt') jwtToken?: string,
+    @Query('jwt') jwtToken?: string
   ) {
     let jwtPayload: JwtAttachmentPayload = null;
     try {
       jwtPayload = await this.tokenService.verifyJwt(
         jwtToken,
-        JwtType.ATTACHMENT,
+        JwtType.ATTACHMENT
       );
     } catch (err) {
       throw new BadRequestException(
-        'Expired or invalid attachment access token',
+        'Expired or invalid attachment access token'
       );
     }
 
@@ -278,19 +278,19 @@ export class AttachmentController {
     @Req() req: any,
     @Res() res: FastifyReply,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const maxFileSize = bytes(MAX_AVATAR_SIZE);
 
     let file = null;
     try {
       file = await req.file({
-        limits: { fileSize: maxFileSize, fields: 3, files: 1 },
+        limits: { fileSize: maxFileSize, fields: 3, files: 1 }
       });
     } catch (err: any) {
       if (err?.statusCode === 413) {
         throw new BadRequestException(
-          `File too large. Exceeds the ${MAX_AVATAR_SIZE} limit`,
+          `File too large. Exceeds the ${MAX_AVATAR_SIZE} limit`
         );
       }
     }
@@ -318,7 +318,7 @@ export class AttachmentController {
       if (
         ability.cannot(
           WorkspaceCaslAction.Manage,
-          WorkspaceCaslSubject.Settings,
+          WorkspaceCaslSubject.Settings
         )
       ) {
         throw new ForbiddenException();
@@ -344,7 +344,7 @@ export class AttachmentController {
         attachmentType,
         user.id,
         workspace.id,
-        spaceId,
+        spaceId
       );
 
       return res.send(fileResponse);
@@ -359,7 +359,7 @@ export class AttachmentController {
     @Res() res: FastifyReply,
     @AuthWorkspace() workspace: Workspace,
     @Param('attachmentType') attachmentType: AttachmentType,
-    @Param('fileName') fileName?: string,
+    @Param('fileName') fileName?: string
   ) {
     if (
       !validAttachmentTypes.includes(attachmentType) ||
@@ -389,7 +389,7 @@ export class AttachmentController {
       const fileStream = await this.storageService.readStream(filePath);
       res.headers({
         'Content-Type': getMimeType(filePath),
-        'Cache-Control': 'private, max-age=86400',
+        'Cache-Control': 'private, max-age=86400'
       });
       return res.send(fileStream);
     } catch (err) {
@@ -404,7 +404,7 @@ export class AttachmentController {
   async getAttachmentInfo(
     @Body() dto: AttachmentInfoDto,
     @AuthWorkspace() workspace: Workspace,
-    @AuthUser() user: User,
+    @AuthUser() user: User
   ) {
     const attachment = await this.attachmentRepo.findById(dto.attachmentId);
     if (
@@ -434,7 +434,7 @@ export class AttachmentController {
     @Body() dto: PageIdDto,
     @Body() pagination: PaginationOptions,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const page = await this.pageRepo.findById(dto.pageId);
     if (!page || page.workspaceId !== workspace.id) {
@@ -445,15 +445,15 @@ export class AttachmentController {
 
     const result = await this.attachmentRepo.findPageAttachments(
       page.id,
-      pagination,
+      pagination
     );
 
     return {
       ...result,
       items: result.items.map((attachment) => ({
         ...attachment,
-        url: this.buildFileUrl(workspace, attachment),
-      })),
+        url: this.buildFileUrl(workspace, attachment)
+      }))
     };
   }
 
@@ -463,7 +463,7 @@ export class AttachmentController {
   async removeIcon(
     @Body() dto: RemoveIconDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const { type, spaceId } = dto;
 
@@ -477,7 +477,7 @@ export class AttachmentController {
     if (type === AttachmentType.SpaceIcon) {
       if (!spaceId) {
         throw new BadRequestException(
-          'spaceId is required to change space icons',
+          'spaceId is required to change space icons'
         );
       }
 
@@ -498,7 +498,7 @@ export class AttachmentController {
       if (
         ability.cannot(
           WorkspaceCaslAction.Manage,
-          WorkspaceCaslSubject.Settings,
+          WorkspaceCaslSubject.Settings
         )
       ) {
         throw new ForbiddenException();
@@ -516,7 +516,7 @@ export class AttachmentController {
     req: FastifyRequest,
     res: FastifyReply,
     attachment: Attachment,
-    cacheScope: 'private' | 'public',
+    cacheScope: 'private' | 'public'
   ) {
     const fileSize = Number(attachment.fileSize);
     const rangeHeader = req.headers.range;
@@ -524,13 +524,13 @@ export class AttachmentController {
     res.header('Accept-Ranges', 'bytes');
     res.header(
       'Content-Security-Policy',
-      "base-uri 'none'; object-src 'self'; default-src 'self';",
+      "base-uri 'none'; object-src 'self'; default-src 'self';"
     );
 
     if (!inlineFileExtensions.includes(attachment.fileExt)) {
       res.header(
         'Content-Disposition',
-        `attachment; filename="${encodeURIComponent(attachment.fileName)}"`,
+        `attachment; filename="${encodeURIComponent(attachment.fileName)}"`
       );
     }
 
@@ -550,7 +550,7 @@ export class AttachmentController {
 
         const fileStream = await this.storageService.readRangeStream(
           attachment.filePath,
-          { start, end },
+          { start, end }
         );
 
         res.status(206);
@@ -558,7 +558,7 @@ export class AttachmentController {
           'Content-Type': attachment.mimeType,
           'Content-Range': `bytes ${start}-${end}/${fileSize}`,
           'Content-Length': end - start + 1,
-          'Cache-Control': `${cacheScope}, max-age=3600`,
+          'Cache-Control': `${cacheScope}, max-age=3600`
         });
 
         return res.send(fileStream);
@@ -566,12 +566,12 @@ export class AttachmentController {
     }
 
     const fileStream = await this.storageService.readStream(
-      attachment.filePath,
+      attachment.filePath
     );
 
     res.headers({
       'Content-Type': attachment.mimeType,
-      'Cache-Control': `${cacheScope}, max-age=3600`,
+      'Cache-Control': `${cacheScope}, max-age=3600`
     });
 
     const isSvg = attachment.fileExt === '.svg';

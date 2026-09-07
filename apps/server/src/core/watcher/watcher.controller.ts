@@ -5,7 +5,7 @@ import {
   HttpStatus,
   NotFoundException,
   Post,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { WatcherService } from './watcher.service';
 import { AuthUser } from '../../common/decorators/auth-user.decorator';
@@ -22,7 +22,7 @@ export class WatcherController {
   constructor(
     private readonly watcherService: WatcherService,
     private readonly pageRepo: PageRepo,
-    private readonly pageAccessService: PageAccessService,
+    private readonly pageAccessService: PageAccessService
   ) {}
 
   @HttpCode(HttpStatus.OK)
@@ -30,7 +30,7 @@ export class WatcherController {
   async watchPage(
     @Body() dto: WatcherPageDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const page = await this.pageRepo.findById(dto.pageId);
     if (!page) {
@@ -43,7 +43,7 @@ export class WatcherController {
       user.id,
       page.id,
       page.spaceId,
-      workspace.id,
+      workspace.id
     );
 
     return { watching: true };
@@ -63,7 +63,7 @@ export class WatcherController {
       user.id,
       page.id,
       page.spaceId,
-      page.workspaceId,
+      page.workspaceId
     );
 
     return { watching: false };

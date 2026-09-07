@@ -1,13 +1,13 @@
-import { ReactRenderer } from "@tiptap/react";
-import type { SuggestionProps } from "@tiptap/suggestion";
-import CommandList from "@/features/editor/components/slash-menu/command-list";
+import { ReactRenderer } from '@tiptap/react';
+import type { SuggestionProps } from '@tiptap/suggestion';
+import CommandList from '@/features/editor/components/slash-menu/command-list';
 import {
   autoUpdate,
   computePosition,
   flip,
   offset,
-  shift,
-} from "@floating-ui/dom";
+  shift
+} from '@floating-ui/dom';
 
 const renderItems = () => {
   let component: ReactRenderer | null = null;
@@ -22,8 +22,8 @@ const renderItems = () => {
     const rect = getReferenceClientRect();
 
     computePosition({ getBoundingClientRect: () => rect }, popup, {
-      placement: "bottom-start",
-      middleware: [offset(0), flip(), shift()],
+      placement: 'bottom-start',
+      middleware: [offset(0), flip(), shift()]
     }).then(({ x, y }) => {
       if (popup) {
         popup.style.left = `${x}px`;
@@ -36,7 +36,7 @@ const renderItems = () => {
     onStart: (props: SuggestionProps) => {
       component = new ReactRenderer(CommandList, {
         props,
-        editor: props.editor,
+        editor: props.editor
       });
 
       if (!props.clientRect) {
@@ -46,11 +46,11 @@ const renderItems = () => {
       // @ts-ignore
       getReferenceClientRect = props.clientRect;
 
-      popup = document.createElement("div");
-      popup.style.zIndex = "199";
-      popup.style.position = "absolute";
-      popup.style.top = "0";
-      popup.style.left = "0";
+      popup = document.createElement('div');
+      popup.style.zIndex = '199';
+      popup.style.position = 'absolute';
+      popup.style.top = '0';
+      popup.style.left = '0';
 
       document.body.appendChild(popup);
       popup.appendChild(component.element);
@@ -62,7 +62,7 @@ const renderItems = () => {
             return getReferenceClientRect
               ? getReferenceClientRect()
               : new DOMRect();
-          },
+          }
         },
         popup,
         updatePosition
@@ -80,9 +80,9 @@ const renderItems = () => {
       updatePosition();
     },
     onKeyDown: (props: { event: KeyboardEvent }) => {
-      if (props.event.key === "Escape") {
+      if (props.event.key === 'Escape') {
         if (popup) {
-          popup.style.display = "none";
+          popup.style.display = 'none';
         }
 
         return true;
@@ -106,7 +106,7 @@ const renderItems = () => {
         component.destroy();
         component = null;
       }
-    },
+    }
   };
 };
 

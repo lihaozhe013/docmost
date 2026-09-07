@@ -1,15 +1,15 @@
-import { Modal, Tabs, rem, Group, ScrollArea, Text } from "@mantine/core";
-import SpaceMembersList from "@/features/space/components/space-members.tsx";
-import AddSpaceMembersModal from "@/features/space/components/add-space-members-modal.tsx";
-import React from "react";
-import SpaceDetails from "@/features/space/components/space-details.tsx";
-import { useSpaceQuery } from "@/features/space/queries/space-query.ts";
-import { useSpaceAbility } from "@/features/space/permissions/use-space-ability.ts";
+import { Modal, Tabs, rem, Group, ScrollArea, Text } from '@mantine/core';
+import SpaceMembersList from '@/features/space/components/space-members.tsx';
+import AddSpaceMembersModal from '@/features/space/components/add-space-members-modal.tsx';
+import React from 'react';
+import SpaceDetails from '@/features/space/components/space-details.tsx';
+import { useSpaceQuery } from '@/features/space/queries/space-query.ts';
+import { useSpaceAbility } from '@/features/space/permissions/use-space-ability.ts';
 import {
   SpaceCaslAction,
-  SpaceCaslSubject,
-} from "@/features/space/permissions/permissions.type.ts";
-import { useTranslation } from "react-i18next";
+  SpaceCaslSubject
+} from '@/features/space/permissions/permissions.type.ts';
+import { useTranslation } from 'react-i18next';
 
 interface SpaceSettingsModalProps {
   spaceId: string;
@@ -20,7 +20,7 @@ interface SpaceSettingsModalProps {
 export default function SpaceSettingsModal({
   spaceId,
   opened,
-  onClose,
+  onClose
 }: SpaceSettingsModalProps) {
   const { t } = useTranslation();
   const { data: space, isLoading } = useSpaceQuery(spaceId);
@@ -40,35 +40,35 @@ export default function SpaceSettingsModal({
         mah={400}
       >
         <Modal.Overlay />
-        <Modal.Content style={{ overflow: "hidden" }}>
+        <Modal.Content style={{ overflow: 'hidden' }}>
           <Modal.Header py={0}>
             <Modal.Title>
               <Text fw={500} lineClamp={1}>
                 {space?.name}
               </Text>
             </Modal.Title>
-            <Modal.CloseButton aria-label={t("Close")} />
+            <Modal.CloseButton aria-label={t('Close')} />
           </Modal.Header>
           <Modal.Body>
             <div style={{ height: rem(600) }}>
               <Tabs color="dark" defaultValue="members">
                 <Tabs.List>
                   <Tabs.Tab fw={500} value="general">
-                    {t("Settings")}
+                    {t('Settings')}
                   </Tabs.Tab>
                   <Tabs.Tab fw={500} value="members">
-                    {t("Members")}
+                    {t('Members')}
                   </Tabs.Tab>
                 </Tabs.List>
 
                 <Tabs.Panel value="general">
                   <ScrollArea h={580} scrollbarSize={5} pr={8}>
-                    <div style={{ paddingBottom: "100px" }}>
+                    <div style={{ paddingBottom: '100px' }}>
                       <SpaceDetails
                         spaceId={space?.id}
                         readOnly={spaceAbility.cannot(
                           SpaceCaslAction.Manage,
-                          SpaceCaslSubject.Settings,
+                          SpaceCaslSubject.Settings
                         )}
                       />
                     </div>
@@ -79,7 +79,7 @@ export default function SpaceSettingsModal({
                   <Group my="md" justify="flex-end">
                     {spaceAbility.can(
                       SpaceCaslAction.Manage,
-                      SpaceCaslSubject.Member,
+                      SpaceCaslSubject.Member
                     ) && <AddSpaceMembersModal spaceId={space?.id} />}
                   </Group>
 
@@ -87,7 +87,7 @@ export default function SpaceSettingsModal({
                     spaceId={space?.id}
                     readOnly={spaceAbility.cannot(
                       SpaceCaslAction.Manage,
-                      SpaceCaslSubject.Member,
+                      SpaceCaslSubject.Member
                     )}
                   />
                 </Tabs.Panel>

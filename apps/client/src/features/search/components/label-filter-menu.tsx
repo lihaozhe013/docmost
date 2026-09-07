@@ -1,18 +1,18 @@
-import { ReactNode, useMemo, useState } from "react";
+import { ReactNode, useMemo, useState } from 'react';
 import {
   Group,
   Menu,
   ScrollArea,
   Text,
   TextInput,
-  useComputedColorScheme,
-} from "@mantine/core";
-import { useDebouncedValue } from "@mantine/hooks";
-import { IconCheck, IconSearch } from "@tabler/icons-react";
-import { useTranslation } from "react-i18next";
-import { useWorkspaceLabelsQuery } from "@/features/label/queries/label-query.ts";
-import { getLabelColor } from "@/features/label/utils/label-colors.ts";
-import { CheckboxMenuItem } from "@/components/ui/checkbox-menu-item";
+  useComputedColorScheme
+} from '@mantine/core';
+import { useDebouncedValue } from '@mantine/hooks';
+import { IconCheck, IconSearch } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
+import { useWorkspaceLabelsQuery } from '@/features/label/queries/label-query.ts';
+import { getLabelColor } from '@/features/label/utils/label-colors.ts';
+import { CheckboxMenuItem } from '@/components/ui/checkbox-menu-item';
 
 type LabelFilterMenuProps = {
   value: string[];
@@ -20,12 +20,12 @@ type LabelFilterMenuProps = {
   children: ReactNode;
   width?: number;
   position?:
-    | "bottom-start"
-    | "bottom-end"
-    | "bottom"
-    | "top-start"
-    | "top-end"
-    | "top";
+    | 'bottom-start'
+    | 'bottom-end'
+    | 'bottom'
+    | 'top-start'
+    | 'top-end'
+    | 'top';
   zIndex?: number;
   opened?: boolean;
   onOpenChange?: (opened: boolean) => void;
@@ -36,14 +36,14 @@ export function LabelFilterMenu({
   onChange,
   children,
   width = 280,
-  position = "bottom-end",
+  position = 'bottom-end',
   zIndex,
   opened,
-  onOpenChange,
+  onOpenChange
 }: LabelFilterMenuProps) {
   const { t } = useTranslation();
-  const scheme = useComputedColorScheme("light");
-  const [searchQuery, setSearchQuery] = useState("");
+  const scheme = useComputedColorScheme('light');
+  const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery] = useDebouncedValue(searchQuery, 300);
 
   const { data, isLoading } = useWorkspaceLabelsQuery(debouncedQuery, true);
@@ -72,7 +72,7 @@ export function LabelFilterMenu({
       <Menu.Target>{children}</Menu.Target>
       <Menu.Dropdown>
         <TextInput
-          placeholder={t("Find a label")}
+          placeholder={t('Find a label')}
           data-autofocus
           autoFocus
           leftSection={<IconSearch size={16} />}
@@ -87,7 +87,7 @@ export function LabelFilterMenu({
         <ScrollArea.Autosize mah={280}>
           {labels.length === 0 && (
             <Text size="xs" c="dimmed" px="xs" py="sm">
-              {isLoading ? t("Loading...") : t("No labels found")}
+              {isLoading ? t('Loading...') : t('No labels found')}
             </Text>
           )}
 
@@ -107,9 +107,9 @@ export function LabelFilterMenu({
                     style={{
                       width: 8,
                       height: 8,
-                      borderRadius: "50%",
+                      borderRadius: '50%',
                       background: color.dot,
-                      flexShrink: 0,
+                      flexShrink: 0
                     }}
                   />
                   <Text size="sm" fw={500} style={{ flex: 1 }} truncate>

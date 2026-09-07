@@ -17,7 +17,7 @@ export class FileTaskProcessor extends WorkerHost implements OnModuleDestroy {
     private readonly fileTaskService: FileImportTaskService,
     private readonly storageService: StorageService,
     private readonly moduleRef: ModuleRef,
-    @InjectKysely() private readonly db: KyselyDB,
+    @InjectKysely() private readonly db: KyselyDB
   ) {
     super();
   }
@@ -45,7 +45,7 @@ export class FileTaskProcessor extends WorkerHost implements OnModuleDestroy {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const PdfExportModule = require('./../../../ee/pdf-export/pdf-export.service');
     return this.moduleRef.get(PdfExportModule.PdfExportService, {
-      strict: false,
+      strict: false
     });
   }
 
@@ -70,7 +70,7 @@ export class FileTaskProcessor extends WorkerHost implements OnModuleDestroy {
     this.logger.error(
       fileTaskId
         ? `Error processing ${job.name} job. File Task ID: ${fileTaskId}. Reason: ${job.failedReason}`
-        : `Error processing ${job.name} job. Reason: ${job.failedReason}`,
+        : `Error processing ${job.name} job. Reason: ${job.failedReason}`
     );
 
     if (job.name === QueueJob.IMPORT_TASK) {
@@ -86,13 +86,13 @@ export class FileTaskProcessor extends WorkerHost implements OnModuleDestroy {
     this.logger.log(
       fileTaskId
         ? `Completed ${job.name} job for File task ID ${fileTaskId}`
-        : `Completed ${job.name} job`,
+        : `Completed ${job.name} job`
     );
 
     if (job.name === QueueJob.IMPORT_TASK) {
       try {
         const fileTask = await this.fileTaskService.getFileTask(
-          job.data.fileTaskId,
+          job.data.fileTaskId
         );
         if (fileTask) {
           await this.storageService.delete(fileTask.filePath);
@@ -113,7 +113,7 @@ export class FileTaskProcessor extends WorkerHost implements OnModuleDestroy {
       await this.fileTaskService.updateTaskStatus(
         fileTaskId,
         FileTaskStatus.Failed,
-        reason,
+        reason
       );
 
       const fileTask = await this.fileTaskService.getFileTask(fileTaskId);
@@ -135,7 +135,7 @@ export class FileTaskProcessor extends WorkerHost implements OnModuleDestroy {
         .set({
           status: FileTaskStatus.Failed,
           errorMessage: reason,
-          updatedAt: new Date(),
+          updatedAt: new Date()
         })
         .where('id', '=', fileTaskId)
         .execute();

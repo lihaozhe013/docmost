@@ -1,7 +1,7 @@
 import { Node } from '@tiptap/pm/model';
 import {
   jsonToNode,
-  tiptapExtensions,
+  tiptapExtensions
 } from '../../../collaboration/collaboration.util';
 import { validate as isValidUUID } from 'uuid';
 import { Transform } from '@tiptap/pm/transform';
@@ -9,7 +9,7 @@ import { TiptapTransformer } from '@hocuspocus/transformer';
 import * as Y from 'yjs';
 import {
   INTERNAL_LINK_REGEX,
-  extractPageSlugId,
+  extractPageSlugId
 } from '../../../integrations/export/utils';
 import { isAttachmentNode } from './attachment-node-types';
 
@@ -36,7 +36,7 @@ export function extractMentions(prosemirrorJson: any) {
           label: node.attrs.label,
           entityType: node.attrs.entityType,
           entityId: node.attrs.entityId,
-          creatorId: node.attrs.creatorId,
+          creatorId: node.attrs.creatorId
         });
       }
     }
@@ -60,7 +60,7 @@ export function extractPageMentions(mentionList: MentionNode[]): MentionNode[] {
     if (
       mention.entityType === 'page' &&
       !pageMentionList.some(
-        (pageMention) => pageMention.entityId === mention.entityId,
+        (pageMention) => pageMention.entityId === mention.entityId
       )
     ) {
       pageMentionList.push(mention);
@@ -118,7 +118,7 @@ export function getProsemirrorContent(content: any) {
   return (
     content ?? {
       type: 'doc',
-      content: [{ type: 'paragraph', attrs: { textAlign: 'left' } }],
+      content: [{ type: 'paragraph', attrs: { textAlign: 'left' } }]
     }
   );
 }
@@ -159,7 +159,7 @@ export function createYdocFromJson(prosemirrorJson: any): Buffer | null {
     const ydoc = TiptapTransformer.toYdoc(
       prosemirrorJson,
       'default',
-      tiptapExtensions,
+      tiptapExtensions
     );
 
     Y.encodeStateAsUpdate(ydoc);

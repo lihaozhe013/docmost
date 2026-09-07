@@ -4,7 +4,7 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable('pages')
     .addColumn('id', 'uuid', (col) =>
-      col.primaryKey().defaultTo(sql`gen_uuid_v7()`),
+      col.primaryKey().defaultTo(sql`gen_uuid_v7()`)
     )
     .addColumn('slug_id', 'varchar', (col) => col.notNull())
     .addColumn('title', 'varchar', (col) => col)
@@ -16,25 +16,25 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('text_content', 'text', (col) => col)
     .addColumn('tsv', sql`tsvector`, (col) => col)
     .addColumn('parent_page_id', 'uuid', (col) =>
-      col.references('pages.id').onDelete('cascade'),
+      col.references('pages.id').onDelete('cascade')
     )
     .addColumn('creator_id', 'uuid', (col) => col.references('users.id'))
     .addColumn('last_updated_by_id', 'uuid', (col) =>
-      col.references('users.id'),
+      col.references('users.id')
     )
     .addColumn('deleted_by_id', 'uuid', (col) => col.references('users.id'))
     .addColumn('space_id', 'uuid', (col) =>
-      col.references('spaces.id').onDelete('cascade').notNull(),
+      col.references('spaces.id').onDelete('cascade').notNull()
     )
     .addColumn('workspace_id', 'uuid', (col) =>
-      col.references('workspaces.id').onDelete('cascade').notNull(),
+      col.references('workspaces.id').onDelete('cascade').notNull()
     )
     .addColumn('is_locked', 'boolean', (col) => col.defaultTo(false).notNull())
     .addColumn('created_at', 'timestamptz', (col) =>
-      col.notNull().defaultTo(sql`now()`),
+      col.notNull().defaultTo(sql`now()`)
     )
     .addColumn('updated_at', 'timestamptz', (col) =>
-      col.notNull().defaultTo(sql`now()`),
+      col.notNull().defaultTo(sql`now()`)
     )
     .addColumn('deleted_at', 'timestamptz', (col) => col)
     .addUniqueConstraint('pages_slug_id_unique', ['slug_id'])

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import {
   WatcherRepo,
-  WatcherType,
+  WatcherType
 } from '@docmost/db/repos/watcher/watcher.repo';
 import { PaginationOptions } from '@docmost/db/pagination/pagination-options';
 import { KyselyTransaction } from '@docmost/db/types/kysely.types';
@@ -12,7 +12,7 @@ import { SpaceMemberRepo } from '@docmost/db/repos/space/space-member.repo';
 export class WatcherService {
   constructor(
     private readonly watcherRepo: WatcherRepo,
-    private readonly spaceMemberRepo: SpaceMemberRepo,
+    private readonly spaceMemberRepo: SpaceMemberRepo
   ) {}
 
   async watchPage(
@@ -20,7 +20,7 @@ export class WatcherService {
     pageId: string,
     spaceId: string,
     workspaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ) {
     const watcher: InsertableWatcher = {
       userId,
@@ -28,7 +28,7 @@ export class WatcherService {
       spaceId,
       workspaceId,
       type: WatcherType.PAGE,
-      addedById: userId,
+      addedById: userId
     };
     return this.watcherRepo.upsert(watcher, trx);
   }
@@ -38,7 +38,7 @@ export class WatcherService {
     pageId: string,
     spaceId: string,
     workspaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ) {
     if (userIds.length === 0) return;
 
@@ -48,7 +48,7 @@ export class WatcherService {
       spaceId,
       workspaceId,
       type: WatcherType.PAGE,
-      addedById: userId,
+      addedById: userId
     }));
 
     return this.watcherRepo.insertMany(watchers, trx);
@@ -58,7 +58,7 @@ export class WatcherService {
     userId: string,
     pageId: string,
     spaceId: string,
-    workspaceId: string,
+    workspaceId: string
   ) {
     return this.watcherRepo.mute(userId, pageId, spaceId, workspaceId);
   }
@@ -71,7 +71,7 @@ export class WatcherService {
     userId: string,
     spaceId: string,
     workspaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ) {
     const watcher: InsertableWatcher = {
       userId,
@@ -79,7 +79,7 @@ export class WatcherService {
       spaceId,
       workspaceId,
       type: WatcherType.SPACE,
-      addedById: userId,
+      addedById: userId
     };
     return this.watcherRepo.upsertSpace(watcher, trx);
   }
@@ -89,7 +89,10 @@ export class WatcherService {
   }
 
   async getWatchedSpaceIds(userId: string, workspaceId: string) {
-    const result = await this.watcherRepo.getWatchedSpaceIds(userId, workspaceId);
+    const result = await this.watcherRepo.getWatchedSpaceIds(
+      userId,
+      workspaceId
+    );
 
     const spaceIds = result.items.map((r) => r.spaceId);
 
@@ -102,7 +105,7 @@ export class WatcherService {
 
     return {
       items: spaceIds.filter((id) => spaceSet.has(id)),
-      meta: result.meta,
+      meta: result.meta
     };
   }
 
@@ -116,7 +119,7 @@ export class WatcherService {
 
   async getPageWatcherIds(
     pageId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<string[]> {
     return this.watcherRepo.getPageWatcherIds(pageId, trx);
   }
@@ -128,24 +131,24 @@ export class WatcherService {
   async cleanupOnSpaceAccessChange(
     userIds: string[],
     spaceId: string,
-    opts?: { trx?: KyselyTransaction },
+    opts?: { trx?: KyselyTransaction }
   ): Promise<void> {
     const { trx } = opts;
     await this.watcherRepo.deleteByUsersWithoutSpaceAccess(userIds, spaceId, {
-      trx,
+      trx
     });
   }
 
   async movePageWatchersToSpace(
     pageIds: string[],
     spaceId: string,
-    opts?: { trx?: KyselyTransaction },
+    opts?: { trx?: KyselyTransaction }
   ): Promise<void> {
     await this.watcherRepo.updateSpaceIdByPageIds(spaceId, pageIds, opts);
     await this.watcherRepo.deleteByPageIdsWithoutSpaceAccess(
       pageIds,
       spaceId,
-      opts,
+      opts
     );
   }
 }

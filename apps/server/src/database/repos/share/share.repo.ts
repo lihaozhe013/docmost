@@ -5,7 +5,7 @@ import { dbOrTx } from '../../utils';
 import {
   InsertableShare,
   Share,
-  UpdatableShare,
+  UpdatableShare
 } from '@docmost/db/types/entity.types';
 import { PaginationOptions } from '@docmost/db/pagination/pagination-options';
 import { executeWithCursorPagination } from '@docmost/db/pagination/cursor-pagination';
@@ -19,7 +19,7 @@ import { SpaceMemberRepo } from '@docmost/db/repos/space/space-member.repo';
 export class ShareRepo {
   constructor(
     @InjectKysely() private readonly db: KyselyDB,
-    private spaceMemberRepo: SpaceMemberRepo,
+    private spaceMemberRepo: SpaceMemberRepo
   ) {}
 
   private baseFields: Array<keyof Share> = [
@@ -33,7 +33,7 @@ export class ShareRepo {
     'workspaceId',
     'createdAt',
     'updatedAt',
-    'deletedAt',
+    'deletedAt'
   ];
 
   async findById(
@@ -43,7 +43,7 @@ export class ShareRepo {
       includeCreator?: boolean;
       withLock?: boolean;
       trx?: KyselyTransaction;
-    },
+    }
   ): Promise<Share> {
     const db = dbOrTx(this.db, opts?.trx);
 
@@ -76,7 +76,7 @@ export class ShareRepo {
       includeCreator?: boolean;
       withLock?: boolean;
       trx?: KyselyTransaction;
-    },
+    }
   ): Promise<Share> {
     const db = dbOrTx(this.db, opts?.trx);
 
@@ -98,7 +98,7 @@ export class ShareRepo {
   async updateShare(
     updatableShare: UpdatableShare,
     shareId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ) {
     return dbOrTx(this.db, trx)
       .updateTable('shares')
@@ -106,7 +106,7 @@ export class ShareRepo {
       .where(
         isValidUUID(shareId) ? 'id' : sql`LOWER(key)`,
         '=',
-        shareId.toLowerCase(),
+        shareId.toLowerCase()
       )
       .returning(this.baseFields)
       .executeTakeFirst();
@@ -114,7 +114,7 @@ export class ShareRepo {
 
   async insertShare(
     insertableShare: InsertableShare,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<Share> {
     const db = dbOrTx(this.db, trx);
     return db
@@ -138,18 +138,15 @@ export class ShareRepo {
 
   async deleteBySpaceId(
     spaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<void> {
     const db = dbOrTx(this.db, trx);
-    await db
-      .deleteFrom('shares')
-      .where('spaceId', '=', spaceId)
-      .execute();
+    await db.deleteFrom('shares').where('spaceId', '=', spaceId).execute();
   }
 
   async deleteByWorkspaceId(
     workspaceId: string,
-    trx?: KyselyTransaction,
+    trx?: KyselyTransaction
   ): Promise<void> {
     const db = dbOrTx(this.db, trx);
     await db
@@ -165,7 +162,11 @@ export class ShareRepo {
       .select((eb) => this.withPage(eb))
       .select((eb) => this.withSpace(eb, userId))
       .select((eb) => this.withCreator(eb))
-      .where('spaceId', 'in', this.spaceMemberRepo.getUserSpaceIdsQuery(userId));
+      .where(
+        'spaceId',
+        'in',
+        this.spaceMemberRepo.getUserSpaceIdsQuery(userId)
+      );
 
     return executeWithCursorPagination(query, {
       perPage: pagination.limit,
@@ -173,12 +174,12 @@ export class ShareRepo {
       beforeCursor: pagination.beforeCursor,
       fields: [
         { expression: 'updatedAt', direction: 'desc' },
-        { expression: 'id', direction: 'desc' },
+        { expression: 'id', direction: 'desc' }
       ],
       parseCursor: (cursor) => ({
         updatedAt: new Date(cursor.updatedAt),
-        id: cursor.id,
-      }),
+        id: cursor.id
+      })
     });
   }
 
@@ -187,7 +188,7 @@ export class ShareRepo {
       eb
         .selectFrom('pages')
         .select(['pages.id', 'pages.title', 'pages.slugId', 'pages.icon'])
-        .whereRef('pages.id', '=', 'shares.pageId'),
+        .whereRef('pages.id', '=', 'shares.pageId')
     ).as('page');
   }
 
@@ -197,9 +198,9 @@ export class ShareRepo {
         .selectFrom('spaces')
         .select(['spaces.id', 'spaces.name', 'spaces.slug'])
         .$if(Boolean(userId), (qb) =>
-          qb.select((eb) => this.withUserSpaceRole(eb, userId)),
+          qb.select((eb) => this.withUserSpaceRole(eb, userId))
         )
-        .whereRef('spaces.id', '=', 'shares.spaceId'),
+        .whereRef('spaces.id', '=', 'shares.spaceId')
     ).as('space');
   }
 
@@ -217,13 +218,13 @@ export class ShareRepo {
               .innerJoin(
                 'groupUsers',
                 'groupUsers.groupId',
-                'spaceMembers.groupId',
+                'spaceMembers.groupId'
               )
               .select(['spaceMembers.role'])
               .whereRef('spaceMembers.spaceId', '=', 'spaces.id')
-              .where('groupUsers.userId', '=', userId),
+              .where('groupUsers.userId', '=', userId)
           )
-          .as('roles_union'),
+          .as('roles_union')
       )
       .select('roles_union.role')
       .orderBy(
@@ -234,7 +235,7 @@ export class ShareRepo {
             ELSE 0
            END`,
 
-        'desc',
+        'desc'
       )
       .limit(1)
       .as('userRole');
@@ -245,7 +246,7 @@ export class ShareRepo {
       eb
         .selectFrom('users')
         .select(['users.id', 'users.name', 'users.avatarUrl'])
-        .whereRef('users.id', '=', 'shares.creatorId'),
+        .whereRef('users.id', '=', 'shares.creatorId')
     ).as('creator');
   }
 
@@ -258,9 +259,9 @@ export class ShareRepo {
           'pages.slugId',
           'pages.title',
           'pages.icon',
-          'pages.parentPageId',
+          'pages.parentPageId'
         ])
-        .whereRef('pages.id', '=', 'shares.pageId'),
+        .whereRef('pages.id', '=', 'shares.pageId')
     ).as('sharedPage');
   }
 }

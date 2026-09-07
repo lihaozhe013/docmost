@@ -3,7 +3,7 @@ import { InjectKysely } from 'nestjs-kysely';
 import { KyselyDB } from '@docmost/db/types/kysely.types';
 import {
   ICommentNotificationJob,
-  ICommentResolvedNotificationJob,
+  ICommentResolvedNotificationJob
 } from '../../../integrations/queue/constants/queue.interface';
 import { NotificationService } from '../notification.service';
 import { NotificationType } from '../notification.constants';
@@ -20,7 +20,7 @@ export class CommentNotificationService {
     private readonly notificationService: NotificationService,
     private readonly spaceMemberRepo: SpaceMemberRepo,
     private readonly pagePermissionRepo: PagePermissionRepo,
-    private readonly watcherRepo: WatcherRepo,
+    private readonly watcherRepo: WatcherRepo
   ) {}
 
   async processComment(data: ICommentNotificationJob) {
@@ -32,7 +32,7 @@ export class CommentNotificationService {
       workspaceId,
       actorId,
       mentionedUserIds,
-      notifyWatchers,
+      notifyWatchers
     } = data;
 
     const notifiedUserIds = new Set<string>();
@@ -45,19 +45,18 @@ export class CommentNotificationService {
         : [];
 
     const allCandidateIds = [
-      ...new Set([...mentionedUserIds, ...recipientIds]),
+      ...new Set([...mentionedUserIds, ...recipientIds])
     ];
     const usersWithSpaceAccess =
       await this.spaceMemberRepo.getUserIdsWithSpaceAccess(
         allCandidateIds,
-        spaceId,
+        spaceId
       );
 
     const usersWithPageAccess =
-      await this.pagePermissionRepo.getUserIdsWithPageAccess(
-        pageId,
-        [...usersWithSpaceAccess],
-      );
+      await this.pagePermissionRepo.getUserIdsWithPageAccess(pageId, [
+        ...usersWithSpaceAccess
+      ]);
     const usersWithAccess = new Set(usersWithPageAccess);
 
     for (const userId of mentionedUserIds) {
@@ -70,7 +69,7 @@ export class CommentNotificationService {
         actorId,
         pageId,
         spaceId,
-        commentId,
+        commentId
       });
       if (!notification) continue;
 
@@ -88,7 +87,7 @@ export class CommentNotificationService {
         actorId,
         pageId,
         spaceId,
-        commentId,
+        commentId
       });
       if (!notification) continue;
     }
@@ -101,28 +100,27 @@ export class CommentNotificationService {
       pageId,
       spaceId,
       workspaceId,
-      actorId,
+      actorId
     } = data;
 
     if (commentCreatorId === actorId) return;
 
     const roles = await this.spaceMemberRepo.getUserSpaceRoles(
       commentCreatorId,
-      spaceId,
+      spaceId
     );
 
     if (!roles) {
       this.logger.debug(
-        `Skipping resolved notification for user ${commentCreatorId}: no access to space ${spaceId}`,
+        `Skipping resolved notification for user ${commentCreatorId}: no access to space ${spaceId}`
       );
       return;
     }
 
     const hasPageAccess =
-      await this.pagePermissionRepo.getUserIdsWithPageAccess(
-        pageId,
-        [commentCreatorId],
-      );
+      await this.pagePermissionRepo.getUserIdsWithPageAccess(pageId, [
+        commentCreatorId
+      ]);
     if (hasPageAccess.length === 0) return;
 
     const notification = await this.notificationService.create({
@@ -132,13 +130,13 @@ export class CommentNotificationService {
       actorId,
       pageId,
       spaceId,
-      commentId,
+      commentId
     });
     if (!notification) return;
   }
 
   private async getThreadParticipantIds(
-    parentCommentId: string,
+    parentCommentId: string
   ): Promise<string[]> {
     const participants = await this.db
       .selectFrom('comments')
@@ -146,8 +144,8 @@ export class CommentNotificationService {
       .where((eb) =>
         eb.or([
           eb('id', '=', parentCommentId),
-          eb('parentCommentId', '=', parentCommentId),
-        ]),
+          eb('parentCommentId', '=', parentCommentId)
+        ])
       )
       .execute();
 

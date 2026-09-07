@@ -14,34 +14,33 @@ describe('BacklinkService.countByPageId', () => {
   beforeEach(async () => {
     const backlinkRepoMock: jest.Mocked<Partial<BacklinkRepo>> = {
       findRelatedPageIds: jest.fn(),
-      findPagesByIdsPaginated: jest.fn(),
+      findPagesByIdsPaginated: jest.fn()
     };
     const permissionRepoMock: jest.Mocked<Partial<PagePermissionRepo>> = {
-      filterAccessiblePageIds: jest.fn(),
+      filterAccessiblePageIds: jest.fn()
     };
 
     const module = await Test.createTestingModule({
       providers: [
         BacklinkService,
         { provide: BacklinkRepo, useValue: backlinkRepoMock },
-        { provide: PagePermissionRepo, useValue: permissionRepoMock },
-      ],
+        { provide: PagePermissionRepo, useValue: permissionRepoMock }
+      ]
     }).compile();
 
     service = module.get(BacklinkService);
     backlinkRepo = module.get(BacklinkRepo) as jest.Mocked<BacklinkRepo>;
     permissionRepo = module.get(
-      PagePermissionRepo,
+      PagePermissionRepo
     ) as jest.Mocked<PagePermissionRepo>;
   });
 
   it('returns post-filter counts for both directions', async () => {
     backlinkRepo.findRelatedPageIds.mockImplementation(async (_id, dir) =>
-      dir === 'incoming' ? ['a', 'b', 'c'] : ['x', 'y'],
+      dir === 'incoming' ? ['a', 'b', 'c'] : ['x', 'y']
     );
     permissionRepo.filterAccessiblePageIds.mockImplementation(
-      async ({ pageIds }) =>
-        pageIds.filter((id) => id !== 'b' && id !== 'y'),
+      async ({ pageIds }) => pageIds.filter((id) => id !== 'b' && id !== 'y')
     );
 
     const result = await service.countByPageId(pageId, userId);
@@ -49,11 +48,11 @@ describe('BacklinkService.countByPageId', () => {
     expect(result).toEqual({ incoming: 2, outgoing: 1 });
     expect(permissionRepo.filterAccessiblePageIds).toHaveBeenCalledWith({
       pageIds: ['a', 'b', 'c'],
-      userId,
+      userId
     });
     expect(permissionRepo.filterAccessiblePageIds).toHaveBeenCalledWith({
       pageIds: ['x', 'y'],
-      userId,
+      userId
     });
   });
 
@@ -75,12 +74,12 @@ describe('BacklinkService.countByPageId', () => {
     expect(backlinkRepo.findRelatedPageIds).toHaveBeenCalledWith(
       pageId,
       'incoming',
-      userId,
+      userId
     );
     expect(backlinkRepo.findRelatedPageIds).toHaveBeenCalledWith(
       pageId,
       'outgoing',
-      userId,
+      userId
     );
   });
 });
@@ -96,24 +95,24 @@ describe('BacklinkService.findByPageId', () => {
   beforeEach(async () => {
     const backlinkRepoMock: jest.Mocked<Partial<BacklinkRepo>> = {
       findRelatedPageIds: jest.fn(),
-      findPagesByIdsPaginated: jest.fn(),
+      findPagesByIdsPaginated: jest.fn()
     };
     const permissionRepoMock: jest.Mocked<Partial<PagePermissionRepo>> = {
-      filterAccessiblePageIds: jest.fn(),
+      filterAccessiblePageIds: jest.fn()
     };
 
     const module = await Test.createTestingModule({
       providers: [
         BacklinkService,
         { provide: BacklinkRepo, useValue: backlinkRepoMock },
-        { provide: PagePermissionRepo, useValue: permissionRepoMock },
-      ],
+        { provide: PagePermissionRepo, useValue: permissionRepoMock }
+      ]
     }).compile();
 
     service = module.get(BacklinkService);
     backlinkRepo = module.get(BacklinkRepo) as jest.Mocked<BacklinkRepo>;
     permissionRepo = module.get(
-      PagePermissionRepo,
+      PagePermissionRepo
     ) as jest.Mocked<PagePermissionRepo>;
   });
 
@@ -127,15 +126,17 @@ describe('BacklinkService.findByPageId', () => {
         hasNextPage: false,
         hasPrevPage: false,
         nextCursor: null,
-        prevCursor: null,
-      },
+        prevCursor: null
+      }
     } as any);
 
-    await service.findByPageId(pageId, 'incoming', userId, { limit: 20 } as any);
+    await service.findByPageId(pageId, 'incoming', userId, {
+      limit: 20
+    } as any);
 
     expect(backlinkRepo.findPagesByIdsPaginated).toHaveBeenCalledWith(
       ['a'],
-      expect.objectContaining({ limit: 20 }),
+      expect.objectContaining({ limit: 20 })
     );
   });
 
@@ -148,15 +149,17 @@ describe('BacklinkService.findByPageId', () => {
         hasNextPage: false,
         hasPrevPage: false,
         nextCursor: null,
-        prevCursor: null,
-      },
+        prevCursor: null
+      }
     } as any);
 
-    await service.findByPageId(pageId, 'incoming', userId, { limit: 20 } as any);
+    await service.findByPageId(pageId, 'incoming', userId, {
+      limit: 20
+    } as any);
 
     expect(backlinkRepo.findPagesByIdsPaginated).toHaveBeenCalledWith(
       [],
-      expect.objectContaining({ limit: 20 }),
+      expect.objectContaining({ limit: 20 })
     );
     expect(permissionRepo.filterAccessiblePageIds).not.toHaveBeenCalled();
   });

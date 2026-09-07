@@ -6,12 +6,12 @@ import { QueueJob, QueueName } from '../../integrations/queue/constants';
 import {
   IPageBacklinkJob,
   IPageHistoryJob,
-  IPageUpdateNotificationJob,
+  IPageUpdateNotificationJob
 } from '../../integrations/queue/constants/queue.interface';
 import {
   extractMentions,
   extractPageMentions,
-  extractInternalLinkSlugIds,
+  extractInternalLinkSlugIds
 } from '../../common/helpers/prosemirror/utils';
 import { PageHistoryRepo } from '@docmost/db/repos/page/page-history.repo';
 import { PageRepo } from '@docmost/db/repos/page/page.repo';
@@ -30,7 +30,7 @@ export class HistoryProcessor extends WorkerHost implements OnModuleDestroy {
     private readonly collabHistory: CollabHistoryService,
     private readonly watcherService: WatcherService,
     @InjectQueue(QueueName.NOTIFICATION_QUEUE) private notificationQueue: Queue,
-    @InjectQueue(QueueName.GENERAL_QUEUE) private generalQueue: Queue,
+    @InjectQueue(QueueName.GENERAL_QUEUE) private generalQueue: Queue
   ) {
     super();
   }
@@ -42,7 +42,7 @@ export class HistoryProcessor extends WorkerHost implements OnModuleDestroy {
       const { pageId } = job.data;
 
       const page = await this.pageRepo.findById(pageId, {
-        includeContent: true,
+        includeContent: true
       });
 
       if (!page) {
@@ -53,12 +53,12 @@ export class HistoryProcessor extends WorkerHost implements OnModuleDestroy {
 
       const lastHistory = await this.pageHistoryRepo.findPageLastHistory(
         pageId,
-        { includeContent: true },
+        { includeContent: true }
       );
 
       if (!lastHistory && isEmptyParagraphDoc(page.content as any)) {
         this.logger.debug(
-          `Skipping first history for page ${pageId}: empty content`,
+          `Skipping first history for page ${pageId}: empty content`
         );
         await this.collabHistory.clearContributors(pageId);
         return;
@@ -75,7 +75,7 @@ export class HistoryProcessor extends WorkerHost implements OnModuleDestroy {
             contributorIds,
             pageId,
             page.spaceId,
-            page.workspaceId,
+            page.workspaceId
           );
 
           await this.pageHistoryRepo.saveHistory(page, { contributorIds });
@@ -94,11 +94,11 @@ export class HistoryProcessor extends WorkerHost implements OnModuleDestroy {
             pageId,
             workspaceId: page.workspaceId,
             mentions: pageMentions,
-            internalLinkSlugIds,
+            internalLinkSlugIds
           } as IPageBacklinkJob)
           .catch((err) => {
             this.logger.error(
-              `Failed to queue backlinks for ${pageId}: ${err.message}`,
+              `Failed to queue backlinks for ${pageId}: ${err.message}`
             );
           });
 
@@ -108,11 +108,11 @@ export class HistoryProcessor extends WorkerHost implements OnModuleDestroy {
               pageId,
               spaceId: page.spaceId,
               workspaceId: page.workspaceId,
-              actorIds: contributorIds,
+              actorIds: contributorIds
             } as IPageUpdateNotificationJob)
             .catch((err) => {
               this.logger.error(
-                `Failed to queue page update notification for ${pageId}: ${err.message}`,
+                `Failed to queue page update notification for ${pageId}: ${err.message}`
               );
             });
         }
@@ -130,7 +130,7 @@ export class HistoryProcessor extends WorkerHost implements OnModuleDestroy {
   @OnWorkerEvent('failed')
   onError(job: Job) {
     this.logger.error(
-      `Failed ${job.name} for page: ${job.data.pageId}. Reason: ${job.failedReason}`,
+      `Failed ${job.name} for page: ${job.data.pageId}. Reason: ${job.failedReason}`
     );
   }
 

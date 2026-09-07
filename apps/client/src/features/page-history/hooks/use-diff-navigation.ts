@@ -1,13 +1,13 @@
-import { useAtomValue } from "jotai";
-import { RefObject, useCallback, useEffect, useState } from "react";
-import { diffCountsAtom } from "@/features/page-history/atoms/history-atoms";
+import { useAtomValue } from 'jotai';
+import { RefObject, useCallback, useEffect, useState } from 'react';
+import { diffCountsAtom } from '@/features/page-history/atoms/history-atoms';
 
 /**
  * Manages navigation between diff changes in the history view.
  * Provides prev/next handlers and auto-scrolls to the current change.
  */
 export function useDiffNavigation(
-  scrollViewportRef: RefObject<HTMLDivElement>,
+  scrollViewportRef: RefObject<HTMLDivElement>
 ) {
   const diffCounts = useAtomValue(diffCountsAtom);
   const [currentChangeIndex, setCurrentChangeIndex] = useState(0);
@@ -23,10 +23,10 @@ export function useDiffNavigation(
         const viewportHeight = viewport.clientHeight;
         const scrollTarget =
           elementTop - viewportHeight / 2 + element.offsetHeight / 2;
-        viewport.scrollTo({ top: scrollTarget, behavior: "smooth" });
+        viewport.scrollTo({ top: scrollTarget, behavior: 'smooth' });
       }
     },
-    [scrollViewportRef],
+    [scrollViewportRef]
   );
 
   useEffect(() => {

@@ -8,7 +8,7 @@ import {
   NotFoundException,
   Post,
   Res,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { ExportService } from './export.service';
 import { ExportPageDto, ExportSpaceDto } from './dto/export-dto';
@@ -20,20 +20,20 @@ import { PageRepo } from '@docmost/db/repos/page/page.repo';
 import { PageAccessService } from '../../core/page/page-access/page-access.service';
 import {
   SpaceCaslAction,
-  SpaceCaslSubject,
+  SpaceCaslSubject
 } from '../../core/casl/interfaces/space-ability.type';
 import { FastifyReply } from 'fastify';
 import { getExportExtension } from './utils';
 import {
   getMimeType,
   getPageTitle,
-  sanitizeFileName,
+  sanitizeFileName
 } from '../../common/helpers';
 import * as path from 'path';
 import { AuditEvent, AuditResource } from '../../common/events/audit-events';
 import {
   AUDIT_SERVICE,
-  IAuditService,
+  IAuditService
 } from '../../integrations/audit/audit.service';
 
 @Controller()
@@ -43,7 +43,7 @@ export class ExportController {
     private readonly pageRepo: PageRepo,
     private readonly spaceAbility: SpaceAbilityFactory,
     private readonly pageAccessService: PageAccessService,
-    @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService,
+    @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -52,10 +52,10 @@ export class ExportController {
   async exportPage(
     @Body() dto: ExportPageDto,
     @AuthUser() user: User,
-    @Res() res: FastifyReply,
+    @Res() res: FastifyReply
   ) {
     const page = await this.pageRepo.findById(dto.pageId, {
-      includeContent: true,
+      includeContent: true
     });
 
     if (!page || page.deletedAt) {
@@ -69,7 +69,7 @@ export class ExportController {
       dto.format,
       dto.includeAttachments,
       dto.includeChildren,
-      user.id,
+      user.id
     );
 
     this.auditService.log({
@@ -82,8 +82,8 @@ export class ExportController {
         format: dto.format,
         includeChildren: dto.includeChildren,
         includeAttachments: dto.includeAttachments,
-        spaceId: page.spaceId,
-      },
+        spaceId: page.spaceId
+      }
     });
 
     if (result.type === 'file') {
@@ -96,7 +96,7 @@ export class ExportController {
       res.headers({
         'Content-Type': contentType,
         'Content-Disposition':
-          'attachment; filename="' + encodeURIComponent(fileName) + '"',
+          'attachment; filename="' + encodeURIComponent(fileName) + '"'
       });
 
       res.send(result.content);
@@ -108,7 +108,7 @@ export class ExportController {
       res.headers({
         'Content-Type': 'application/zip',
         'Content-Disposition':
-          'attachment; filename="' + encodeURIComponent(fileName) + '"',
+          'attachment; filename="' + encodeURIComponent(fileName) + '"'
       });
 
       res.send(result.stream);
@@ -121,7 +121,7 @@ export class ExportController {
   async exportSpace(
     @Body() dto: ExportSpaceDto,
     @AuthUser() user: User,
-    @Res() res: FastifyReply,
+    @Res() res: FastifyReply
   ) {
     const ability = await this.spaceAbility.createForUser(user, dto.spaceId);
     if (ability.cannot(SpaceCaslAction.Manage, SpaceCaslSubject.Settings)) {
@@ -132,7 +132,7 @@ export class ExportController {
       dto.spaceId,
       dto.format,
       dto.includeAttachments,
-      user.id,
+      user.id
     );
 
     this.auditService.log({
@@ -143,8 +143,8 @@ export class ExportController {
       metadata: {
         format: dto.format,
         includeAttachments: dto.includeAttachments ?? false,
-        spaceName: exportFile.spaceName,
-      },
+        spaceName: exportFile.spaceName
+      }
     });
 
     res.headers({
@@ -152,9 +152,9 @@ export class ExportController {
       'Content-Disposition':
         'attachment; filename="' +
         encodeURIComponent(
-          sanitizeFileName(exportFile.fileName, { preserveSpaces: true }),
+          sanitizeFileName(exportFile.fileName, { preserveSpaces: true })
         ) +
-        '"',
+        '"'
     });
 
     res.send(exportFile.fileStream);

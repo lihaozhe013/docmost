@@ -4,16 +4,16 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable('page_verifications')
     .addColumn('id', 'uuid', (col) =>
-      col.primaryKey().defaultTo(sql`gen_uuid_v7()`),
+      col.primaryKey().defaultTo(sql`gen_uuid_v7()`)
     )
     .addColumn('page_id', 'uuid', (col) =>
-      col.notNull().unique().references('pages.id').onDelete('cascade'),
+      col.notNull().unique().references('pages.id').onDelete('cascade')
     )
     .addColumn('workspace_id', 'uuid', (col) =>
-      col.notNull().references('workspaces.id').onDelete('cascade'),
+      col.notNull().references('workspaces.id').onDelete('cascade')
     )
     .addColumn('space_id', 'uuid', (col) =>
-      col.notNull().references('spaces.id').onDelete('cascade'),
+      col.notNull().references('spaces.id').onDelete('cascade')
     )
     .addColumn('type', 'varchar', (col) => col.notNull().defaultTo('expiring'))
     .addColumn('status', 'varchar')
@@ -22,51 +22,51 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('period_unit', 'varchar')
     .addColumn('verified_at', 'timestamptz')
     .addColumn('verified_by_id', 'uuid', (col) =>
-      col.references('users.id').onDelete('set null'),
+      col.references('users.id').onDelete('set null')
     )
     .addColumn('expires_at', 'timestamptz')
     .addColumn('requested_at', 'timestamptz')
     .addColumn('requested_by_id', 'uuid', (col) =>
-      col.references('users.id').onDelete('set null'),
+      col.references('users.id').onDelete('set null')
     )
     .addColumn('rejected_at', 'timestamptz')
     .addColumn('rejected_by_id', 'uuid', (col) =>
-      col.references('users.id').onDelete('set null'),
+      col.references('users.id').onDelete('set null')
     )
     .addColumn('rejection_comment', 'text')
     .addColumn('data', 'jsonb')
     .addColumn('creator_id', 'uuid', (col) =>
-      col.references('users.id').onDelete('set null'),
+      col.references('users.id').onDelete('set null')
     )
     .addColumn('created_at', 'timestamptz', (col) =>
-      col.notNull().defaultTo(sql`now()`),
+      col.notNull().defaultTo(sql`now()`)
     )
     .addColumn('updated_at', 'timestamptz', (col) =>
-      col.notNull().defaultTo(sql`now()`),
+      col.notNull().defaultTo(sql`now()`)
     )
     .execute();
 
   await db.schema
     .createTable('page_verifiers')
     .addColumn('id', 'uuid', (col) =>
-      col.primaryKey().defaultTo(sql`gen_uuid_v7()`),
+      col.primaryKey().defaultTo(sql`gen_uuid_v7()`)
     )
     .addColumn('page_verification_id', 'uuid', (col) =>
-      col.notNull().references('page_verifications.id').onDelete('cascade'),
+      col.notNull().references('page_verifications.id').onDelete('cascade')
     )
     .addColumn('user_id', 'uuid', (col) =>
-      col.notNull().references('users.id').onDelete('cascade'),
+      col.notNull().references('users.id').onDelete('cascade')
     )
     .addColumn('is_primary', 'boolean', (col) => col.notNull().defaultTo(false))
     .addColumn('added_by_id', 'uuid', (col) =>
-      col.references('users.id').onDelete('set null'),
+      col.references('users.id').onDelete('set null')
     )
     .addColumn('created_at', 'timestamptz', (col) =>
-      col.notNull().defaultTo(sql`now()`),
+      col.notNull().defaultTo(sql`now()`)
     )
     .addUniqueConstraint('page_verifiers_verification_user_unique', [
       'page_verification_id',
-      'user_id',
+      'user_id'
     ])
     .execute();
 
@@ -102,7 +102,7 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .alterTable('notifications')
     .addColumn('page_verification_id', 'uuid', (col) =>
-      col.references('page_verifications.id').onDelete('cascade'),
+      col.references('page_verifications.id').onDelete('cascade')
     )
     .execute();
 }

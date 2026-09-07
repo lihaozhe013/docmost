@@ -1,7 +1,7 @@
 import {
   Extension,
   onDisconnectPayload,
-  onLoadDocumentPayload,
+  onLoadDocumentPayload
 } from '@hocuspocus/server';
 import { Injectable, Logger } from '@nestjs/common';
 

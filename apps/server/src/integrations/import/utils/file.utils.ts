@@ -4,24 +4,24 @@ import * as fs from 'node:fs';
 
 export enum FileTaskType {
   Import = 'import',
-  Export = 'export',
+  Export = 'export'
 }
 
 export enum FileImportSource {
   Generic = 'generic',
   Notion = 'notion',
-  Confluence = 'confluence',
+  Confluence = 'confluence'
 }
 
 export enum FileTaskStatus {
   Processing = 'processing',
   Success = 'success',
-  Failed = 'failed',
+  Failed = 'failed'
 }
 
 export function getFileTaskFolderPath(
   type: FileTaskType,
-  workspaceId: string,
+  workspaceId: string
 ): string {
   switch (type) {
     case FileTaskType.Import:
@@ -39,12 +39,12 @@ type SizeBudget = { used: number; max: number };
 
 export async function extractZip(
   source: string,
-  target: string,
+  target: string
 ): Promise<void> {
   const { size: compressedSize } = await fs.promises.stat(source);
   const max = Math.max(
     compressedSize * COMPRESSION_HEADROOM,
-    MIN_EXTRACTED_BYTES,
+    MIN_EXTRACTED_BYTES
   );
   return extractZipInternal(source, target, true, { used: 0, max });
 }
@@ -53,7 +53,7 @@ function extractZipInternal(
   source: string,
   target: string,
   allowNested: boolean,
-  budget: SizeBudget,
+  budget: SizeBudget
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     yauzl.open(
@@ -62,7 +62,7 @@ function extractZipInternal(
         lazyEntries: true,
         decodeStrings: false,
         autoClose: true,
-        validateEntrySizes: true,
+        validateEntrySizes: true
       },
       (err, zipfile) => {
         if (err) return reject(err);
@@ -85,8 +85,8 @@ function extractZipInternal(
               if (budget.used > budget.max) {
                 return reject(
                   new Error(
-                    'Import archive exceeds the allowed extracted size limit',
-                  ),
+                    'Import archive exceeds the allowed extracted size limit'
+                  )
                 );
               }
 
@@ -110,7 +110,7 @@ function extractZipInternal(
               zipfile.close();
               extractZipInternal(source, target, false, budget).then(
                 resolve,
-                reject,
+                reject
               );
             }
           });
@@ -172,8 +172,8 @@ function extractZipInternal(
           if (budget.used > budget.max) {
             return reject(
               new Error(
-                'Import archive exceeds the allowed extracted size limit',
-              ),
+                'Import archive exceeds the allowed extracted size limit'
+              )
             );
           }
 
@@ -183,7 +183,7 @@ function extractZipInternal(
           } catch (mkdirErr: any) {
             if (mkdirErr.code === 'ENAMETOOLONG') {
               console.warn(
-                `Skipping file directory creation (path too long): ${fullPath}`,
+                `Skipping file directory creation (path too long): ${fullPath}`
               );
               zipfile.readEntry();
               return;
@@ -200,7 +200,7 @@ function extractZipInternal(
             } catch (openWsErr: any) {
               if (openWsErr.code === 'ENAMETOOLONG') {
                 console.warn(
-                  `Skipping file write (path too long): ${fullPath}`,
+                  `Skipping file write (path too long): ${fullPath}`
                 );
                 zipfile.readEntry();
                 return;
@@ -212,7 +212,7 @@ function extractZipInternal(
             ws.on('error', (err) => {
               if ((err as any).code === 'ENAMETOOLONG') {
                 console.warn(
-                  `Skipping file write on stream (path too long): ${fullPath}`,
+                  `Skipping file write on stream (path too long): ${fullPath}`
                 );
                 zipfile.readEntry();
               } else {
@@ -226,7 +226,7 @@ function extractZipInternal(
 
         zipfile.on('end', () => resolve());
         zipfile.on('error', (err) => reject(err));
-      },
+      }
     );
   });
 }

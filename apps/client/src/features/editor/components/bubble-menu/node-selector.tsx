@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction } from "react";
+import React, { Dispatch, FC, SetStateAction } from 'react';
 import {
   IconBlockquote,
   IconCaretRightFilled,
@@ -13,14 +13,14 @@ import {
   IconList,
   IconListNumbers,
   IconQuote,
-  IconTypography,
-} from "@tabler/icons-react";
-import { Popover, Button, ScrollArea, Tooltip } from "@mantine/core";
-import type { Editor } from "@tiptap/react";
-import { useEditorState } from "@tiptap/react";
-import { useTranslation } from "react-i18next";
-import { isEditorReady } from "@docmost/editor-ext";
-import classes from "./bubble-menu.module.css";
+  IconTypography
+} from '@tabler/icons-react';
+import { Popover, Button, ScrollArea, Tooltip } from '@mantine/core';
+import type { Editor } from '@tiptap/react';
+import { useEditorState } from '@tiptap/react';
+import { useTranslation } from 'react-i18next';
+import { isEditorReady } from '@docmost/editor-ext';
+import classes from './bubble-menu.module.css';
 
 interface NodeSelectorProps {
   editor: Editor | null;
@@ -38,7 +38,7 @@ export interface BubbleMenuItem {
 export const NodeSelector: FC<NodeSelectorProps> = ({
   editor,
   isOpen,
-  setIsOpen,
+  setIsOpen
 }) => {
   const { t } = useTranslation();
 
@@ -50,116 +50,116 @@ export const NodeSelector: FC<NodeSelectorProps> = ({
       }
 
       return {
-        isParagraph: ctx.editor.isActive("paragraph"),
-        isBulletList: ctx.editor.isActive("bulletList"),
-        isOrderedList: ctx.editor.isActive("orderedList"),
-        isHeading1: ctx.editor.isActive("heading", { level: 1 }),
-        isHeading2: ctx.editor.isActive("heading", { level: 2 }),
-        isHeading3: ctx.editor.isActive("heading", { level: 3 }),
-        isTaskItem: ctx.editor.isActive("taskItem"),
-        isBlockquote: ctx.editor.isActive("blockquote"),
-        isCodeBlock: ctx.editor.isActive("codeBlock"),
-        isCallout: ctx.editor.isActive("callout"),
-        isDetails: ctx.editor.isActive("details"),
-        isTransclusionSource: ctx.editor.isActive("transclusionSource"),
+        isParagraph: ctx.editor.isActive('paragraph'),
+        isBulletList: ctx.editor.isActive('bulletList'),
+        isOrderedList: ctx.editor.isActive('orderedList'),
+        isHeading1: ctx.editor.isActive('heading', { level: 1 }),
+        isHeading2: ctx.editor.isActive('heading', { level: 2 }),
+        isHeading3: ctx.editor.isActive('heading', { level: 3 }),
+        isTaskItem: ctx.editor.isActive('taskItem'),
+        isBlockquote: ctx.editor.isActive('blockquote'),
+        isCodeBlock: ctx.editor.isActive('codeBlock'),
+        isCallout: ctx.editor.isActive('callout'),
+        isDetails: ctx.editor.isActive('details'),
+        isTransclusionSource: ctx.editor.isActive('transclusionSource')
       };
-    },
+    }
   });
 
   const items: BubbleMenuItem[] = [
     {
-      name: "Text",
+      name: 'Text',
       icon: IconTypography,
       command: () =>
-        editor.chain().focus().toggleNode("paragraph", "paragraph").run(),
+        editor.chain().focus().toggleNode('paragraph', 'paragraph').run(),
       isActive: () =>
         editorState?.isParagraph &&
         !editorState?.isBulletList &&
-        !editorState?.isOrderedList,
+        !editorState?.isOrderedList
     },
     {
-      name: "Heading 1",
+      name: 'Heading 1',
       icon: IconH1,
       command: () => editor.chain().focus().toggleHeading({ level: 1 }).run(),
-      isActive: () => editorState?.isHeading1,
+      isActive: () => editorState?.isHeading1
     },
     {
-      name: "Heading 2",
+      name: 'Heading 2',
       icon: IconH2,
       command: () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
-      isActive: () => editorState?.isHeading2,
+      isActive: () => editorState?.isHeading2
     },
     {
-      name: "Heading 3",
+      name: 'Heading 3',
       icon: IconH3,
       command: () => editor.chain().focus().toggleHeading({ level: 3 }).run(),
-      isActive: () => editorState?.isHeading3,
+      isActive: () => editorState?.isHeading3
     },
     {
-      name: "To-do List",
+      name: 'To-do List',
       icon: IconCheckbox,
       command: () => editor.chain().focus().toggleTaskList().run(),
-      isActive: () => editorState?.isTaskItem,
+      isActive: () => editorState?.isTaskItem
     },
     {
-      name: "Bullet List",
+      name: 'Bullet List',
       icon: IconList,
       command: () => editor.chain().focus().toggleBulletList().run(),
-      isActive: () => editorState?.isBulletList,
+      isActive: () => editorState?.isBulletList
     },
     {
-      name: "Numbered List",
+      name: 'Numbered List',
       icon: IconListNumbers,
       command: () => editor.chain().focus().toggleOrderedList().run(),
-      isActive: () => editorState?.isOrderedList,
+      isActive: () => editorState?.isOrderedList
     },
     {
-      name: "Blockquote",
+      name: 'Blockquote',
       icon: IconBlockquote,
       command: () =>
         editor
           .chain()
           .focus()
-          .toggleNode("paragraph", "paragraph")
+          .toggleNode('paragraph', 'paragraph')
           .toggleBlockquote()
           .run(),
-      isActive: () => editorState?.isBlockquote,
+      isActive: () => editorState?.isBlockquote
     },
     {
-      name: "Synced block",
+      name: 'Synced block',
       icon: IconQuote,
       command: () => editor.chain().focus().toggleTransclusionSource().run(),
-      isActive: () => editorState?.isTransclusionSource,
+      isActive: () => editorState?.isTransclusionSource
     },
     {
-      name: "Code",
+      name: 'Code',
       icon: IconCode,
       command: () => editor.chain().focus().toggleCodeBlock().run(),
-      isActive: () => editorState?.isCodeBlock,
+      isActive: () => editorState?.isCodeBlock
     },
     {
-      name: "Callout",
+      name: 'Callout',
       icon: IconInfoCircle,
       command: () => editor.chain().focus().toggleCallout().run(),
-      isActive: () => editorState?.isCallout,
+      isActive: () => editorState?.isCallout
     },
     {
-      name: "Toggle block",
+      name: 'Toggle block',
       icon: IconCaretRightFilled,
       command: () => editor.chain().focus().setDetails().run(),
-      isActive: () => editorState?.isDetails,
-    },
+      isActive: () => editorState?.isDetails
+    }
   ];
 
   const activeItem = items.filter((item) => item.isActive()).pop() ?? {
-    name: "Multiple",
+    name: 'Multiple'
   };
 
   return (
     <Popover opened={isOpen} onChange={setIsOpen} withArrow>
       <Popover.Target>
         <Tooltip
-          label={t("Turn into")}
+          label={t('Turn into')}
           withArrow
           withinPortal={false}
           disabled={isOpen}
@@ -167,11 +167,11 @@ export const NodeSelector: FC<NodeSelectorProps> = ({
           <Button
             className={classes.buttonRoot}
             variant="default"
-            style={{ border: "none", height: "34px" }}
+            style={{ border: 'none', height: '34px' }}
             radius="0"
             rightSection={<IconChevronDown size={16} />}
             onClick={() => setIsOpen(!isOpen)}
-            aria-label={t("Turn into")}
+            aria-label={t('Turn into')}
             aria-haspopup="menu"
             aria-expanded={isOpen}
           >
@@ -197,7 +197,7 @@ export const NodeSelector: FC<NodeSelectorProps> = ({
                   if (isEditorReady(editor)) item.command();
                   setIsOpen(false);
                 }}
-                style={{ border: "none" }}
+                style={{ border: 'none' }}
               >
                 {t(item.name)}
               </Button>

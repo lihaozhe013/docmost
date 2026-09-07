@@ -1,21 +1,22 @@
-import React from "react";
-import type { Editor } from "@tiptap/react";
-import { useTableHandleState } from "./hooks/use-table-handle-state";
-import { ColumnHandle } from "./column-handle";
-import { RowHandle } from "./row-handle";
-import { CellChevron } from "./cell-chevron";
+import React from 'react';
+import type { Editor } from '@tiptap/react';
+import { useTableHandleState } from './hooks/use-table-handle-state';
+import { ColumnHandle } from './column-handle';
+import { RowHandle } from './row-handle';
+import { CellChevron } from './cell-chevron';
 
 interface TableHandlesLayerProps {
   editor: Editor | null;
 }
 
 export const TableHandlesLayer = React.memo(function TableHandlesLayer({
-  editor,
+  editor
 }: TableHandlesLayerProps) {
   const state = useTableHandleState(editor);
 
   if (!editor || !editor.isEditable) return null;
-  if (!state.hoveringCell || !state.tableNode || state.tablePos == null) return null;
+  if (!state.hoveringCell || !state.tableNode || state.tablePos == null)
+    return null;
 
   return (
     <>

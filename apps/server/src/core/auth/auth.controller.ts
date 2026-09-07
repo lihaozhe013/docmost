@@ -8,12 +8,12 @@ import {
   Req,
   Res,
   UseGuards,
-  Logger,
+  Logger
 } from '@nestjs/common';
 import { SkipThrottle, ThrottlerGuard } from '@nestjs/throttler';
 import {
   ALL_NAMED_THROTTLERS_SKIPPED,
-  AUTH_THROTTLER,
+  AUTH_THROTTLER
 } from '../../integrations/throttle/throttler-names';
 import { LoginDto } from './dto/login.dto';
 import { AuthService } from './services/auth.service';
@@ -32,7 +32,7 @@ import { ModuleRef } from '@nestjs/core';
 import { AuditEvent, AuditResource } from '../../common/events/audit-events';
 import {
   AUDIT_SERVICE,
-  IAuditService,
+  IAuditService
 } from '../../integrations/audit/audit.service';
 
 @SkipThrottle({ ...ALL_NAMED_THROTTLERS_SKIPPED, [AUTH_THROTTLER]: false })
@@ -46,7 +46,7 @@ export class AuthController {
     private sessionService: SessionService,
     private environmentService: EnvironmentService,
     private moduleRef: ModuleRef,
-    @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService,
+    @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService
   ) {}
 
   @HttpCode(HttpStatus.OK)
@@ -54,7 +54,7 @@ export class AuthController {
   async login(
     @AuthWorkspace() workspace: Workspace,
     @Res({ passthrough: true }) res: FastifyReply,
-    @Body() loginInput: LoginDto,
+    @Body() loginInput: LoginDto
   ) {
     validateSsoEnforcement(workspace);
 
@@ -66,19 +66,19 @@ export class AuthController {
       isMfaModuleReady = true;
     } catch (err) {
       this.logger.debug(
-        'MFA module requested but EE module not bundled in this build',
+        'MFA module requested but EE module not bundled in this build'
       );
       isMfaModuleReady = false;
     }
     if (isMfaModuleReady) {
       const mfaService = this.moduleRef.get(MfaModule.MfaService, {
-        strict: false,
+        strict: false
       });
 
       const mfaResult = await mfaService.checkMfaRequirements(
         loginInput,
         workspace,
-        res,
+        res
       );
 
       if (mfaResult) {
@@ -87,7 +87,7 @@ export class AuthController {
           return {
             userHasMfa: mfaResult.userHasMfa,
             requiresMfaSetup: mfaResult.requiresMfaSetup,
-            isMfaEnforced: mfaResult.isMfaEnforced,
+            isMfaEnforced: mfaResult.isMfaEnforced
           };
         } else if (mfaResult.authToken) {
           // User doesn't have MFA and workspace doesn't require it
@@ -106,7 +106,7 @@ export class AuthController {
   @Post('setup')
   async setupWorkspace(
     @Res({ passthrough: true }) res: FastifyReply,
-    @Body() createAdminUserDto: CreateAdminUserDto,
+    @Body() createAdminUserDto: CreateAdminUserDto
   ) {
     const { workspace, authToken } =
       await this.authService.setup(createAdminUserDto);
@@ -123,14 +123,14 @@ export class AuthController {
     @Body() dto: ChangePasswordDto,
     @AuthUser() user: User,
     @AuthWorkspace() workspace: Workspace,
-    @Req() req: FastifyRequest,
+    @Req() req: FastifyRequest
   ) {
     const currentSessionId = (req.raw as any).sessionId;
     return this.authService.changePassword(
       dto,
       user.id,
       workspace.id,
-      currentSessionId,
+      currentSessionId
     );
   }
 
@@ -140,7 +140,7 @@ export class AuthController {
   @Post('collab-token')
   async collabToken(
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     return this.authService.getCollabToken(user, workspace.id);
   }
@@ -152,14 +152,14 @@ export class AuthController {
   async logout(
     @AuthUser() user: User,
     @Req() req: FastifyRequest,
-    @Res({ passthrough: true }) res: FastifyReply,
+    @Res({ passthrough: true }) res: FastifyReply
   ) {
     const sessionId = (req.raw as any).sessionId;
     if (sessionId) {
       await this.sessionService.revokeSession(
         sessionId,
         user.id,
-        user.workspaceId,
+        user.workspaceId
       );
     }
 
@@ -168,7 +168,7 @@ export class AuthController {
     this.auditService.log({
       event: AuditEvent.USER_LOGOUT,
       resourceType: AuditResource.USER,
-      resourceId: user.id,
+      resourceId: user.id
     });
   }
 
@@ -178,7 +178,7 @@ export class AuthController {
       sameSite: 'lax',
       path: '/',
       expires: this.environmentService.getCookieExpiresIn(),
-      secure: this.environmentService.isHttps(),
+      secure: this.environmentService.isHttps()
     });
   }
 }

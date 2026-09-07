@@ -26,17 +26,17 @@ import { EnvironmentModule } from '../integrations/environment/environment.modul
     HistoryProcessor,
     CollabHistoryService,
     CollaborationHandler,
-    TransclusionService,
+    TransclusionService
   ],
   exports: [CollaborationGateway],
   imports: [
     TokenModule,
     WatcherModule,
     StorageModule.forRootAsync({
-      imports: [EnvironmentModule],
+      imports: [EnvironmentModule]
     }),
-    TransclusionModule,
-  ],
+    TransclusionModule
+  ]
 })
 export class CollaborationModule implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(CollaborationModule.name);
@@ -45,7 +45,7 @@ export class CollaborationModule implements OnModuleInit, OnModuleDestroy {
 
   constructor(
     private readonly collaborationGateway: CollaborationGateway,
-    private readonly httpAdapterHost: HttpAdapterHost,
+    private readonly httpAdapterHost: HttpAdapterHost
   ) {}
 
   onModuleInit() {
@@ -63,7 +63,7 @@ export class CollaborationModule implements OnModuleInit, OnModuleDestroy {
     });
 
     wss.on('error', (error) =>
-      this.logger.error('WebSocket server error:', error),
+      this.logger.error('WebSocket server error:', error)
     );
   }
 

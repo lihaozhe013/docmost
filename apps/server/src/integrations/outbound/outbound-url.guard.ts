@@ -5,20 +5,24 @@ import { EnvironmentService } from '../environment/environment.service';
 import {
   OutboundNetworkPolicy,
   parseOutboundNetworkPolicy,
-  policyNamesAddress,
+  policyNamesAddress
 } from './outbound-network-policy';
 
 export const OUTBOUND_LOOKUP = 'OUTBOUND_LOOKUP';
 
 export type ResolvedAddress = { address: string; family: number };
 export type LookupFn = (hostname: string) => Promise<ResolvedAddress[]>;
-export type PinnedAddress = { hostname: string; address: string; family: 4 | 6 };
+export type PinnedAddress = {
+  hostname: string;
+  address: string;
+  family: 4 | 6;
+};
 
 /** A rejected URL. Only transient resolution failures are retryable. */
 export class OutboundUrlError extends Error {
   constructor(
     message: string,
-    readonly retryable: boolean = false,
+    readonly retryable: boolean = false
   ) {
     super(message);
     this.name = 'OutboundUrlError';
@@ -32,29 +36,29 @@ export const defaultLookup: LookupFn = async (hostname) => {
 
 // Reserved ranges blocked unless explicitly allowed on self-hosted deployments.
 const ALWAYS_BLOCKED = new BlockList();
-ALWAYS_BLOCKED.addSubnet('0.0.0.0', 8, 'ipv4');       // "this" network / unspecified
+ALWAYS_BLOCKED.addSubnet('0.0.0.0', 8, 'ipv4'); // "this" network / unspecified
 ALWAYS_BLOCKED.addSubnet('127.0.0.0', 8, 'ipv4');
-ALWAYS_BLOCKED.addSubnet('169.254.0.0', 16, 'ipv4');  // link-local / cloud metadata
-ALWAYS_BLOCKED.addSubnet('192.0.0.0', 24, 'ipv4');    // IETF protocol assignments
-ALWAYS_BLOCKED.addSubnet('192.0.2.0', 24, 'ipv4');    // TEST-NET-1
-ALWAYS_BLOCKED.addSubnet('192.88.99.0', 24, 'ipv4');  // deprecated 6to4 relay anycast
-ALWAYS_BLOCKED.addSubnet('198.18.0.0', 15, 'ipv4');   // benchmarking
+ALWAYS_BLOCKED.addSubnet('169.254.0.0', 16, 'ipv4'); // link-local / cloud metadata
+ALWAYS_BLOCKED.addSubnet('192.0.0.0', 24, 'ipv4'); // IETF protocol assignments
+ALWAYS_BLOCKED.addSubnet('192.0.2.0', 24, 'ipv4'); // TEST-NET-1
+ALWAYS_BLOCKED.addSubnet('192.88.99.0', 24, 'ipv4'); // deprecated 6to4 relay anycast
+ALWAYS_BLOCKED.addSubnet('198.18.0.0', 15, 'ipv4'); // benchmarking
 ALWAYS_BLOCKED.addSubnet('198.51.100.0', 24, 'ipv4'); // TEST-NET-2
-ALWAYS_BLOCKED.addSubnet('203.0.113.0', 24, 'ipv4');  // TEST-NET-3
+ALWAYS_BLOCKED.addSubnet('203.0.113.0', 24, 'ipv4'); // TEST-NET-3
 ALWAYS_BLOCKED.addRange('224.0.0.0', '255.255.255.255', 'ipv4'); // multicast + reserved
-ALWAYS_BLOCKED.addSubnet('::', 96, 'ipv6');           // deprecated IPv4-compatible
+ALWAYS_BLOCKED.addSubnet('::', 96, 'ipv6'); // deprecated IPv4-compatible
 ALWAYS_BLOCKED.addSubnet('::ffff:0:0:0', 96, 'ipv6'); // IPv4-translated (SIIT): ::ffff:0:7f00:1 is 127.0.0.1
-ALWAYS_BLOCKED.addSubnet('::', 128, 'ipv6');          // unspecified
-ALWAYS_BLOCKED.addSubnet('::1', 128, 'ipv6');         // loopback
-ALWAYS_BLOCKED.addSubnet('64:ff9b::', 96, 'ipv6');    // NAT64 well-known prefix
-ALWAYS_BLOCKED.addSubnet('64:ff9b:1::', 48, 'ipv6');  // NAT64 local-use
-ALWAYS_BLOCKED.addSubnet('100::', 64, 'ipv6');        // discard-only
-ALWAYS_BLOCKED.addSubnet('2001::', 32, 'ipv6');       // Teredo
-ALWAYS_BLOCKED.addSubnet('2001:db8::', 32, 'ipv6');   // documentation
-ALWAYS_BLOCKED.addSubnet('2002::', 16, 'ipv6');       // 6to4
-ALWAYS_BLOCKED.addSubnet('fe80::', 10, 'ipv6');       // link-local
-ALWAYS_BLOCKED.addSubnet('fec0::', 10, 'ipv6');       // deprecated site-local
-ALWAYS_BLOCKED.addSubnet('ff00::', 8, 'ipv6');        // multicast
+ALWAYS_BLOCKED.addSubnet('::', 128, 'ipv6'); // unspecified
+ALWAYS_BLOCKED.addSubnet('::1', 128, 'ipv6'); // loopback
+ALWAYS_BLOCKED.addSubnet('64:ff9b::', 96, 'ipv6'); // NAT64 well-known prefix
+ALWAYS_BLOCKED.addSubnet('64:ff9b:1::', 48, 'ipv6'); // NAT64 local-use
+ALWAYS_BLOCKED.addSubnet('100::', 64, 'ipv6'); // discard-only
+ALWAYS_BLOCKED.addSubnet('2001::', 32, 'ipv6'); // Teredo
+ALWAYS_BLOCKED.addSubnet('2001:db8::', 32, 'ipv6'); // documentation
+ALWAYS_BLOCKED.addSubnet('2002::', 16, 'ipv6'); // 6to4
+ALWAYS_BLOCKED.addSubnet('fe80::', 10, 'ipv6'); // link-local
+ALWAYS_BLOCKED.addSubnet('fec0::', 10, 'ipv6'); // deprecated site-local
+ALWAYS_BLOCKED.addSubnet('ff00::', 8, 'ipv6'); // multicast
 
 // Private ranges that self-hosted deployments can allow.
 const PRIVATE_NETWORKS = new BlockList();
@@ -62,7 +66,7 @@ PRIVATE_NETWORKS.addSubnet('10.0.0.0', 8, 'ipv4');
 PRIVATE_NETWORKS.addSubnet('100.64.0.0', 10, 'ipv4'); // CGNAT
 PRIVATE_NETWORKS.addSubnet('172.16.0.0', 12, 'ipv4');
 PRIVATE_NETWORKS.addSubnet('192.168.0.0', 16, 'ipv4');
-PRIVATE_NETWORKS.addSubnet('fc00::', 7, 'ipv6');      // unique-local
+PRIVATE_NETWORKS.addSubnet('fc00::', 7, 'ipv6'); // unique-local
 
 // These ranges cannot be allowed by policy.
 const HARD_BLOCKED = new BlockList();
@@ -107,11 +111,12 @@ type Refusal = {
 function findRefusal(
   resolved: ResolvedAddress[],
   port: number,
-  policy: OutboundNetworkPolicy,
+  policy: OutboundNetworkPolicy
 ): Refusal | undefined {
   for (const { address } of resolved) {
     // Reject invalid resolver output before policy checks.
-    if (!isIPv4(address) && !isIPv6(address)) return { address, kind: 'not-an-ip' };
+    if (!isIPv4(address) && !isIPv6(address))
+      return { address, kind: 'not-an-ip' };
     if (isHardBlockedAddress(address)) return { address, kind: 'hard-blocked' };
     if (policyNamesAddress(policy, address, port)) continue;
     if (isPrivateNetworkAddress(address)) {
@@ -148,7 +153,7 @@ export class OutboundUrlGuard {
 
   constructor(
     private readonly environmentService: EnvironmentService,
-    @Optional() @Inject(OUTBOUND_LOOKUP) lookup?: LookupFn,
+    @Optional() @Inject(OUTBOUND_LOOKUP) lookup?: LookupFn
   ) {
     this.lookup = lookup ?? defaultLookup;
   }
@@ -160,7 +165,7 @@ export class OutboundUrlGuard {
       const policy = parseOutboundNetworkPolicy(raw);
       if (policy.invalid) {
         this.logger.error(
-          `Invalid ALLOWED_PRIVATE_NETWORKS value "${raw}"; refusing every private and reserved destination`,
+          `Invalid ALLOWED_PRIVATE_NETWORKS value "${raw}"; refusing every private and reserved destination`
         );
       }
       this.cachedPolicy = { raw, policy };
@@ -185,7 +190,9 @@ export class OutboundUrlGuard {
       throw new OutboundUrlError('Destination URL must use https');
     }
     if (url.username || url.password) {
-      throw new OutboundUrlError('Destination URL must not contain credentials');
+      throw new OutboundUrlError(
+        'Destination URL must not contain credentials'
+      );
     }
 
     const hostname = url.hostname.replace(/^\[|\]$/g, '');
@@ -198,14 +205,14 @@ export class OutboundUrlGuard {
       } catch {
         throw new OutboundUrlError(
           `Could not resolve destination host "${hostname}"`,
-          true,
+          true
         );
       }
     }
     if (resolved.length === 0) {
       throw new OutboundUrlError(
         `Could not resolve destination host "${hostname}"`,
-        true,
+        true
       );
     }
 
@@ -213,19 +220,24 @@ export class OutboundUrlGuard {
       const blocked = resolved.find((r) => isPrivateAddress(r.address));
       if (blocked) {
         throw new OutboundUrlError(
-          `Destination host "${hostname}" resolves to a private or reserved address (${blocked.address}), which is not allowed`,
+          `Destination host "${hostname}" resolves to a private or reserved address (${blocked.address}), which is not allowed`
         );
       }
     } else {
       const refusal = findRefusal(
         resolved,
         effectivePort(url),
-        this.resolvePolicy(),
+        this.resolvePolicy()
       );
-      if (refusal) throw new OutboundUrlError(describeRefusal(hostname, refusal));
+      if (refusal)
+        throw new OutboundUrlError(describeRefusal(hostname, refusal));
     }
 
     const pick = resolved[0];
-    return { hostname, address: pick.address, family: pick.family === 6 ? 6 : 4 };
+    return {
+      hostname,
+      address: pick.address,
+      family: pick.family === 6 ? 6 : 4
+    };
   }
 }

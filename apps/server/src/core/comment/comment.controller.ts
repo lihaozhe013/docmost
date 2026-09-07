@@ -7,7 +7,7 @@ import {
   UseGuards,
   Inject,
   NotFoundException,
-  ForbiddenException,
+  ForbiddenException
 } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
@@ -23,14 +23,14 @@ import SpaceAbilityFactory from '../casl/abilities/space-ability.factory';
 import { PageRepo } from '@docmost/db/repos/page/page.repo';
 import {
   SpaceCaslAction,
-  SpaceCaslSubject,
+  SpaceCaslSubject
 } from '../casl/interfaces/space-ability.type';
 import { CommentRepo } from '@docmost/db/repos/comment/comment.repo';
 import { PageAccessService } from '../page/page-access/page-access.service';
 import { AuditEvent, AuditResource } from '../../common/events/audit-events';
 import {
   AUDIT_SERVICE,
-  IAuditService,
+  IAuditService
 } from '../../integrations/audit/audit.service';
 import { WsService } from '../../ws/ws.service';
 
@@ -44,7 +44,7 @@ export class CommentController {
     private readonly spaceAbility: SpaceAbilityFactory,
     private readonly pageAccessService: PageAccessService,
     private readonly wsService: WsService,
-    @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService,
+    @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService
   ) {}
 
   @HttpCode(HttpStatus.OK)
@@ -53,7 +53,7 @@ export class CommentController {
   async create(
     @Body() createCommentDto: CreateCommentDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const page = await this.pageRepo.findById(createCommentDto.pageId);
     if (!page || page.workspaceId !== workspace.id || page.deletedAt) {
@@ -66,9 +66,9 @@ export class CommentController {
       {
         page,
         workspaceId: workspace.id,
-        user,
+        user
       },
-      createCommentDto,
+      createCommentDto
     );
 
     this.auditService.log({
@@ -77,8 +77,8 @@ export class CommentController {
       resourceId: comment.id,
       spaceId: page.spaceId,
       metadata: {
-        pageId: page.id,
-      },
+        pageId: page.id
+      }
     });
 
     return comment;
@@ -92,7 +92,7 @@ export class CommentController {
     @Body()
     pagination: PaginationOptions,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const page = await this.pageRepo.findById(input.pageId);
     if (!page || page.workspaceId !== workspace.id || page.deletedAt) {
@@ -109,7 +109,7 @@ export class CommentController {
   async findOne(
     @Body() input: CommentIdDto,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const comment = await this.commentRepo.findById(input.commentId);
     if (!comment) {
@@ -129,10 +129,14 @@ export class CommentController {
   @HttpCode(HttpStatus.OK)
   @Post('update')
   @OAuthScope('write')
-  async update(@Body() dto: UpdateCommentDto, @AuthUser() user: User, @AuthWorkspace() workspace: Workspace) {
+  async update(
+    @Body() dto: UpdateCommentDto,
+    @AuthUser() user: User,
+    @AuthWorkspace() workspace: Workspace
+  ) {
     const comment = await this.commentRepo.findById(dto.commentId, {
       includeCreator: true,
-      includeResolvedBy: true,
+      includeResolvedBy: true
     });
     if (!comment) {
       throw new NotFoundException('Comment not found');
@@ -150,7 +154,11 @@ export class CommentController {
 
   @HttpCode(HttpStatus.OK)
   @Post('delete')
-  async delete(@Body() input: CommentIdDto, @AuthUser() user: User, @AuthWorkspace() workspace: Workspace) {
+  async delete(
+    @Body() input: CommentIdDto,
+    @AuthUser() user: User,
+    @AuthWorkspace() workspace: Workspace
+  ) {
     const comment = await this.commentRepo.findById(input.commentId);
     if (!comment) {
       throw new NotFoundException('Comment not found');
@@ -171,14 +179,12 @@ export class CommentController {
     } else {
       const ability = await this.spaceAbility.createForUser(
         user,
-        comment.spaceId,
+        comment.spaceId
       );
 
       // Space admin can delete any comment
       if (ability.cannot(SpaceCaslAction.Manage, SpaceCaslSubject.Settings)) {
-        throw new ForbiddenException(
-          'You can only delete your own comments',
-        );
+        throw new ForbiddenException('You can only delete your own comments');
       }
       await this.commentRepo.deleteComment(comment.id);
     }
@@ -186,7 +192,7 @@ export class CommentController {
     this.wsService.emitCommentEvent(comment.spaceId, comment.pageId, {
       operation: 'commentDeleted',
       pageId: comment.pageId,
-      commentId: comment.id,
+      commentId: comment.id
     });
 
     this.auditService.log({
@@ -197,9 +203,9 @@ export class CommentController {
       changes: {
         before: {
           pageId: comment.pageId,
-          creatorId: comment.creatorId,
-        },
-      },
+          creatorId: comment.creatorId
+        }
+      }
     });
   }
 }

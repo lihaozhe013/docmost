@@ -14,7 +14,7 @@ export class ShareSeoController {
   constructor(
     private readonly shareService: ShareService,
     private workspaceRepo: WorkspaceRepo,
-    private environmentService: EnvironmentService,
+    private environmentService: EnvironmentService
   ) {}
 
   /*
@@ -25,7 +25,7 @@ export class ShareSeoController {
     @Res({ passthrough: false }) res: FastifyReply,
     @Req() req: FastifyRequest,
     @Param('shareId') shareId: string,
-    @Param('pageSlug') pageSlug: string,
+    @Param('pageSlug') pageSlug: string
   ) {
     // Nestjs does not to apply middlewares to paths excluded from the global /api prefix
     // https://github.com/nestjs/nest/issues/9124
@@ -48,7 +48,7 @@ export class ShareSeoController {
       '..',
       '..',
       '..',
-      'client/dist',
+      'client/dist'
     );
 
     if (fs.existsSync(clientDistPath)) {
@@ -62,7 +62,7 @@ export class ShareSeoController {
 
       const share = await this.shareService.getShareForPage(
         pageId,
-        workspace.id,
+        workspace.id
       );
 
       if (!share) {
@@ -78,7 +78,7 @@ export class ShareSeoController {
       const metaTags = [
         `<meta property="og:title" content="${metaTitle}" />`,
         `<meta property="twitter:title" content="${metaTitle}" />`,
-        !share.searchIndexing ? `<meta name="robots" content="noindex" />` : '',
+        !share.searchIndexing ? `<meta name="robots" content="noindex" />` : ''
       ]
         .filter(Boolean)
         .join('\n    ');

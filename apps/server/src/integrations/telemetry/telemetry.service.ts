@@ -16,7 +16,7 @@ export class TelemetryService {
     private readonly environmentService: EnvironmentService,
     @InjectKysely() private readonly db: KyselyDB,
     private readonly workspaceRepo: WorkspaceRepo,
-    private schedulerRegistry: SchedulerRegistry,
+    private schedulerRegistry: SchedulerRegistry
   ) {}
 
   @Interval('telemetry', 24 * 60 * 60 * 1000)
@@ -38,7 +38,7 @@ export class TelemetryService {
 
       const anonymizedHash = createHmac(
         'sha256',
-        this.environmentService.getAppSecret(),
+        this.environmentService.getAppSecret()
       )
         .update(workspace.id)
         .digest('hex');
@@ -69,16 +69,16 @@ export class TelemetryService {
         userCount,
         pageCount,
         spaceCount,
-        workspaceCount,
+        workspaceCount
       };
 
       await fetch(this.ENDPOINT_URL, {
         method: 'POST',
         headers: {
           'User-Agent': 'docmost:' + data.version,
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(data)
       });
     } catch (err) {
       /* empty */

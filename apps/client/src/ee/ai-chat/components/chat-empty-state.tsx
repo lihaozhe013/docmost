@@ -3,15 +3,15 @@ import {
   IconSearch,
   IconFilePlus,
   IconEdit,
-  IconFileText,
-} from "@tabler/icons-react";
-import { useTranslation } from "react-i18next";
-import { useAtomValue } from "jotai";
-import { workspaceAtom } from "@/features/user/atoms/current-user-atom.ts";
-import { useRef } from "react";
-import ChatInput, { ChatInputHandle } from "./chat-input";
-import type { ChatAttachment, PageMention } from "../types/ai-chat.types";
-import classes from "../styles/ai-chat.module.css";
+  IconFileText
+} from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
+import { useAtomValue } from 'jotai';
+import { workspaceAtom } from '@/features/user/atoms/current-user-atom.ts';
+import { useRef } from 'react';
+import ChatInput, { ChatInputHandle } from './chat-input';
+import type { ChatAttachment, PageMention } from '../types/ai-chat.types';
+import classes from '../styles/ai-chat.module.css';
 
 type Suggestion = {
   icon: React.ReactNode;
@@ -23,31 +23,35 @@ type Suggestion = {
 const SUGGESTIONS: Suggestion[] = [
   {
     icon: <IconSearch size={16} />,
-    text: "Search across all pages",
-    prompt: "Search for pages about ",
+    text: 'Search across all pages',
+    prompt: 'Search for pages about '
   },
   {
     icon: <IconFilePlus size={16} />,
-    text: "Create a new page",
-    prompt: "Create a new page titled ",
-    write: true,
+    text: 'Create a new page',
+    prompt: 'Create a new page titled ',
+    write: true
   },
   {
     icon: <IconFileText size={16} />,
-    text: "Summarize a page",
-    prompt: "Summarize the page @",
+    text: 'Summarize a page',
+    prompt: 'Summarize the page @'
   },
   {
     icon: <IconEdit size={16} />,
-    text: "Update page content",
-    prompt: "Update the page @",
-    write: true,
-  },
+    text: 'Update page content',
+    prompt: 'Update the page @',
+    write: true
+  }
 ];
 
 type Props = {
   isStreaming: boolean;
-  onSend: (content: string, mentions: PageMention[], attachments: ChatAttachment[]) => void;
+  onSend: (
+    content: string,
+    mentions: PageMention[],
+    attachments: ChatAttachment[]
+  ) => void;
   onStop: () => void;
 };
 
@@ -65,9 +69,9 @@ export default function ChatEmptyState({ isStreaming, onSend, onStop }: Props) {
   return (
     <div className={classes.emptyState}>
       <IconSparkles size={48} stroke={1.5} className={classes.emptyStateIcon} />
-      <div className={classes.emptyStateBrand}>{t("Docmost AI")}</div>
+      <div className={classes.emptyStateBrand}>{t('Docmost AI')}</div>
       <h1 className={classes.emptyStateTitle}>
-        {t("What can I help you with?")}
+        {t('What can I help you with?')}
       </h1>
 
       <div className={classes.emptyStateInput}>
@@ -76,13 +80,13 @@ export default function ChatEmptyState({ isStreaming, onSend, onStop }: Props) {
           isStreaming={isStreaming}
           onSend={onSend}
           onStop={onStop}
-          placeholder={t("Ask anything... Use @ to mention pages")}
+          placeholder={t('Ask anything... Use @ to mention pages')}
           autofocus
         />
       </div>
 
       <div className={classes.suggestionsSection}>
-        <h2 className={classes.suggestionsLabel}>{t("Get started")}</h2>
+        <h2 className={classes.suggestionsLabel}>{t('Get started')}</h2>
         <div className={classes.suggestionsGrid}>
           {SUGGESTIONS.filter((s) => !writesDisabled || !s.write).map((s) => (
             <button

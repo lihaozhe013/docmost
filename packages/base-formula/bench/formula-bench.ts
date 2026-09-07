@@ -4,47 +4,47 @@ import {
   typecheck,
   evaluate,
   registry,
-  DEFAULT_MAX_DEPTH,
-} from "../src/index.server";
+  DEFAULT_MAX_DEPTH
+} from '../src/index.server';
 import type {
   FormulaAST,
   EvalContext,
   PropertyLookup,
   Value,
-  FormulaResultType,
-} from "../src/index.server";
+  FormulaResultType
+} from '../src/index.server';
 
 // sample row: properties a..j (numbers), name (string)
-const NUM_PROPS = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"];
+const NUM_PROPS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'];
 const cells: Record<string, unknown> = {
-  prop_name: "widget",
+  prop_name: 'widget'
 };
 NUM_PROPS.forEach((p, idx) => {
   cells[`prop_${p}`] = (idx + 1) * 7.3 - idx; // arbitrary non-trivial floats
 });
 
 const nameToId = new Map<string, string>([
-  ["name", "prop_name"],
-  ...NUM_PROPS.map((p) => [p, `prop_${p}`] as [string, string]),
+  ['name', 'prop_name'],
+  ...NUM_PROPS.map((p) => [p, `prop_${p}`] as [string, string])
 ]);
 
 const propertyTypes = new Map<string, FormulaResultType>([
-  ["prop_name", "string"],
+  ['prop_name', 'string'],
   ...NUM_PROPS.map(
-    (p) => [`prop_${p}`, "number"] as [string, FormulaResultType],
-  ),
+    (p) => [`prop_${p}`, 'number'] as [string, FormulaResultType]
+  )
 ]);
 
 // Base (non-formula) property lookup. Nested-formula cases extend this.
 const baseProps = new Map<string, PropertyLookup>([
-  ["prop_name", { id: "prop_name", type: "string", typeOptions: {} }],
+  ['prop_name', { id: 'prop_name', type: 'string', typeOptions: {} }],
   ...NUM_PROPS.map(
     (p) =>
-      [`prop_${p}`, { id: `prop_${p}`, type: "number", typeOptions: {} }] as [
+      [`prop_${p}`, { id: `prop_${p}`, type: 'number', typeOptions: {} }] as [
         string,
-        PropertyLookup,
-      ],
-  ),
+        PropertyLookup
+      ]
+  )
 ]);
 
 function mkCtx(properties: ReadonlyMap<string, PropertyLookup>): EvalContext {
@@ -53,7 +53,7 @@ function mkCtx(properties: ReadonlyMap<string, PropertyLookup>): EvalContext {
     properties,
     depth: 0,
     maxDepth: DEFAULT_MAX_DEPTH,
-    memo: new Map<string, Value>(),
+    memo: new Map<string, Value>()
   };
 }
 
@@ -65,17 +65,17 @@ function astStats(ast: FormulaAST): { nodes: number; depth: number } {
     let max = d;
     const kids: FormulaAST[] = [];
     switch (n.t) {
-      case "op":
+      case 'op':
         kids.push(...n.args);
         break;
-      case "and":
-      case "or":
+      case 'and':
+      case 'or':
         kids.push(...n.args);
         break;
-      case "call":
+      case 'call':
         kids.push(...n.args);
         break;
-      case "if":
+      case 'if':
         kids.push(n.cond, n.then, n.else);
         break;
     }
@@ -89,7 +89,7 @@ function astStats(ast: FormulaAST): { nodes: number; depth: number } {
 // timing harness
 function timed(
   fn: () => void,
-  targetMs = 600,
+  targetMs = 600
 ): { opsPerSec: number; nsPerOp: number } {
   // warmup ~150ms to let V8 JIT settle
   const warmEnd = performance.now() + 150;
@@ -108,7 +108,7 @@ function timed(
       elapsedMs = Number(t1 - t0) / 1e6;
       if (elapsedMs >= targetMs) break;
       iters = Math.ceil(
-        iters * Math.max(2, targetMs / Math.max(elapsedMs, 0.01)),
+        iters * Math.max(2, targetMs / Math.max(elapsedMs, 0.01))
       );
     }
     const nsPerOp = (elapsedMs * 1e6) / iters;
@@ -122,7 +122,7 @@ type Case = { tier: string; name: string; src: string };
 
 function buildArithChain(n: number): string {
   // ((((a + b) * c) - d) ... ) cycling through props/ops
-  const ops = ["+", "*", "-"];
+  const ops = ['+', '*', '-'];
   let expr = 'prop("a")';
   for (let i = 0; i < n; i++) {
     const p = NUM_PROPS[(i + 1) % NUM_PROPS.length];
@@ -152,59 +152,59 @@ function buildBalancedAddTree(depth: number): string {
 
 const cases: Case[] = [
   // BASIC
-  { tier: "basic", name: "literal add", src: "1 + 2" },
-  { tier: "basic", name: "two-prop add", src: 'prop("a") + prop("b")' },
-  { tier: "basic", name: "comparison", src: 'prop("a") > 10' },
-  { tier: "basic", name: "neg + mul", src: '-prop("a") * 2' },
+  { tier: 'basic', name: 'literal add', src: '1 + 2' },
+  { tier: 'basic', name: 'two-prop add', src: 'prop("a") + prop("b")' },
+  { tier: 'basic', name: 'comparison', src: 'prop("a") > 10' },
+  { tier: 'basic', name: 'neg + mul', src: '-prop("a") * 2' },
 
   // INTERMEDIATE
   {
-    tier: "intermediate",
-    name: "round(mul)",
-    src: 'round(prop("a") * 1.5, 2)',
+    tier: 'intermediate',
+    name: 'round(mul)',
+    src: 'round(prop("a") * 1.5, 2)'
   },
   {
-    tier: "intermediate",
-    name: "if/then/else",
-    src: 'if(prop("a") > prop("b"), "hi", "lo")',
+    tier: 'intermediate',
+    name: 'if/then/else',
+    src: 'if(prop("a") > prop("b"), "hi", "lo")'
   },
   {
-    tier: "intermediate",
-    name: "string concat",
-    src: 'concat(upper(prop("name")), "-", toString(prop("a")))',
+    tier: 'intermediate',
+    name: 'string concat',
+    src: 'concat(upper(prop("name")), "-", toString(prop("a")))'
   },
   {
-    tier: "intermediate",
-    name: "bool and/or",
-    src: 'and(prop("a") > 0, or(prop("b") < 100, prop("c") == 0))',
+    tier: 'intermediate',
+    name: 'bool and/or',
+    src: 'and(prop("a") > 0, or(prop("b") < 100, prop("c") == 0))'
   },
 
   // COMPLEX
   {
-    tier: "complex",
-    name: "hypotenuse",
-    src: 'sqrt(pow(prop("a"), 2) + pow(prop("b"), 2))',
+    tier: 'complex',
+    name: 'hypotenuse',
+    src: 'sqrt(pow(prop("a"), 2) + pow(prop("b"), 2))'
   },
   {
-    tier: "complex",
-    name: "sum(10 props)",
-    src: `sum(${NUM_PROPS.map((p) => `prop("${p}")`).join(", ")})`,
+    tier: 'complex',
+    name: 'sum(10 props)',
+    src: `sum(${NUM_PROPS.map((p) => `prop("${p}")`).join(', ')})`
   },
   {
-    tier: "complex",
-    name: "nested if (4-tier grade)",
-    src: 'if(prop("a") > 90, "A", if(prop("a") > 80, "B", if(prop("a") > 70, "C", "F")))',
+    tier: 'complex',
+    name: 'nested if (4-tier grade)',
+    src: 'if(prop("a") > 90, "A", if(prop("a") > 80, "B", if(prop("a") > 70, "C", "F")))'
   },
   {
-    tier: "complex",
-    name: "mixed math+string+logic",
-    src: 'if(and(prop("a") > 0, prop("b") > 0), concat("ok:", toString(round(prop("a") / prop("b"), 2))), "n/a")',
+    tier: 'complex',
+    name: 'mixed math+string+logic',
+    src: 'if(and(prop("a") > 0, prop("b") > 0), concat("ok:", toString(round(prop("a") / prop("b"), 2))), "n/a")'
   },
 
   // DEEPLY NESTED
-  { tier: "deep", name: "arith chain x20", src: buildArithChain(20) },
-  { tier: "deep", name: "nested if x10 tiers", src: buildIfChain(10) },
-  { tier: "deep", name: "balanced fn tree d6", src: buildBalancedAddTree(6) },
+  { tier: 'deep', name: 'arith chain x20', src: buildArithChain(20) },
+  { tier: 'deep', name: 'nested if x10 tiers', src: buildIfChain(10) },
+  { tier: 'deep', name: 'balanced fn tree d6', src: buildBalancedAddTree(6) }
 ];
 
 // nested-formula (cross-property) case
@@ -217,25 +217,25 @@ function buildNestedFormulaCtx(): {
 } {
   const subRaw = resolve(
     parseRaw('round((prop("a") + prop("b") + prop("c")) / 3, 2)'),
-    nameToId,
+    nameToId
   ).ast;
   const totalRaw = resolve(
     parseRaw('prop("sub") * prop("d") + prop("e")'),
     // @ts-ignore
-    new Map([...nameToId, ["sub", "prop_sub"]]),
+    new Map([...nameToId, ['sub', 'prop_sub']])
   ).ast;
 
   const props = new Map<string, PropertyLookup>(baseProps);
-  props.set("prop_sub", {
-    id: "prop_sub",
-    type: "formula",
+  props.set('prop_sub', {
+    id: 'prop_sub',
+    type: 'formula',
     typeOptions: {
       ast: subRaw,
-      source: "",
-      resultType: "number",
+      source: '',
+      resultType: 'number',
       dependencies: [],
-      astVersion: 1,
-    },
+      astVersion: 1
+    }
   });
   return { ast: totalRaw, ctx: mkCtx(props), stats: astStats(totalRaw) };
 }
@@ -250,15 +250,15 @@ const fmt = (n: number) =>
 
 console.log(`\nnode ${process.version} | base-formula engine benchmark\n`);
 console.log(
-  "tier".padEnd(13) +
-    "formula".padEnd(28) +
-    "nodes".padStart(6) +
-    "depth".padStart(6) +
-    "compile op/s".padStart(15) +
-    "eval op/s".padStart(13) +
-    "eval ns/op".padStart(13),
+  'tier'.padEnd(13) +
+    'formula'.padEnd(28) +
+    'nodes'.padStart(6) +
+    'depth'.padStart(6) +
+    'compile op/s'.padStart(15) +
+    'eval op/s'.padStart(13) +
+    'eval ns/op'.padStart(13)
 );
-console.log("-".repeat(94));
+console.log('-'.repeat(94));
 
 for (const c of cases) {
   const raw = parseRaw(c.src);
@@ -282,7 +282,7 @@ for (const c of cases) {
       String(stats.depth).padStart(6) +
       fmt(compile.opsPerSec).padStart(15) +
       fmt(ev.opsPerSec).padStart(13) +
-      ev.nsPerOp.toFixed(0).padStart(13),
+      ev.nsPerOp.toFixed(0).padStart(13)
   );
 }
 
@@ -294,25 +294,25 @@ for (const c of cases) {
     evaluate(ast, cells, ctx);
   });
   console.log(
-    "nested-prop".padEnd(13) +
-      "total->sub->raw".padEnd(28) +
+    'nested-prop'.padEnd(13) +
+      'total->sub->raw'.padEnd(28) +
       String(stats.nodes).padStart(6) +
       String(stats.depth).padStart(6) +
-      "-".padStart(15) +
+      '-'.padStart(15) +
       fmt(ev.opsPerSec).padStart(13) +
-      ev.nsPerOp.toFixed(0).padStart(13),
+      ev.nsPerOp.toFixed(0).padStart(13)
   );
 }
 
 // whole-table simulation: eval N rows for the complex grade formula
 console.log(
-  "\nwhole-table recompute simulation (mixed math+string+logic formula):",
+  '\nwhole-table recompute simulation (mixed math+string+logic formula):'
 );
 const tableAst = resolve(
   parseRaw(
-    'if(and(prop("a") > 0, prop("b") > 0), concat("ok:", toString(round(prop("a") / prop("b"), 2))), "n/a")',
+    'if(and(prop("a") > 0, prop("b") > 0), concat("ok:", toString(round(prop("a") / prop("b"), 2))), "n/a")'
   ),
-  nameToId,
+  nameToId
 ).ast;
 for (const rows of [1_000, 10_000, 100_000]) {
   const ctx = mkCtx(baseProps);
@@ -323,7 +323,7 @@ for (const rows of [1_000, 10_000, 100_000]) {
   }
   const ms = Number(process.hrtime.bigint() - t0) / 1e6;
   console.log(
-    `  ${fmt(rows).padStart(6)} rows  ->  ${ms.toFixed(1)} ms   (${fmt((rows / ms) * 1000)} rows/sec)`,
+    `  ${fmt(rows).padStart(6)} rows  ->  ${ms.toFixed(1)} ms   (${fmt((rows / ms) * 1000)} rows/sec)`
   );
 }
 console.log();

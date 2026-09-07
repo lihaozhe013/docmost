@@ -108,7 +108,7 @@ export const AuditEvent = {
 
   // Template
   TEMPLATE_CREATED: 'template.created',
-  TEMPLATE_DELETED: 'template.deleted',
+  TEMPLATE_DELETED: 'template.deleted'
 } as const;
 
 export type AuditEventType = (typeof AuditEvent)[keyof typeof AuditEvent];
@@ -122,7 +122,7 @@ export const EXCLUDED_AUDIT_EVENTS: Set<string> = new Set([
   AuditEvent.COMMENT_RESOLVED,
   AuditEvent.COMMENT_REOPENED,
   AuditEvent.ATTACHMENT_UPLOADED,
-  AuditEvent.SIEM_DESTINATION_TEST,
+  AuditEvent.SIEM_DESTINATION_TEST
 ]);
 
 export const AuditResource = {
@@ -142,7 +142,7 @@ export const AuditResource = {
   WORKSPACE_INVITATION: 'workspace_invitation',
   ATTACHMENT: 'attachment',
   SIEM_DESTINATION: 'siem_destination',
-  TEMPLATE: 'template',
+  TEMPLATE: 'template'
 } as const;
 
 export type AuditResourceType =

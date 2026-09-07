@@ -14,7 +14,7 @@ export class TrashCleanupService {
 
   constructor(
     @InjectKysely() private readonly db: KyselyDB,
-    @InjectQueue(QueueName.ATTACHMENT_QUEUE) private attachmentQueue: Queue,
+    @InjectQueue(QueueName.ATTACHMENT_QUEUE) private attachmentQueue: Queue
   ) {}
 
   @Interval('trash-cleanup', 24 * 60 * 60 * 1000) // every 24 hours
@@ -51,7 +51,7 @@ export class TrashCleanupService {
           } catch (error) {
             this.logger.error(
               `Failed to cleanup page ${page.id}: ${error instanceof Error ? error.message : 'Unknown error'}`,
-              error instanceof Error ? error.stack : undefined,
+              error instanceof Error ? error.stack : undefined
             );
           }
         }
@@ -60,12 +60,12 @@ export class TrashCleanupService {
       this.logger.debug(
         totalCleaned > 0
           ? `Trash cleanup completed: ${totalCleaned} pages cleaned`
-          : 'No old trash items to clean up',
+          : 'No old trash items to clean up'
       );
     } catch (error) {
       this.logger.error(
         'Trash cleanup job failed',
-        error instanceof Error ? error.stack : undefined,
+        error instanceof Error ? error.stack : undefined
       );
     }
   }
@@ -82,8 +82,8 @@ export class TrashCleanupService {
             exp
               .selectFrom('pages as p')
               .select(['p.id'])
-              .innerJoin('page_descendants as pd', 'pd.id', 'p.parentPageId'),
-          ),
+              .innerJoin('page_descendants as pd', 'pd.id', 'p.parentPageId')
+          )
       )
       .selectFrom('page_descendants')
       .selectAll()
@@ -92,7 +92,7 @@ export class TrashCleanupService {
     const pageIds = descendants.map((d) => d.id);
 
     this.logger.debug(
-      `Cleaning up page ${pageId} with ${pageIds.length - 1} descendants`,
+      `Cleaning up page ${pageId} with ${pageIds.length - 1} descendants`
     );
 
     // Queue attachment deletion for all pages with unique job IDs to prevent duplicates
@@ -100,16 +100,16 @@ export class TrashCleanupService {
       await this.attachmentQueue.add(
         QueueJob.DELETE_PAGE_ATTACHMENTS,
         {
-          pageId: id,
+          pageId: id
         },
         {
           jobId: `delete-page-attachments-${id}`,
           attempts: 3,
           backoff: {
             type: 'exponential',
-            delay: 5000,
-          },
-        },
+            delay: 5000
+          }
+        }
       );
     }
 
@@ -120,7 +120,7 @@ export class TrashCleanupService {
     } catch (error) {
       // Log but don't throw - pages might have been deleted by another node
       this.logger.warn(
-        `Error deleting pages, they may have been already deleted: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Error deleting pages, they may have been already deleted: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
   }

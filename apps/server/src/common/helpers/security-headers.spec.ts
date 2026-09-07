@@ -1,14 +1,14 @@
 import {
   resolveFrameHeader,
   resolveFrameHeadersForPath,
-  SecurityHeader,
+  SecurityHeader
 } from './security-headers';
 
 describe('resolveFrameHeader', () => {
   it('denies framing with X-Frame-Options when embedding is off', () => {
     expect(resolveFrameHeader(false, [])).toEqual({
       name: 'X-Frame-Options',
-      value: 'SAMEORIGIN',
+      value: 'SAMEORIGIN'
     });
   });
 
@@ -17,18 +17,19 @@ describe('resolveFrameHeader', () => {
   });
 
   it('emits a frame-ancestors CSP for the allowed origins', () => {
-    expect(resolveFrameHeader(true, ['https://a.example', 'https://b.example']))
-      .toEqual({
-        name: 'Content-Security-Policy',
-        value: "frame-ancestors 'self' https://a.example https://b.example",
-      });
+    expect(
+      resolveFrameHeader(true, ['https://a.example', 'https://b.example'])
+    ).toEqual({
+      name: 'Content-Security-Policy',
+      value: "frame-ancestors 'self' https://a.example https://b.example"
+    });
   });
 });
 
 describe('resolveFrameHeadersForPath', () => {
   const configured: SecurityHeader = {
     name: 'Content-Security-Policy',
-    value: "frame-ancestors 'self' https://a.example",
+    value: "frame-ancestors 'self' https://a.example"
   };
 
   it.each(['/oauth/consent', '/oauth/consent/nested'])(
@@ -36,27 +37,27 @@ describe('resolveFrameHeadersForPath', () => {
     (path) => {
       expect(resolveFrameHeadersForPath(path, configured)).toEqual([
         { name: 'X-Frame-Options', value: 'DENY' },
-        { name: 'Content-Security-Policy', value: "frame-ancestors 'none'" },
+        { name: 'Content-Security-Policy', value: "frame-ancestors 'none'" }
       ]);
-    },
+    }
   );
 
   it('force-denies consent even when the global header is absent', () => {
     expect(resolveFrameHeadersForPath('/oauth/consent', null)).toEqual([
       { name: 'X-Frame-Options', value: 'DENY' },
-      { name: 'Content-Security-Policy', value: "frame-ancestors 'none'" },
+      { name: 'Content-Security-Policy', value: "frame-ancestors 'none'" }
     ]);
   });
 
   it('does not match an unrelated path that merely contains the prefix', () => {
     expect(
-      resolveFrameHeadersForPath('/oauth/consenting-adults', configured),
+      resolveFrameHeadersForPath('/oauth/consenting-adults', configured)
     ).toEqual([configured]);
   });
 
   it('passes the configured header through for other paths', () => {
     expect(resolveFrameHeadersForPath('/home', configured)).toEqual([
-      configured,
+      configured
     ]);
   });
 

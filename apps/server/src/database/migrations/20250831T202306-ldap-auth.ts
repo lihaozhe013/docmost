@@ -12,7 +12,7 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .alterTable('users')
     .addColumn('has_generated_password', 'boolean', (col) =>
-      col.notNull().defaultTo(false).ifNotExists(),
+      col.notNull().defaultTo(false).ifNotExists()
     )
     .execute();
 
@@ -24,7 +24,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('ldap_base_dn', 'varchar', (col) => col)
     .addColumn('ldap_user_search_filter', 'varchar', (col) => col)
     .addColumn('ldap_user_attributes', 'jsonb', (col) =>
-      col.defaultTo(sql`'{}'::jsonb`),
+      col.defaultTo(sql`'{}'::jsonb`)
     )
     .addColumn('ldap_tls_enabled', 'boolean', (col) => col.defaultTo(false))
     .addColumn('ldap_tls_ca_cert', 'text', (col) => col)

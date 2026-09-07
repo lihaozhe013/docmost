@@ -4,20 +4,20 @@ import {
   UnstyledButton,
   Badge,
   Table,
-  Button,
-} from "@mantine/core";
-import { Link } from "react-router-dom";
-import PageListSkeleton from "@/components/ui/page-list-skeleton.tsx";
-import { buildPageUrl, getPageTitle } from "@/features/page/page.utils.ts";
-import { formattedDate } from "@/lib/time.ts";
-import { useRecentChangesQuery } from "@/features/page/queries/page-query.ts";
-import { PageListIcon } from "@/components/common/page-list-icon";
-import { IconFiles } from "@tabler/icons-react";
-import { EmptyState } from "@/components/ui/empty-state.tsx";
-import { getSpaceUrl } from "@/lib/config.ts";
-import { useTranslation } from "react-i18next";
-import { getInitialsColor } from "@/lib/get-initials-color.ts";
-import rowClasses from "@/components/ui/clickable-table-row.module.css";
+  Button
+} from '@mantine/core';
+import { Link } from 'react-router-dom';
+import PageListSkeleton from '@/components/ui/page-list-skeleton.tsx';
+import { buildPageUrl, getPageTitle } from '@/features/page/page.utils.ts';
+import { formattedDate } from '@/lib/time.ts';
+import { useRecentChangesQuery } from '@/features/page/queries/page-query.ts';
+import { PageListIcon } from '@/components/common/page-list-icon';
+import { IconFiles } from '@tabler/icons-react';
+import { EmptyState } from '@/components/ui/empty-state.tsx';
+import { getSpaceUrl } from '@/lib/config.ts';
+import { useTranslation } from 'react-i18next';
+import { getInitialsColor } from '@/lib/get-initials-color.ts';
+import rowClasses from '@/components/ui/clickable-table-row.module.css';
 
 interface Props {
   spaceId?: string;
@@ -25,7 +25,14 @@ interface Props {
 
 export default function RecentChanges({ spaceId }: Props) {
   const { t } = useTranslation();
-  const { data, isLoading, isError, hasNextPage, fetchNextPage, isFetchingNextPage } = useRecentChangesQuery(spaceId);
+  const {
+    data,
+    isLoading,
+    isError,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage
+  } = useRecentChangesQuery(spaceId);
   const pages = data?.pages.flatMap((p) => p.items) ?? [];
 
   if (isLoading) {
@@ -33,7 +40,7 @@ export default function RecentChanges({ spaceId }: Props) {
   }
 
   if (isError) {
-    return <Text>{t("Failed to fetch recent pages")}</Text>;
+    return <Text>{t('Failed to fetch recent pages')}</Text>;
   }
 
   return pages.length > 0 ? (
@@ -65,7 +72,7 @@ export default function RecentChanges({ spaceId }: Props) {
                       variant="light"
                       component={Link}
                       to={getSpaceUrl(page?.space.slug)}
-                      style={{ cursor: "pointer" }}
+                      style={{ cursor: 'pointer' }}
                     >
                       {page?.space.name}
                     </Badge>
@@ -74,7 +81,7 @@ export default function RecentChanges({ spaceId }: Props) {
                 <Table.Td>
                   <Text
                     c="dimmed"
-                    style={{ whiteSpace: "nowrap" }}
+                    style={{ whiteSpace: 'nowrap' }}
                     size="xs"
                     fw={500}
                   >
@@ -95,15 +102,15 @@ export default function RecentChanges({ spaceId }: Props) {
           onClick={() => fetchNextPage()}
           loading={isFetchingNextPage}
         >
-          {t("Load more")}
+          {t('Load more')}
         </Button>
       )}
     </>
   ) : (
     <EmptyState
       icon={IconFiles}
-      title={t("No pages yet")}
-      description={t("Pages you create will show up here.")}
+      title={t('No pages yet')}
+      description={t('Pages you create will show up here.')}
     />
   );
 }

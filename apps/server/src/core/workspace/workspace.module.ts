@@ -8,6 +8,6 @@ import { TokenModule } from '../auth/token.module';
   imports: [SpaceModule, TokenModule],
   controllers: [WorkspaceController],
   providers: [WorkspaceService],
-  exports: [WorkspaceService],
+  exports: [WorkspaceService]
 })
 export class WorkspaceModule {}

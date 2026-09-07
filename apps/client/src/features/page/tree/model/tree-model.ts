@@ -2,7 +2,7 @@ import type { TreeNode, SiblingsInfo } from './tree-model.types';
 
 function findInternal<T extends object>(
   nodes: TreeNode<T>[],
-  id: string,
+  id: string
 ): { parents: TreeNode<T>[]; node: TreeNode<T> } | null {
   for (const node of nodes) {
     if (node.id === id) return { parents: [], node };
@@ -19,7 +19,10 @@ export const treeModel = {
     return findInternal(tree, id)?.node ?? null;
   },
 
-  path<T extends object>(tree: TreeNode<T>[], id: string): TreeNode<T>[] | null {
+  path<T extends object>(
+    tree: TreeNode<T>[],
+    id: string
+  ): TreeNode<T>[] | null {
     const found = findInternal(tree, id);
     if (!found) return null;
     return [...found.parents, found.node];
@@ -27,7 +30,7 @@ export const treeModel = {
 
   siblingsOf<T extends object>(
     tree: TreeNode<T>[],
-    id: string,
+    id: string
   ): SiblingsInfo<T> | null {
     const found = findInternal(tree, id);
     if (!found) return null;
@@ -36,14 +39,14 @@ export const treeModel = {
     return {
       parentId: parent?.id ?? null,
       siblings,
-      index: siblings.findIndex((n) => n.id === id),
+      index: siblings.findIndex((n) => n.id === id)
     };
   },
 
   isDescendant<T extends object>(
     tree: TreeNode<T>[],
     ancestorId: string,
-    descendantId: string,
+    descendantId: string
   ): boolean {
     if (ancestorId === descendantId) return false;
     const ancestor = treeModel.find(tree, ancestorId);
@@ -53,7 +56,7 @@ export const treeModel = {
 
   visible<T extends object>(
     tree: TreeNode<T>[],
-    openIds: ReadonlySet<string>,
+    openIds: ReadonlySet<string>
   ): TreeNode<T>[] {
     const out: TreeNode<T>[] = [];
     const walk = (nodes: TreeNode<T>[]) => {
@@ -70,7 +73,7 @@ export const treeModel = {
     tree: TreeNode<T>[],
     parentId: string | null,
     node: TreeNode<T>,
-    index?: number,
+    index?: number
   ): TreeNode<T>[] {
     if (parentId === null) {
       const idx = index ?? tree.length;
@@ -85,7 +88,7 @@ export const treeModel = {
           const idx = index ?? kids.length;
           return {
             ...n,
-            children: [...kids.slice(0, idx), node, ...kids.slice(idx)],
+            children: [...kids.slice(0, idx), node, ...kids.slice(idx)]
           };
         }
         if (n.children) {
@@ -126,7 +129,7 @@ export const treeModel = {
   update<T extends object>(
     tree: TreeNode<T>[],
     id: string,
-    patch: Omit<Partial<T>, "id" | "children">,
+    patch: Omit<Partial<T>, 'id' | 'children'>
   ): TreeNode<T>[] {
     let touched = false;
     const walk = (nodes: TreeNode<T>[]): TreeNode<T>[] =>
@@ -148,7 +151,7 @@ export const treeModel = {
   appendChildren<T extends object>(
     tree: TreeNode<T>[],
     parentId: string,
-    children: TreeNode<T>[],
+    children: TreeNode<T>[]
   ): TreeNode<T>[] {
     let touched = false;
     const walk = (nodes: TreeNode<T>[]): TreeNode<T>[] =>
@@ -177,7 +180,7 @@ export const treeModel = {
   place<T extends object>(
     tree: TreeNode<T>[],
     sourceId: string,
-    to: { parentId: string | null; index: number },
+    to: { parentId: string | null; index: number }
   ): TreeNode<T>[] {
     const source = treeModel.find(tree, sourceId);
     if (!source) return tree;
@@ -189,9 +192,10 @@ export const treeModel = {
   move<T extends object>(
     tree: TreeNode<T>[],
     sourceId: string,
-    op: import('./tree-model.types').DropOp,
+    op: import('./tree-model.types').DropOp
   ): { tree: TreeNode<T>[]; result: import('./tree-model.types').DropResult } {
-    if (sourceId === op.targetId) return { tree, result: { parentId: null, index: 0 } };
+    if (sourceId === op.targetId)
+      return { tree, result: { parentId: null, index: 0 } };
     if (!treeModel.find(tree, sourceId) || !treeModel.find(tree, op.targetId)) {
       return { tree, result: { parentId: null, index: 0 } };
     }
@@ -211,12 +215,11 @@ export const treeModel = {
       parentId = info.parentId;
       const sourceInfo = treeModel.siblingsOf(tree, sourceId)!;
       const sameParent = sourceInfo.parentId === parentId;
-      const adjust =
-        sameParent && sourceInfo.index < info.index ? -1 : 0;
+      const adjust = sameParent && sourceInfo.index < info.index ? -1 : 0;
       index = info.index + adjust + (op.kind === 'reorder-after' ? 1 : 0);
     }
 
     const next = treeModel.place(tree, sourceId, { parentId, index });
     return { tree: next, result: { parentId, index } };
-  },
+  }
 };

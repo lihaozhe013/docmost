@@ -4,17 +4,17 @@ import {
   Button,
   Text,
   Group,
-  PasswordInput,
-} from "@mantine/core";
-import { z } from "zod/v4";
-import { useState } from "react";
-import { useAtom } from "jotai";
-import { currentUserAtom } from "@/features/user/atoms/current-user-atom.ts";
-import { useDisclosure } from "@mantine/hooks";
-import * as React from "react";
-import { useForm } from "@mantine/form";
-import { zod4Resolver } from "mantine-form-zod-resolver";
-import { useTranslation } from "react-i18next";
+  PasswordInput
+} from '@mantine/core';
+import { z } from 'zod/v4';
+import { useState } from 'react';
+import { useAtom } from 'jotai';
+import { currentUserAtom } from '@/features/user/atoms/current-user-atom.ts';
+import { useDisclosure } from '@mantine/hooks';
+import * as React from 'react';
+import { useForm } from '@mantine/form';
+import { zod4Resolver } from 'mantine-form-zod-resolver';
+import { useTranslation } from 'react-i18next';
 
 export default function ChangeEmail() {
   const { t } = useTranslation();
@@ -24,7 +24,7 @@ export default function ChangeEmail() {
   return (
     <Group justify="space-between" wrap="nowrap" gap="xl">
       <div style={{ minWidth: 0, flex: 1 }}>
-        <Text size="md">{t("Email")}</Text>
+        <Text size="md">{t('Email')}</Text>
         <Text size="sm" c="dimmed">
           {currentUser?.user.email}
         </Text>
@@ -39,13 +39,13 @@ export default function ChangeEmail() {
       <Modal
         opened={opened}
         onClose={close}
-        title={t("Change email")}
+        title={t('Change email')}
         centered
-        closeButtonProps={{ "aria-label": t("Close") }}
+        closeButtonProps={{ 'aria-label': t('Close') }}
       >
         <Text mb="md">
           {t(
-            "To change your email, you have to enter your password and new email.",
+            'To change your email, you have to enter your password and new email.'
           )}
         </Text>
         <ChangeEmailForm />
@@ -55,10 +55,8 @@ export default function ChangeEmail() {
 }
 
 const formSchema = z.object({
-  email: z.email({ error: "New email is required" }),
-  password: z
-    .string({ error: "your current password is required" })
-    .min(8),
+  email: z.email({ error: 'New email is required' }),
+  password: z.string({ error: 'your current password is required' }).min(8)
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -70,9 +68,9 @@ function ChangeEmailForm() {
   const form = useForm<FormValues>({
     validate: zod4Resolver(formSchema),
     initialValues: {
-      password: "",
-      email: "",
-    },
+      password: '',
+      email: ''
+    }
   });
 
   function handleSubmit(data: FormValues) {
@@ -82,30 +80,30 @@ function ChangeEmailForm() {
   return (
     <form onSubmit={form.onSubmit(handleSubmit)}>
       <PasswordInput
-        label={t("Password")}
-        placeholder={t("Enter your password")}
+        label={t('Password')}
+        placeholder={t('Enter your password')}
         variant="filled"
         mb="md"
         visibilityToggleButtonProps={{
-          "aria-label": t("Toggle password visibility"),
-          "aria-hidden": false,
-          tabIndex: 0,
+          'aria-label': t('Toggle password visibility'),
+          'aria-hidden': false,
+          tabIndex: 0
         }}
-        {...form.getInputProps("password")}
+        {...form.getInputProps('password')}
       />
 
       <TextInput
         id="email"
-        label={t("Email")}
-        description={t("Enter your new preferred email")}
-        placeholder={t("New email")}
+        label={t('Email')}
+        description={t('Enter your new preferred email')}
+        placeholder={t('New email')}
         variant="filled"
         mb="md"
-        {...form.getInputProps("email")}
+        {...form.getInputProps('email')}
       />
 
       <Button type="submit" disabled={isLoading} loading={isLoading}>
-        {t("Change email")}
+        {t('Change email')}
       </Button>
     </form>
   );

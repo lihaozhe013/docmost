@@ -39,7 +39,7 @@ export class CollabProxySocket implements WebSocketLike {
     const msg: RSAMessageSend = {
       type: 'send',
       socketId: this.socketId,
-      message,
+      message
     };
     this.publish(msg);
   }

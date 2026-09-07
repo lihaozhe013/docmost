@@ -1,7 +1,7 @@
-import { useMemo } from "react";
-import { useAtomValue } from "jotai";
-import { sharedTreeDataAtom } from "@/features/share/atoms/shared-page-atom";
-import { SharedPageTreeNode } from "@/features/share/utils";
+import { useMemo } from 'react';
+import { useAtomValue } from 'jotai';
+import { sharedTreeDataAtom } from '@/features/share/atoms/shared-page-atom';
+import { SharedPageTreeNode } from '@/features/share/utils';
 
 export function useSharedPageSubpages(pageId: string | undefined) {
   const treeData = useAtomValue(sharedTreeDataAtom);

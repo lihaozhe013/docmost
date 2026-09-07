@@ -10,6 +10,6 @@ import { TokenModule } from '../auth/token.module';
 @Module({
   imports: [StorageModule, UserModule, WorkspaceModule, TokenModule],
   controllers: [AttachmentController],
-  providers: [AttachmentService, AttachmentProcessor],
+  providers: [AttachmentService, AttachmentProcessor]
 })
 export class AttachmentModule {}

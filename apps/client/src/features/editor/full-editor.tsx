@@ -1,7 +1,7 @@
-import classes from "@/features/editor/styles/editor.module.css";
-import React, { useEffect } from "react";
-import { TitleEditor } from "@/features/editor/title-editor";
-import PageEditor from "@/features/editor/page-editor";
+import classes from '@/features/editor/styles/editor.module.css';
+import React, { useEffect } from 'react';
+import { TitleEditor } from '@/features/editor/title-editor';
+import PageEditor from '@/features/editor/page-editor';
 import {
   ActionIcon,
   Container,
@@ -11,20 +11,20 @@ import {
   Stack,
   Text,
   Tooltip,
-  UnstyledButton,
-} from "@mantine/core";
-import { IconInfoCircle } from "@tabler/icons-react";
-import { useAtom } from "jotai";
-import { userAtom } from "@/features/user/atoms/current-user-atom.ts";
-import { CustomAvatar } from "@/components/ui/custom-avatar.tsx";
-import { useTranslation } from "react-i18next";
-import { IContributor } from "@/features/page/types/page.types.ts";
-import { FixedToolbar } from "@/features/editor/components/fixed-toolbar/fixed-toolbar";
-import { PageEditMode } from "@/features/user/types/user.types.ts";
-import { useAsideTriggerProps } from "@/hooks/use-toggle-aside.tsx";
-import { DeletedPageBanner } from "@/features/page/trash/components/deleted-page-banner.tsx";
-import clsx from "clsx";
-import { currentPageEditModeAtom } from "@/features/editor/atoms/editor-atoms.ts";
+  UnstyledButton
+} from '@mantine/core';
+import { IconInfoCircle } from '@tabler/icons-react';
+import { useAtom } from 'jotai';
+import { userAtom } from '@/features/user/atoms/current-user-atom.ts';
+import { CustomAvatar } from '@/components/ui/custom-avatar.tsx';
+import { useTranslation } from 'react-i18next';
+import { IContributor } from '@/features/page/types/page.types.ts';
+import { FixedToolbar } from '@/features/editor/components/fixed-toolbar/fixed-toolbar';
+import { PageEditMode } from '@/features/user/types/user.types.ts';
+import { useAsideTriggerProps } from '@/hooks/use-toggle-aside.tsx';
+import { DeletedPageBanner } from '@/features/page/trash/components/deleted-page-banner.tsx';
+import clsx from 'clsx';
+import { currentPageEditModeAtom } from '@/features/editor/atoms/editor-atoms.ts';
 
 const MemoizedTitleEditor = React.memo(TitleEditor);
 const MemoizedPageEditor = React.memo(PageEditor);
@@ -62,14 +62,14 @@ export function FullEditor({
   editable,
   creator,
   contributors,
-  canComment,
+  canComment
 }: FullEditorProps) {
   const [user] = useAtom(userAtom);
   const fullPageWidth = user.settings?.preferences?.fullPageWidth;
   const editorToolbarEnabled =
     user.settings?.preferences?.editorToolbar ?? false;
   const [currentPageEditMode, setCurrentPageEditMode] = useAtom(
-    currentPageEditModeAtom,
+    currentPageEditModeAtom
   );
   const userPageEditMode =
     user.settings?.preferences?.pageEditMode ?? PageEditMode.Edit;
@@ -89,7 +89,7 @@ export function FullEditor({
       fluid={fullPageWidth}
       size={!fullPageWidth && 900}
       className={classes.editor}
-      style={{ display: "flex", flexDirection: "column" }}
+      style={{ display: 'flex', flexDirection: 'column' }}
     >
       {editorToolbarEnabled && editable && isEditMode && (
         <MemoizedFixedToolbar />
@@ -125,24 +125,24 @@ type PageBylineProps = {
 
 function PageByline({ creator, contributors, readOnly }: PageBylineProps) {
   const { t } = useTranslation();
-  const detailsTriggerProps = useAsideTriggerProps("details");
+  const detailsTriggerProps = useAsideTriggerProps('details');
 
   const otherContributors = (contributors ?? []).filter(
-    (c) => c.id !== creator?.id,
+    (c) => c.id !== creator?.id
   );
 
   return (
     <Group
       gap="sm"
       mb="md"
-      className={clsx("print-hide", classes.byline)}
-      style={{ marginTop: "-0.5em" }}
+      className={clsx('print-hide', classes.byline)}
+      style={{ marginTop: '-0.5em' }}
     >
       {creator && (
         <Popover position="bottom-start" shadow="md" width={280} withArrow>
           <Popover.Target>
             <UnstyledButton
-              aria-label={t("Created by {{name}}", { name: creator.name })}
+              aria-label={t('Created by {{name}}', { name: creator.name })}
             >
               <Group gap={6}>
                 <CustomAvatar
@@ -151,7 +151,7 @@ function PageByline({ creator, contributors, readOnly }: PageBylineProps) {
                   size={22}
                 />
                 <Text size="sm" c="dimmed">
-                  {t("By {{name}}", { name: creator.name })}
+                  {t('By {{name}}', { name: creator.name })}
                 </Text>
               </Group>
             </UnstyledButton>
@@ -170,8 +170,8 @@ function PageByline({ creator, contributors, readOnly }: PageBylineProps) {
                   </Text>
                   <Text size="xs" c="dimmed">
                     {otherContributors.length === 0
-                      ? t("Owner, no contributors")
-                      : t("Owner")}
+                      ? t('Owner, no contributors')
+                      : t('Owner')}
                   </Text>
                 </div>
               </Group>
@@ -180,7 +180,7 @@ function PageByline({ creator, contributors, readOnly }: PageBylineProps) {
                 <>
                   <Divider />
                   <Text size="xs" fw={500} c="dimmed" tt="uppercase">
-                    {t("Contributors")}
+                    {t('Contributors')}
                   </Text>
                   <Stack gap={6}>
                     {otherContributors.map((contributor) => (
@@ -200,11 +200,11 @@ function PageByline({ creator, contributors, readOnly }: PageBylineProps) {
           </Popover.Dropdown>
         </Popover>
       )}
-      <Tooltip label={t("Details")} withArrow openDelay={250}>
+      <Tooltip label={t('Details')} withArrow openDelay={250}>
         <ActionIcon
           variant="subtle"
           color="gray"
-          aria-label={t("Details")}
+          aria-label={t('Details')}
           {...detailsTriggerProps}
         >
           <IconInfoCircle size={20} stroke={1.5} />

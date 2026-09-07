@@ -15,7 +15,10 @@ const tableReadonlySortKey = new PluginKey('tableReadonlySort');
 const sortStates = new WeakMap<HTMLTableElement, SortState>();
 const originalOrders = new WeakMap<HTMLTableElement, HTMLTableRowElement[]>();
 
-const collator = new Intl.Collator(undefined, { sensitivity: 'base', numeric: true });
+const collator = new Intl.Collator(undefined, {
+  sensitivity: 'base',
+  numeric: true,
+});
 
 function getColumnIndex(th: HTMLTableCellElement): number {
   const row = th.parentElement as HTMLTableRowElement;
@@ -87,7 +90,9 @@ function applySort(table: HTMLTableElement, colIndex: number): void {
   const tbody = table.querySelector('tbody');
   if (!tbody) return;
 
-  const allRows = Array.from(tbody.querySelectorAll<HTMLTableRowElement>(':scope > tr'));
+  const allRows = Array.from(
+    tbody.querySelectorAll<HTMLTableRowElement>(':scope > tr'),
+  );
   if (allRows.length === 0) return;
 
   const headerRow = allRows[0];

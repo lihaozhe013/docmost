@@ -2,7 +2,7 @@ import { Readable } from 'stream';
 import {
   AzureStorageConfig,
   StorageDriver,
-  StorageOption,
+  StorageOption
 } from '../interfaces';
 import {
   BlobSASPermissions,
@@ -11,7 +11,7 @@ import {
   ContainerClient,
   generateBlobSASQueryParameters,
   SASProtocol,
-  StorageSharedKeyCredential,
+  StorageSharedKeyCredential
 } from '@azure/storage-blob';
 import { Logger } from '@nestjs/common';
 import { getMimeType } from '../../../common/helpers';
@@ -37,17 +37,16 @@ export class AzureDriver implements StorageDriver {
     }
 
     this.accountUrl =
-      config.endpoint ??
-      `https://${config.accountName}.blob.core.windows.net`;
+      config.endpoint ?? `https://${config.accountName}.blob.core.windows.net`;
 
     this.sharedKeyCredential = new StorageSharedKeyCredential(
       config.accountName,
-      config.accountKey,
+      config.accountKey
     );
 
     this.blobServiceClient = this.createBlobServiceClient();
     this.containerClient = this.blobServiceClient.getContainerClient(
-      config.container,
+      config.container
     );
   }
 
@@ -63,7 +62,7 @@ export class AzureDriver implements StorageDriver {
   async uploadStream(
     filePath: string,
     file: Readable,
-    options?: { recreateClient?: boolean },
+    options?: { recreateClient?: boolean }
   ): Promise<void> {
     const clientToUse = options?.recreateClient
       ? this.createBlobServiceClient()
@@ -74,7 +73,7 @@ export class AzureDriver implements StorageDriver {
     try {
       const contentType = getMimeType(filePath);
       await clientToUse.uploadStream(file, undefined, undefined, {
-        blobHTTPHeaders: { blobContentType: contentType },
+        blobHTTPHeaders: { blobContentType: contentType }
       });
     } catch (err) {
       Logger.error(err);
@@ -100,7 +99,7 @@ export class AzureDriver implements StorageDriver {
       return await this.blockBlob(filePath).downloadToBuffer();
     } catch (err) {
       throw new Error(
-        `Failed to read file from Azure: ${(err as Error).message}`,
+        `Failed to read file from Azure: ${(err as Error).message}`
       );
     }
   }
@@ -111,25 +110,25 @@ export class AzureDriver implements StorageDriver {
       return response.readableStreamBody as Readable;
     } catch (err) {
       throw new Error(
-        `Failed to read file from Azure: ${(err as Error).message}`,
+        `Failed to read file from Azure: ${(err as Error).message}`
       );
     }
   }
 
   async readRangeStream(
     filePath: string,
-    range: { start: number; end: number },
+    range: { start: number; end: number }
   ): Promise<Readable> {
     try {
       const count = range.end - range.start + 1;
       const response = await this.blockBlob(filePath).download(
         range.start,
-        count,
+        count
       );
       return response.readableStreamBody as Readable;
     } catch (err) {
       throw new Error(
-        `Failed to read file from Azure: ${(err as Error).message}`,
+        `Failed to read file from Azure: ${(err as Error).message}`
       );
     }
   }
@@ -139,7 +138,7 @@ export class AzureDriver implements StorageDriver {
       return await this.blockBlob(filePath).exists();
     } catch (err) {
       throw new Error(
-        `Failed to check existence in Azure: ${(err as Error).message}`,
+        `Failed to check existence in Azure: ${(err as Error).message}`
       );
     }
   }
@@ -157,9 +156,9 @@ export class AzureDriver implements StorageDriver {
         blobName: filePath,
         permissions: BlobSASPermissions.parse('r'),
         expiresOn,
-        protocol: SASProtocol.HttpsAndHttp,
+        protocol: SASProtocol.HttpsAndHttp
       },
-      this.sharedKeyCredential,
+      this.sharedKeyCredential
     ).toString();
     return `${this.accountUrl}/${this.config.container}/${filePath}?${sas}`;
   }
@@ -169,7 +168,7 @@ export class AzureDriver implements StorageDriver {
       await this.blockBlob(filePath).delete();
     } catch (err) {
       throw new Error(
-        `Error deleting file ${filePath} from Azure: ${(err as Error).message}`,
+        `Error deleting file ${filePath} from Azure: ${(err as Error).message}`
       );
     }
   }

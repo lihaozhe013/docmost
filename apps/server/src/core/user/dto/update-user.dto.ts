@@ -6,12 +6,12 @@ import {
   IsOptional,
   IsString,
   MaxLength,
-  MinLength,
+  MinLength
 } from 'class-validator';
 import { CreateUserDto } from '../../auth/dto/create-user.dto';
 
 export class UpdateUserDto extends PartialType(
-  OmitType(CreateUserDto, ['password'] as const),
+  OmitType(CreateUserDto, ['password'] as const)
 ) {
   @IsOptional()
   @IsBoolean()

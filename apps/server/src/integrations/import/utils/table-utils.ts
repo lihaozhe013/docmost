@@ -30,7 +30,7 @@ function parsePixelWidth(el: Cheerio<any>): number | null {
  */
 function deriveColumnWidths(
   $: CheerioAPI,
-  table: Cheerio<any>,
+  table: Cheerio<any>
 ): (number | null)[] | null {
   const cols = table.find('> colgroup > col');
   if (cols.length > 0) {
@@ -68,7 +68,7 @@ function deriveColumnWidths(
  */
 export function normalizeTableColumnWidths(
   $: CheerioAPI,
-  $root: Cheerio<any>,
+  $root: Cheerio<any>
 ): void {
   $root.find('table').each(function () {
     const table = $(this);

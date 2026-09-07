@@ -6,6 +6,6 @@ import { UserRepo } from '@docmost/db/repos/user/user.repo';
 @Module({
   controllers: [UserController],
   providers: [UserService, UserRepo],
-  exports: [UserService, UserRepo],
+  exports: [UserService, UserRepo]
 })
 export class UserModule {}

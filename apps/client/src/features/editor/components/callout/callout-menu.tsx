@@ -1,25 +1,29 @@
-import { BubbleMenu as BaseBubbleMenu } from "@tiptap/react/menus";
-import { findParentNode, posToDOMRect, useEditorState } from "@tiptap/react";
-import React, { useCallback } from "react";
-import { Node as PMNode } from "@tiptap/pm/model";
+import { BubbleMenu as BaseBubbleMenu } from '@tiptap/react/menus';
+import { findParentNode, posToDOMRect, useEditorState } from '@tiptap/react';
+import React, { useCallback } from 'react';
+import { Node as PMNode } from '@tiptap/pm/model';
 import {
   EditorMenuProps,
-  ShouldShowProps,
-} from "@/features/editor/components/table/types/types.ts";
-import { ActionIcon, Tooltip } from "@mantine/core";
-import clsx from "clsx";
+  ShouldShowProps
+} from '@/features/editor/components/table/types/types.ts';
+import { ActionIcon, Tooltip } from '@mantine/core';
+import clsx from 'clsx';
 import {
   IconAlertTriangleFilled,
   IconCircleCheckFilled,
   IconCircleXFilled,
   IconInfoCircleFilled,
   IconMoodSmile,
-  IconNotes,
-} from "@tabler/icons-react";
-import { CalloutType, isEditorReady, isTextSelected } from "@docmost/editor-ext";
-import { useTranslation } from "react-i18next";
-import EmojiPicker from "@/components/ui/emoji-picker.tsx";
-import classes from "../common/toolbar-menu.module.css";
+  IconNotes
+} from '@tabler/icons-react';
+import {
+  CalloutType,
+  isEditorReady,
+  isTextSelected
+} from '@docmost/editor-ext';
+import { useTranslation } from 'react-i18next';
+import EmojiPicker from '@/components/ui/emoji-picker.tsx';
+import classes from '../common/toolbar-menu.module.css';
 
 export function CalloutMenu({ editor }: EditorMenuProps) {
   const { t } = useTranslation();
@@ -31,9 +35,9 @@ export function CalloutMenu({ editor }: EditorMenuProps) {
       }
       if (isTextSelected(editor)) return false;
 
-      return editor.isActive("callout");
+      return editor.isActive('callout');
     },
-    [editor],
+    [editor]
   );
 
   const editorState = useEditorState({
@@ -44,20 +48,20 @@ export function CalloutMenu({ editor }: EditorMenuProps) {
       }
 
       return {
-        isCallout: ctx.editor.isActive("callout"),
-        isInfo: ctx.editor.isActive("callout", { type: "info" }),
-        isNote: ctx.editor.isActive("callout", { type: "note" }),
-        isSuccess: ctx.editor.isActive("callout", { type: "success" }),
-        isWarning: ctx.editor.isActive("callout", { type: "warning" }),
-        isDanger: ctx.editor.isActive("callout", { type: "danger" }),
+        isCallout: ctx.editor.isActive('callout'),
+        isInfo: ctx.editor.isActive('callout', { type: 'info' }),
+        isNote: ctx.editor.isActive('callout', { type: 'note' }),
+        isSuccess: ctx.editor.isActive('callout', { type: 'success' }),
+        isWarning: ctx.editor.isActive('callout', { type: 'warning' }),
+        isDanger: ctx.editor.isActive('callout', { type: 'danger' })
       };
-    },
+    }
   });
 
   const getReferencedVirtualElement = useCallback(() => {
     if (!isEditorReady(editor)) return;
     const { selection } = editor.state;
-    const predicate = (node: PMNode) => node.type.name === "callout";
+    const predicate = (node: PMNode) => node.type.name === 'callout';
     const parent = findParentNode(predicate)(selection);
 
     if (parent) {
@@ -65,14 +69,14 @@ export function CalloutMenu({ editor }: EditorMenuProps) {
       const domRect = dom.getBoundingClientRect();
       return {
         getBoundingClientRect: () => domRect,
-        getClientRects: () => [domRect],
+        getClientRects: () => [domRect]
       };
     }
 
     const domRect = posToDOMRect(editor.view, selection.from, selection.to);
     return {
       getBoundingClientRect: () => domRect,
-      getClientRects: () => [domRect],
+      getClientRects: () => [domRect]
     };
   }, [editor]);
 
@@ -84,7 +88,7 @@ export function CalloutMenu({ editor }: EditorMenuProps) {
         .updateCalloutType(calloutType)
         .run();
     },
-    [editor],
+    [editor]
   );
 
   const setCalloutIcon = useCallback(
@@ -96,20 +100,20 @@ export function CalloutMenu({ editor }: EditorMenuProps) {
         .updateCalloutIcon(emojiChar)
         .run();
     },
-    [editor],
+    [editor]
   );
 
   const removeCalloutIcon = useCallback(() => {
     editor
       .chain()
       .focus(undefined, { scrollIntoView: false })
-      .updateCalloutIcon("")
+      .updateCalloutIcon('')
       .run();
   }, [editor]);
 
   const getCurrentIcon = () => {
     const { selection } = editor.state;
-    const predicate = (node: PMNode) => node.type.name === "callout";
+    const predicate = (node: PMNode) => node.type.name === 'callout';
     const parent = findParentNode(predicate)(selection);
     const icon = parent?.node.attrs.icon;
     return icon || null;
@@ -124,19 +128,19 @@ export function CalloutMenu({ editor }: EditorMenuProps) {
       updateDelay={0}
       getReferencedVirtualElement={getReferencedVirtualElement}
       options={{
-        placement: "bottom",
+        placement: 'bottom',
         // offset: 233, //      //         offset: [0, 10],
         // zIndex: 99,
-        flip: false,
+        flip: false
       }}
       shouldShow={shouldShow}
     >
       <div className={classes.toolbar}>
-        <Tooltip position="top" label={t("Info")} withinPortal={false}>
+        <Tooltip position="top" label={t('Info')} withinPortal={false}>
           <ActionIcon
-            onClick={() => setCalloutType("info")}
+            onClick={() => setCalloutType('info')}
             size="lg"
-            aria-label={t("Info")}
+            aria-label={t('Info')}
             variant="subtle"
             className={clsx({ [classes.active]: editorState?.isInfo })}
           >
@@ -147,11 +151,11 @@ export function CalloutMenu({ editor }: EditorMenuProps) {
           </ActionIcon>
         </Tooltip>
 
-        <Tooltip position="top" label={t("Note")} withinPortal={false}>
+        <Tooltip position="top" label={t('Note')} withinPortal={false}>
           <ActionIcon
-            onClick={() => setCalloutType("note")}
+            onClick={() => setCalloutType('note')}
             size="lg"
-            aria-label={t("Note")}
+            aria-label={t('Note')}
             variant="subtle"
             className={clsx({ [classes.active]: editorState?.isNote })}
           >
@@ -159,11 +163,11 @@ export function CalloutMenu({ editor }: EditorMenuProps) {
           </ActionIcon>
         </Tooltip>
 
-        <Tooltip position="top" label={t("Success")} withinPortal={false}>
+        <Tooltip position="top" label={t('Success')} withinPortal={false}>
           <ActionIcon
-            onClick={() => setCalloutType("success")}
+            onClick={() => setCalloutType('success')}
             size="lg"
-            aria-label={t("Success")}
+            aria-label={t('Success')}
             variant="subtle"
             className={clsx({ [classes.active]: editorState?.isSuccess })}
           >
@@ -174,11 +178,11 @@ export function CalloutMenu({ editor }: EditorMenuProps) {
           </ActionIcon>
         </Tooltip>
 
-        <Tooltip position="top" label={t("Warning")} withinPortal={false}>
+        <Tooltip position="top" label={t('Warning')} withinPortal={false}>
           <ActionIcon
-            onClick={() => setCalloutType("warning")}
+            onClick={() => setCalloutType('warning')}
             size="lg"
-            aria-label={t("Warning")}
+            aria-label={t('Warning')}
             variant="subtle"
             className={clsx({ [classes.active]: editorState?.isWarning })}
           >
@@ -189,11 +193,11 @@ export function CalloutMenu({ editor }: EditorMenuProps) {
           </ActionIcon>
         </Tooltip>
 
-        <Tooltip position="top" label={t("Danger")} withinPortal={false}>
+        <Tooltip position="top" label={t('Danger')} withinPortal={false}>
           <ActionIcon
-            onClick={() => setCalloutType("danger")}
+            onClick={() => setCalloutType('danger')}
             size="lg"
-            aria-label={t("Danger")}
+            aria-label={t('Danger')}
             variant="subtle"
             className={clsx({ [classes.active]: editorState?.isDanger })}
           >
@@ -207,8 +211,8 @@ export function CalloutMenu({ editor }: EditorMenuProps) {
           readOnly={false}
           icon={currentIcon || <IconMoodSmile size={18} />}
           actionIconProps={{
-            size: "lg",
-            variant: "subtle",
+            size: 'lg',
+            variant: 'subtle'
           }}
         />
       </div>

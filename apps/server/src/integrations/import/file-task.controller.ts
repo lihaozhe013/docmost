@@ -6,18 +6,18 @@ import {
   HttpStatus,
   NotFoundException,
   Post,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import SpaceAbilityFactory from '../../core/casl/abilities/space-ability.factory';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { User, Workspace } from '@docmost/db/types/entity.types';
 import {
   SpaceCaslAction,
-  SpaceCaslSubject,
+  SpaceCaslSubject
 } from '../../core/casl/interfaces/space-ability.type';
 import {
   WorkspaceCaslAction,
-  WorkspaceCaslSubject,
+  WorkspaceCaslSubject
 } from '../../core/casl/interfaces/workspace-ability.type';
 import WorkspaceAbilityFactory from '../../core/casl/abilities/workspace-ability.factory';
 import { AuthWorkspace } from '../../common/decorators/auth-workspace.decorator';
@@ -35,7 +35,7 @@ export class FileTaskController {
     private readonly spaceAbility: SpaceAbilityFactory,
     private readonly workspaceAbility: WorkspaceAbilityFactory,
     private readonly spaceMemberRepo: SpaceMemberRepo,
-    @InjectKysely() private readonly db: KyselyDB,
+    @InjectKysely() private readonly db: KyselyDB
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -44,7 +44,7 @@ export class FileTaskController {
   async getFileTasks(
     @Body() pagination: PaginationOptions,
     @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace,
+    @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
     if (
@@ -56,14 +56,18 @@ export class FileTaskController {
     const query = this.db
       .selectFrom('fileTasks')
       .selectAll()
-      .where('spaceId', 'in', this.spaceMemberRepo.getUserSpaceIdsQuery(user.id));
+      .where(
+        'spaceId',
+        'in',
+        this.spaceMemberRepo.getUserSpaceIdsQuery(user.id)
+      );
 
     return executeWithCursorPagination(query, {
       perPage: pagination.limit,
       cursor: pagination.cursor,
       beforeCursor: pagination.beforeCursor,
       fields: [{ expression: 'id', direction: 'desc' }],
-      parseCursor: (cursor) => ({ id: cursor.id }),
+      parseCursor: (cursor) => ({ id: cursor.id })
     });
   }
 
@@ -83,7 +87,7 @@ export class FileTaskController {
 
     const ability = await this.spaceAbility.createForUser(
       user,
-      fileTask.spaceId,
+      fileTask.spaceId
     );
     if (ability.cannot(SpaceCaslAction.Read, SpaceCaslSubject.Page)) {
       throw new ForbiddenException();

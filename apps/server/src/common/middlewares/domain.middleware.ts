@@ -7,12 +7,12 @@ import { WorkspaceRepo } from '@docmost/db/repos/workspace/workspace.repo';
 export class DomainMiddleware implements NestMiddleware {
   constructor(
     private workspaceRepo: WorkspaceRepo,
-    private environmentService: EnvironmentService,
+    private environmentService: EnvironmentService
   ) {}
   async use(
     req: FastifyRequest['raw'],
     res: FastifyReply['raw'],
-    next: () => void,
+    next: () => void
   ) {
     if (this.environmentService.isSelfHosted()) {
       const workspace = await this.workspaceRepo.findFirst();

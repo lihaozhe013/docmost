@@ -1,13 +1,13 @@
-import { Transform } from "@tiptap/pm/transform";
-import { Node, Schema } from "@tiptap/pm/model";
-import { applyPatch, createPatch, Operation } from "rfc6902";
-import { diffWordsWithSpace, diffChars } from "diff";
-import { AnyObject } from "./types";
-import { getReplaceStep } from "./getReplaceStep";
-import { simplifyTransform } from "./simplifyTransform";
-import { removeMarks } from "./removeMarks";
-import { getFromPath } from "./getFromPath";
-import { copy } from "./copy";
+import { Transform } from '@tiptap/pm/transform';
+import { Node, Schema } from '@tiptap/pm/model';
+import { applyPatch, createPatch, Operation } from 'rfc6902';
+import { diffWordsWithSpace, diffChars } from 'diff';
+import { AnyObject } from './types';
+import { getReplaceStep } from './getReplaceStep';
+import { simplifyTransform } from './simplifyTransform';
+import { removeMarks } from './removeMarks';
+import { getFromPath } from './getFromPath';
+import { copy } from './copy';
 
 export interface Options {
   complexSteps?: boolean;
@@ -82,7 +82,7 @@ export class RecreateTransform {
 
       let toDoc;
       const afterStepJSON = copy(this.currentJSON); // working document receiving patches
-      const pathParts = op.path.split("/");
+      const pathParts = op.path.split('/');
 
       // collect operations until we receive a valid document:
       // apply ops-patches until a valid prosemirror document is retrieved,
@@ -108,7 +108,7 @@ export class RecreateTransform {
       if (
         this.complexSteps &&
         ops.length === 1 &&
-        (pathParts.includes("attrs") || pathParts.includes("type"))
+        (pathParts.includes('attrs') || pathParts.includes('type'))
       ) {
         // Node markup is changing
         this.addSetNodeMarkup(); // a lost update is ignored
@@ -116,8 +116,8 @@ export class RecreateTransform {
         // console.log("%cop", logStyle, "- update node", ops);
       } else if (
         ops.length === 1 &&
-        op.op === "replace" &&
-        pathParts[pathParts.length - 1] === "text"
+        op.op === 'replace' &&
+        pathParts[pathParts.length - 1] === 'text'
       ) {
         // Text is being replaced, we apply text diffing to find the smallest possible diffs.
         this.addReplaceTextSteps(op, afterStepJSON);
@@ -151,7 +151,7 @@ export class RecreateTransform {
       } catch (e: any) {
         // if nodetypes differ, the updated node-type and contents might not be compatible
         // with schema and requires a replace
-        if (nodeType && e.message.includes("Invalid content")) {
+        if (nodeType && e.message.includes('Invalid content')) {
           // @todo add test-case for this scenario
           this.tr.replaceWith(start, start + fromNode.nodeSize, toNode);
         } else {
@@ -209,14 +209,14 @@ export class RecreateTransform {
       return true; // @change previously null
     }
 
-    throw new Error("No valid step found.");
+    throw new Error('No valid step found.');
   }
 
   /** retrieve and possibly apply text replace-steps based from doc changes */
   addReplaceTextSteps(op, afterStepJSON) {
     // We find the position number of the first character in the string
-    const op1 = { ...op, value: "xx" };
-    const op2 = { ...op, value: "yy" };
+    const op1 = { ...op, value: 'xx' };
+    const op2 = { ...op, value: 'yy' };
     const afterOP1JSON = copy(this.currentJSON);
     const afterOP2JSON = copy(this.currentJSON);
     applyPatch(afterOP1JSON, [op1]);
@@ -239,7 +239,7 @@ export class RecreateTransform {
 
       if (diff.added) {
         const textNode = this.schema
-          .nodeFromJSON({ type: "text", text: diff.value })
+          .nodeFromJSON({ type: 'text', text: diff.value })
           .mark(marks);
 
         if (textDiffs.length && textDiffs[0].removed) {
@@ -253,7 +253,7 @@ export class RecreateTransform {
         if (textDiffs.length && textDiffs[0].added) {
           const nextDiff = textDiffs.shift();
           const textNode = this.schema
-            .nodeFromJSON({ type: "text", text: nextDiff.value })
+            .nodeFromJSON({ type: 'text', text: nextDiff.value })
             .mark(marks);
           this.tr.replaceWith(offset, offset + diff.value.length, textNode);
           offset += nextDiff.value.length;

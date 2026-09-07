@@ -1,24 +1,23 @@
-import React, { useState } from "react";
-import { useSpaceQuery } from "@/features/space/queries/space-query.ts";
-import { EditSpaceForm } from "@/features/space/components/edit-space-form.tsx";
-import { Button, Divider, Text, Title } from "@mantine/core";
-import DeleteSpaceModal from "./delete-space-modal";
-import { useDisclosure } from "@mantine/hooks";
-import ExportModal from "@/components/common/export-modal.tsx";
-import AvatarUploader from "@/components/common/avatar-uploader.tsx";
+import React, { useState } from 'react';
+import { useSpaceQuery } from '@/features/space/queries/space-query.ts';
+import { EditSpaceForm } from '@/features/space/components/edit-space-form.tsx';
+import { Button, Divider, Text, Title } from '@mantine/core';
+import DeleteSpaceModal from './delete-space-modal';
+import { useDisclosure } from '@mantine/hooks';
+import ExportModal from '@/components/common/export-modal.tsx';
+import AvatarUploader from '@/components/common/avatar-uploader.tsx';
 import {
   uploadSpaceIcon,
-  removeSpaceIcon,
-} from "@/features/attachments/services/attachment-service.ts";
-import { useTranslation } from "react-i18next";
-import { AvatarIconType } from "@/features/attachments/types/attachment.types.ts";
-import { queryClient } from "@/main.tsx";
+  removeSpaceIcon
+} from '@/features/attachments/services/attachment-service.ts';
+import { useTranslation } from 'react-i18next';
+import { AvatarIconType } from '@/features/attachments/types/attachment.types.ts';
+import { queryClient } from '@/main.tsx';
 import {
   ResponsiveSettingsContent,
   ResponsiveSettingsControl,
-  ResponsiveSettingsRow,
-} from "@/components/ui/responsive-settings-row.tsx";
-
+  ResponsiveSettingsRow
+} from '@/components/ui/responsive-settings-row.tsx';
 
 interface SpaceDetailsProps {
   spaceId: string;
@@ -37,7 +36,7 @@ export default function SpaceDetails({ spaceId, readOnly }: SpaceDetailsProps) {
       await uploadSpaceIcon(file, spaceId);
       await refetch();
       await queryClient.invalidateQueries({
-        predicate: (item) => ["spaces"].includes(item.queryKey[0] as string),
+        predicate: (item) => ['spaces'].includes(item.queryKey[0] as string)
       });
     } catch (err) {
       // skip
@@ -52,7 +51,7 @@ export default function SpaceDetails({ spaceId, readOnly }: SpaceDetailsProps) {
       await removeSpaceIcon(spaceId);
       await refetch();
       await queryClient.invalidateQueries({
-        predicate: (item) => ["spaces"].includes(item.queryKey[0] as string),
+        predicate: (item) => ['spaces'].includes(item.queryKey[0] as string)
       });
     } catch (err) {
       // skip
@@ -66,17 +65,17 @@ export default function SpaceDetails({ spaceId, readOnly }: SpaceDetailsProps) {
       {space && (
         <div>
           <Title order={3} my="md" size="h6" fw={600}>
-            {t("Details")}
+            {t('Details')}
           </Title>
 
-          <div style={{ marginBottom: "20px" }}>
+          <div style={{ marginBottom: '20px' }}>
             <Text size="sm" fw={500} mb="xs">
-              {t("Icon")}
+              {t('Icon')}
             </Text>
             <AvatarUploader
               currentImageUrl={space.logo}
               fallbackName={space.name}
-              size={"60px"}
+              size={'60px'}
               variant="filled"
               type={AvatarIconType.SPACE_ICON}
               onUpload={handleIconUpload}
@@ -94,13 +93,13 @@ export default function SpaceDetails({ spaceId, readOnly }: SpaceDetailsProps) {
 
               <ResponsiveSettingsRow>
                 <ResponsiveSettingsContent>
-                  <Text size="md">{t("Export space")}</Text>
+                  <Text size="md">{t('Export space')}</Text>
                   <Text size="sm" c="dimmed">
-                    {t("Export all pages and attachments in this space.")}
+                    {t('Export all pages and attachments in this space.')}
                   </Text>
                 </ResponsiveSettingsContent>
                 <ResponsiveSettingsControl>
-                  <Button onClick={openExportModal}>{t("Export")}</Button>
+                  <Button onClick={openExportModal}>{t('Export')}</Button>
                 </ResponsiveSettingsControl>
               </ResponsiveSettingsRow>
 
@@ -108,9 +107,9 @@ export default function SpaceDetails({ spaceId, readOnly }: SpaceDetailsProps) {
 
               <ResponsiveSettingsRow>
                 <ResponsiveSettingsContent>
-                  <Text size="md">{t("Delete space")}</Text>
+                  <Text size="md">{t('Delete space')}</Text>
                   <Text size="sm" c="dimmed">
-                    {t("Delete this space with all its pages and data.")}
+                    {t('Delete this space with all its pages and data.')}
                   </Text>
                 </ResponsiveSettingsContent>
                 <ResponsiveSettingsControl>

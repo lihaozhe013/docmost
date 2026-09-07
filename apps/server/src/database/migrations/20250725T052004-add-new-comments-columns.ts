@@ -5,7 +5,7 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .alterTable('comments')
     .addColumn('last_edited_by_id', 'uuid', (col) =>
-      col.references('users.id').onDelete('set null'),
+      col.references('users.id').onDelete('set null')
     )
     .execute();
 
@@ -13,7 +13,7 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .alterTable('comments')
     .addColumn('resolved_by_id', 'uuid', (col) =>
-      col.references('users.id').onDelete('set null'),
+      col.references('users.id').onDelete('set null')
     )
     .execute();
 
@@ -21,7 +21,7 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .alterTable('comments')
     .addColumn('updated_at', 'timestamptz', (col) =>
-      col.notNull().defaultTo(sql`now()`),
+      col.notNull().defaultTo(sql`now()`)
     )
     .execute();
 
@@ -29,7 +29,7 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .alterTable('comments')
     .addColumn('space_id', 'uuid', (col) =>
-      col.references('spaces.id').onDelete('cascade'),
+      col.references('spaces.id').onDelete('cascade')
     )
     .execute();
 
@@ -37,7 +37,7 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db
     .updateTable('comments as c')
     .set((eb) => ({
-      space_id: eb.ref('p.space_id'),
+      space_id: eb.ref('p.space_id')
     }))
     .from('pages as p')
     .whereRef('c.page_id', '=', 'p.id')

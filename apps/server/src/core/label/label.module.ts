@@ -5,6 +5,6 @@ import { LabelService } from './label.service';
 @Module({
   controllers: [LabelController],
   providers: [LabelService],
-  exports: [LabelService],
+  exports: [LabelService]
 })
 export class LabelModule {}

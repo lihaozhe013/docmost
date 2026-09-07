@@ -23,7 +23,7 @@ describe('containsDomain', () => {
       'example.uk',
       'example.de',
       'example.fr',
-      'example.ru',
+      'example.ru'
     ])('blocks "%s"', (value) => {
       expect(containsDomain(value)).toBe(true);
     });
@@ -34,7 +34,7 @@ describe('containsDomain', () => {
       'example.com/reset',
       'example.com/reset-password',
       'click example.com/page',
-      'go to example.net/login',
+      'go to example.net/login'
     ])('blocks "%s"', (value) => {
       expect(containsDomain(value)).toBe(true);
     });
@@ -47,7 +47,7 @@ describe('containsDomain', () => {
       'Foo.mine.net',
       'Foo.mine.ne',
       'sub.example.com',
-      'login.example.co.uk',
+      'login.example.co.uk'
     ])('blocks "%s"', (value) => {
       expect(containsDomain(value)).toBe(true);
     });
@@ -58,16 +58,19 @@ describe('containsDomain', () => {
       'Reset your password at example.com',
       'URGENT click example.com/reset',
       'Visit example.org for details',
-      'go to mysite.io now',
+      'go to mysite.io now'
     ])('blocks "%s"', (value) => {
       expect(containsDomain(value)).toBe(true);
     });
   });
 
   describe('case insensitive — should block', () => {
-    it.each(['EXAMPLE.COM', 'Example.Com', 'example.COM'])('blocks "%s"', (value) => {
-      expect(containsDomain(value)).toBe(true);
-    });
+    it.each(['EXAMPLE.COM', 'Example.Com', 'example.COM'])(
+      'blocks "%s"',
+      (value) => {
+        expect(containsDomain(value)).toBe(true);
+      }
+    );
   });
 
   describe('fake TLDs — should allow', () => {
@@ -79,7 +82,7 @@ describe('containsDomain', () => {
       'Foo.abcd',
       'Foo.abcde',
       'Foo.abcdef',
-      'Foo.abcdefg',
+      'Foo.abcdefg'
     ])('allows "%s"', (value) => {
       expect(containsDomain(value)).toBe(false);
     });
@@ -98,13 +101,12 @@ describe('containsDomain', () => {
   });
 
   describe('emails — should allow', () => {
-    it.each([
-      'user@example.com',
-      'admin@company.org',
-      'test@sub.domain.co.uk',
-    ])('allows "%s"', (value) => {
-      expect(containsDomain(value)).toBe(false);
-    });
+    it.each(['user@example.com', 'admin@company.org', 'test@sub.domain.co.uk'])(
+      'allows "%s"',
+      (value) => {
+        expect(containsDomain(value)).toBe(false);
+      }
+    );
   });
 
   describe('normal names — should allow', () => {
@@ -116,7 +118,7 @@ describe('containsDomain', () => {
       'Mary Jane',
       "O'Brien",
       'Jean-Pierre',
-      'José García',
+      'José García'
     ])('allows "%s"', (value) => {
       expect(containsDomain(value)).toBe(false);
     });
@@ -127,7 +129,7 @@ describe('containsDomain', () => {
       'allows "%s"',
       (value) => {
         expect(containsDomain(value)).toBe(false);
-      },
+      }
     );
   });
 
@@ -136,7 +138,7 @@ describe('containsDomain', () => {
       'allows "%s"',
       (value) => {
         expect(containsDomain(value)).toBe(false);
-      },
+      }
     );
   });
 });

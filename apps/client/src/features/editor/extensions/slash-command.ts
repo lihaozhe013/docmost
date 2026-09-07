@@ -24,8 +24,8 @@ const Command = Extension.create({
             return false;
           }
           return true;
-        },
-      } as Partial<SuggestionOptions>,
+        }
+      } as Partial<SuggestionOptions>
     };
   },
 
@@ -34,17 +34,17 @@ const Command = Extension.create({
       Suggestion({
         pluginKey: slashMenuPluginKey,
         ...this.options.suggestion,
-        editor: this.editor,
-      }),
+        editor: this.editor
+      })
     ];
-  },
+  }
 });
 
 const SlashCommand = Command.configure({
   suggestion: {
     items: ({ query }) => getSuggestionItems({ query }) as any,
-    render: renderItems,
-  },
+    render: renderItems
+  }
 });
 
 export { Command as SlashCommandExtension };

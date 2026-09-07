@@ -1,6 +1,6 @@
-import { Node, mergeAttributes } from "@tiptap/core";
-import { ReactNodeViewRenderer } from "@tiptap/react";
-import { sanitizeUrl } from "../utils";
+import { Node, mergeAttributes } from '@tiptap/core';
+import { ReactNodeViewRenderer } from '@tiptap/react';
+import { sanitizeUrl } from '../utils';
 
 export interface AttachmentOptions {
   HTMLAttributes: Record<string, any>;
@@ -16,7 +16,7 @@ export interface AttachmentAttributes {
   placeholder?: string;
 }
 
-declare module "@tiptap/core" {
+declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     attachment: {
       setAttachment: (attributes: AttachmentAttributes) => ReturnType;
@@ -25,9 +25,9 @@ declare module "@tiptap/core" {
 }
 
 export const Attachment = Node.create<AttachmentOptions>({
-  name: "attachment",
+  name: 'attachment',
   inline: false,
-  group: "block",
+  group: 'block',
   isolating: true,
   atom: true,
   defining: true,
@@ -42,41 +42,41 @@ export const Attachment = Node.create<AttachmentOptions>({
   addAttributes() {
     return {
       url: {
-        default: "",
+        default: '',
         parseHTML: (element) => {
-          const url = element.getAttribute("data-attachment-url");
+          const url = element.getAttribute('data-attachment-url');
           return sanitizeUrl(url);
         },
         renderHTML: (attributes) => ({
-          "data-attachment-url": sanitizeUrl(attributes.url),
+          'data-attachment-url': sanitizeUrl(attributes.url),
         }),
       },
       name: {
         default: undefined,
-        parseHTML: (element) => element.getAttribute("data-attachment-name"),
+        parseHTML: (element) => element.getAttribute('data-attachment-name'),
         renderHTML: (attributes: AttachmentAttributes) => ({
-          "data-attachment-name": attributes.name,
+          'data-attachment-name': attributes.name,
         }),
       },
       mime: {
         default: undefined,
-        parseHTML: (element) => element.getAttribute("data-attachment-mime"),
+        parseHTML: (element) => element.getAttribute('data-attachment-mime'),
         renderHTML: (attributes: AttachmentAttributes) => ({
-          "data-attachment-mime": attributes.mime,
+          'data-attachment-mime': attributes.mime,
         }),
       },
       size: {
         default: null,
-        parseHTML: (element) => element.getAttribute("data-attachment-size"),
+        parseHTML: (element) => element.getAttribute('data-attachment-size'),
         renderHTML: (attributes: AttachmentAttributes) => ({
-          "data-attachment-size": attributes.size,
+          'data-attachment-size': attributes.size,
         }),
       },
       attachmentId: {
         default: undefined,
-        parseHTML: (element) => element.getAttribute("data-attachment-id"),
+        parseHTML: (element) => element.getAttribute('data-attachment-id'),
         renderHTML: (attributes: AttachmentAttributes) => ({
-          "data-attachment-id": attributes.attachmentId,
+          'data-attachment-id': attributes.attachmentId,
         }),
       },
       placeholder: {
@@ -96,20 +96,20 @@ export const Attachment = Node.create<AttachmentOptions>({
 
   renderHTML({ HTMLAttributes }) {
     return [
-      "div",
+      'div',
       mergeAttributes(
-        { "data-type": this.name },
+        { 'data-type': this.name },
         this.options.HTMLAttributes,
-        HTMLAttributes
+        HTMLAttributes,
       ),
       [
-        "a",
+        'a',
         {
-          href: sanitizeUrl(HTMLAttributes["data-attachment-url"]),
-          class: "attachment",
-          target: "blank",
+          href: sanitizeUrl(HTMLAttributes['data-attachment-url']),
+          class: 'attachment',
+          target: 'blank',
         },
-        `${HTMLAttributes["data-attachment-name"]}`,
+        `${HTMLAttributes['data-attachment-name']}`,
       ],
     ];
   },
@@ -120,7 +120,7 @@ export const Attachment = Node.create<AttachmentOptions>({
         (attrs: AttachmentAttributes) =>
         ({ commands }) => {
           return commands.insertContent({
-            type: "attachment",
+            type: 'attachment',
             attrs: attrs,
           });
         },

@@ -19,11 +19,11 @@ import { Window } from 'happy-dom';
 export function generateJSON(
   html: string,
   extensions: Extensions,
-  options?: ParseOptions,
+  options?: ParseOptions
 ): Record<string, any> {
   if (typeof window !== 'undefined') {
     throw new Error(
-      'generateJSON can only be used in a Node environment\nIf you want to use this in a browser environment, use the `@tiptap/html` import instead.',
+      'generateJSON can only be used in a Node environment\nIf you want to use this in a browser environment, use the `@tiptap/html` import instead.'
     );
   }
 

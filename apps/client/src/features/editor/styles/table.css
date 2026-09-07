@@ -70,7 +70,7 @@
 
     .selectedCell:after {
       background: rgba(200, 200, 255, 0.4);
-      content: "";
+      content: '';
       left: 0;
       right: 0;
       top: 0;
@@ -87,50 +87,49 @@
   table {
     @mixin dark {
       /* Blue */
-      td[data-background-color="#b4d5ff"],
-      th[data-background-color="#b4d5ff"] {
+      td[data-background-color='#b4d5ff'],
+      th[data-background-color='#b4d5ff'] {
         background-color: #1a3a5c !important;
       }
 
       /* Green */
-      td[data-background-color="#acf5d2"],
-      th[data-background-color="#acf5d2"] {
+      td[data-background-color='#acf5d2'],
+      th[data-background-color='#acf5d2'] {
         background-color: #1a4d3a !important;
       }
 
       /* Yellow */
-      td[data-background-color="#fef1b4"],
-      th[data-background-color="#fef1b4"] {
+      td[data-background-color='#fef1b4'],
+      th[data-background-color='#fef1b4'] {
         background-color: #7c5014 !important;
       }
 
       /* Red */
-      td[data-background-color="#ffbead"],
-      th[data-background-color="#ffbead"] {
+      td[data-background-color='#ffbead'],
+      th[data-background-color='#ffbead'] {
         background-color: #5c2a23 !important;
       }
 
       /* Pink */
-      td[data-background-color="#ffc7fe"],
-      th[data-background-color="#ffc7fe"] {
+      td[data-background-color='#ffc7fe'],
+      th[data-background-color='#ffc7fe'] {
         background-color: #4d2a4d !important;
       }
 
       /* Gray */
-      td[data-background-color="#eaecef"],
-      th[data-background-color="#eaecef"] {
+      td[data-background-color='#eaecef'],
+      th[data-background-color='#eaecef'] {
         background-color: #2a2e33 !important;
       }
 
       /* Purple */
-      td[data-background-color="#c1b7f2"],
-      th[data-background-color="#c1b7f2"] {
+      td[data-background-color='#c1b7f2'],
+      th[data-background-color='#c1b7f2'] {
         background-color: #3a2f5c !important;
       }
     }
   }
 }
-
 
 /* Header-row pinning. Two CSS paths, picked by `header-pin/controller.ts`:
    - native sticky (preferred): wrapper drops its overflow constraint so
@@ -156,7 +155,9 @@
   top: var(--editor-pin-offset, 90px);
 }
 
-.tableWrapper.tableHeaderPinned:not(.tableWrapperNoOverflow) table tr:first-child {
+.tableWrapper.tableHeaderPinned:not(.tableWrapperNoOverflow)
+  table
+  tr:first-child {
   position: relative;
   transform: translateY(var(--table-pin-offset, 0px));
 }
@@ -187,21 +188,18 @@
   width: 18px;
   height: 18px;
   border-radius: 4px;
-  background: light-dark(
-    rgba(55, 53, 47, 0.08),
-    rgba(255, 255, 255, 0.08)
-  );
-  color: light-dark(
-    rgba(55, 53, 47, 0.55),
-    rgba(255, 255, 255, 0.55)
-  );
+  background: light-dark(rgba(55, 53, 47, 0.08), rgba(255, 255, 255, 0.08));
+  color: light-dark(rgba(55, 53, 47, 0.55), rgba(255, 255, 255, 0.55));
   user-select: none;
   cursor: pointer;
   z-index: 1;
   /* Hidden by default; revealed on header-cell hover or when this column is
      the active sort (see selectors below). */
   opacity: 0;
-  transition: opacity 120ms ease, background-color 120ms ease, color 120ms ease;
+  transition:
+    opacity 120ms ease,
+    background-color 120ms ease,
+    color 120ms ease;
 }
 
 .ProseMirror table th:hover .tableReadonlySortChevron,
@@ -210,10 +208,7 @@
 }
 
 .tableReadonlySortChevron:hover {
-  background: light-dark(
-    rgba(55, 53, 47, 0.16),
-    rgba(255, 255, 255, 0.16)
-  );
+  background: light-dark(rgba(55, 53, 47, 0.16), rgba(255, 255, 255, 0.16));
 }
 
 /* Immediate tooltip on the chevron — same style language as the rest of the
@@ -249,23 +244,20 @@
   display: block;
 }
 
-.tableReadonlySortChevron[data-sort="asc"],
-.tableReadonlySortChevron[data-sort="desc"] {
+.tableReadonlySortChevron[data-sort='asc'],
+.tableReadonlySortChevron[data-sort='desc'] {
   background: light-dark(
     var(--mantine-color-blue-1),
     var(--mantine-color-blue-9)
   );
-  color: light-dark(
-    var(--mantine-color-blue-7),
-    var(--mantine-color-blue-2)
-  );
+  color: light-dark(var(--mantine-color-blue-7), var(--mantine-color-blue-2));
 }
 
-.tableReadonlySortChevron[data-sort="asc"] svg {
+.tableReadonlySortChevron[data-sort='asc'] svg {
   transform: rotate(180deg);
 }
 
-.editor-container:has(.table-dnd-drop-indicator[data-dragging="true"]) {
+.editor-container:has(.table-dnd-drop-indicator[data-dragging='true']) {
   .prosemirror-dropcursor-block {
     display: none;
   }

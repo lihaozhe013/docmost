@@ -50,7 +50,7 @@ type EditingEvent = {
   toolCallId?: string;
   input?: unknown;
   output?: unknown;
-  error?: { code?: string; message: string };
+  error?: { code?: string; message: string; details?: unknown };
 };
 
 type ToolRequest = {
@@ -67,7 +67,7 @@ type ToolRequest = {
 type ToolResponse = {
   ok: boolean;
   result?: BrowserToolResult;
-  error?: { code: string; message: string };
+  error?: { code: string; message: string; details?: unknown };
 };
 
 function messageId(): string {
@@ -84,15 +84,61 @@ function getError(error: unknown): { code: string; message: string } {
   };
 }
 
-function getToolError(output: unknown): string | undefined {
+function getToolError(
+  output: unknown
+): { code?: string; message: string; details?: unknown } | undefined {
   if (!output || typeof output !== 'object') return undefined;
   const envelope = output as {
     ok?: boolean;
-    error?: { message?: unknown };
+    error?: { code?: unknown; message?: unknown; details?: unknown };
   };
   return envelope.ok === false && typeof envelope.error?.message === 'string'
-    ? envelope.error.message
+    ? {
+        ...(typeof envelope.error.code === 'string'
+          ? { code: envelope.error.code }
+          : {}),
+        message: envelope.error.message,
+        ...(envelope.error.details !== undefined
+          ? { details: envelope.error.details }
+          : {})
+      }
     : undefined;
+}
+
+function formatErrorDetails(details: unknown): string | undefined {
+  if (!details || typeof details !== 'object' || Array.isArray(details)) {
+    return undefined;
+  }
+  const issues = (details as { issues?: unknown }).issues;
+  if (!Array.isArray(issues)) return undefined;
+  const messages = issues
+    .slice(0, 4)
+    .map((issue) => {
+      if (!issue || typeof issue !== 'object' || Array.isArray(issue)) {
+        return undefined;
+      }
+      const value = issue as {
+        path?: unknown;
+        code?: unknown;
+        message?: unknown;
+      };
+      if (typeof value.message !== 'string') return undefined;
+      const path = typeof value.path === 'string' ? value.path : '$';
+      const code = typeof value.code === 'string' ? value.code : 'invalid';
+      return `${path} [${code}]: ${value.message}`;
+    })
+    .filter((message): message is string => Boolean(message));
+  return messages.length ? messages.join('; ').slice(0, 1_000) : undefined;
+}
+
+function formatDisplayedError(error: {
+  code?: string;
+  message: string;
+  details?: unknown;
+}): string {
+  const prefix = error.code ? `[${error.code}] ` : '';
+  const details = formatErrorDetails(error.details);
+  return `${prefix}${error.message}${details ? ` (${details})` : ''}`;
 }
 
 function getToolChange(output: unknown): {
@@ -284,17 +330,17 @@ export function AiPageEditingPanel({
           setLatestAffectedBlockId(change.affectedBlockId);
         }
         const toolError = getToolError(raw.output);
+        const error = raw.error || toolError;
         setMessages((current) =>
           current.map((item) =>
             item.id === `tool:${raw.toolCallId}`
               ? {
                   ...item,
-                  content:
-                    raw.error || toolError
-                      ? `${raw.toolName || 'Document tool'} failed: ${raw.error?.message || toolError}`
-                      : change.summary
-                        ? `${raw.toolName || 'Document tool'} applied: ${change.summary}`
-                        : `${raw.toolName || 'Document tool'} completed`
+                  content: error
+                    ? `${raw.toolName || 'Document tool'} failed: ${formatDisplayedError(error)}`
+                    : change.summary
+                      ? `${raw.toolName || 'Document tool'} applied: ${change.summary}`
+                      : `${raw.toolName || 'Document tool'} completed`
                 }
               : item
           )
@@ -326,9 +372,10 @@ export function AiPageEditingPanel({
         runIdRef.current = null;
         assistantMessageIdRef.current = null;
         if (raw.event !== 'run.completed' && raw.error?.message) {
+          const runError = formatDisplayedError(raw.error);
           setMessages((current) => [
             ...current,
-            { id: messageId(), role: 'tool', content: raw.error.message }
+            { id: messageId(), role: 'tool', content: runError }
           ]);
         }
       }

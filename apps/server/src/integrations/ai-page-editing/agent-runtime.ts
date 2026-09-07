@@ -14,10 +14,28 @@ export interface RuntimeToolContext {
 export interface RuntimeToolDefinition<TSchema extends z.ZodType = z.ZodType> {
   description: string;
   inputSchema: TSchema;
+  normalizeInput?: (input: unknown) => unknown;
   execute: (
     input: z.infer<TSchema>,
     context: RuntimeToolContext
   ) => Promise<unknown>;
+}
+
+export interface RuntimeToolError {
+  code: string;
+  message: string;
+  details?: unknown;
+}
+
+export class AgentRuntimeError extends Error {
+  constructor(
+    public readonly code: string,
+    message: string,
+    public readonly details?: unknown
+  ) {
+    super(message);
+    this.name = 'AgentRuntimeError';
+  }
 }
 
 export interface RuntimeMessage {
@@ -121,8 +139,92 @@ function inputFromMessages(
 type CachedToolResult = {
   arguments: string;
   output: unknown;
-  error?: unknown;
+  error?: RuntimeToolError;
 };
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function runtimeToolError(value: unknown): RuntimeToolError | undefined {
+  if (!isRecord(value) || typeof value.message !== 'string') return undefined;
+  return {
+    code: typeof value.code === 'string' ? value.code : 'TOOL_FAILED',
+    message: value.message,
+    ...(value.details !== undefined ? { details: value.details } : {})
+  };
+}
+
+function toolFailureFromOutput(output: unknown): RuntimeToolError | undefined {
+  if (!isRecord(output) || output.ok !== false) return undefined;
+  return (
+    runtimeToolError(output.error) || {
+      code: 'TOOL_FAILED',
+      message: 'The document tool failed without an error description'
+    }
+  );
+}
+
+function validationIssues(error: z.ZodError): Array<{
+  path: string;
+  code: string;
+  message: string;
+}> {
+  return error.issues.map((issue) => ({
+    path: issue.path.length ? issue.path.join('.') : '$',
+    code: issue.code,
+    message: issue.message
+  }));
+}
+
+function toolErrorFromUnknown(error: unknown): RuntimeToolError {
+  if (error instanceof AgentRuntimeError) {
+    return {
+      code: error.code,
+      message: error.message,
+      ...(error.details !== undefined ? { details: error.details } : {})
+    };
+  }
+  if (isRecord(error)) {
+    const structured = runtimeToolError(error);
+    if (structured) return structured;
+  }
+  return { code: 'TOOL_EXECUTION_FAILED', message: errorMessage(error) };
+}
+
+function canonicalValue(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(canonicalValue);
+  if (!isRecord(value)) return value;
+  return Object.fromEntries(
+    Object.keys(value)
+      .sort()
+      .map((key) => [key, canonicalValue(value[key])])
+  );
+}
+
+function toolFingerprint(
+  toolName: string,
+  argumentsValue: string,
+  normalizeInput?: (input: unknown) => unknown
+): string {
+  try {
+    const parsed = JSON.parse(argumentsValue);
+    const normalized = normalizeInput ? normalizeInput(parsed) : parsed;
+    return `${toolName}:${JSON.stringify(canonicalValue(normalized))}`;
+  } catch {
+    return `${toolName}:${argumentsValue}`;
+  }
+}
+
+function isFatalToolError(error: RuntimeToolError): boolean {
+  return new Set([
+    'ACCESS_DENIED',
+    'SESSION_UNAVAILABLE',
+    'CANCELLED',
+    'RESULT_UNKNOWN',
+    'TOOL_LIMIT'
+  ]).has(error.code);
+}
 
 /**
  * Provider-independent tool loop. The runtime owns orchestration only; the
@@ -136,6 +238,7 @@ export class AgentRuntime {
     ];
     const tools = runtimeTools(options.tools);
     const cachedToolResults = new Map<string, CachedToolResult>();
+    const failedToolAttempts = new Map<string, number>();
     const maxSteps = options.maxSteps ?? 8;
     let text = '';
     let usage: ResponsesUsage | undefined;
@@ -168,7 +271,8 @@ export class AgentRuntime {
           const cached = cachedToolResults.get(call.callId);
           if (cached) {
             if (cached.arguments !== call.arguments) {
-              throw new Error(
+              throw new AgentRuntimeError(
+                'TOOL_CALL_REUSE',
                 `The tool call ID ${call.callId} was reused with different arguments`
               );
             }
@@ -177,6 +281,26 @@ export class AgentRuntime {
               call_id: call.callId,
               output: toolOutputString(cached.output)
             });
+            if (cached.error) {
+              const fingerprint = toolFingerprint(
+                call.name,
+                call.arguments,
+                options.tools[call.name]?.normalizeInput
+              );
+              const attempts = (failedToolAttempts.get(fingerprint) || 0) + 1;
+              failedToolAttempts.set(fingerprint, attempts);
+              throw new AgentRuntimeError(
+                isFatalToolError(cached.error)
+                  ? cached.error.code
+                  : 'TOOL_RETRY_LIMIT',
+                isFatalToolError(cached.error)
+                  ? cached.error.message
+                  : `The ${call.name} tool failed twice with the same arguments; stopping to preserve partial changes`,
+                isFatalToolError(cached.error)
+                  ? cached.error.details
+                  : { toolName: call.name, attempts }
+              );
+            }
             continue;
           }
 
@@ -190,30 +314,59 @@ export class AgentRuntime {
 
           let result: CachedToolResult;
           if (!definition) {
+            const unknownToolError: RuntimeToolError = {
+              code: 'UNKNOWN_TOOL',
+              message: `Unknown tool: ${call.name}`
+            };
             result = {
               arguments: call.arguments,
-              output: { error: `Unknown tool: ${call.name}` },
-              error: new Error(`Unknown tool: ${call.name}`)
+              output: { ok: false, error: unknownToolError },
+              error: unknownToolError
             };
           } else {
             try {
-              const parsedArguments: unknown = JSON.parse(call.arguments);
-              const parsed = definition.inputSchema.safeParse(parsedArguments);
+              let parsedArguments: unknown;
+              try {
+                parsedArguments = JSON.parse(call.arguments);
+              } catch {
+                throw new AgentRuntimeError(
+                  'INVALID_CONTENT',
+                  `Invalid JSON arguments for ${call.name}`,
+                  {
+                    issues: [
+                      { path: '$', message: 'Arguments must be valid JSON' }
+                    ]
+                  }
+                );
+              }
+              const normalizedArguments = definition.normalizeInput
+                ? definition.normalizeInput(parsedArguments)
+                : parsedArguments;
+              const parsed =
+                definition.inputSchema.safeParse(normalizedArguments);
               if (!parsed.success) {
-                throw new Error(
-                  `Invalid arguments for ${call.name}: ${parsed.error.message}`
+                throw new AgentRuntimeError(
+                  'INVALID_CONTENT',
+                  `Invalid arguments for ${call.name}`,
+                  { issues: validationIssues(parsed.error) }
                 );
               }
               const output = await definition.execute(parsed.data, {
                 toolCallId: call.callId,
                 signal: options.signal
               });
-              result = { arguments: call.arguments, output };
-            } catch (error) {
+              const toolError = toolFailureFromOutput(output);
               result = {
                 arguments: call.arguments,
-                output: { error: errorMessage(error) },
-                error
+                output,
+                ...(toolError ? { error: toolError } : {})
+              };
+            } catch (error) {
+              const structuredError = toolErrorFromUnknown(error);
+              result = {
+                arguments: call.arguments,
+                output: { ok: false, error: structuredError },
+                error: structuredError
               };
             }
           }
@@ -241,10 +394,40 @@ export class AgentRuntime {
             call_id: call.callId,
             output: toolOutputString(result.output)
           });
+
+          if (result.error) {
+            const fingerprint = toolFingerprint(
+              call.name,
+              call.arguments,
+              definition?.normalizeInput
+            );
+            const attempts = (failedToolAttempts.get(fingerprint) || 0) + 1;
+            failedToolAttempts.set(fingerprint, attempts);
+            if (isFatalToolError(result.error)) {
+              throw new AgentRuntimeError(
+                result.error.code,
+                result.error.message,
+                result.error.details
+              );
+            }
+            if (attempts >= 2) {
+              throw new AgentRuntimeError(
+                'TOOL_RETRY_LIMIT',
+                `The ${call.name} tool failed twice with the same arguments; stopping to preserve partial changes`,
+                {
+                  toolName: call.name,
+                  attempts
+                }
+              );
+            }
+          }
         }
       }
 
-      throw new Error(`The AI run exceeded its ${maxSteps}-step limit`);
+      throw new AgentRuntimeError(
+        'STEP_LIMIT',
+        `The AI run exceeded its ${maxSteps}-step limit`
+      );
     } catch (error) {
       await options.onEvent?.({ type: 'error', error });
       throw error;

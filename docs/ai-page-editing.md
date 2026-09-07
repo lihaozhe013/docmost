@@ -420,6 +420,32 @@ content.
 Inputs contain `expectedRevision`, a structured insertion target, and Markdown
 in the supported insertion grammar.
 
+The target is always an object. Use one of these forms:
+
+```json
+{ "kind": "document_start" }
+{ "kind": "document_end" }
+{ "kind": "before_block", "blockId": "b2" }
+{ "kind": "after_block", "blockId": "b2" }
+```
+
+Complete insertion input:
+
+```json
+{
+  "expectedRevision": "r17",
+  "target": { "kind": "document_end" },
+  "markdown": "A newly inserted paragraph."
+}
+```
+
+The agent runtime also normalizes the unambiguous legacy forms
+`target: "document_start"`, `target: "document_end"`, and a
+`target: "before_block"` or `target: "after_block"` paired with a top-level
+`blockId`. Some providers return the object target as a JSON-encoded string; the
+runtime decodes one such layer before schema validation. A bare block ID or an
+insertion direction without its required block ID remains invalid.
+
 Insertion targets are `document_start`, `document_end`, `before_block`, or
 `after_block`. The latter two require a block handle. Initial insertion is
 limited to valid top-level boundaries. An anchor within a nested container is
@@ -453,7 +479,16 @@ Use structured error codes:
 
 Error details may include bounded relevant context, but must not return
 unrelated document content. Every failed validation leaves the document
-unchanged.
+unchanged. Schema validation failures include bounded `details.issues` entries
+with the failing field path, validation code, and correction message. The
+runtime accepts one JSON-encoded object layer for `insert_blocks.target` because
+some providers serialize nested tool arguments as strings.
+
+The runtime sends a failed tool result back to the model so it can make one
+corrective attempt. If the same tool and arguments fail twice, the run stops
+with `TOOL_RETRY_LIMIT`; successful changes from earlier calls remain applied
+and are reported to the user. The normal eight-step run limit remains in force
+and reports `STEP_LIMIT` when reached.
 
 ## 8. Consistency, Undo, and Persistence
 

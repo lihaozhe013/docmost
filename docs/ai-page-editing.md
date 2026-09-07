@@ -208,18 +208,32 @@ defines the behavior required by Docmost.
 
 Page editing is configured with three server-only environment variables:
 
-| Variable     | Meaning                                                                             |
-| ------------ | ----------------------------------------------------------------------------------- |
-| `AI_API_URL` | Complete Responses endpoint URL, for example `https://api.openai.com/v1/responses`. |
-| `AI_API_KEY` | Bearer credential sent only by the server.                                          |
-| `AI_MODEL`   | Model identifier accepted by the configured endpoint.                               |
+| Variable     | Meaning                                                                                |
+| ------------ | -------------------------------------------------------------------------------------- |
+| `AI_API_URL` | Provider base URL or complete Responses endpoint, such as `https://api.openai.com/v1`. |
+| `AI_API_KEY` | Bearer credential sent only by the server.                                             |
+| `AI_MODEL`   | Model identifier accepted by the configured endpoint.                                  |
 
 All three values must be set to enable page editing. The URL is used exactly as
-configured; the client does not append a provider-specific path. Requests use
-`stream: true`, `store: false`, and include encrypted reasoning content so the
-stateless tool loop can replay reasoning items on the next request. The
-configured service must support standard Responses streaming and function
-calling. Chat Completions-only endpoints are outside the supported contract.
+configured when it already ends in `/responses`; otherwise the server resolves
+the Responses endpoint before sending a request. The official OpenAI host gets
+`/v1/responses` from a root URL, a URL ending in `/v1` gets `/v1/responses`, and
+other provider roots get `/responses`. A URL ending in `/chat/completions` is
+rewritten to the corresponding `/responses` path. The resolver does not send
+probe requests or retry a 404. Requests use `stream: true`, `store: false`, and
+include encrypted reasoning content so the stateless tool loop can replay
+reasoning items on the next request. The configured service must support
+standard Responses streaming and function calling. Chat Completions-only
+services are outside the supported contract.
+
+For example, these configurations resolve to the provider endpoints shown:
+
+```env
+# Choose one provider base URL:
+# OpenAI: https://api.openai.com/v1
+# DeepSeek: https://api.deepseek.com
+AI_API_URL=https://api.deepseek.com
+```
 
 An unavailable or incomplete configuration fails the run with a structured
 error. Credentials, authorization headers, and request bodies are never sent to

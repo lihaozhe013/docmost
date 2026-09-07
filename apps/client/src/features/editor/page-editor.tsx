@@ -338,10 +338,12 @@ function CollabPageEditor({
       },
       onCreate({ editor }) {
         if (editor) {
-          // @ts-ignore
-          setEditor(editor);
+          // Set the page identity before publishing the editor instance so
+          // consumers can safely create page-scoped adapters immediately.
           // @ts-ignore
           editor.storage.pageId = pageId;
+          // @ts-ignore
+          setEditor(editor);
           handleScrollTo(editor);
           editorRef.current = editor;
         }
@@ -358,6 +360,8 @@ function CollabPageEditor({
 
   useLayoutEffect(() => {
     if (editor && !editor.isDestroyed) {
+      // @ts-ignore
+      editor.storage.pageId = pageId;
       // @ts-ignore
       setEditor(editor);
       editorRef.current = editor;

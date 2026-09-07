@@ -1,12 +1,20 @@
-import { Injectable, ServiceUnavailableException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  ServiceUnavailableException
+} from '@nestjs/common';
 import { EnvironmentService } from '../environment/environment.service';
 import {
   createOpenAiResponsesClient,
-  OpenAiResponsesHttpClient
+  OpenAiResponsesHttpClient,
+  redactResponsesEndpoint,
+  resolveResponsesEndpoint
 } from './responses-client';
 
 @Injectable()
 export class OpenAiResponsesClientFactory {
+  private readonly logger = new Logger(OpenAiResponsesClientFactory.name);
+
   constructor(private readonly environmentService: EnvironmentService) {}
 
   create(): OpenAiResponsesHttpClient {
@@ -19,7 +27,11 @@ export class OpenAiResponsesClientFactory {
       );
     }
 
-    return createOpenAiResponsesClient(apiUrl, apiKey);
+    const endpoint = resolveResponsesEndpoint(apiUrl);
+    this.logger.debug(
+      `[ai_page_editing] provider endpoint resolved: ${redactResponsesEndpoint(endpoint)}`
+    );
+    return createOpenAiResponsesClient(endpoint, apiKey);
   }
 
   getModel(): string {

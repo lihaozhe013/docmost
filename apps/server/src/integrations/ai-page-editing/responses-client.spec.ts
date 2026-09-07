@@ -1,6 +1,8 @@
 import {
   createOpenAiResponsesClient,
-  OpenAiResponsesHttpClient
+  OpenAiResponsesHttpClient,
+  redactResponsesEndpoint,
+  resolveResponsesEndpoint
 } from './responses-client';
 
 function sseEvent(event: Record<string, unknown>): string {
@@ -27,6 +29,57 @@ describe('OpenAiResponsesHttpClient', () => {
   afterEach(() => {
     globalThis.fetch = originalFetch;
     jest.restoreAllMocks();
+  });
+
+  it.each([
+    ['https://api.openai.com', 'https://api.openai.com/v1/responses'],
+    ['https://api.openai.com/v1/', 'https://api.openai.com/v1/responses'],
+    [
+      'https://api.openai.com/chat/completions',
+      'https://api.openai.com/v1/responses'
+    ],
+    [
+      'https://api.openai.com/v1/chat/completions',
+      'https://api.openai.com/v1/responses'
+    ],
+    ['https://api.deepseek.com', 'https://api.deepseek.com/responses'],
+    [
+      'https://api.deepseek.com/responses/',
+      'https://api.deepseek.com/responses'
+    ],
+    ['https://gateway.example/v1', 'https://gateway.example/v1/responses'],
+    [
+      'https://gateway.example/v1/chat/completions',
+      'https://gateway.example/v1/responses'
+    ],
+    [
+      'https://gateway.example/proxy/openai',
+      'https://gateway.example/proxy/openai/responses'
+    ]
+  ])('resolves %s to %s', (rawUrl, expected) => {
+    expect(resolveResponsesEndpoint(rawUrl)).toBe(expected);
+  });
+
+  it('preserves query parameters and removes URL fragments', () => {
+    expect(
+      resolveResponsesEndpoint(
+        'https://gateway.example/v1?api-version=2026-01-01#responses'
+      )
+    ).toBe('https://gateway.example/v1/responses?api-version=2026-01-01');
+  });
+
+  it('redacts credentials and query data from endpoint logs', () => {
+    expect(
+      redactResponsesEndpoint(
+        'https://user:secret@gateway.example/v1/responses?token=secret'
+      )
+    ).toBe('https://gateway.example/v1/responses');
+  });
+
+  it('rejects non-HTTP endpoint URLs', () => {
+    expect(() => resolveResponsesEndpoint('ftp://gateway.example')).toThrow(
+      'AI_API_URL must be a valid HTTP(S) URL'
+    );
   });
 
   it('parses streamed text and function calls while preserving output items', async () => {
@@ -85,7 +138,7 @@ describe('OpenAiResponsesHttpClient', () => {
     globalThis.fetch = fetchMock;
     const textDeltas: string[] = [];
     const client = new OpenAiResponsesHttpClient(
-      'https://example.test/v1/responses',
+      'https://example.test/v1',
       'secret-key'
     );
 
@@ -126,6 +179,7 @@ describe('OpenAiResponsesHttpClient', () => {
     expect(fetchMock.mock.calls[0]?.[0]).toBe(
       'https://example.test/v1/responses'
     );
+    expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(request?.headers).toMatchObject({
       authorization: 'Bearer secret-key',
       'content-type': 'application/json',

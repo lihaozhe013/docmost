@@ -45,6 +45,10 @@ export interface ResponsesApiClient {
   stream(options: ResponsesStreamOptions): Promise<ResponsesStreamResult>;
 }
 
+const OPENAI_API_HOST = 'api.openai.com';
+const RESPONSES_PATH = '/responses';
+const CHAT_COMPLETIONS_SUFFIX = '/chat/completions';
+
 type SseEvent = {
   type?: unknown;
   [key: string]: unknown;
@@ -52,6 +56,61 @@ type SseEvent = {
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
+}
+
+function normalizedPath(pathname: string): string {
+  const path = pathname.replace(/\/+$/, '');
+  return path || '/';
+}
+
+/**
+ * Resolves a configured base URL or endpoint to a Responses API endpoint.
+ *
+ * Providers use different base path conventions: the official OpenAI API
+ * includes /v1, while DeepSeek exposes /responses from its root. Complete
+ * endpoints remain unchanged so custom gateways can provide their own path.
+ */
+export function resolveResponsesEndpoint(rawUrl: string): string {
+  let url: URL;
+  try {
+    url = new URL(rawUrl.trim());
+  } catch {
+    throw new ServiceUnavailableException(
+      'AI_API_URL must be a valid HTTP(S) URL.'
+    );
+  }
+
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    throw new ServiceUnavailableException(
+      'AI_API_URL must be a valid HTTP(S) URL.'
+    );
+  }
+
+  const path = normalizedPath(url.pathname);
+  const lowerPath = path.toLowerCase();
+  const hostname = url.hostname.toLowerCase().replace(/\.$/, '');
+
+  if (lowerPath.endsWith(RESPONSES_PATH)) {
+    url.pathname = path;
+  } else if (lowerPath.endsWith(CHAT_COMPLETIONS_SUFFIX)) {
+    const prefix = path.slice(0, -CHAT_COMPLETIONS_SUFFIX.length);
+    const basePath = prefix || (hostname === OPENAI_API_HOST ? '/v1' : '');
+    url.pathname = `${basePath}${RESPONSES_PATH}`;
+  } else if (path === '/') {
+    url.pathname =
+      hostname === OPENAI_API_HOST ? `/v1${RESPONSES_PATH}` : RESPONSES_PATH;
+  } else {
+    url.pathname = `${path}${RESPONSES_PATH}`;
+  }
+
+  url.hash = '';
+  return url.toString();
+}
+
+/** Returns an endpoint string safe for logs by omitting credentials and query data. */
+export function redactResponsesEndpoint(endpoint: string): string {
+  const url = new URL(endpoint);
+  return `${url.origin}${normalizedPath(url.pathname)}`;
 }
 
 function finiteNumber(value: unknown): number | undefined {
@@ -217,10 +276,13 @@ function responseId(event: SseEvent): string | undefined {
 }
 
 export class OpenAiResponsesHttpClient implements ResponsesApiClient {
-  constructor(
-    private readonly apiUrl: string,
-    private readonly apiKey: string
-  ) {}
+  private readonly apiUrl: string;
+  private readonly apiKey: string;
+
+  constructor(apiUrl: string, apiKey: string) {
+    this.apiUrl = resolveResponsesEndpoint(apiUrl);
+    this.apiKey = apiKey;
+  }
 
   async stream(
     options: ResponsesStreamOptions

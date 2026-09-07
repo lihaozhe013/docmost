@@ -479,7 +479,23 @@ export function AiPageEditingPanel({
 
   const handleSend = () => {
     const value = prompt.trim();
-    if (!value || running || !socket || !adapterRef.current) return;
+    if (!value || running) return;
+    if (!socket) {
+      reportLocalError('The editor connection is not available yet.');
+      return;
+    }
+    if (!socket.connected) {
+      reportLocalError(
+        'The editor connection is not ready. Wait for it to reconnect and try again.'
+      );
+      return;
+    }
+    if (!adapterRef.current) {
+      reportLocalError(
+        'The page editor is still loading. Wait for the editor to finish loading and try again.'
+      );
+      return;
+    }
     let selection;
     try {
       selection = adapterRef.current.read().selection;
@@ -506,6 +522,15 @@ export function AiPageEditingPanel({
       messages: history,
       ...(selection ? { selection } : {})
     });
+  };
+
+  const reportLocalError = (message: string) => {
+    console.warn(`[ai_page_editing] ${message}`);
+    setMessages((current) => [
+      ...current,
+      { id: messageId(), role: 'tool', content: message }
+    ]);
+    setOpen(true);
   };
 
   const handleStop = () => {

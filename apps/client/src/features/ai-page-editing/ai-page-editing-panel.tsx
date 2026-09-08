@@ -8,12 +8,13 @@ import {
   ScrollArea,
   Stack,
   Text,
-  TextInput,
+  Textarea,
   Tooltip
 } from '@mantine/core';
 import {
   IconArrowUp,
   IconPlayerStop,
+  IconPlus,
   IconRotate2,
   IconSparkles,
   IconX
@@ -32,6 +33,7 @@ import classes from './ai-page-editing-panel.module.css';
 
 const MAX_STORED_TOOL_RESULTS = 24;
 const MAX_HISTORY_CHARS = 80_000;
+const MAX_CANCELLED_RUN_IDS = 32;
 
 type ChatMessage = {
   id: string;
@@ -214,6 +216,17 @@ function getBoundedHistory(messages: ChatMessage[]) {
   return selected;
 }
 
+function rememberCancelledRun(
+  cancelledRunIds: Set<string>,
+  runId: string | null
+): void {
+  if (!runId) return;
+  cancelledRunIds.add(runId);
+  if (cancelledRunIds.size <= MAX_CANCELLED_RUN_IDS) return;
+  const oldest = cancelledRunIds.values().next().value;
+  if (typeof oldest === 'string') cancelledRunIds.delete(oldest);
+}
+
 export function AiPageEditingPanel({
   pageId,
   enabled
@@ -239,6 +252,9 @@ export function AiPageEditingPanel({
   const toolPromisesRef = useRef(new Map<string, Promise<ToolResponse>>());
   const lastSequenceRef = useRef(0);
   const runAbortRef = useRef<AbortController | null>(null);
+  const cancelledRunIdsRef = useRef(new Set<string>());
+  const pendingStartRef = useRef(false);
+  const cancelledPendingStartRef = useRef(false);
 
   messagesRef.current = messages;
 
@@ -267,9 +283,25 @@ export function AiPageEditingPanel({
       if (!raw || typeof raw !== 'object') return;
       if (raw.sessionId && socket.id && raw.sessionId !== socket.id) return;
       if (raw.pageId && raw.pageId !== pageId) return;
+      if (raw.runId !== 'none' && cancelledRunIdsRef.current.has(raw.runId)) {
+        return;
+      }
       const isRunStarted = 'event' in raw && raw.event === 'run.started';
       if (isRunStarted) {
-        if (runIdRef.current) return;
+        if (cancelledPendingStartRef.current) {
+          cancelledPendingStartRef.current = false;
+          pendingStartRef.current = false;
+          rememberCancelledRun(cancelledRunIdsRef.current, raw.runId);
+          if (socket.connected) {
+            socket.emit('message', {
+              operation: 'aiPageEditing.stop',
+              runId: raw.runId
+            });
+          }
+          return;
+        }
+        if (runIdRef.current || !pendingStartRef.current) return;
+        pendingStartRef.current = false;
         lastSequenceRef.current = (raw.sequence ?? 1) - 1;
       } else if (raw.runId !== 'none') {
         if (!runIdRef.current || raw.runId !== runIdRef.current) return;
@@ -361,6 +393,8 @@ export function AiPageEditingPanel({
         raw.event === 'run.failed' ||
         raw.event === 'run.stopped'
       ) {
+        pendingStartRef.current = false;
+        cancelledPendingStartRef.current = false;
         if (
           raw.event === 'run.completed' &&
           raw.text &&
@@ -391,6 +425,9 @@ export function AiPageEditingPanel({
     };
 
     const handleDisconnect = () => {
+      pendingStartRef.current = false;
+      cancelledPendingStartRef.current = false;
+      rememberCancelledRun(cancelledRunIdsRef.current, runIdRef.current);
       runAbortRef.current?.abort();
       runAbortRef.current = null;
       if (runIdRef.current) {
@@ -416,6 +453,7 @@ export function AiPageEditingPanel({
       socket.off('message', handleMessage);
       socket.off('disconnect', handleDisconnect);
       if (runIdRef.current && socket.connected) {
+        rememberCancelledRun(cancelledRunIdsRef.current, runIdRef.current);
         runAbortRef.current?.abort();
         runAbortRef.current = null;
         socket.emit('message', {
@@ -428,6 +466,8 @@ export function AiPageEditingPanel({
         lastSequenceRef.current = 0;
         setRunning(false);
       } else {
+        pendingStartRef.current = false;
+        cancelledPendingStartRef.current = false;
         runAbortRef.current?.abort();
         runAbortRef.current = null;
       }
@@ -482,6 +522,7 @@ export function AiPageEditingPanel({
       toolPromisesRef.current.set(request.toolCallId, operation);
       const response = await operation;
       toolPromisesRef.current.delete(request.toolCallId);
+      if (cancelledRunIdsRef.current.has(request.runId)) return;
       toolResultsRef.current.set(request.toolCallId, response);
       if (toolResultsRef.current.size > MAX_STORED_TOOL_RESULTS) {
         const oldest = toolResultsRef.current.keys().next().value;
@@ -509,6 +550,7 @@ export function AiPageEditingPanel({
 
   useEffect(() => {
     if (enabled || !socket || !runIdRef.current) return;
+    rememberCancelledRun(cancelledRunIdsRef.current, runIdRef.current);
     runAbortRef.current?.abort();
     runAbortRef.current = null;
     socket.emit('message', {
@@ -522,6 +564,7 @@ export function AiPageEditingPanel({
   useEffect(() => {
     if (editor && !editor.isDestroyed && adapterRef.current) return;
     if (!socket || !runIdRef.current) return;
+    rememberCancelledRun(cancelledRunIdsRef.current, runIdRef.current);
     runAbortRef.current?.abort();
     runAbortRef.current = null;
     socket.emit('message', {
@@ -573,6 +616,8 @@ export function AiPageEditingPanel({
     setPrompt('');
     setOpen(true);
     setRunning(true);
+    pendingStartRef.current = true;
+    cancelledPendingStartRef.current = false;
     socket.emit('message', {
       operation: 'aiPageEditing.start',
       pageId,
@@ -598,6 +643,34 @@ export function AiPageEditingPanel({
       operation: 'aiPageEditing.stop',
       runId: runIdRef.current
     });
+  };
+
+  const handleNewSession = () => {
+    const activeRunId = runIdRef.current;
+    if (pendingStartRef.current) {
+      pendingStartRef.current = false;
+      cancelledPendingStartRef.current = true;
+    }
+    rememberCancelledRun(cancelledRunIdsRef.current, activeRunId);
+    runAbortRef.current?.abort();
+    runAbortRef.current = null;
+    if (activeRunId && socket?.connected) {
+      socket.emit('message', {
+        operation: 'aiPageEditing.stop',
+        runId: activeRunId
+      });
+    }
+    runIdRef.current = null;
+    assistantMessageIdRef.current = null;
+    toolResultsRef.current.clear();
+    toolPromisesRef.current.clear();
+    lastSequenceRef.current = 0;
+    messagesRef.current = [];
+    setMessages([]);
+    setPrompt('');
+    setRunning(false);
+    setLatestChangeId(null);
+    setLatestAffectedBlockId(null);
   };
 
   const handleUndo = () => {
@@ -654,13 +727,24 @@ export function AiPageEditingPanel({
               <Text fw={600}>Page AI</Text>
               {running && <Badge size="xs">Working</Badge>}
             </Group>
-            <ActionIcon
-              variant="subtle"
-              onClick={() => setOpen(false)}
-              aria-label="Close Page AI"
-            >
-              <IconX size={16} />
-            </ActionIcon>
+            <Group gap={4}>
+              <Tooltip label="New session">
+                <ActionIcon
+                  variant="subtle"
+                  onClick={handleNewSession}
+                  aria-label="New session"
+                >
+                  <IconPlus size={16} />
+                </ActionIcon>
+              </Tooltip>
+              <ActionIcon
+                variant="subtle"
+                onClick={() => setOpen(false)}
+                aria-label="Close Page AI"
+              >
+                <IconX size={16} />
+              </ActionIcon>
+            </Group>
           </Group>
           <Divider mb="sm" />
           <ScrollArea className={classes.messages} offsetScrollbars>
@@ -700,10 +784,15 @@ export function AiPageEditingPanel({
             </Stack>
           </ScrollArea>
           <Group gap="xs" mt="sm" align="flex-end">
-            <TextInput
+            <Textarea
               flex={1}
+              className={classes.promptInput}
               value={prompt}
               disabled={running}
+              autosize
+              minRows={1}
+              maxRows={5}
+              resize="none"
               placeholder="Ask Page AI…"
               onChange={(event) => setPrompt(event.currentTarget.value)}
               onKeyDown={(event) => {

@@ -33,6 +33,17 @@
   color: light-dark(var(--mantine-color-gray-8), var(--mantine-color-dark-1));
 }
 
+.promptInput {
+  min-width: 0;
+  flex: 1;
+}
+
+.promptInput textarea {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 .tool {
   font-family: var(--mantine-font-family-monospace);
   font-size: var(--mantine-font-size-xs);

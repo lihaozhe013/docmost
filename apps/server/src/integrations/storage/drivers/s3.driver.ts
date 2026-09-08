@@ -49,7 +49,9 @@ export class S3Driver implements StorageDriver {
       await upload.done();
     } catch (err) {
       Logger.error(err);
-      throw new Error(`Failed to upload file: ${(err as Error).message}`);
+      throw new Error(`Failed to upload file: ${(err as Error).message}`, {
+        cause: err
+      });
     }
   }
 
@@ -84,7 +86,9 @@ export class S3Driver implements StorageDriver {
       await upload.done();
     } catch (err) {
       Logger.error(err);
-      throw new Error(`Failed to upload file: ${(err as Error).message}`);
+      throw new Error(`Failed to upload file: ${(err as Error).message}`, {
+        cause: err
+      });
     } finally {
       if (shouldDestroyClient && clientToUse) {
         clientToUse.destroy();
@@ -104,7 +108,9 @@ export class S3Driver implements StorageDriver {
         );
       }
     } catch (err) {
-      throw new Error(`Failed to copy file: ${(err as Error).message}`);
+      throw new Error(`Failed to copy file: ${(err as Error).message}`, {
+        cause: err
+      });
     }
   }
 
@@ -119,7 +125,10 @@ export class S3Driver implements StorageDriver {
 
       return streamToBuffer(response.Body as Readable);
     } catch (err) {
-      throw new Error(`Failed to read file from S3: ${(err as Error).message}`);
+      throw new Error(
+        `Failed to read file from S3: ${(err as Error).message}`,
+        { cause: err }
+      );
     }
   }
 
@@ -134,7 +143,10 @@ export class S3Driver implements StorageDriver {
 
       return response.Body as Readable;
     } catch (err) {
-      throw new Error(`Failed to read file from S3: ${(err as Error).message}`);
+      throw new Error(
+        `Failed to read file from S3: ${(err as Error).message}`,
+        { cause: err }
+      );
     }
   }
 
@@ -153,7 +165,10 @@ export class S3Driver implements StorageDriver {
 
       return response.Body as Readable;
     } catch (err) {
-      throw new Error(`Failed to read file from S3: ${(err as Error).message}`);
+      throw new Error(
+        `Failed to read file from S3: ${(err as Error).message}`,
+        { cause: err }
+      );
     }
   }
 
@@ -195,7 +210,8 @@ export class S3Driver implements StorageDriver {
       await this.s3Client.send(command);
     } catch (err) {
       throw new Error(
-        `Error deleting file ${filePath} from S3. ${(err as Error).message}`
+        `Error deleting file ${filePath} from S3. ${(err as Error).message}`,
+        { cause: err }
       );
     }
   }

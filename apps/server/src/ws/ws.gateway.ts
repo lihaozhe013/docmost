@@ -47,7 +47,7 @@ export class WsGateway
 
   async handleConnection(client: Socket, ...args: any[]): Promise<void> {
     try {
-      const cookies = cookie.parse(client.handshake.headers.cookie);
+      const cookies = cookie.parseCookie(client.handshake.headers.cookie);
       const token: JwtPayload = await this.tokenService.verifyJwt(
         cookies['authToken'],
         JwtType.ACCESS

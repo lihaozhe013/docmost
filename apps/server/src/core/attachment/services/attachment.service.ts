@@ -55,7 +55,7 @@ export class AttachmentService {
     });
 
     let isUpdate = false;
-    let attachmentId = null;
+    let attachmentId: string;
 
     // passing attachmentId to allow for updating diagrams
     // instead of creating new files for each save

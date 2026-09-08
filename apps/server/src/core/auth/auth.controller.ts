@@ -59,7 +59,7 @@ export class AuthController {
     validateSsoEnforcement(workspace);
 
     let MfaModule: any;
-    let isMfaModuleReady = false;
+    let isMfaModuleReady: boolean;
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       MfaModule = require('./../../ee/mfa/services/mfa.service');

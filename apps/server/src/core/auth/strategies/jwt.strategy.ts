@@ -108,7 +108,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
   private async validateApiKey(req: any, payload: JwtApiKeyPayload) {
     let ApiKeyModule: any;
-    let isApiKeyModuleReady = false;
+    let isApiKeyModuleReady: boolean;
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -134,7 +134,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
   private async validateOAuthToken(req: any, payload: JwtOAuthPayload) {
     let OAuthStrategyModule: any;
-    let isOAuthModuleReady = false;
+    let isOAuthModuleReady: boolean;
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports

@@ -77,7 +77,9 @@ export class AzureDriver implements StorageDriver {
       });
     } catch (err) {
       Logger.error(err);
-      throw new Error(`Failed to upload file: ${(err as Error).message}`);
+      throw new Error(`Failed to upload file: ${(err as Error).message}`, {
+        cause: err
+      });
     }
   }
 
@@ -90,7 +92,9 @@ export class AzureDriver implements StorageDriver {
       const dest = this.blockBlob(toFilePath);
       await dest.syncCopyFromURL(sourceUrl);
     } catch (err) {
-      throw new Error(`Failed to copy file: ${(err as Error).message}`);
+      throw new Error(`Failed to copy file: ${(err as Error).message}`, {
+        cause: err
+      });
     }
   }
 
@@ -99,7 +103,8 @@ export class AzureDriver implements StorageDriver {
       return await this.blockBlob(filePath).downloadToBuffer();
     } catch (err) {
       throw new Error(
-        `Failed to read file from Azure: ${(err as Error).message}`
+        `Failed to read file from Azure: ${(err as Error).message}`,
+        { cause: err }
       );
     }
   }
@@ -110,7 +115,8 @@ export class AzureDriver implements StorageDriver {
       return response.readableStreamBody as Readable;
     } catch (err) {
       throw new Error(
-        `Failed to read file from Azure: ${(err as Error).message}`
+        `Failed to read file from Azure: ${(err as Error).message}`,
+        { cause: err }
       );
     }
   }
@@ -128,7 +134,8 @@ export class AzureDriver implements StorageDriver {
       return response.readableStreamBody as Readable;
     } catch (err) {
       throw new Error(
-        `Failed to read file from Azure: ${(err as Error).message}`
+        `Failed to read file from Azure: ${(err as Error).message}`,
+        { cause: err }
       );
     }
   }
@@ -138,7 +145,8 @@ export class AzureDriver implements StorageDriver {
       return await this.blockBlob(filePath).exists();
     } catch (err) {
       throw new Error(
-        `Failed to check existence in Azure: ${(err as Error).message}`
+        `Failed to check existence in Azure: ${(err as Error).message}`,
+        { cause: err }
       );
     }
   }
@@ -168,7 +176,8 @@ export class AzureDriver implements StorageDriver {
       await this.blockBlob(filePath).delete();
     } catch (err) {
       throw new Error(
-        `Error deleting file ${filePath} from Azure: ${(err as Error).message}`
+        `Error deleting file ${filePath} from Azure: ${(err as Error).message}`,
+        { cause: err }
       );
     }
   }

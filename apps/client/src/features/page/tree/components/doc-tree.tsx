@@ -194,6 +194,7 @@ function DocTreeInner<T extends object>(
     return flat[0]?.node.id;
   }, [activeId, selectedId, flatIds, flat]);
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- @tanstack/react-virtual is not yet on the React Compiler compatibility list; memoization bailout only affects performance
   const virtualizer = useVirtualizer({
     count: flat.length,
     getScrollElement: () => scrollRef.current,

@@ -3,6 +3,7 @@ import {
   NodeSelection,
   Plugin,
   PluginKey,
+  Selection,
   TextSelection
 } from '@tiptap/pm/state';
 import { Fragment, Slice, Node } from '@tiptap/pm/model';
@@ -183,7 +184,7 @@ export function DragHandlePlugin(
     const diff = from - to;
 
     const fromSelectionPos = calcNodePos(from, view);
-    let differentNodeSelected = false;
+    let differentNodeSelected: boolean;
 
     const nodePos = view.state.doc.resolve(fromSelectionPos);
 
@@ -200,7 +201,7 @@ export function DragHandlePlugin(
         draggedNodePos <= nodeSelection.$to.pos
       );
     }
-    let selection = view.state.selection;
+    let selection: Selection;
     if (
       !differentNodeSelected &&
       diff !== 0 &&

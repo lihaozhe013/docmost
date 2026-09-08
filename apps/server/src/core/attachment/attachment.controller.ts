@@ -231,7 +231,7 @@ export class AttachmentController {
     @Param('fileName') fileName?: string,
     @Query('jwt') jwtToken?: string
   ) {
-    let jwtPayload: JwtAttachmentPayload = null;
+    let jwtPayload: JwtAttachmentPayload;
     try {
       jwtPayload = await this.tokenService.verifyJwt(
         jwtToken,

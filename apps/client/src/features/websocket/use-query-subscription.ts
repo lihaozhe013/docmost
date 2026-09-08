@@ -22,8 +22,6 @@ export const useQuerySubscription = () => {
     socket?.on('message', (event) => {
       const data: WebSocketEvent = event;
 
-      let entity = null;
-
       switch (data.operation) {
         case 'invalidate':
           queryClient.invalidateQueries({
@@ -106,7 +104,7 @@ export const useQuerySubscription = () => {
           invalidateOnDeletePage(data.payload.node.id);
           break;
         case 'updateOne': {
-          entity = data.entity[0];
+          const entity = data.entity[0];
           const keyIds =
             entity === 'pages' ? [data.payload.slugId, data.id] : [data.id];
 

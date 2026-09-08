@@ -161,7 +161,8 @@ function parseSseBlock(block: string): SseEvent | undefined {
     return parsed as SseEvent;
   } catch (error) {
     throw new Error(
-      `Invalid Responses API stream event: ${errorMessage(error)}`
+      `Invalid Responses API stream event: ${errorMessage(error)}`,
+      { cause: error }
     );
   }
 }
@@ -309,7 +310,9 @@ export class OpenAiResponsesHttpClient implements ResponsesApiClient {
       });
     } catch (error) {
       if (options.signal.aborted) throw error;
-      throw new Error(`The AI provider request failed: ${errorMessage(error)}`);
+      throw new Error(`The AI provider request failed: ${errorMessage(error)}`, {
+        cause: error
+      });
     }
 
     if (!httpResponse.ok) {

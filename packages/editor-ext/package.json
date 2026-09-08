@@ -11,7 +11,7 @@
   "module": "./src/index.ts",
   "types": "dist/index.d.ts",
   "dependencies": {
-    "marked": "17.0.5"
+    "marked": "18.0.11"
   },
   "devDependencies": {
     "@typescript/native": "npm:typescript@^7.0.2"

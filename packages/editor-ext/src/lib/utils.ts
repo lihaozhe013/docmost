@@ -4,7 +4,6 @@ import { EditorView } from '@tiptap/pm/view';
 import { CellSelection, TableMap } from '@tiptap/pm/tables';
 import { Node, ResolvedPos } from '@tiptap/pm/model';
 import { sanitizeUrl as braintreeSanitizeUrl } from '@braintree/sanitize-url';
-import { customAlphabet } from 'nanoid';
 
 export const isRectSelected = (rect: any) => (selection: CellSelection) => {
   const map = TableMap.get(selection.$anchorCell.node(-1));
@@ -400,7 +399,18 @@ export function isInternalFileUrl(url: string | undefined): boolean {
 }
 
 const alphabet = 'abcdefghijklmnopqrstuvwxyz';
-export const generateNodeId = customAlphabet(alphabet, 12);
+
+// Inline nanoid-style generator. nanoid v5+ is ESM-only and cannot be
+// required from this CommonJS package.
+export function generateNodeId(size = 12): string {
+  const bytes = new Uint8Array(size);
+  crypto.getRandomValues(bytes);
+  let id = '';
+  for (let i = 0; i < size; i++) {
+    id += alphabet[bytes[i] % alphabet.length];
+  }
+  return id;
+}
 
 export function copyToClipboard(text: string): void {
   if ('clipboard' in navigator) {

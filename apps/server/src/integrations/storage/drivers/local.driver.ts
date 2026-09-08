@@ -35,7 +35,9 @@ export class LocalDriver implements StorageDriver {
         await pipeline(file, createWriteStream(fullPath));
       }
     } catch (err) {
-      throw new Error(`Failed to upload file: ${(err as Error).message}`);
+      throw new Error(`Failed to upload file: ${(err as Error).message}`, {
+        cause: err
+      });
     }
   }
 
@@ -49,7 +51,9 @@ export class LocalDriver implements StorageDriver {
       await fs.mkdir(dirname(fullPath), { recursive: true });
       await pipeline(file, createWriteStream(fullPath));
     } catch (err) {
-      throw new Error(`Failed to upload file: ${(err as Error).message}`);
+      throw new Error(`Failed to upload file: ${(err as Error).message}`, {
+        cause: err
+      });
     }
   }
 
@@ -62,7 +66,9 @@ export class LocalDriver implements StorageDriver {
         await fs.copy(fromFullPath, toFullPath);
       }
     } catch (err) {
-      throw new Error(`Failed to copy file: ${(err as Error).message}`);
+      throw new Error(`Failed to copy file: ${(err as Error).message}`, {
+        cause: err
+      });
     }
   }
 
@@ -70,7 +76,9 @@ export class LocalDriver implements StorageDriver {
     try {
       return await fs.readFile(this._fullPath(filePath));
     } catch (err) {
-      throw new Error(`Failed to read file: ${(err as Error).message}`);
+      throw new Error(`Failed to read file: ${(err as Error).message}`, {
+        cause: err
+      });
     }
   }
 
@@ -101,7 +109,8 @@ export class LocalDriver implements StorageDriver {
       return await fs.pathExists(this._fullPath(filePath));
     } catch (err) {
       throw new Error(
-        `Failed to check file existence: ${(err as Error).message}`
+        `Failed to check file existence: ${(err as Error).message}`,
+        { cause: err }
       );
     }
   }
@@ -118,7 +127,9 @@ export class LocalDriver implements StorageDriver {
     try {
       await fs.remove(this._fullPath(filePath));
     } catch (err) {
-      throw new Error(`Failed to delete file: ${(err as Error).message}`);
+      throw new Error(`Failed to delete file: ${(err as Error).message}`, {
+        cause: err
+      });
     }
   }
 

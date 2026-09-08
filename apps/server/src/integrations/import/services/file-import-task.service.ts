@@ -480,7 +480,7 @@ export class FileImportTaskService {
 
           for (const [filePath, page] of levelPages) {
             const absPath = path.join(extractDir, filePath);
-            let content = '';
+            let content: string;
 
             // Check if file exists (placeholder pages won't have physical files)
             try {
@@ -611,7 +611,9 @@ export class FileImportTaskService {
       }
     } catch (error) {
       this.logger.error('Failed to import files:', error);
-      throw new Error(`File import failed: ${error?.['message']}`);
+      throw new Error(`File import failed: ${error?.['message']}`, {
+        cause: error
+      });
     }
   }
 

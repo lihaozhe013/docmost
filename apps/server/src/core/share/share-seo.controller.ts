@@ -33,7 +33,7 @@ export class ShareSeoController {
     // https://github.com/nestjs/nest/issues/13401
     // we have to duplicate the DomainMiddleware code here as a workaround
 
-    let workspace: Workspace = null;
+    let workspace: Workspace;
     if (this.environmentService.isSelfHosted()) {
       workspace = await this.workspaceRepo.findFirst();
     } else {

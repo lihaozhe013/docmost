@@ -232,7 +232,15 @@ describe('AI page editing session', () => {
         target: expect.any(Object)
       }
     });
+    expect(JSON.stringify(requests[0]?.tools[1]?.parameters)).toContain(
+      'replace_code'
+    );
+    expect(JSON.stringify(requests[0]?.tools[1]?.parameters)).toContain(
+      'replace_inline_math'
+    );
     expect(requests[0]?.instructions).toContain('capabilities: replace_text');
+    expect(requests[0]?.instructions).toContain('Mermaid');
+    expect(requests[0]?.instructions).toContain('LaTeX');
     expect(JSON.stringify(requests[1]?.input)).toContain('r1');
     expect(JSON.stringify(requests[2]?.input)).toContain('change-1');
   });

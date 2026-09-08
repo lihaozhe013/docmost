@@ -10,6 +10,16 @@ export type BufferErrorCode =
   | 'RESULT_UNKNOWN'
   | 'CANCELLED';
 
+export type BufferCapability =
+  | 'replace_text'
+  | 'replace_code'
+  | 'replace_math'
+  | 'replace_inline_math'
+  | 'replace_text_with_math'
+  | 'delete_block'
+  | 'insert_before'
+  | 'insert_after';
+
 export class BufferError extends Error {
   constructor(
     public readonly code: BufferErrorCode,
@@ -28,9 +38,16 @@ export interface BufferBlock {
   parentBlockId?: string;
   text: string;
   editable: boolean;
-  capabilities: Array<
-    'replace_text' | 'delete_block' | 'insert_before' | 'insert_after'
-  >;
+  capabilities: BufferCapability[];
+  language?: string;
+  truncated?: boolean;
+  segments?: BufferSegment[];
+}
+
+export interface BufferSegment {
+  index: number;
+  type: 'text' | 'mathInline';
+  text: string;
 }
 
 export interface BufferReadResult {
@@ -56,6 +73,38 @@ export interface ReplaceTextOperation {
   blockId: string;
   oldText: string;
   newText: string;
+  segmentIndex?: number;
+}
+
+export interface ReplaceCodeOperation {
+  type: 'replace_code';
+  blockId: string;
+  oldText: string;
+  newText: string;
+  language?: string;
+}
+
+export interface ReplaceMathOperation {
+  type: 'replace_math';
+  blockId: string;
+  oldText: string;
+  newText: string;
+}
+
+export interface ReplaceInlineMathOperation {
+  type: 'replace_inline_math';
+  blockId: string;
+  segmentIndex: number;
+  oldText: string;
+  newText: string;
+}
+
+export interface ReplaceTextWithMathOperation {
+  type: 'replace_text_with_math';
+  blockId: string;
+  segmentIndex: number;
+  oldText: string;
+  newText: string;
 }
 
 export interface DeleteBlockOperation {
@@ -63,7 +112,13 @@ export interface DeleteBlockOperation {
   blockId: string;
 }
 
-export type BufferEditOperation = ReplaceTextOperation | DeleteBlockOperation;
+export type BufferEditOperation =
+  | ReplaceTextOperation
+  | ReplaceCodeOperation
+  | ReplaceMathOperation
+  | ReplaceInlineMathOperation
+  | ReplaceTextWithMathOperation
+  | DeleteBlockOperation;
 
 export interface BufferEditResult {
   changeId: string;

@@ -74,9 +74,17 @@ function messageId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
-function getError(error: unknown): { code: string; message: string } {
+function getError(error: unknown): {
+  code: string;
+  message: string;
+  details?: unknown;
+} {
   if (error instanceof BufferError) {
-    return { code: error.code, message: error.message };
+    return {
+      code: error.code,
+      message: error.message,
+      ...(error.details !== undefined ? { details: error.details } : {})
+    };
   }
   return {
     code: 'SESSION_UNAVAILABLE',
@@ -438,7 +446,9 @@ export function AiPageEditingPanel({
 
       const operation = (async (): Promise<ToolResponse> => {
         let result: BrowserToolResult | undefined;
-        let error: { code: string; message: string } | undefined;
+        let error:
+          | { code: string; message: string; details?: unknown }
+          | undefined;
         const signal = runAbortRef.current?.signal;
         try {
           const adapter = adapterRef.current;

@@ -36,6 +36,8 @@ The initial release supports:
 - A chat panel associated with the currently open page.
 - Reading the current body and a captured selection as context.
 - Replacing text within supported blocks.
+- Generating and editing fenced code blocks, including Mermaid diagrams.
+- Generating and editing block LaTeX formulas and inline LaTeX formulas.
 - Inserting supported blocks at explicit locations, including into an empty
   page.
 - Deleting supported blocks through an explicit operation.
@@ -65,7 +67,8 @@ The following are outside the initial release:
   tools.
 - Multi-agent orchestration, skills, plugin marketplaces, and MCP exposure.
 - Retrieval pipelines, embeddings, and workspace knowledge chat.
-- Creating attachments or editing diagrams, databases, and embedded content.
+- Creating attachments or editing non-Mermaid diagrams, databases, and embedded
+  content.
 - Editing page titles, permissions, comments, or other page metadata.
 - Durable chat history, automatic run recovery, and resuming interrupted tool
   execution.
@@ -288,6 +291,14 @@ Typed tool results must distinguish plain text from Markdown and structural
 metadata. For text replacement, `oldText` refers to the block's plain-text
 content, not heading syntax or metadata labels.
 
+Code blocks include their `language` and complete source in `text`. Formula
+blocks expose their LaTeX source in `text` without delimiters. Paragraphs and
+headings may include `segments`; each segment has the editor child `index`, a
+`type` of `text` or `mathInline`, and its source text. Use segment indexes for
+inline formula operations instead of guessing offsets from the rendered `$...$`
+notation. A block marked `truncated` must be read again before attempting a
+source replacement.
+
 Protected blocks expose their type and available local description only. The
 adapter must not fetch linked pages, embedded resources, or referenced document
 contents to enrich this projection.
@@ -314,23 +325,27 @@ Target-scoped checks may be introduced later with dedicated consistency tests.
 
 ### 6.4 Initial content support
 
-| Content                                                                                  | Read behavior                                  | Mutation behavior                                                                             |
-| ---------------------------------------------------------------------------------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| Ordinary paragraphs and headings                                                         | Text plus relevant structure/format metadata   | Targeted text replacement and explicit supported block deletion                               |
-| Simple lists                                                                             | Preserve list hierarchy in the read projection | Text replacement within supported paragraph children; insertion of new validated simple lists |
-| Empty document                                                                           | Explicit empty-buffer representation           | Insert supported content at document start                                                    |
-| Existing links and formatting marks                                                      | Expose enough context to interpret the text    | Preserve unaffected marks; reject ambiguous replacements                                      |
-| Comments and inline atoms                                                                | Indicate protected ranges                      | Reject edits that intersect protected ranges                                                  |
-| Tables, code blocks, callouts, columns, transclusions, attachments, diagrams, and embeds | Structural or protected representation         | Preserve existing nodes; do not edit their descendants in the initial release                 |
+| Content                                                                                 | Read behavior                                  | Mutation behavior                                                                             |
+| --------------------------------------------------------------------------------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Ordinary paragraphs and headings                                                        | Text plus relevant structure/format metadata   | Targeted text replacement and explicit supported block deletion                               |
+| Simple lists                                                                            | Preserve list hierarchy in the read projection | Text replacement within supported paragraph children; insertion of new validated simple lists |
+| Empty document                                                                          | Explicit empty-buffer representation           | Insert supported content at document start                                                    |
+| Existing links and formatting marks                                                     | Expose enough context to interpret the text    | Preserve unaffected marks; reject ambiguous replacements                                      |
+| Comments and unsupported inline atoms                                                   | Indicate protected ranges                      | Reject edits that intersect protected ranges                                                  |
+| Code blocks and Mermaid diagrams                                                        | Source text plus language                      | Replace complete source, optionally changing the language; Mermaid syntax is validated        |
+| Block and inline LaTeX formulas                                                         | Formula source and inline segment metadata     | Replace complete source after KaTeX validation                                                |
+| Tables, callouts, columns, transclusions, attachments, non-Mermaid diagrams, and embeds | Structural or protected representation         | Preserve existing nodes; do not edit their descendants                                        |
 
 An otherwise ordinary paragraph inside a protected container remains protected.
 Capability checks must inspect ancestry, not just the leaf node type.
 
-New content initially supports paragraphs, headings, and simple bullet or
-ordered lists, with a documented subset of basic inline formatting. Unsupported
-Markdown constructs must produce an explicit error rather than silently
-disappear or degrade. Raw HTML, image insertion, and application-specific nodes
-are outside this insertion grammar.
+New content supports paragraphs, headings, simple bullet or ordered lists,
+fenced code blocks, Mermaid code blocks, block formulas, and inline formulas,
+with a documented subset of basic inline formatting. Unsupported Markdown
+constructs must produce an explicit error rather than silently disappear or
+degrade. Raw HTML, image insertion, and application-specific nodes are outside
+this insertion grammar. HTML-looking text inside a code fence or formula is
+treated as source text.
 
 ## 7. Tool Contract
 
@@ -364,10 +379,18 @@ an edit. If a captured selection becomes invalid, report that state explicitly.
 
 ### 7.2 `edit_buffer`
 
-Inputs contain `expectedRevision` and one or more operations. The initial
+Inputs contain `expectedRevision` and one or more operations. The supported
 operation set is:
 
-- `replace_text`: `blockId`, `oldText`, and `newText`.
+- `replace_text`: `blockId`, `oldText`, `newText`, and optional `segmentIndex`
+  for a text segment in a paragraph containing inline formulas.
+- `replace_code`: complete code source in `oldText`, replacement source in
+  `newText`, and an optional `language`. Use this for Mermaid as well.
+- `replace_math`: complete block-formula source replacement.
+- `replace_inline_math`: replace the complete LaTeX source of an inline formula
+  identified by `segmentIndex`.
+- `replace_text_with_math`: replace a unique range in a text segment with a new
+  inline formula.
 - `delete_block`: `blockId`, restricted to deletable supported blocks.
 
 Example:
@@ -401,14 +424,24 @@ Replacement rules:
    resulting revision.
 
 Text replacement is confined to a supported text range within one text block.
-Multi-paragraph insertion belongs to `insert_blocks`.
+For a paragraph containing inline formulas, use the returned segment index and
+keep the range within its text segment. Multi-paragraph insertion belongs to
+`insert_blocks`.
+
+Code replacement compares the complete source, preserves the code block node and
+its attributes, and may contain line breaks. Setting `language` changes the
+language class; the exact value `language: "mermaid"` enables Mermaid rendering
+and requires valid Mermaid syntax. Formula replacement compares the complete
+source and validates the new source with KaTeX before changing the node. Inline
+formula source excludes its `$` delimiters and cannot contain line breaks.
 
 Use localized ProseMirror operations so unaffected nodes, attributes, and marks
 remain intact. Replacement text inherits marks only when the matched range has a
-uniform supported mark set. Mixed mark boundaries, comment ranges, and inline
-atoms produce `UNSUPPORTED_RANGE` in the initial release. The agent may read
-again and choose a smaller valid edit; the tool must never silently remove
-formatting to succeed.
+uniform supported mark set. Mixed mark boundaries, comment ranges, and
+unsupported inline atoms produce `UNSUPPORTED_RANGE`. Inline formula segments
+are handled only by their dedicated operations. The agent may read again and
+choose a smaller valid edit; the tool must never silently remove formatting to
+succeed.
 
 Block deletion must validate the resulting structure. Unsupported or ambiguous
 container cleanup is rejected rather than inferred. Preserve a valid empty
@@ -439,6 +472,25 @@ Complete insertion input:
 }
 ```
 
+The Markdown insertion grammar also accepts fenced code blocks. The language
+after the opening fence is stored on the code block; use `mermaid` exactly to
+render a diagram. A block formula is written as `$$` on separate lines, and an
+inline formula uses `$...$`. Formula and Mermaid sources are preserved as raw
+source and are validated before the transaction is dispatched. For example:
+
+````markdown
+The result is $a^2+b^2=c^2$.
+
+$$
+\\int_0^1 x^2\\,dx
+$$
+
+```mermaid
+flowchart TD
+  A[Start] --> B[Finish]
+```
+````
+
 The agent runtime also normalizes the unambiguous legacy forms
 `target: "document_start"`, `target: "document_end"`, and a
 `target: "before_block"` or `target: "after_block"` paired with a top-level
@@ -454,7 +506,9 @@ rejected.
 Parse and validate the entire fragment before inserting it. Apply it in one
 transaction using the current schema. New nodes receive IDs through the
 application's established ID behavior; returned handles must resolve
-immediately. Protected existing nodes remain unchanged.
+immediately. Protected existing nodes remain unchanged. A trailing empty
+paragraph may still be supplied by the editor's trailing-node extension and is
+not part of the requested content.
 
 ### 7.4 Tool results and errors
 
@@ -724,6 +778,7 @@ apps/client/src/features/ai-page-editing/
   ai-page-editing-panel.tsx
   ai-page-editing-panel.module.css
   document-buffer.ts
+  document-buffer-content.ts
   document-buffer-types.ts
   document-buffer-utils.ts
   document-buffer.test.ts
@@ -803,7 +858,10 @@ evidence.
 | Remote user edits after the read                                  | The pending edit fails its revision precondition when that update is present locally              |
 | Remote edit after local application                               | Existing collaboration convergence is preserved; no claim of semantic conflict resolution is made |
 | Existing marks and links                                          | Unaffected marks remain; ambiguous mixed-mark replacements are rejected                           |
-| Protected ancestor or inline atom                                 | The tool rejects the range without flattening it                                                  |
+| Inline formula segment                                            | The segment is addressed by index and its LaTeX source is replaced without changing adjacent text |
+| Code or Mermaid source                                            | Complete source and language are preserved or intentionally replaced; invalid Mermaid is rejected |
+| Block formula source                                              | Complete LaTeX source is preserved or intentionally replaced; invalid LaTeX is rejected           |
+| Protected ancestor or unsupported inline atom                     | The tool rejects the range without flattening it                                                  |
 | Diagram, table, attachment, or transclusion elsewhere on the page | The original protected node JSON remains unchanged                                                |
 | Empty page insertion                                              | A valid supported document fragment is created                                                    |
 | Unsupported insertion syntax                                      | An explicit error occurs with no partial insertion                                                |

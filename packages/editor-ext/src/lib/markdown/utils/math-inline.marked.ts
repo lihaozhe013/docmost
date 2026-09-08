@@ -1,6 +1,3 @@
-// @ts-ignore require(esm)
-import { Token, marked } from 'marked';
-
 interface MathInlineToken {
   type: 'mathInline';
   text: string;
@@ -43,14 +40,16 @@ export const mathInlineExtension = {
       };
     }
   },
-  renderer(token: Token) {
-    const mathInlineToken = token as MathInlineToken;
-    // parse to prevent escaping slashes
-    const latex = marked
-      .parse(mathInlineToken.text)
-      .toString()
-      .replace(/<(\/)?p>/g, '');
-
-    return `<span data-type="${mathInlineToken.type}" data-katex="true">${latex}</span>`;
+  renderer(token: MathInlineToken) {
+    return `<span data-type="${token.type}" data-katex="true">${escapeHtml(token.text)}</span>`;
   },
 };
+
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}

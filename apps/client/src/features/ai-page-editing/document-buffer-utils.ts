@@ -1,6 +1,7 @@
 import { Node as ProseMirrorNode } from '@tiptap/pm/model';
 import { Mapping, Step } from '@tiptap/pm/transform';
 import type {
+  BufferSegment,
   BufferEditOperation,
   BufferInsertInput
 } from './document-buffer-types';
@@ -19,20 +20,19 @@ export const MAX_BLOCK_TEXT = 20_000;
 export const MAX_READ_RESULT_CHARS = 80_000;
 export const MAX_CHANGE_TEXT = 2_000;
 
-const RAW_HTML_TAG_PATTERN = /<\/?[A-Za-z][^>]*>/;
-
 export function isEditableBlock(
   node: ProseMirrorNode,
   doc?: ProseMirrorNode,
   position?: number
 ): boolean {
-  if (
-    !(
-      (node.type.name === 'paragraph' || node.type.name === 'heading') &&
-      isDirectTextBlock(node) &&
-      node.content.content.every((child) => !hasProtectedTextMark(child))
-    )
-  ) {
+  const isTextBlock =
+    (node.type.name === 'paragraph' || node.type.name === 'heading') &&
+    isEditableInlineContent(node);
+  const isCodeBlock =
+    node.type.name === 'codeBlock' &&
+    node.content.content.every((child) => child.type.name === 'text');
+  const isMathBlock = node.type.name === 'mathBlock';
+  if (!isTextBlock && !isCodeBlock && !isMathBlock) {
     return false;
   }
   if (!doc || position === undefined) return true;
@@ -67,14 +67,50 @@ export function isValidEditOperation(
     return false;
   }
   if (value.type === 'delete_block') return true;
-  return (
-    value.type === 'replace_text' &&
-    typeof value.oldText === 'string' &&
-    value.oldText.length > 0 &&
-    value.oldText.length <= MAX_BLOCK_TEXT &&
-    typeof value.newText === 'string' &&
-    value.newText.length <= MAX_BLOCK_TEXT
-  );
+  if (
+    typeof value.oldText !== 'string' ||
+    value.oldText.length > MAX_BLOCK_TEXT ||
+    typeof value.newText !== 'string' ||
+    value.newText.length > MAX_BLOCK_TEXT
+  ) {
+    return false;
+  }
+  if (
+    (value.type === 'replace_text' ||
+      value.type === 'replace_text_with_math') &&
+    value.oldText.length < 1
+  ) {
+    return false;
+  }
+  if (
+    value.segmentIndex !== undefined &&
+    (!Number.isInteger(value.segmentIndex) ||
+      value.segmentIndex < 0 ||
+      value.segmentIndex > 100)
+  ) {
+    return false;
+  }
+  if (value.type === 'replace_text') return true;
+  if (value.type === 'replace_code' || value.type === 'replace_math') {
+    return (
+      value.type === 'replace_math' ||
+      value.language === undefined ||
+      (typeof value.language === 'string' &&
+        value.language.length <= 64 &&
+        !/[\r\n]/.test(value.language))
+    );
+  }
+  if (
+    value.type === 'replace_inline_math' ||
+    value.type === 'replace_text_with_math'
+  ) {
+    return (
+      Number.isInteger(value.segmentIndex) &&
+      value.segmentIndex >= 0 &&
+      value.segmentIndex <= 100
+    );
+  }
+  return false;
 }
 
 export function isValidInsertInput(value: unknown): value is BufferInsertInput {
@@ -86,7 +122,7 @@ export function isValidInsertInput(value: unknown): value is BufferInsertInput {
     typeof value.markdown !== 'string' ||
     !value.markdown.trim() ||
     value.markdown.length > 40_000 ||
-    RAW_HTML_TAG_PATTERN.test(value.markdown) ||
+    hasRawHtmlOutsideLiterals(value.markdown) ||
     !isRecord(value.target) ||
     typeof value.target.kind !== 'string'
   ) {
@@ -108,9 +144,41 @@ export function isValidInsertInput(value: unknown): value is BufferInsertInput {
 }
 
 export function getNodeText(node: ProseMirrorNode): string {
-  return node.type.name === 'paragraph' || node.type.name === 'heading'
-    ? node.textContent
-    : node.textBetween(0, node.content.size, '\n');
+  if (node.type.name === 'mathBlock') return String(node.attrs?.text ?? '');
+  if (node.type.name === 'codeBlock') return node.textContent;
+  if (node.type.name === 'paragraph' || node.type.name === 'heading') {
+    return node.content.content
+      .map((child) => {
+        if (child.type.name === 'mathInline') {
+          return `$${String(child.attrs?.text ?? '')}$`;
+        }
+        if (child.type.name === 'hardBreak') return '\n';
+        return child.text ?? '';
+      })
+      .join('');
+  }
+  return node.textBetween(0, node.content.size, '\n');
+}
+
+export function getInlineSegments(node: ProseMirrorNode): BufferSegment[] {
+  if (node.type.name !== 'paragraph' && node.type.name !== 'heading') {
+    return [];
+  }
+  return node.content.content
+    .map((child, index) => {
+      if (child.type.name === 'mathInline') {
+        return {
+          index,
+          type: 'mathInline' as const,
+          text: String(child.attrs?.text ?? '')
+        };
+      }
+      if (child.type.name === 'text') {
+        return { index, type: 'text' as const, text: child.text ?? '' };
+      }
+      return undefined;
+    })
+    .filter((segment): segment is BufferSegment => segment !== undefined);
 }
 
 export function compactChange(change: {
@@ -140,6 +208,14 @@ export function isDirectTextBlock(node: ProseMirrorNode): boolean {
   return node.content.content.every((child) => child.type.name === 'text');
 }
 
+function isEditableInlineContent(node: ProseMirrorNode): boolean {
+  return node.content.content.every(
+    (child) =>
+      (child.type.name === 'text' || child.type.name === 'mathInline') &&
+      !hasProtectedTextMark(child)
+  );
+}
+
 function hasProtectedTextMark(node: ProseMirrorNode): boolean {
   return node.marks.some((mark) => mark.type.name === 'comment');
 }
@@ -166,10 +242,108 @@ export function isSupportedInsertedNode(node: ProseMirrorNode): boolean {
     'orderedList',
     'listItem',
     'text',
-    'hardBreak'
+    'hardBreak',
+    'codeBlock',
+    'mathBlock',
+    'mathInline'
   ]);
   if (!allowed.has(node.type.name)) return false;
+  if (node.type.name === 'codeBlock') {
+    return node.content.content.every((child) => child.type.name === 'text');
+  }
+  if (node.type.name === 'mathBlock' || node.type.name === 'mathInline') {
+    return true;
+  }
   return node.content.content.every(isSupportedInsertedNode);
+}
+
+function hasRawHtmlOutsideLiterals(markdown: string): boolean {
+  for (let index = 0; index < markdown.length; index += 1) {
+    const character = markdown[index];
+    if (character === '\\') {
+      index += 1;
+      continue;
+    }
+    if (character === '`' || character === '~') {
+      let length = 1;
+      while (markdown[index + length] === character) length += 1;
+      if (character === '~' && length < 3) {
+        index += length - 1;
+        continue;
+      }
+      const delimiter = character.repeat(length);
+      const closing = findUnescapedDelimiter(
+        markdown,
+        delimiter,
+        index + length
+      );
+      if (closing !== -1) {
+        index = closing + length - 1;
+        continue;
+      }
+    }
+    if (character === '$') {
+      const length = markdown[index + 1] === '$' ? 2 : 1;
+      const delimiter = '$'.repeat(length);
+      const closing = findUnescapedDelimiter(
+        markdown,
+        delimiter,
+        index + length
+      );
+      if (
+        closing !== -1 &&
+        (length === 2 || isInlineMathRange(markdown, index, closing))
+      ) {
+        index = closing + length - 1;
+        continue;
+      }
+    }
+    if (character === '<') {
+      const rest = markdown.slice(index);
+      if (/^<\/?[A-Za-z][^>]*>/.test(rest) || /^<!--[\s\S]*?-->/.test(rest)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function findUnescapedDelimiter(
+  markdown: string,
+  delimiter: string,
+  start: number
+): number {
+  let index = start;
+  while (index < markdown.length) {
+    const candidate = markdown.indexOf(delimiter, index);
+    if (candidate === -1) return -1;
+    let backslashes = 0;
+    for (
+      let cursor = candidate - 1;
+      cursor >= 0 && markdown[cursor] === '\\';
+      cursor -= 1
+    ) {
+      backslashes += 1;
+    }
+    if (backslashes % 2 === 0) return candidate;
+    index = candidate + delimiter.length;
+  }
+  return -1;
+}
+
+function isInlineMathRange(
+  markdown: string,
+  opening: number,
+  closing: number
+): boolean {
+  const contentStart = opening + 1;
+  return (
+    (opening === 0 || markdown[opening - 1] === ' ') &&
+    closing > contentStart &&
+    !/\s/.test(markdown[contentStart]) &&
+    !/\s/.test(markdown[closing - 1]) &&
+    (closing + 1 >= markdown.length || !/\d/.test(markdown[closing + 1]))
+  );
 }
 
 export function rangesOverlap(

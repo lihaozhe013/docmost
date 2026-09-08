@@ -1,6 +1,3 @@
-// @ts-ignore require(esm)
-import { Token, marked } from 'marked';
-
 interface MathBlockToken {
   type: 'mathBlock';
   text: string;
@@ -25,14 +22,16 @@ export const mathBlockExtension = {
       };
     }
   },
-  renderer(token: Token) {
-    const mathBlockToken = token as MathBlockToken;
-    // parse to prevent escaping slashes
-    const latex = marked
-      .parse(mathBlockToken.text)
-      .toString()
-      .replace(/<(\/)?p>/g, '');
-
-    return `<div data-type="${mathBlockToken.type}" data-katex="true">${latex}</div>`;
+  renderer(token: MathBlockToken) {
+    return `<div data-type="${token.type}" data-katex="true">${escapeHtml(token.text)}</div>`;
   },
 };
+
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}

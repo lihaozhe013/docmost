@@ -4,6 +4,15 @@ import { DOMParser, Node as ProseMirrorNode } from '@tiptap/pm/model';
 import { Step } from '@tiptap/pm/transform';
 import { nanoid } from 'nanoid';
 import { BufferError } from './document-buffer-types';
+import {
+  replaceInlineSegmentText,
+  replaceInlineSegmentWithMath,
+  trimTrailingEmptyParagraphs,
+  validateFormulaContent,
+  validateLatex,
+  validateMermaidContent,
+  validateMermaidSource
+} from './document-buffer-content';
 import type {
   BrowserToolResult,
   BufferBlock,
@@ -15,6 +24,7 @@ import type {
 } from './document-buffer-types';
 import {
   compactChange,
+  getInlineSegments,
   getNodeText,
   isDirectTextBlock,
   isEditableBlock,
@@ -35,6 +45,7 @@ import type { FallbackBinding } from './document-buffer-utils';
 export { BufferError };
 export type {
   BufferErrorCode,
+  BufferCapability,
   BrowserToolResult,
   BufferBlock,
   BufferEditOperation,
@@ -43,8 +54,13 @@ export type {
   BufferInsertResult,
   BufferReadInput,
   BufferReadResult,
+  BufferSegment,
   DeleteBlockOperation,
-  ReplaceTextOperation
+  ReplaceCodeOperation,
+  ReplaceInlineMathOperation,
+  ReplaceMathOperation,
+  ReplaceTextOperation,
+  ReplaceTextWithMathOperation
 } from './document-buffer-types';
 
 type BlockLocation = {
@@ -175,18 +191,7 @@ export class DocumentBuffer {
           input.operations.length < 1 ||
           input.operations.length > 20 ||
           input.operations.some(
-            (operation: any) =>
-              !operation ||
-              typeof operation.blockId !== 'string' ||
-              operation.blockId.length < 1 ||
-              operation.blockId.length > 128 ||
-              (operation.type === 'replace_text' &&
-                (typeof operation.oldText !== 'string' ||
-                  !operation.oldText.length ||
-                  operation.oldText.length > MAX_BLOCK_TEXT ||
-                  typeof operation.newText !== 'string' ||
-                  operation.newText.length > MAX_BLOCK_TEXT)) ||
-              !['replace_text', 'delete_block'].includes(operation.type)
+            (operation: unknown) => !isValidEditOperation(operation)
           )
         ) {
           throw new BufferError(
@@ -194,7 +199,7 @@ export class DocumentBuffer {
             'edit_buffer requires a revision and operations'
           );
         }
-        return this.edit(input?.expectedRevision, input?.operations);
+        return this.edit(input?.expectedRevision, input?.operations, signal);
       case 'insert_blocks':
         if (
           !isRecord(input) ||
@@ -297,7 +302,7 @@ export class DocumentBuffer {
       index += 1
     ) {
       const block = this.toBlock(visibleLocations[index]);
-      const blockChars = block.text.length + block.blockId.length + 64;
+      const blockChars = JSON.stringify(block).length + 1;
       if (
         blocks.length > 0 &&
         resultChars + blockChars > MAX_READ_RESULT_CHARS
@@ -320,11 +325,13 @@ export class DocumentBuffer {
     };
   }
 
-  edit(
+  async edit(
     expectedRevision: string,
-    operations: BufferEditOperation[]
-  ): BufferEditResult {
+    operations: BufferEditOperation[],
+    signal?: AbortSignal
+  ): Promise<BufferEditResult> {
     this.ensureEditable();
+    ensureNotAborted(signal);
     if (
       typeof expectedRevision !== 'string' ||
       expectedRevision.length < 1 ||
@@ -351,6 +358,9 @@ export class DocumentBuffer {
         'edit_buffer contains invalid operations'
       );
     }
+    await this.validateEditContent(expectedRevision, operations, signal);
+    this.ensureEditable();
+    ensureNotAborted(signal);
 
     const locations = this.getLocations();
     const byId = new Map(
@@ -362,10 +372,12 @@ export class DocumentBuffer {
     const prepared: Array<{
       operation: BufferEditOperation;
       location: BlockLocation;
+      kind: 'text' | 'code' | 'node' | 'inline-node' | 'text-to-inline-math';
       from: number;
       to: number;
       before: string;
       after: string;
+      attrs?: Record<string, unknown>;
     }> = [];
 
     for (const operation of operations) {
@@ -394,18 +406,191 @@ export class DocumentBuffer {
         prepared.push({
           operation,
           location,
+          kind: 'node',
           from: location.position,
           to: location.position + location.node.nodeSize,
-          before: location.node.textContent,
+          before: getNodeText(location.node),
           after: ''
         });
         continue;
       }
 
-      if (!isDirectTextBlock(location.node)) {
+      if (operation.type === 'replace_code') {
+        if (location.node.type.name !== 'codeBlock') {
+          throw new BufferError(
+            'UNSUPPORTED_RANGE',
+            `Block ${operation.blockId} is not a code block`
+          );
+        }
+        const before = location.node.textContent;
+        if (before !== operation.oldText) {
+          throw new BufferError(
+            'TEXT_NOT_FOUND',
+            `The complete code source was not found in block ${operation.blockId}`
+          );
+        }
+        const attrs =
+          operation.language === undefined
+            ? undefined
+            : { ...location.node.attrs, language: operation.language };
+        prepared.push({
+          operation,
+          location,
+          kind: 'code',
+          from: location.position + 1,
+          to: location.position + location.node.nodeSize - 1,
+          before,
+          after: operation.newText,
+          ...(attrs ? { attrs } : {})
+        });
+        continue;
+      }
+
+      if (operation.type === 'replace_math') {
+        if (location.node.type.name !== 'mathBlock') {
+          throw new BufferError(
+            'UNSUPPORTED_RANGE',
+            `Block ${operation.blockId} is not a block formula`
+          );
+        }
+        const before = String(location.node.attrs?.text ?? '');
+        if (before !== operation.oldText) {
+          throw new BufferError(
+            'TEXT_NOT_FOUND',
+            `The complete formula source was not found in block ${operation.blockId}`
+          );
+        }
+        validateLatex(operation.newText, true, operation.blockId);
+        prepared.push({
+          operation,
+          location,
+          kind: 'node',
+          from: location.position,
+          to: location.position + location.node.nodeSize,
+          before,
+          after: operation.newText,
+          attrs: { ...location.node.attrs, text: operation.newText }
+        });
+        continue;
+      }
+
+      if (
+        operation.type === 'replace_inline_math' ||
+        operation.type === 'replace_text_with_math'
+      ) {
+        if (
+          location.node.type.name !== 'paragraph' &&
+          location.node.type.name !== 'heading'
+        ) {
+          throw new BufferError(
+            'UNSUPPORTED_RANGE',
+            `Block ${operation.blockId} does not contain inline formula segments`
+          );
+        }
+        const segment = getInlineChildLocation(
+          location.node,
+          location.position,
+          operation.segmentIndex
+        );
+        if (!segment) {
+          throw new BufferError(
+            'UNSUPPORTED_RANGE',
+            `Segment ${operation.segmentIndex} was not found in block ${operation.blockId}`
+          );
+        }
+        if (
+          operation.type === 'replace_inline_math' &&
+          segment.node.type.name !== 'mathInline'
+        ) {
+          throw new BufferError(
+            'UNSUPPORTED_RANGE',
+            `Segment ${operation.segmentIndex} is not an inline formula`
+          );
+        }
+        if (
+          operation.type === 'replace_text_with_math' &&
+          segment.node.type.name !== 'text'
+        ) {
+          throw new BufferError(
+            'UNSUPPORTED_RANGE',
+            `Segment ${operation.segmentIndex} is not text`
+          );
+        }
+        const segmentText =
+          segment.node.type.name === 'mathInline'
+            ? String(segment.node.attrs?.text ?? '')
+            : (segment.node.text ?? '');
+        let before = segmentText;
+        let matchOffset = 0;
+        if (operation.type === 'replace_inline_math') {
+          if (segmentText !== operation.oldText) {
+            throw new BufferError(
+              'TEXT_NOT_FOUND',
+              `The complete segment text was not found in block ${operation.blockId}`
+            );
+          }
+        } else {
+          matchOffset = segmentText.indexOf(operation.oldText);
+          if (matchOffset === -1) {
+            throw new BufferError(
+              'TEXT_NOT_FOUND',
+              `The exact text was not found in segment ${operation.segmentIndex}`
+            );
+          }
+          if (matchOffset !== segmentText.lastIndexOf(operation.oldText)) {
+            throw new BufferError(
+              'AMBIGUOUS_MATCH',
+              `The exact text occurs more than once in segment ${operation.segmentIndex}`
+            );
+          }
+          before = getNodeText(location.node);
+        }
+        if (
+          operation.newText.includes('\n') ||
+          operation.newText.includes('\r')
+        ) {
+          throw new BufferError(
+            'UNSUPPORTED_RANGE',
+            'Inline formulas cannot contain line breaks'
+          );
+        }
+        validateLatex(operation.newText, false, operation.blockId);
+        const attrs = { text: operation.newText };
+        prepared.push({
+          operation,
+          location,
+          kind:
+            operation.type === 'replace_inline_math'
+              ? 'inline-node'
+              : 'text-to-inline-math',
+          from: segment.position + matchOffset,
+          to:
+            segment.position +
+            (operation.type === 'replace_inline_math'
+              ? segment.node.nodeSize
+              : matchOffset + operation.oldText.length),
+          before,
+          after:
+            operation.type === 'replace_inline_math'
+              ? operation.newText
+              : replaceInlineSegmentWithMath(
+                  location.node,
+                  operation.segmentIndex,
+                  operation.oldText,
+                  operation.newText
+                ),
+          attrs
+        });
+        continue;
+      }
+
+      if (
+        location.node.type.name !== 'paragraph' &&
+        location.node.type.name !== 'heading'
+      ) {
         throw new BufferError(
           'UNSUPPORTED_RANGE',
-          `Block ${operation.blockId} contains inline or nested content`
+          `Block ${operation.blockId} does not contain editable text`
         );
       }
       if (
@@ -417,38 +602,86 @@ export class DocumentBuffer {
           `Block ${operation.blockId} replacements cannot contain line breaks`
         );
       }
-      const first = location.node.textContent.indexOf(operation.oldText);
-      if (first === -1) {
-        throw new BufferError(
-          'TEXT_NOT_FOUND',
-          `The exact text was not found in block ${operation.blockId}`
+
+      let from: number;
+      let before: string;
+      let first: number;
+      if (operation.segmentIndex !== undefined) {
+        const segment = getInlineChildLocation(
+          location.node,
+          location.position,
+          operation.segmentIndex
         );
+        if (!segment || segment.node.type.name !== 'text') {
+          throw new BufferError(
+            'UNSUPPORTED_RANGE',
+            `Segment ${operation.segmentIndex} is not editable text`
+          );
+        }
+        before = segment.node.text ?? '';
+        first = before.indexOf(operation.oldText);
+        if (first === -1) {
+          throw new BufferError(
+            'TEXT_NOT_FOUND',
+            `The exact text was not found in segment ${operation.segmentIndex}`
+          );
+        }
+        if (first !== before.lastIndexOf(operation.oldText)) {
+          throw new BufferError(
+            'AMBIGUOUS_MATCH',
+            `The exact text occurs more than once in segment ${operation.segmentIndex}`
+          );
+        }
+        from = segment.position + first;
+      } else {
+        if (!isDirectTextBlock(location.node)) {
+          throw new BufferError(
+            'UNSUPPORTED_RANGE',
+            `Block ${operation.blockId} contains inline content; provide segmentIndex`
+          );
+        }
+        before = location.node.textContent;
+        first = before.indexOf(operation.oldText);
+        if (first === -1) {
+          throw new BufferError(
+            'TEXT_NOT_FOUND',
+            `The exact text was not found in block ${operation.blockId}`
+          );
+        }
+        if (first !== before.lastIndexOf(operation.oldText)) {
+          throw new BufferError(
+            'AMBIGUOUS_MATCH',
+            `The exact text occurs more than once in block ${operation.blockId}`
+          );
+        }
+        if (
+          !isSingleTextNodeRange(location.node, first, operation.oldText.length)
+        ) {
+          throw new BufferError(
+            'UNSUPPORTED_RANGE',
+            `The replacement in block ${operation.blockId} crosses formatting boundaries`
+          );
+        }
+        from = location.position + 1 + first;
       }
-      if (first !== location.node.textContent.lastIndexOf(operation.oldText)) {
-        throw new BufferError(
-          'AMBIGUOUS_MATCH',
-          `The exact text occurs more than once in block ${operation.blockId}`
-        );
-      }
-      if (
-        !isSingleTextNodeRange(location.node, first, operation.oldText.length)
-      ) {
-        throw new BufferError(
-          'UNSUPPORTED_RANGE',
-          `The replacement in block ${operation.blockId} crosses formatting boundaries`
-        );
-      }
-      const from = location.position + 1 + first;
       prepared.push({
         operation,
         location,
+        kind: 'text',
         from,
         to: from + operation.oldText.length,
-        before: location.node.textContent,
+        before: getNodeText(location.node),
         after:
-          location.node.textContent.slice(0, first) +
-          operation.newText +
-          location.node.textContent.slice(first + operation.oldText.length)
+          operation.segmentIndex === undefined
+            ? getNodeText(location.node).slice(0, first) +
+              operation.newText +
+              getNodeText(location.node).slice(first + operation.oldText.length)
+            : replaceInlineSegmentText(
+                location.node,
+                operation.segmentIndex,
+                operation.oldText,
+                operation.newText
+              )
       });
     }
 
@@ -476,25 +709,66 @@ export class DocumentBuffer {
             `Block ${item.operation.blockId} is nested and cannot be deleted`
           );
         }
+        const preserveFinalBlock =
+          item.operation.blockId === preservedFinalBlockId &&
+          item.location.node.content.size > 0 &&
+          (item.location.node.type.name === 'paragraph' ||
+            item.location.node.type.name === 'heading');
         if (
           item.operation.blockId === preservedFinalBlockId &&
           item.location.node.content.size === 0
         ) {
-          throw new BufferError(
-            'UNSUPPORTED_RANGE',
-            'The final empty block cannot be deleted'
-          );
+          const isEmptyTextBlock =
+            item.location.node.type.name === 'paragraph' ||
+            item.location.node.type.name === 'heading';
+          if (isEmptyTextBlock) {
+            throw new BufferError(
+              'UNSUPPORTED_RANGE',
+              'The final empty block cannot be deleted'
+            );
+          }
         }
         transaction.delete(
-          item.operation.blockId === preservedFinalBlockId
-            ? item.from + 1
-            : item.from,
-          item.operation.blockId === preservedFinalBlockId
-            ? item.to - 1
-            : item.to
+          preserveFinalBlock ? item.from + 1 : item.from,
+          preserveFinalBlock ? item.to - 1 : item.to
         );
+      } else if (item.kind === 'text' || item.kind === 'code') {
+        const operation = item.operation as
+          | Extract<BufferEditOperation, { type: 'replace_text' }>
+          | Extract<BufferEditOperation, { type: 'replace_code' }>;
+        transaction.insertText(operation.newText, item.from, item.to);
+        if (item.kind === 'code' && item.attrs) {
+          transaction.setNodeMarkup(
+            item.location.position,
+            undefined,
+            item.attrs
+          );
+        }
+      } else if (item.kind === 'node') {
+        transaction.setNodeMarkup(
+          item.location.position,
+          undefined,
+          item.attrs
+        );
+      } else if (item.kind === 'inline-node') {
+        transaction.setNodeMarkup(item.from, undefined, item.attrs);
       } else {
-        transaction.insertText(item.operation.newText, item.from, item.to);
+        const operation = item.operation as Extract<
+          BufferEditOperation,
+          { type: 'replace_text_with_math' }
+        >;
+        const mathInline = this.editor.schema.nodes.mathInline;
+        if (!mathInline) {
+          throw new BufferError(
+            'UNSUPPORTED_RANGE',
+            'Inline formulas are not supported by this editor'
+          );
+        }
+        transaction.replaceWith(
+          item.from,
+          item.to,
+          mathInline.create({ text: operation.newText })
+        );
       }
       changes.push({
         blockId: item.operation.blockId,
@@ -540,6 +814,7 @@ export class DocumentBuffer {
       content = parser.parseSlice(wrapper, {
         preserveWhitespace: true
       }).content;
+      content = trimTrailingEmptyParagraphs(content);
     } catch (error) {
       throw new BufferError(
         'INVALID_CONTENT',
@@ -555,6 +830,9 @@ export class DocumentBuffer {
         'The insertion contains unsupported or empty content'
       );
     }
+
+    validateFormulaContent(content);
+    await validateMermaidContent(content);
 
     this.ensureAvailable();
     ensureNotAborted(signal);
@@ -662,6 +940,33 @@ export class DocumentBuffer {
         ? changes.map(compactChange)
         : provisionalChanges.map(compactChange)
     };
+  }
+
+  private async validateEditContent(
+    expectedRevision: string,
+    operations: BufferEditOperation[],
+    signal?: AbortSignal
+  ): Promise<void> {
+    this.ensureAvailable();
+    ensureNotAborted(signal);
+    this.ensureRevision(expectedRevision);
+    const locations = new Map(
+      this.getLocations().map((location) => [location.blockId, location])
+    );
+    for (const operation of operations) {
+      ensureNotAborted(signal);
+      if (operation.type !== 'replace_code') continue;
+      const location = locations.get(operation.blockId);
+      if (!location || location.node.type.name !== 'codeBlock') continue;
+      const language =
+        operation.language ?? String(location.node.attrs?.language ?? '');
+      if (language === 'mermaid') {
+        await validateMermaidSource(operation.newText, operation.blockId);
+      }
+      ensureNotAborted(signal);
+      this.ensureAvailable();
+      this.ensureRevision(expectedRevision);
+    }
   }
 
   undo(changeId?: string): { changeId: string; revision: string } {
@@ -876,7 +1181,9 @@ export class DocumentBuffer {
         node.descendants((child, childPosition) => {
           if (
             child.type.name !== 'paragraph' &&
-            child.type.name !== 'heading'
+            child.type.name !== 'heading' &&
+            child.type.name !== 'codeBlock' &&
+            child.type.name !== 'mathBlock'
           ) {
             return;
           }
@@ -926,13 +1233,34 @@ export class DocumentBuffer {
 
   private toBlock(location: BlockLocation): BufferBlock {
     const editable = location.editable;
+    const fullText = getNodeText(location.node);
+    const truncated = fullText.length > MAX_BLOCK_TEXT;
     const capabilities: BufferBlock['capabilities'] = [];
+    if (editable && !truncated) {
+      if (
+        location.node.type.name === 'paragraph' ||
+        location.node.type.name === 'heading'
+      ) {
+        capabilities.push('replace_text');
+        const segments = getInlineSegments(location.node);
+        if (segments.some((segment) => segment.type === 'mathInline')) {
+          capabilities.push('replace_inline_math');
+        }
+        if (segments.some((segment) => segment.type === 'text')) {
+          capabilities.push('replace_text_with_math');
+        }
+      } else if (location.node.type.name === 'codeBlock') {
+        capabilities.push('replace_code');
+      } else if (location.node.type.name === 'mathBlock') {
+        capabilities.push('replace_math');
+      }
+    }
     if (editable) {
-      capabilities.push('replace_text');
       if (location.topLevel) {
         capabilities.push('delete_block', 'insert_before', 'insert_after');
       }
     }
+    const segments = getInlineSegments(location.node);
     return {
       blockId: location.blockId,
       type: location.node.type.name,
@@ -940,9 +1268,22 @@ export class DocumentBuffer {
       ...(location.parentBlockId
         ? { parentBlockId: location.parentBlockId }
         : {}),
-      text: getNodeText(location.node).slice(0, MAX_BLOCK_TEXT),
+      text: fullText.slice(0, MAX_BLOCK_TEXT),
       editable,
-      capabilities
+      capabilities,
+      ...(location.node.type.name === 'codeBlock' &&
+      typeof location.node.attrs?.language === 'string'
+        ? { language: location.node.attrs.language }
+        : {}),
+      ...(segments.length
+        ? {
+            segments: segments.map((segment) => ({
+              ...segment,
+              text: segment.text.slice(0, MAX_BLOCK_TEXT)
+            }))
+          }
+        : {}),
+      ...(truncated ? { truncated: true } : {})
     };
   }
 
@@ -989,4 +1330,24 @@ function ensureNotAborted(signal?: AbortSignal): void {
   if (signal?.aborted) {
     throw new BufferError('CANCELLED', 'The document operation was cancelled');
   }
+}
+
+function getInlineChildLocation(
+  node: ProseMirrorNode,
+  blockPosition: number,
+  childIndex: number
+): { node: ProseMirrorNode; position: number } | undefined {
+  if (childIndex < 0 || childIndex >= node.childCount) return undefined;
+  let offset = 0;
+  for (let index = 0; index < node.childCount; index += 1) {
+    const child = node.child(index);
+    if (index === childIndex) {
+      return {
+        node: child,
+        position: blockPosition + 1 + offset
+      };
+    }
+    offset += child.nodeSize;
+  }
+  return undefined;
 }

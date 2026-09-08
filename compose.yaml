@@ -1,6 +1,6 @@
 services:
   docmost:
-    image: ghcr.io/lihaozhe013/docmost:hash
+    image: ghcr.io/lihaozhe013/docmost:latest
     environment:
       APP_URL: 'url'
       APP_SECRET: 'APP_SECRET'

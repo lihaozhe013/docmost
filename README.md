@@ -1,10 +1,15 @@
 # Docmost (Personal fork)
 
-A focused, self-hosted fork of [Docmost](https://docmost.com) for private use
-by one person or a small group of family, friends, or colleagues. The project
-is intended to be deployed on infrastructure controlled by its users. It is
-free, open-source, and non-commercial by default, and it is not intended to
-become a public hosted service or a general enterprise distribution.
+A focused, self-hosted project maintained in
+[lihaozhe013/docmost](https://github.com/lihaozhe013/docmost) for private use by
+one person or a small group of family, friends, or colleagues. It started as a
+fork of [Docmost](https://docmost.com), and is intended to be deployed on
+infrastructure controlled by its users. It is free, open-source, and
+non-commercial by default, and it is not intended to become a public hosted
+service or a general enterprise distribution.
+
+The default container image is built and published by this repository as
+`ghcr.io/lihaozhe013/docmost`.
 
 ## Project direction
 

@@ -1,6 +1,6 @@
 {
   "name": "@docmost/base-formula",
-  "homepage": "https://docmost.com",
+  "homepage": "https://github.com/lihaozhe013/docmost",
   "private": true,
   "scripts": {
     "build": "tsc --build",

@@ -15,6 +15,11 @@ REDIS_URL=redis://127.0.0.1:6379
 
 # options: local | s3 | azure
 STORAGE_DRIVER=local
+
+AI_API_URL=
+# Examples: https://api.openai.com/v1 or https://api.openai.com/v1/responses
+AI_API_KEY=
+AI_MODEL=
 ```
 
 run this to create a db:

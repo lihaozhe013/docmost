@@ -1,6 +1,6 @@
 {
   "name": "@docmost/editor-ext",
-  "homepage": "https://docmost.com",
+  "homepage": "https://github.com/lihaozhe013/docmost",
   "private": true,
   "sideEffects": false,
   "scripts": {

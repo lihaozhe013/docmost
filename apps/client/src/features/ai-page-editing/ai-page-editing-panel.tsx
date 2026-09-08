@@ -27,6 +27,7 @@ import {
   BrowserToolResult,
   DocumentBuffer
 } from './document-buffer';
+import { MarkdownContent } from '@/components/common/markdown-content';
 import classes from './ai-page-editing-panel.module.css';
 
 const MAX_STORED_TOOL_RESULTS = 24;
@@ -679,14 +680,21 @@ export function AiPageEditingPanel({
                         ? 'Page AI'
                         : 'Tool'}
                   </Text>
-                  <Text
-                    size="sm"
-                    className={
-                      message.role === 'tool' ? classes.tool : classes.message
-                    }
-                  >
-                    {message.content}
-                  </Text>
+                  {message.role === 'assistant' ? (
+                    <MarkdownContent
+                      content={message.content}
+                      className={classes.markdownMessage}
+                    />
+                  ) : (
+                    <Text
+                      size="sm"
+                      className={
+                        message.role === 'tool' ? classes.tool : classes.message
+                      }
+                    >
+                      {message.content}
+                    </Text>
+                  )}
                 </div>
               ))}
             </Stack>

@@ -36,6 +36,7 @@ import {
   MAX_BLOCK_TEXT,
   MAX_READ_BLOCKS,
   MAX_READ_RESULT_CHARS,
+  NESTED_CONTAINER_TYPES,
   rangesOverlap,
   rebaseFallbackBindings,
   resolveBlockId
@@ -1177,7 +1178,7 @@ export class DocumentBuffer {
         topLevel: true,
         depth: 0
       });
-      if (node.type.name === 'bulletList' || node.type.name === 'orderedList') {
+      if (NESTED_CONTAINER_TYPES.has(node.type.name)) {
         node.descendants((child, childPosition) => {
           if (
             child.type.name !== 'paragraph' &&

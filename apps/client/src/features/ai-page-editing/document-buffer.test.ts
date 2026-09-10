@@ -1,6 +1,15 @@
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
-import { MathBlock, MathInline } from '@docmost/editor-ext';
+import { TaskItem, TaskList } from '@tiptap/extension-list';
+import {
+  Callout,
+  CustomTable,
+  TableCell,
+  TableHeader,
+  TableRow,
+  MathBlock,
+  MathInline
+} from '@docmost/editor-ext';
 import CodeBlock from '@tiptap/extension-code-block';
 import { describe, expect, it } from 'vitest';
 import { BufferError, DocumentBuffer } from './document-buffer';
@@ -21,6 +30,24 @@ function createRichEditor(content: any): Editor {
       MathInline.configure({ view: TestNodeView }),
       MathBlock.configure({ view: TestNodeView }),
       CodeBlock.configure({ languageClassPrefix: 'language-' })
+    ],
+    content
+  });
+}
+
+function createContainerEditor(content: any): Editor {
+  return new Editor({
+    extensions: [
+      StarterKit,
+      TaskList,
+      TaskItem,
+      Callout.configure({ view: TestNodeView }),
+      CustomTable,
+      TableRow,
+      // The real cell content expressions reference media nodes that are not
+      // part of this minimal test schema.
+      TableCell.extend({ content: 'block+' }),
+      TableHeader.extend({ content: 'block+' })
     ],
     content
   });
@@ -748,6 +775,137 @@ describe('DocumentBuffer', () => {
         { type: 'delete_block', blockId: item!.blockId }
       ])
     ).rejects.toThrowError(/nested and cannot be deleted/);
+
+    editor.destroy();
+    buffer.destroy();
+  });
+
+  it('inserts quotes and edits their nested paragraphs', async () => {
+    const editor = createEditor({
+      type: 'doc',
+      content: [
+        { type: 'paragraph', content: [{ type: 'text', text: 'Seed' }] }
+      ]
+    });
+    const buffer = new DocumentBuffer(editor, 'page-1');
+
+    const inserted = await buffer.insert({
+      expectedRevision: buffer.read().revision,
+      target: { kind: 'document_end' },
+      markdown: '> quoted one\n>\n> quoted two'
+    });
+    expect(inserted.status).toBe('applied');
+
+    const read = buffer.read();
+    const quote = read.blocks.find((block) => block.type === 'blockquote');
+    expect(quote).toBeDefined();
+    const nested = read.blocks.filter(
+      (block) => block.parentBlockId === quote!.blockId
+    );
+    expect(nested.map((block) => block.text)).toEqual([
+      'quoted one',
+      'quoted two'
+    ]);
+    expect(nested.every((block) => block.editable)).toBe(true);
+
+    const change = await buffer.edit(read.revision, [
+      {
+        type: 'replace_text',
+        blockId: nested[0].blockId,
+        oldText: 'quoted one',
+        newText: 'replaced quote line'
+      }
+    ]);
+    expect(change.status).toBe('applied');
+    expect(editor.state.doc.textContent).toContain('replaced quote line');
+
+    await expect(
+      buffer.edit(change.revision, [
+        { type: 'delete_block', blockId: nested[1].blockId }
+      ])
+    ).rejects.toThrowError(/nested and cannot be deleted/);
+
+    editor.destroy();
+    buffer.destroy();
+  });
+
+  it('inserts task lists, callouts, tables, and horizontal rules', async () => {
+    const editor = createContainerEditor({
+      type: 'doc',
+      content: [
+        { type: 'paragraph', content: [{ type: 'text', text: 'Seed' }] }
+      ]
+    });
+    const buffer = new DocumentBuffer(editor, 'page-1');
+
+    const tasks = await buffer.insert({
+      expectedRevision: buffer.read().revision,
+      target: { kind: 'document_end' },
+      markdown: '- [ ] open task\n- [x] done task'
+    });
+    const callout = await buffer.insert({
+      expectedRevision: tasks.revision,
+      target: { kind: 'document_end' },
+      markdown: ':::info\nPay attention\n:::'
+    });
+    const table = await buffer.insert({
+      expectedRevision: callout.revision,
+      target: { kind: 'document_end' },
+      markdown: '| name | value |\n| --- | --- |\n| alpha | 1 |'
+    });
+    const rule = await buffer.insert({
+      expectedRevision: table.revision,
+      target: { kind: 'document_end' },
+      markdown: '---'
+    });
+    expect([tasks.status, callout.status, table.status, rule.status]).toEqual([
+      'applied',
+      'applied',
+      'applied',
+      'applied'
+    ]);
+
+    const read = buffer.read();
+    expect(read.blocks.some((block) => block.type === 'horizontalRule')).toBe(
+      true
+    );
+
+    const list = read.blocks.find((block) => block.type === 'taskList')!;
+    // marked keeps the space after the "[ ]" checkbox, like the paste path.
+    expect(
+      read.blocks
+        .filter((block) => block.parentBlockId === list.blockId)
+        .map((block) => block.text.trim())
+    ).toEqual(['open task', 'done task']);
+
+    const note = read.blocks.find((block) => block.type === 'callout')!;
+    expect(
+      read.blocks
+        .filter((block) => block.parentBlockId === note.blockId)
+        .map((block) => block.text)
+    ).toEqual(['Pay attention']);
+
+    const grid = read.blocks.find((block) => block.type === 'table')!;
+    const cells = read.blocks.filter(
+      (block) => block.parentBlockId === grid.blockId
+    );
+    expect(cells.map((block) => block.text)).toEqual([
+      'name',
+      'value',
+      'alpha',
+      '1'
+    ]);
+
+    const edited = await buffer.edit(read.revision, [
+      {
+        type: 'replace_text',
+        blockId: cells[2].blockId,
+        oldText: 'alpha',
+        newText: 'beta'
+      }
+    ]);
+    expect(edited.status).toBe('applied');
+    expect(editor.state.doc.textContent).toContain('beta');
 
     editor.destroy();
     buffer.destroy();

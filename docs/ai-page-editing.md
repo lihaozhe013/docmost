@@ -325,27 +325,31 @@ Target-scoped checks may be introduced later with dedicated consistency tests.
 
 ### 6.4 Initial content support
 
-| Content                                                                                 | Read behavior                                  | Mutation behavior                                                                             |
-| --------------------------------------------------------------------------------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| Ordinary paragraphs and headings                                                        | Text plus relevant structure/format metadata   | Targeted text replacement and explicit supported block deletion                               |
-| Simple lists                                                                            | Preserve list hierarchy in the read projection | Text replacement within supported paragraph children; insertion of new validated simple lists |
-| Empty document                                                                          | Explicit empty-buffer representation           | Insert supported content at document start                                                    |
-| Existing links and formatting marks                                                     | Expose enough context to interpret the text    | Preserve unaffected marks; reject ambiguous replacements                                      |
-| Comments and unsupported inline atoms                                                   | Indicate protected ranges                      | Reject edits that intersect protected ranges                                                  |
-| Code blocks and Mermaid diagrams                                                        | Source text plus language                      | Replace complete source, optionally changing the language; Mermaid syntax is validated        |
-| Block and inline LaTeX formulas                                                         | Formula source and inline segment metadata     | Replace complete source after KaTeX validation                                                |
-| Tables, callouts, columns, transclusions, attachments, non-Mermaid diagrams, and embeds | Structural or protected representation         | Preserve existing nodes; do not edit their descendants                                        |
+| Content                                                               | Read behavior                                  | Mutation behavior                                                                             |
+| --------------------------------------------------------------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Ordinary paragraphs and headings                                      | Text plus relevant structure/format metadata   | Targeted text replacement and explicit supported block deletion                               |
+| Simple lists                                                          | Preserve list hierarchy in the read projection | Text replacement within supported paragraph children; insertion of new validated simple lists |
+| Quotes, task lists, callouts, and tables                              | Index nested text blocks under the container   | Text replacement within nested supported paragraphs; insertion of new validated containers    |
+| Empty document                                                        | Explicit empty-buffer representation           | Insert supported content at document start                                                    |
+| Existing links and formatting marks                                   | Expose enough context to interpret the text    | Preserve unaffected marks; reject ambiguous replacements                                      |
+| Comments and unsupported inline atoms                                 | Indicate protected ranges                      | Reject edits that intersect protected ranges                                                  |
+| Code blocks and Mermaid diagrams                                      | Source text plus language                      | Replace complete source, optionally changing the language; Mermaid syntax is validated        |
+| Block and inline LaTeX formulas                                       | Formula source and inline segment metadata     | Replace complete source after KaTeX validation                                                |
+| Columns, transclusions, attachments, non-Mermaid diagrams, and embeds | Structural or protected representation         | Preserve existing nodes; do not edit their descendants                                        |
 
 An otherwise ordinary paragraph inside a protected container remains protected.
 Capability checks must inspect ancestry, not just the leaf node type.
 
-New content supports paragraphs, headings, simple bullet or ordered lists,
-fenced code blocks, Mermaid code blocks, block formulas, and inline formulas,
-with a documented subset of basic inline formatting. Unsupported Markdown
-constructs must produce an explicit error rather than silently disappear or
-degrade. Raw HTML, image insertion, and application-specific nodes are outside
-this insertion grammar. HTML-looking text inside a code fence or formula is
-treated as source text.
+New content supports paragraphs, headings, simple bullet or ordered lists, task
+lists (`- [ ]`, `- [x] `), quotes (`> `), callouts
+(`:::info|success|warning|danger` with a body closed by `:::`), GitHub pipe
+tables, horizontal rules (`---`), fenced code blocks, Mermaid code blocks, block
+formulas, and inline formulas, with a documented subset of basic inline
+formatting. Unsupported Markdown constructs must produce an explicit error
+rather than silently disappear or degrade. Raw HTML, image insertion, and media,
+attachment, transclusion, column, or details nodes are outside this insertion
+grammar. HTML-looking text inside a code fence or formula is treated as source
+text.
 
 ## 7. Tool Contract
 
@@ -474,9 +478,15 @@ Complete insertion input:
 
 The Markdown insertion grammar also accepts fenced code blocks. The language
 after the opening fence is stored on the code block; use `mermaid` exactly to
-render a diagram. A block formula is written as `$$` on separate lines, and an
-inline formula uses `$...$`. Formula and Mermaid sources are preserved as raw
-source and are validated before the transaction is dispatched. For example:
+render a diagram. Quotes use `> ` lines, task items start with `- [ ] ` or
+`- [x] `, callouts use `:::type` followed by a body and a closing `:::`, GitHub
+pipe syntax inserts real tables, and a `---` line separated by blank lines is a
+horizontal rule. Text blocks nested inside these containers are indexed with
+their container as `parentBlockId` and can be replaced with `replace_text`, but
+nested blocks cannot be deleted or used as insertion targets. A block formula is
+written as `$$` on separate lines, and an inline formula uses `$...$`. Formula
+and Mermaid sources are preserved as raw source and are validated before the
+transaction is dispatched. For example:
 
 ````markdown
 The result is $a^2+b^2=c^2$.

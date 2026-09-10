@@ -20,6 +20,31 @@ export const MAX_BLOCK_TEXT = 20_000;
 export const MAX_READ_RESULT_CHARS = 80_000;
 export const MAX_CHANGE_TEXT = 2_000;
 
+// Containers whose supported children are indexed as nested editable blocks.
+export const NESTED_CONTAINER_TYPES = new Set([
+  'bulletList',
+  'orderedList',
+  'blockquote',
+  'taskList',
+  'callout',
+  'table'
+]);
+
+// Ancestors that keep a text block editable when the block is nested.
+const EDITABLE_ANCESTOR_TYPES = new Set([
+  'bulletList',
+  'orderedList',
+  'listItem',
+  'blockquote',
+  'taskList',
+  'taskItem',
+  'callout',
+  'table',
+  'tableRow',
+  'tableCell',
+  'tableHeader'
+]);
+
 export function isEditableBlock(
   node: ProseMirrorNode,
   doc?: ProseMirrorNode,
@@ -39,12 +64,7 @@ export function isEditableBlock(
 
   const resolved = doc.resolve(position + 1);
   for (let depth = 1; depth < resolved.depth; depth += 1) {
-    const ancestor = resolved.node(depth).type.name;
-    if (
-      ancestor !== 'bulletList' &&
-      ancestor !== 'orderedList' &&
-      ancestor !== 'listItem'
-    ) {
+    if (!EDITABLE_ANCESTOR_TYPES.has(resolved.node(depth).type.name)) {
       return false;
     }
   }
@@ -241,6 +261,15 @@ export function isSupportedInsertedNode(node: ProseMirrorNode): boolean {
     'bulletList',
     'orderedList',
     'listItem',
+    'blockquote',
+    'taskList',
+    'taskItem',
+    'callout',
+    'table',
+    'tableRow',
+    'tableCell',
+    'tableHeader',
+    'horizontalRule',
     'text',
     'hardBreak',
     'codeBlock',

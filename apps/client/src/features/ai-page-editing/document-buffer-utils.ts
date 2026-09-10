@@ -1,9 +1,10 @@
 import { Node as ProseMirrorNode } from '@tiptap/pm/model';
 import { Mapping, Step } from '@tiptap/pm/transform';
-import type {
-  BufferSegment,
-  BufferEditOperation,
-  BufferInsertInput
+import {
+  BufferError,
+  type BufferSegment,
+  type BufferEditOperation,
+  type BufferInsertInput
 } from './document-buffer-types';
 
 export type FallbackBinding = {
@@ -498,4 +499,10 @@ export function resolveBlockId(
     ...(parentBlockId ? { parentBlockId } : {})
   });
   return { blockId, nextCounter: nextCounter + 1 };
+}
+
+export function ensureNotAborted(signal?: AbortSignal): void {
+  if (signal?.aborted) {
+    throw new BufferError('CANCELLED', 'The document operation was cancelled');
+  }
 }

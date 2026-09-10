@@ -649,6 +649,23 @@ acknowledgement is lost, mark its result unknown. The initial release stops the
 run and requires a fresh document read before further work; it does not
 automatically resend the mutation after reconnecting.
 
+### 9.1 Image attachments
+
+A start message may reference up to four images with `attachmentIds`. The
+browser uploads images through the existing `POST /api/files/upload` endpoint
+before sending the start message; raw image bytes never travel over Socket.IO
+because its default payload limit is about 1 MB.
+
+The server re-validates every referenced attachment before the run: it must
+exist, belong to the requesting user and workspace, be attached to the same page
+as the run, not be deleted, carry an image extension in `png/jpg/jpeg/webp/gif`,
+and be no larger than 10 MB. Valid attachments are read from storage and sent to
+the provider as `input_image` content parts on the current run's user message
+only. Images are intentionally not replayed in later runs, so the model does not
+retain them across turns. Failures end the run with `run.failed` and codes
+`INVALID_ATTACHMENT`, `UNSUPPORTED_IMAGE_TYPE`, or `ATTACHMENT_TOO_LARGE`. This
+requires a vision-capable `AI_MODEL`.
+
 ## 10. Context, Limits, and Model Instructions
 
 The run context contains the user request, bounded prior conversation, current
@@ -676,8 +693,9 @@ five-minute run timeout, a 20-message history window with an 80,000-character
 aggregate history budget, 20,000-character prompt and block-text limits, a
 40,000-character Markdown insertion limit, 100 blocks per read page, an
 80,000-character read-result budget, and a 60,000-character initial buffer
-context. These limits are implementation defaults and must be changed together
-with this document and the corresponding schemas.
+context. Image attachments allow at most four per message, each no larger than
+10 MB, and only for the current run. These limits are implementation defaults
+and must be changed together with this document and the corresponding schemas.
 
 Writes execute sequentially regardless of the chosen library's default tool
 concurrency. A model-generated batch of dependent writes must either be
@@ -698,6 +716,8 @@ changes.
 Required behavior:
 
 - Capture the page and selection when submitting a message.
+- Allow attaching images through a file picker or paste, show upload state and
+  thumbnails, and keep the message enabled for text-only use.
 - Show read/edit activity without exposing raw protocol payloads by default.
 - Apply only complete, validated tool calls; never stream incomplete edits into
   the document.
@@ -730,7 +750,9 @@ not bypass the application's existing sanitization rules.
 
 Do not include secrets, authentication tokens, provider request bodies, or full
 document contents in operational logs. Document text is sent only as required by
-the configured model invocation and explicit tool results.
+the configured model invocation and explicit tool results. Attached images are
+read from storage and sent to the provider for the current run only; they are
+uploaded as ordinary page attachments and inherit that lifecycle.
 
 ## 13. Observability
 

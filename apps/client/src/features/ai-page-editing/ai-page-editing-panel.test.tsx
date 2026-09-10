@@ -1,4 +1,10 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor
+} from '@testing-library/react';
 import { Provider, createStore } from 'jotai';
 import { MantineProvider } from '@mantine/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -8,13 +14,22 @@ import { AiPageEditingPanel } from './ai-page-editing-panel';
 
 const PAGE_ID = 'page-1';
 const SOCKET_ID = 'socket-1';
+const ATTACHMENT_ID = 'att-1';
 
 const mocks = vi.hoisted(() => ({
   read: vi.fn(() => ({ selection: undefined })),
   executeTool: vi.fn(),
   undo: vi.fn(),
   getLatestChangeId: vi.fn(() => ''),
-  revealBlock: vi.fn()
+  revealBlock: vi.fn(),
+  uploadFile: vi.fn(async () => ({
+    id: 'att-1',
+    url: 'http://localhost:3000/api/files/att-1/shot.png'
+  }))
+}));
+
+vi.mock('@/features/page/services/page-service.ts', () => ({
+  uploadFile: mocks.uploadFile
 }));
 
 vi.mock('./document-buffer', () => {
@@ -127,7 +142,31 @@ describe('AiPageEditingPanel', () => {
         disconnect = vi.fn();
       }
     );
+    Object.defineProperty(URL, 'createObjectURL', {
+      configurable: true,
+      value: vi.fn(() => 'blob:ai-preview')
+    });
+    Object.defineProperty(URL, 'revokeObjectURL', {
+      configurable: true,
+      value: vi.fn()
+    });
   });
+
+  function attachPanelImage(name = 'shot.png') {
+    const fileInput = document.querySelector(
+      'input[type="file"]'
+    ) as HTMLInputElement;
+    expect(fileInput).toBeTruthy();
+    fireEvent.change(fileInput, {
+      target: {
+        files: [
+          new File([new Uint8Array([1, 2, 3])], name, {
+            type: 'image/png'
+          })
+        ]
+      }
+    });
+  }
 
   it('uses a wrapping textarea and keeps Shift+Enter local', () => {
     const { socket } = renderPanel();
@@ -271,5 +310,74 @@ describe('AiPageEditingPanel', () => {
 
     expect(screen.queryByText('Undo last AI change')).toBeNull();
     expect(screen.queryByText('Go to change')).toBeNull();
+  });
+
+  it('sends attachment ids once uploaded images are ready', async () => {
+    const { socket } = renderPanel();
+    const input = screen.getByPlaceholderText('Ask Page AI…');
+
+    attachPanelImage();
+    fireEvent.change(input, {
+      target: { value: 'Describe the screenshot' }
+    });
+    await waitFor(() =>
+      expect(mocks.uploadFile).toHaveBeenCalledWith(
+        expect.objectContaining({ name: 'shot.png' }),
+        PAGE_ID
+      )
+    );
+
+    const sendButton = screen.getByLabelText('Send to Page AI');
+    await waitFor(() =>
+      expect((sendButton as HTMLButtonElement).disabled).toBe(false)
+    );
+    fireEvent.click(sendButton);
+
+    expect(socket.emit).toHaveBeenCalledWith(
+      'message',
+      expect.objectContaining({
+        operation: 'aiPageEditing.start',
+        pageId: PAGE_ID,
+        prompt: 'Describe the screenshot',
+        attachmentIds: [ATTACHMENT_ID]
+      })
+    );
+    expect(screen.getByAltText('shot.png')).toBeTruthy();
+  });
+
+  it('blocks sending during upload and allows an images-only prompt', async () => {
+    let resolveUpload!: (value: { id: string; url: string }) => void;
+    mocks.uploadFile.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveUpload = resolve;
+        })
+    );
+    const { socket } = renderPanel();
+
+    attachPanelImage();
+    const sendButton = screen.getByLabelText('Send to Page AI');
+    expect((sendButton as HTMLButtonElement).disabled).toBe(true);
+
+    await waitFor(() => expect(mocks.uploadFile).toHaveBeenCalled());
+    await act(async () => {
+      resolveUpload({
+        id: ATTACHMENT_ID,
+        url: 'http://localhost:3000/api/files/att-1/shot.png'
+      });
+    });
+    await waitFor(() =>
+      expect((sendButton as HTMLButtonElement).disabled).toBe(false)
+    );
+    fireEvent.click(sendButton);
+
+    expect(socket.emit).toHaveBeenCalledWith(
+      'message',
+      expect.objectContaining({
+        operation: 'aiPageEditing.start',
+        prompt: '',
+        attachmentIds: [ATTACHMENT_ID]
+      })
+    );
   });
 });

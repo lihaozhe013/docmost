@@ -1,9 +1,11 @@
 import {
   ActionIcon,
   Badge,
+  Box,
   Button,
   Divider,
   Group,
+  Loader,
   Paper,
   ScrollArea,
   Stack,
@@ -12,7 +14,9 @@ import {
   Tooltip
 } from '@mantine/core';
 import {
+  IconAlertTriangle,
   IconArrowUp,
+  IconPhoto,
   IconPlayerStop,
   IconPlus,
   IconRotate2,
@@ -23,11 +27,20 @@ import { useAtom } from 'jotai';
 import { useEffect, useRef, useState } from 'react';
 import { socketAtom } from '@/features/websocket/atoms/socket-atom.ts';
 import { pageEditorAtom } from '@/features/editor/atoms/editor-atoms.ts';
+import { uploadFile } from '@/features/page/services/page-service.ts';
+import { IAttachment } from '@/features/attachments/types/attachment.types.ts';
 import {
   BufferError,
   BrowserToolResult,
   DocumentBuffer
 } from './document-buffer';
+import {
+  AI_IMAGE_ACCEPT,
+  MAX_AI_IMAGES,
+  compressImageForAi,
+  isSupportedAiImage,
+  validateAiImageBatch
+} from './ai-image-upload';
 import { MarkdownContent } from '@/components/common/markdown-content';
 import classes from './ai-page-editing-panel.module.css';
 
@@ -39,6 +52,23 @@ type ChatMessage = {
   id: string;
   role: 'user' | 'assistant' | 'tool';
   content: string;
+  images?: ChatMessageImage[];
+};
+
+type ChatMessageImage = {
+  attachmentId: string;
+  url: string;
+  fileName: string;
+};
+
+type PendingImage = {
+  localId: string;
+  file: File;
+  previewUrl: string;
+  status: 'uploading' | 'ready' | 'error';
+  attachmentId?: string;
+  url?: string;
+  error?: string;
 };
 
 type EditingEvent = {
@@ -244,7 +274,10 @@ export function AiPageEditingPanel({
   const [latestAffectedBlockId, setLatestAffectedBlockId] = useState<
     string | null
   >(null);
+  const [pendingImages, setPendingImages] = useState<PendingImage[]>([]);
   const adapterRef = useRef<DocumentBuffer | null>(null);
+  const pendingImagesRef = useRef(pendingImages);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const runIdRef = useRef<string | null>(null);
   const messagesRef = useRef(messages);
   const assistantMessageIdRef = useRef<string | null>(null);
@@ -257,6 +290,10 @@ export function AiPageEditingPanel({
   const cancelledPendingStartRef = useRef(false);
 
   messagesRef.current = messages;
+
+  useEffect(() => {
+    pendingImagesRef.current = pendingImages;
+  }, [pendingImages]);
 
   useEffect(() => {
     if (
@@ -488,8 +525,7 @@ export function AiPageEditingPanel({
       const operation = (async (): Promise<ToolResponse> => {
         let result: BrowserToolResult | undefined;
         let error:
-          | { code: string; message: string; details?: unknown }
-          | undefined;
+          { code: string; message: string; details?: unknown } | undefined;
         const signal = runAbortRef.current?.signal;
         try {
           const adapter = adapterRef.current;
@@ -578,9 +614,99 @@ export function AiPageEditingPanel({
 
   if (!enabled || !editor || editor.isDestroyed) return null;
 
+  const clearPendingImages = () => {
+    setPendingImages((current) => {
+      for (const image of current) {
+        URL.revokeObjectURL(image.previewUrl);
+      }
+      return [];
+    });
+  };
+
+  const removePendingImage = (localId: string) => {
+    setPendingImages((current) => {
+      const target = current.find((image) => image.localId === localId);
+      if (target) URL.revokeObjectURL(target.previewUrl);
+      return current.filter((image) => image.localId !== localId);
+    });
+  };
+
+  const handleAddImages = (files: File[]) => {
+    const supported = files.filter(isSupportedAiImage);
+    if (supported.length !== files.length) {
+      reportLocalError(
+        `Unsupported files were ignored. Allowed image types: ${AI_IMAGE_ACCEPT}`
+      );
+    }
+    const rejection = validateAiImageBatch(
+      pendingImagesRef.current.length,
+      supported
+    );
+    if (rejection) {
+      reportLocalError(rejection);
+      return;
+    }
+    for (const file of supported) {
+      const localId = messageId();
+      const previewUrl = URL.createObjectURL(file);
+      setPendingImages((current) => [
+        ...current,
+        { localId, file, previewUrl, status: 'uploading' }
+      ]);
+      void (async () => {
+        try {
+          const compressed = await compressImageForAi(file);
+          const attachment = await uploadFile(compressed, pageId);
+          const url = (attachment as IAttachment & { url?: string }).url;
+          if (!attachment.id || !url) {
+            throw new Error('The upload response was missing the attachment');
+          }
+          setPendingImages((current) =>
+            current.map((image) =>
+              image.localId === localId && image.status === 'uploading'
+                ? {
+                    ...image,
+                    file: compressed,
+                    attachmentId: attachment.id,
+                    url,
+                    status: 'ready'
+                  }
+                : image
+            )
+          );
+        } catch (error) {
+          const parsed = getError(error);
+          setPendingImages((current) =>
+            current.map((image) =>
+              image.localId === localId && image.status === 'uploading'
+                ? { ...image, status: 'error', error: parsed.message }
+                : image
+            )
+          );
+        }
+      })();
+    }
+  };
+
+  const handlePaste = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const files = Array.from(event.clipboardData?.files ?? []).filter((file) =>
+      file.type.startsWith('image/')
+    );
+    if (!files.length) return;
+    event.preventDefault();
+    handleAddImages(files);
+  };
+
   const handleSend = () => {
     const value = prompt.trim();
-    if (!value || running) return;
+    const readyImages = pendingImages.filter(
+      (image) => image.status === 'ready' && image.attachmentId && image.url
+    );
+    const blockedImages = pendingImages.some(
+      (image) => image.status === 'uploading' || image.status === 'error'
+    );
+    if (running || blockedImages) return;
+    if (!value && readyImages.length === 0) return;
     if (!socket) {
       reportLocalError('The editor connection is not available yet.');
       return;
@@ -611,7 +737,20 @@ export function AiPageEditingPanel({
     const history = getBoundedHistory(messagesRef.current.slice(-20));
     setMessages((current) => [
       ...current,
-      { id: messageId(), role: 'user', content: value }
+      {
+        id: messageId(),
+        role: 'user',
+        content: value,
+        ...(readyImages.length
+          ? {
+              images: readyImages.map((image) => ({
+                attachmentId: image.attachmentId as string,
+                url: image.url as string,
+                fileName: image.file.name
+              }))
+            }
+          : {})
+      }
     ]);
     setPrompt('');
     setOpen(true);
@@ -622,9 +761,17 @@ export function AiPageEditingPanel({
       operation: 'aiPageEditing.start',
       pageId,
       prompt: value,
+      ...(readyImages.length
+        ? {
+            attachmentIds: readyImages.map(
+              (image) => image.attachmentId as string
+            )
+          }
+        : {}),
       messages: history,
       ...(selection ? { selection } : {})
     });
+    clearPendingImages();
   };
 
   const reportLocalError = (message: string) => {
@@ -668,6 +815,7 @@ export function AiPageEditingPanel({
     messagesRef.current = [];
     setMessages([]);
     setPrompt('');
+    clearPendingImages();
     setRunning(false);
     setLatestChangeId(null);
     setLatestAffectedBlockId(null);
@@ -717,6 +865,15 @@ export function AiPageEditingPanel({
     }
   };
 
+  const readyImageCount = pendingImages.filter(
+    (image) => image.status === 'ready'
+  ).length;
+  const blockedByPendingImages = pendingImages.some(
+    (image) => image.status === 'uploading' || image.status === 'error'
+  );
+  const canSend =
+    !blockedByPendingImages && (Boolean(prompt.trim()) || readyImageCount > 0);
+
   return (
     <div className={classes.root}>
       {open && (
@@ -764,6 +921,19 @@ export function AiPageEditingPanel({
                         ? 'Page AI'
                         : 'Tool'}
                   </Text>
+                  {message.role === 'user' && message.images?.length ? (
+                    <Group gap={4} mb={2}>
+                      {message.images.map((image) => (
+                        <img
+                          key={image.attachmentId}
+                          src={image.url}
+                          alt={image.fileName}
+                          title={image.fileName}
+                          className={classes.bubbleImage}
+                        />
+                      ))}
+                    </Group>
+                  ) : null}
                   {message.role === 'assistant' ? (
                     <MarkdownContent
                       content={message.content}
@@ -783,7 +953,73 @@ export function AiPageEditingPanel({
               ))}
             </Stack>
           </ScrollArea>
+          {pendingImages.length > 0 && (
+            <Group gap="xs" mt="sm" wrap="nowrap">
+              {pendingImages.map((image) => (
+                <div
+                  key={image.localId}
+                  className={classes.imageChip}
+                  data-status={image.status}
+                >
+                  <img
+                    src={image.previewUrl}
+                    alt={image.file.name}
+                    title={image.error ?? image.file.name}
+                    className={classes.imageThumb}
+                  />
+                  {image.status === 'uploading' && (
+                    <Box className={classes.imageChipOverlay}>
+                      <Loader size={14} />
+                    </Box>
+                  )}
+                  {image.status === 'error' && (
+                    <Tooltip label={image.error || 'Upload failed'}>
+                      <Box className={classes.imageChipOverlay}>
+                        <IconAlertTriangle
+                          size={14}
+                          color="var(--mantine-color-red-filled)"
+                        />
+                      </Box>
+                    </Tooltip>
+                  )}
+                  <ActionIcon
+                    size="xs"
+                    className={classes.imageChipRemove}
+                    variant="filled"
+                    color="dark"
+                    onClick={() => removePendingImage(image.localId)}
+                    disabled={running}
+                    aria-label={`Remove ${image.file.name}`}
+                  >
+                    <IconX size={10} />
+                  </ActionIcon>
+                </div>
+              ))}
+            </Group>
+          )}
           <Group gap="xs" mt="sm" align="flex-end">
+            <Tooltip label={`Attach up to ${MAX_AI_IMAGES} images`}>
+              <ActionIcon
+                variant="subtle"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={running || pendingImages.length >= MAX_AI_IMAGES}
+                aria-label="Attach images to Page AI"
+              >
+                <IconPhoto size={16} />
+              </ActionIcon>
+            </Tooltip>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept={AI_IMAGE_ACCEPT}
+              multiple
+              hidden
+              onChange={(event) => {
+                const files = Array.from(event.currentTarget.files ?? []);
+                event.currentTarget.value = '';
+                if (files.length) handleAddImages(files);
+              }}
+            />
             <Textarea
               flex={1}
               className={classes.promptInput}
@@ -795,6 +1031,7 @@ export function AiPageEditingPanel({
               resize="none"
               placeholder="Ask Page AI…"
               onChange={(event) => setPrompt(event.currentTarget.value)}
+              onPaste={handlePaste}
               onKeyDown={(event) => {
                 if (event.key === 'Enter' && !event.shiftKey) {
                   event.preventDefault();
@@ -817,7 +1054,7 @@ export function AiPageEditingPanel({
               <ActionIcon
                 color="blue"
                 variant="filled"
-                disabled={!prompt.trim()}
+                disabled={!canSend}
                 onClick={handleSend}
                 aria-label="Send to Page AI"
               >

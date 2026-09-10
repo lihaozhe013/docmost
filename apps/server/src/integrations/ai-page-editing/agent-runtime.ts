@@ -65,6 +65,7 @@ export interface AgentRuntimeRunOptions {
   model: string;
   system: string;
   prompt: string;
+  images?: string[];
   messages?: RuntimeMessage[];
   tools: Record<string, RuntimeToolDefinition>;
   signal: AbortSignal;
@@ -134,6 +135,16 @@ function inputFromMessages(
     role: message.role,
     content: message.content
   }));
+}
+
+function userPromptItem(text: string, images?: string[]): ResponsesInputItem {
+  if (!images?.length) return { role: 'user', content: text };
+  const content: Record<string, unknown>[] = [];
+  if (text) content.push({ type: 'input_text', text });
+  for (const imageUrl of images) {
+    content.push({ type: 'input_image', image_url: imageUrl });
+  }
+  return { role: 'user', content };
 }
 
 type CachedToolResult = {
@@ -234,7 +245,7 @@ export class AgentRuntime {
   async run(options: AgentRuntimeRunOptions): Promise<{ text: string }> {
     const input: ResponsesInputItem[] = [
       ...inputFromMessages(options.messages),
-      { role: 'user', content: options.prompt }
+      userPromptItem(options.prompt, options.images)
     ];
     const tools = runtimeTools(options.tools);
     const cachedToolResults = new Map<string, CachedToolResult>();

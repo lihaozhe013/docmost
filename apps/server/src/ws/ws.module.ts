@@ -5,6 +5,7 @@ import { WsTreeService } from './ws-tree.service';
 import { TokenModule } from '../core/auth/token.module';
 import { BaseRealtimeBridge } from './base-realtime.bridge';
 import { AiPageEditingService } from '../integrations/ai-page-editing/ai-page-editing.service';
+import { AiPageEditingImageService } from '../integrations/ai-page-editing/ai-page-editing-image.service';
 import { AgentRuntime } from '../integrations/ai-page-editing/agent-runtime';
 import { OpenAiResponsesClientFactory } from '../integrations/ai-page-editing/model';
 
@@ -17,6 +18,7 @@ import { OpenAiResponsesClientFactory } from '../integrations/ai-page-editing/mo
     WsTreeService,
     BaseRealtimeBridge,
     AiPageEditingService,
+    AiPageEditingImageService,
     AgentRuntime,
     OpenAiResponsesClientFactory
   ],

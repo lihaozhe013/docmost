@@ -2,6 +2,9 @@ import { z } from 'zod';
 
 export const AI_PAGE_EDITING_OPERATION = 'aiPageEditing';
 
+// Keep in sync with apps/client/src/features/ai-page-editing/ai-image-upload.ts
+export const MAX_AI_IMAGES = 4;
+
 export const aiPageEditingOperation = z.enum([
   'start',
   'stop',
@@ -12,30 +15,42 @@ export const aiPageEditingOperation = z.enum([
 export type AiPageEditingOperation = z.infer<typeof aiPageEditingOperation>;
 
 export const aiPageEditingMessageSchema = z.discriminatedUnion('operation', [
-  z.object({
-    operation: z.literal('aiPageEditing.start'),
-    pageId: z.string().min(1).max(128),
-    prompt: z.string().trim().min(1).max(20_000),
-    messages: z
-      .array(
-        z.object({
-          role: z.enum(['user', 'assistant']),
-          content: z.string().max(20_000)
+  z
+    .object({
+      operation: z.literal('aiPageEditing.start'),
+      pageId: z.string().min(1).max(128),
+      prompt: z.string().trim().max(20_000),
+      attachmentIds: z.array(z.string().uuid()).max(MAX_AI_IMAGES).optional(),
+      messages: z
+        .array(
+          z.object({
+            role: z.enum(['user', 'assistant']),
+            content: z.string().max(20_000)
+          })
+        )
+        .max(20)
+        .optional(),
+      selection: z
+        .object({
+          text: z.string().max(20_000),
+          from: z.number().int().nonnegative(),
+          to: z.number().int().nonnegative()
         })
-      )
-      .max(20)
-      .optional(),
-    selection: z
-      .object({
-        text: z.string().max(20_000),
-        from: z.number().int().nonnegative(),
-        to: z.number().int().nonnegative()
-      })
-      .refine((selection) => selection.from <= selection.to, {
-        message: 'Selection range is invalid'
-      })
-      .optional()
-  }),
+        .refine((selection) => selection.from <= selection.to, {
+          message: 'Selection range is invalid'
+        })
+        .optional()
+    })
+    .superRefine((message, context) => {
+      // A run must carry at least one prompt element; images alone are valid.
+      if (!message.prompt && !message.attachmentIds?.length) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['prompt'],
+          message: 'A prompt or at least one image is required'
+        });
+      }
+    }),
   z.object({
     operation: z.literal('aiPageEditing.stop'),
     runId: z.string().min(1).max(128)
@@ -120,8 +135,7 @@ export interface AiPageEditingToolRequest {
 }
 
 export type AiPageEditingOutboundMessage =
-  | AiPageEditingEvent
-  | AiPageEditingToolRequest;
+  AiPageEditingEvent | AiPageEditingToolRequest;
 
 export interface AiPageEditingSelection {
   text: string;

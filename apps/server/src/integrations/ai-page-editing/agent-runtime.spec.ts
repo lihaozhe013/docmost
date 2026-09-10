@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { AgentRuntime } from './agent-runtime';
 import { normalizeInsertBlocksInput } from './ai-page-editing.service';
-import { ResponsesApiClient } from './responses-client';
+import { ResponsesApiClient, ResponsesInputItem } from './responses-client';
 
 describe('AgentRuntime', () => {
   it('rejects reuse of a tool call ID with different arguments', async () => {
@@ -203,5 +203,66 @@ describe('AgentRuntime', () => {
       2
     );
     expect(events[events.length - 1]?.type).toBe('error');
+  });
+
+  it('sends prompt images as content parts on the user item', async () => {
+    let capturedInput: ResponsesInputItem[] | undefined;
+    const client: ResponsesApiClient = {
+      stream: async (options) => {
+        capturedInput = options.input;
+        return { text: 'ok', output: [], functionCalls: [] };
+      }
+    };
+
+    await new AgentRuntime().run({
+      client,
+      model: 'test-model',
+      system: 'Answer',
+      prompt: 'What is in this image?',
+      images: ['data:image/png;base64,YWJj'],
+      messages: [{ role: 'assistant', content: 'Earlier reply' }],
+      tools: {},
+      signal: new AbortController().signal
+    });
+
+    expect(capturedInput?.[0]).toEqual({
+      role: 'assistant',
+      content: 'Earlier reply'
+    });
+    expect(capturedInput?.[1]).toEqual({
+      role: 'user',
+      content: [
+        { type: 'input_text', text: 'What is in this image?' },
+        { type: 'input_image', image_url: 'data:image/png;base64,YWJj' }
+      ]
+    });
+  });
+
+  it('omits the text part when a message carries only images', async () => {
+    let capturedInput: ResponsesInputItem[] | undefined;
+    const client: ResponsesApiClient = {
+      stream: async (options) => {
+        capturedInput = options.input;
+        return { text: 'ok', output: [], functionCalls: [] };
+      }
+    };
+
+    await new AgentRuntime().run({
+      client,
+      model: 'test-model',
+      system: 'Answer',
+      prompt: '',
+      images: ['data:image/jpeg;base64,YQ==', 'data:image/jpeg;base64,Yg=='],
+      tools: {},
+      signal: new AbortController().signal
+    });
+
+    expect(capturedInput?.[0]).toEqual({
+      role: 'user',
+      content: [
+        { type: 'input_image', image_url: 'data:image/jpeg;base64,YQ==' },
+        { type: 'input_image', image_url: 'data:image/jpeg;base64,Yg==' }
+      ]
+    });
   });
 });

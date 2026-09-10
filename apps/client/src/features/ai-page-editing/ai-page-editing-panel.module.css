@@ -49,6 +49,49 @@
   font-size: var(--mantine-font-size-xs);
 }
 
+.bubbleImage {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: var(--mantine-radius-sm);
+  border: 1px solid
+    light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+}
+
+.imageChip {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.imageChip[data-status='error'] .imageThumb {
+  border-color: var(--mantine-color-red-6);
+  opacity: 0.6;
+}
+
+.imageThumb {
+  display: block;
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: var(--mantine-radius-sm);
+  border: 1px solid
+    light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+}
+
+.imageChipOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.imageChipRemove {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+}
+
 @media (max-width: 48em) {
   .root {
     right: 16px;

@@ -344,7 +344,7 @@ export function DragHandlePlugin(
 
       function onDragHandleDrag(e: DragEvent) {
         hideDragHandle();
-        let scrollY = window.scrollY;
+        const scrollY = window.scrollY;
         if (e.clientY < options.scrollThreshold) {
           window.scrollTo({ top: scrollY - 30, behavior: 'smooth' });
         } else if (window.innerHeight - e.clientY < options.scrollThreshold) {

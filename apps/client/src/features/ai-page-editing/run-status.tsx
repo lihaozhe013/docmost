@@ -2,10 +2,7 @@ import { useEffect, useState } from 'react';
 import { Box, Group, Text } from '@mantine/core';
 import { IconSparkles } from '@tabler/icons-react';
 import type { RunPhase } from './ai-page-editing-types';
-import {
-  formatTokenCount,
-  phaseVerb
-} from './ai-page-editing-run-status';
+import { formatTokenCount, phaseVerb } from './ai-page-editing-run-status';
 import classes from './ai-page-editing-panel.module.css';
 
 function useAnimatedEllipsis(): string {

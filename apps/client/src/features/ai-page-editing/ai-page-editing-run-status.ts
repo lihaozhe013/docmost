@@ -98,8 +98,7 @@ export function formatRunMeta(meta?: {
   const usage = meta.usage;
   if (usage) {
     const total =
-      usage.totalTokens ??
-      (usage.inputTokens || 0) + (usage.outputTokens || 0);
+      usage.totalTokens ?? (usage.inputTokens || 0) + (usage.outputTokens || 0);
     if (total > 0) parts.push(`${formatTokenCount(total)} tokens`);
   }
   if (meta.elapsedMs !== undefined) {

@@ -36,9 +36,7 @@ describe('phaseVerb', () => {
 
 describe('toolStepLabel', () => {
   it('labels known tools per status', () => {
-    expect(toolStepLabel('read_buffer', 'running')).toBe(
-      'Reading the page…'
-    );
+    expect(toolStepLabel('read_buffer', 'running')).toBe('Reading the page…');
     expect(toolStepLabel('read_buffer', 'done')).toBe('Read the page');
     expect(toolStepLabel('edit_buffer', 'done')).toBe('Applied edits');
     expect(toolStepLabel('insert_blocks', 'error')).toBe('Insert failed');

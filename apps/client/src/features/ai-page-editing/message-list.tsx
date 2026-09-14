@@ -100,7 +100,11 @@ function AssistantRow({
 }) {
   const meta = formatRunMeta(message.meta);
   return (
-    <div className={classes.assistantRow} role="article" aria-label="Page AI said:">
+    <div
+      className={classes.assistantRow}
+      role="article"
+      aria-label="Page AI said:"
+    >
       <Box
         component="span"
         className={[
@@ -142,7 +146,10 @@ export function MessageList({
         const isLast = index === blocks.length - 1;
         if (block.kind === 'steps') {
           return (
-            <div key={`steps:${block.messages[0].id}`} className={classes.toolRail}>
+            <div
+              key={`steps:${block.messages[0].id}`}
+              className={classes.toolRail}
+            >
               {block.messages.map((message) => (
                 <ToolStepRow key={message.id} message={message} />
               ))}

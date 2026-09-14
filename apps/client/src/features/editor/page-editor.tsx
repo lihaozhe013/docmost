@@ -451,7 +451,7 @@ function CollabPageEditor({
       isSynced
     ) {
       hasConnectedOnceRef.current = true;
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- switch from the static fallback after synchronization
+
       setShowStatic(false);
     }
   }, [yjsConnectionStatus, isSynced]);

@@ -15,10 +15,10 @@ function autoJoin(
 ) {
   // Collect changed ranges across all transactions, mapping earlier ranges
   // forward through later mappings so every position lands in newTr.doc space.
-  let ranges: number[] = [];
+  const ranges: number[] = [];
   for (const tr of transactions) {
     for (let i = 0; i < tr.mapping.maps.length; i++) {
-      let map = tr.mapping.maps[i];
+      const map = tr.mapping.maps[i];
       if (!map) continue;
       for (let j = 0; j < ranges.length; j++) ranges[j] = map.map(ranges[j]!);
       map.forEach((_s, _e, from, to) => ranges.push(from, to));
@@ -28,11 +28,11 @@ function autoJoin(
   // Figure out which joinable points exist inside those ranges,
   // by checking all node boundaries in their parent nodes.
   // Resolve against newTr.doc — the same document we will join on.
-  let joinable: number[] = [];
+  const joinable: number[] = [];
   for (let i = 0; i < ranges.length; i += 2) {
-    let from = ranges[i]!,
+    const from = ranges[i]!,
       to = ranges[i + 1]!;
-    let $from = newTr.doc.resolve(from),
+    const $from = newTr.doc.resolve(from),
       depth = $from.sharedDepth(to),
       parent = $from.node(depth);
     for (
@@ -40,10 +40,10 @@ function autoJoin(
       pos <= to;
       ++index
     ) {
-      let after = parent.maybeChild(index);
+      const after = parent.maybeChild(index);
       if (!after) break;
       if (index && joinable.indexOf(pos) == -1) {
-        let before = parent.child(index - 1);
+        const before = parent.child(index - 1);
         if (before.type == after.type && nodeTypes.includes(before.type))
           joinable.push(pos);
       }
@@ -92,7 +92,7 @@ const AutoJoiner = Extension.create<AutoJoinerOptions>({
       new Plugin({
         key: plugin,
         appendTransaction(transactions, _, newState) {
-          let newTr = newState.tr;
+          const newTr = newState.tr;
           if (autoJoin(transactions, newTr, joinableNodes as NodeType[])) {
             return newTr;
           }

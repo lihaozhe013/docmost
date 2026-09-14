@@ -56,8 +56,7 @@ export const CellChevron = React.memo(function CellChevron({
     selector: (ctx) => {
       if (!ctx.editor) return false;
       const state = columnResizingPluginKey.getState(ctx.editor.state) as
-        | { activeHandle: number }
-        | undefined;
+        { activeHandle: number } | undefined;
       return !!state && state.activeHandle > -1;
     }
   });
@@ -83,7 +82,10 @@ export const CellChevron = React.memo(function CellChevron({
         const $inside = editor.state.doc.resolve(cellPos + 1);
         const sel = TextSelection.near($inside, 1);
         editor.view.dispatch(editor.state.tr.setSelection(sel));
-      } catch {}
+      } catch {
+        // Selection placement is best-effort; a failed resolve leaves the
+        // existing selection untouched.
+      }
     }
     editor.commands.freezeHandles();
   }, [editor, cellPos]);

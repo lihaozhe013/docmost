@@ -82,12 +82,7 @@ export default function ShareList() {
                 </Table.Td>
                 <Table.Td>
                   <Text fz="sm" style={{ whiteSpace: 'nowrap' }}>
-                    {formatLocalized(
-                      share.createdAt,
-                      'MMM dd, yyyy',
-                      'PP',
-                      locale
-                    )}
+                    {formatLocalized(share.createdAt, 'MMM dd, yyyy', 'PP', locale)}
                   </Text>
                 </Table.Td>
                 <Table.Td>

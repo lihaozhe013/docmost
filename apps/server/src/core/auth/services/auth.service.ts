@@ -13,21 +13,14 @@ import { UserSessionRepo } from '@docmost/db/repos/session/user-session.repo';
 import { SignupService } from './signup.service';
 import { CreateAdminUserDto } from '../dto/create-admin-user.dto';
 import { UserRepo } from '@docmost/db/repos/user/user.repo';
-import {
-  comparePasswordHash,
-  hashPassword,
-  isUserDisabled
-} from '../../../common/helpers';
+import { comparePasswordHash, hashPassword, isUserDisabled } from '../../../common/helpers';
 import { throwIfEmailNotVerified } from '../auth.util';
 import { ChangePasswordDto } from '../dto/change-password.dto';
 import { User } from '@docmost/db/types/entity.types';
 import { KyselyDB } from '@docmost/db/types/kysely.types';
 import { InjectKysely } from 'nestjs-kysely';
 import { AuditEvent, AuditResource } from '../../../common/events/audit-events';
-import {
-  AUDIT_SERVICE,
-  IAuditService
-} from '../../../integrations/audit/audit.service';
+import { AUDIT_SERVICE, IAuditService } from '../../../integrations/audit/audit.service';
 import { EnvironmentService } from '../../../integrations/environment/environment.service';
 
 @Injectable()
@@ -53,10 +46,7 @@ export class AuthService {
       throw new UnauthorizedException(errorMessage);
     }
 
-    const isPasswordMatch = await comparePasswordHash(
-      loginDto.password,
-      user.password
-    );
+    const isPasswordMatch = await comparePasswordHash(loginDto.password, user.password);
 
     if (!isPasswordMatch) {
       throw new UnauthorizedException(errorMessage);
@@ -89,8 +79,7 @@ export class AuthService {
   }
 
   async setup(createAdminUserDto: CreateAdminUserDto) {
-    const { workspace, user } =
-      await this.signupService.initialSetup(createAdminUserDto);
+    const { workspace, user } = await this.signupService.initialSetup(createAdminUserDto);
 
     const authToken = await this.sessionService.createSessionAndToken(user);
     return { workspace, authToken };
@@ -110,10 +99,7 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
-    const comparePasswords = await comparePasswordHash(
-      dto.oldPassword,
-      user.password
-    );
+    const comparePasswords = await comparePasswordHash(dto.oldPassword, user.password);
 
     if (!comparePasswords) {
       throw new BadRequestException('Current password is incorrect');
@@ -130,11 +116,7 @@ export class AuthService {
     );
 
     if (currentSessionId) {
-      await this.userSessionRepo.deleteAllExceptCurrent(
-        currentSessionId,
-        userId,
-        workspaceId
-      );
+      await this.userSessionRepo.deleteAllExceptCurrent(currentSessionId, userId, workspaceId);
     } else {
       await this.userSessionRepo.deleteByUserId(userId, workspaceId);
     }
@@ -147,10 +129,7 @@ export class AuthService {
   }
 
   async getCollabToken(user: User, workspaceId: string) {
-    const token = await this.tokenService.generateCollabToken(
-      user,
-      workspaceId
-    );
+    const token = await this.tokenService.generateCollabToken(user, workspaceId);
     return { token };
   }
 }

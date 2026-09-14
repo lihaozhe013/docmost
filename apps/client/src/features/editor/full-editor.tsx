@@ -67,13 +67,9 @@ export function FullEditor({
 }: FullEditorProps) {
   const [user] = useAtom(userAtom);
   const fullPageWidth = user.settings?.preferences?.fullPageWidth;
-  const editorToolbarEnabled =
-    user.settings?.preferences?.editorToolbar ?? false;
-  const [currentPageEditMode, setCurrentPageEditMode] = useAtom(
-    currentPageEditModeAtom
-  );
-  const userPageEditMode =
-    user.settings?.preferences?.pageEditMode ?? PageEditMode.Edit;
+  const editorToolbarEnabled = user.settings?.preferences?.editorToolbar ?? false;
+  const [currentPageEditMode, setCurrentPageEditMode] = useAtom(currentPageEditModeAtom);
+  const userPageEditMode = user.settings?.preferences?.pageEditMode ?? PageEditMode.Edit;
   const isEditMode = currentPageEditMode === PageEditMode.Edit;
 
   // Apply the user's saved preference only once on initial load, not on every
@@ -92,9 +88,7 @@ export function FullEditor({
       className={classes.editor}
       style={{ display: 'flex', flexDirection: 'column' }}
     >
-      {editorToolbarEnabled && editable && isEditMode && (
-        <MemoizedFixedToolbar />
-      )}
+      {editorToolbarEnabled && editable && isEditMode && <MemoizedFixedToolbar />}
       <MemoizedDeletedPageBanner slugId={slugId} />
       <MemoizedTitleEditor
         pageId={pageId}
@@ -103,22 +97,14 @@ export function FullEditor({
         spaceSlug={spaceSlug}
         editable={editable}
       />
-      <PageByline
-        creator={creator}
-        contributors={contributors}
-        readOnly={!editable}
-      />
+      <PageByline creator={creator} contributors={contributors} readOnly={!editable} />
       <MemoizedPageEditor
         pageId={pageId}
         editable={editable}
         content={content}
         canComment={canComment}
       />
-      <AiPageEditingPanel
-        key={pageId}
-        pageId={pageId}
-        enabled={editable && isEditMode}
-      />
+      <AiPageEditingPanel key={pageId} pageId={pageId} enabled={editable && isEditMode} />
     </Container>
   );
 }
@@ -133,9 +119,7 @@ function PageByline({ creator, contributors, readOnly }: PageBylineProps) {
   const { t } = useTranslation();
   const detailsTriggerProps = useAsideTriggerProps('details');
 
-  const otherContributors = (contributors ?? []).filter(
-    (c) => c.id !== creator?.id
-  );
+  const otherContributors = (contributors ?? []).filter((c) => c.id !== creator?.id);
 
   return (
     <Group
@@ -147,15 +131,9 @@ function PageByline({ creator, contributors, readOnly }: PageBylineProps) {
       {creator && (
         <Popover position="bottom-start" shadow="md" width={280} withArrow>
           <Popover.Target>
-            <UnstyledButton
-              aria-label={t('Created by {{name}}', { name: creator.name })}
-            >
+            <UnstyledButton aria-label={t('Created by {{name}}', { name: creator.name })}>
               <Group gap={6}>
-                <CustomAvatar
-                  avatarUrl={creator.avatarUrl}
-                  name={creator.name}
-                  size={22}
-                />
+                <CustomAvatar avatarUrl={creator.avatarUrl} name={creator.name} size={22} />
                 <Text size="sm" c="dimmed">
                   {t('By {{name}}', { name: creator.name })}
                 </Text>
@@ -165,19 +143,13 @@ function PageByline({ creator, contributors, readOnly }: PageBylineProps) {
           <Popover.Dropdown>
             <Stack gap="xs">
               <Group gap="sm">
-                <CustomAvatar
-                  avatarUrl={creator.avatarUrl}
-                  name={creator.name}
-                  size={36}
-                />
+                <CustomAvatar avatarUrl={creator.avatarUrl} name={creator.name} size={36} />
                 <div>
                   <Text size="sm" fw={500}>
                     {creator.name}
                   </Text>
                   <Text size="xs" c="dimmed">
-                    {otherContributors.length === 0
-                      ? t('Owner, no contributors')
-                      : t('Owner')}
+                    {otherContributors.length === 0 ? t('Owner, no contributors') : t('Owner')}
                   </Text>
                 </div>
               </Group>

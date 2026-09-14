@@ -2,15 +2,7 @@ import { useAtomValue } from 'jotai';
 import { treeDataAtom } from '@/features/page/tree/atoms/tree-data-atom.ts';
 import React, { useCallback, useEffect, useState } from 'react';
 import { findBreadcrumbPath } from '@/features/page/tree/utils';
-import {
-  Button,
-  Anchor,
-  Popover,
-  Breadcrumbs,
-  ActionIcon,
-  Text,
-  Tooltip
-} from '@mantine/core';
+import { Button, Anchor, Popover, Breadcrumbs, ActionIcon, Text, Tooltip } from '@mantine/core';
 import { IconCornerDownRightDouble, IconDots } from '@tabler/icons-react';
 import { Link, useParams } from 'react-router-dom';
 import classes from './breadcrumb.module.css';
@@ -33,9 +25,7 @@ function getTitle(node: SpaceTreeNode, t: TFunction) {
 export default function Breadcrumb() {
   const { t } = useTranslation();
   const treeData = useAtomValue(treeDataAtom);
-  const [breadcrumbNodes, setBreadcrumbNodes] = useState<
-    SpaceTreeNode[] | null
-  >(null);
+  const [breadcrumbNodes, setBreadcrumbNodes] = useState<SpaceTreeNode[] | null>(null);
   const { pageSlug, spaceSlug } = useParams();
   const { data: currentPage } = usePageQuery({
     pageId: extractPageSlugId(pageSlug)
@@ -112,13 +102,7 @@ export default function Breadcrumb() {
 
       return [
         renderAnchor(firstNode),
-        <Popover
-          width={250}
-          position="bottom"
-          withArrow
-          shadow="xl"
-          key="hidden-nodes"
-        >
+        <Popover width={250} position="bottom" withArrow shadow="xl" key="hidden-nodes">
           <Popover.Target>
             <ActionIcon
               color="gray"
@@ -137,9 +121,7 @@ export default function Breadcrumb() {
       ];
     }
 
-    return breadcrumbNodes.map((node, i) =>
-      renderAnchor(node, i === breadcrumbNodes.length - 1)
-    );
+    return breadcrumbNodes.map((node, i) => renderAnchor(node, i === breadcrumbNodes.length - 1));
   };
 
   const getMobileBreadcrumbItems = () => {
@@ -147,20 +129,10 @@ export default function Breadcrumb() {
 
     if (breadcrumbNodes.length > 0) {
       return [
-        <Popover
-          width={250}
-          position="bottom"
-          withArrow
-          shadow="xl"
-          key="mobile-hidden-nodes"
-        >
+        <Popover width={250} position="bottom" withArrow shadow="xl" key="mobile-hidden-nodes">
           <Popover.Target>
             <Tooltip label={t('Breadcrumbs')}>
-              <ActionIcon
-                color="gray"
-                variant="transparent"
-                aria-label={t('Breadcrumbs')}
-              >
+              <ActionIcon color="gray" variant="transparent" aria-label={t('Breadcrumbs')}>
                 <IconCornerDownRightDouble size={20} stroke={2} />
               </ActionIcon>
             </Tooltip>
@@ -172,9 +144,7 @@ export default function Breadcrumb() {
       ];
     }
 
-    return breadcrumbNodes.map((node, i) =>
-      renderAnchor(node, i === breadcrumbNodes.length - 1)
-    );
+    return breadcrumbNodes.map((node, i) => renderAnchor(node, i === breadcrumbNodes.length - 1));
   };
 
   return (

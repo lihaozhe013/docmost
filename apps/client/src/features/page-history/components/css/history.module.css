@@ -5,10 +5,7 @@
   color: light-dark(var(--mantine-color-black), var(--mantine-color-dark-0));
 
   @mixin hover {
-    background-color: light-dark(
-      var(--mantine-color-gray-2),
-      var(--mantine-color-dark-8)
-    );
+    background-color: light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-8));
   }
 }
 
@@ -55,26 +52,21 @@
   }
 
   & :global(.history-diff-node-added) {
-    outline: rem(2px) solid
-      light-dark(var(--mantine-color-teal-5), var(--mantine-color-teal-7));
+    outline: rem(2px) solid light-dark(var(--mantine-color-teal-5), var(--mantine-color-teal-7));
     outline-offset: rem(2px);
     border-radius: rem(4px);
   }
 
   & :global(.history-diff-node-deleted) {
     opacity: 0.5;
-    outline: rem(2px) dashed
-      light-dark(var(--mantine-color-red-4), var(--mantine-color-red-6));
+    outline: rem(2px) dashed light-dark(var(--mantine-color-red-4), var(--mantine-color-red-6));
     outline-offset: rem(4px);
     border-radius: rem(4px);
   }
 }
 
 .active {
-  background-color: light-dark(
-    var(--mantine-color-gray-2),
-    var(--mantine-color-dark-8)
-  );
+  background-color: light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-8));
 }
 
 .sidebar {
@@ -83,8 +75,7 @@
   padding: var(--mantine-spacing-sm);
   display: flex;
   flex-direction: column;
-  border-right: rem(1px) solid
-    light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  border-right: rem(1px) solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
 }
 
 .sidebarFlex {
@@ -101,6 +92,5 @@
 }
 
 .compareBanner {
-  border-bottom: rem(1px) solid
-    light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  border-bottom: rem(1px) solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
 }

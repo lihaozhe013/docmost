@@ -15,10 +15,7 @@ function isUnicodeCharacter(text: string): boolean {
 export async function formatImportHtml(opts: {
   html: string;
   currentFilePath: string;
-  filePathToPageMetaMap: Map<
-    string,
-    { id: string; title: string; slugId: string }
-  >;
+  filePathToPageMetaMap: Map<string, { id: string; title: string; slugId: string }>;
   creatorId: string;
   sourcePageId: string;
   workspaceId: string;
@@ -30,14 +27,8 @@ export async function formatImportHtml(opts: {
   backlinks: InsertableBacklink[];
   pageIcon?: string;
 }> {
-  const {
-    html,
-    currentFilePath,
-    filePathToPageMetaMap,
-    creatorId,
-    sourcePageId,
-    workspaceId
-  } = opts;
+  const { html, currentFilePath, filePathToPageMetaMap, creatorId, sourcePageId, workspaceId } =
+    opts;
   const $: CheerioAPI = load(html);
   const $root: Cheerio<any> = $.root();
 
@@ -128,14 +119,7 @@ export function defaultHtmlFormatter($: CheerioAPI, $root: Cheerio<any>) {
   });
 }
 
-const COLUMN_LAYOUTS = [
-  '',
-  '',
-  'two_equal',
-  'three_equal',
-  'four_equal',
-  'five_equal'
-] as const;
+const COLUMN_LAYOUTS = ['', '', 'two_equal', 'three_equal', 'four_equal', 'five_equal'] as const;
 
 export function notionFormatter($: CheerioAPI, $root: Cheerio<any>) {
   // remove page header icon and cover image
@@ -167,22 +151,14 @@ export function notionFormatter($: CheerioAPI, $root: Cheerio<any>) {
       cells += `<div data-type="column">${$col.html()}</div>`;
     });
 
-    $list.replaceWith(
-      `<div data-type="columns" data-layout="${layout}">${cells}</div>`
-    );
+    $list.replaceWith(`<div data-type="columns" data-layout="${layout}">${cells}</div>`);
   });
 
   // block math → mathBlock
   $root.find('figure.equation').each((_: any, fig: any) => {
     const $fig = $(fig);
-    const tex = $fig
-      .find('annotation[encoding="application/x-tex"]')
-      .text()
-      .trim();
-    const $math = $('<div>')
-      .attr('data-type', 'mathBlock')
-      .attr('data-katex', 'true')
-      .text(tex);
+    const tex = $fig.find('annotation[encoding="application/x-tex"]').text().trim();
+    const $math = $('<div>').attr('data-type', 'mathBlock').attr('data-katex', 'true').text(tex);
     $fig.replaceWith($math);
   });
 
@@ -191,10 +167,7 @@ export function notionFormatter($: CheerioAPI, $root: Cheerio<any>) {
     const $tok = $(tok);
     const $prev = $tok.prev('style');
     if ($prev.length) $prev.remove();
-    const tex = $tok
-      .find('annotation[encoding="application/x-tex"]')
-      .text()
-      .trim();
+    const tex = $tok.find('annotation[encoding="application/x-tex"]').text().trim();
     const $inline = $('<span>')
       .attr('data-type', 'mathInline')
       .attr('data-katex', 'true')
@@ -211,9 +184,7 @@ export function notionFormatter($: CheerioAPI, $root: Cheerio<any>) {
       const $fig = $(fig);
       const $content = $fig.find('div').eq(1);
       if (!$content.length) return;
-      const $wrapper = $('<div>')
-        .attr('data-type', 'callout')
-        .attr('data-callout-type', 'info');
+      const $wrapper = $('<div>').attr('data-type', 'callout').attr('data-callout-type', 'info');
       // @ts-ignore
       $content.children().each((_, child) => $wrapper.append(child));
       $fig.replaceWith($wrapper);
@@ -338,10 +309,7 @@ export async function rewriteInternalLinksToMentionHtml(
   $: CheerioAPI,
   $root: Cheerio<any>,
   currentFilePath: string,
-  filePathToPageMetaMap: Map<
-    string,
-    { id: string; title: string; slugId: string }
-  >,
+  filePathToPageMetaMap: Map<string, { id: string; title: string; slugId: string }>,
   creatorId: string,
   sourcePageId: string,
   workspaceId: string,
@@ -364,15 +332,12 @@ export async function rewriteInternalLinksToMentionHtml(
       );
     }
 
-    const resolved = normalize(
-      path.join(path.dirname(currentFilePath), decodedRaw)
-    );
+    const resolved = normalize(path.join(path.dirname(currentFilePath), decodedRaw));
     const meta = filePathToPageMetaMap.get(resolved);
     if (!meta) return;
 
     const linkText = $a.text().trim();
-    const titleMatch =
-      linkText === meta.title || linkText === meta.title?.trim();
+    const titleMatch = linkText === meta.title || linkText === meta.title?.trim();
 
     if (titleMatch) {
       const mentionId = v7();
@@ -391,9 +356,7 @@ export async function rewriteInternalLinksToMentionHtml(
     } else {
       const titleSlug = slugify(meta.title?.substring(0, 70) || 'untitled');
       const pageSlug = `${titleSlug}-${meta.slugId}`;
-      const internalHref = spaceSlug
-        ? `/s/${spaceSlug}/p/${pageSlug}`
-        : `/p/${pageSlug}`;
+      const internalHref = spaceSlug ? `/s/${spaceSlug}/p/${pageSlug}` : `/p/${pageSlug}`;
 
       $a.attr('href', internalHref);
       $a.attr('data-internal', 'true');

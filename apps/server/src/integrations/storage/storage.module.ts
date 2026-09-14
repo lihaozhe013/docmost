@@ -1,10 +1,7 @@
 import { DynamicModule, Global, Module } from '@nestjs/common';
 import { StorageModuleOptions } from './interfaces';
 import { StorageService } from './storage.service';
-import {
-  storageDriverConfigProvider,
-  storageDriverProvider
-} from './providers/storage.provider';
+import { storageDriverConfigProvider, storageDriverProvider } from './providers/storage.provider';
 
 @Global()
 @Module({})
@@ -13,11 +10,7 @@ export class StorageModule {
     return {
       module: StorageModule,
       imports: options.imports || [],
-      providers: [
-        storageDriverConfigProvider,
-        storageDriverProvider,
-        StorageService
-      ],
+      providers: [storageDriverConfigProvider, storageDriverProvider, StorageService],
       exports: [StorageService]
     };
   }

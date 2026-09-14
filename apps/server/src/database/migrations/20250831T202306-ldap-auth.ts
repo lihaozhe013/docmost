@@ -23,9 +23,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('ldap_bind_password', 'varchar', (col) => col)
     .addColumn('ldap_base_dn', 'varchar', (col) => col)
     .addColumn('ldap_user_search_filter', 'varchar', (col) => col)
-    .addColumn('ldap_user_attributes', 'jsonb', (col) =>
-      col.defaultTo(sql`'{}'::jsonb`)
-    )
+    .addColumn('ldap_user_attributes', 'jsonb', (col) => col.defaultTo(sql`'{}'::jsonb`))
     .addColumn('ldap_tls_enabled', 'boolean', (col) => col.defaultTo(false))
     .addColumn('ldap_tls_ca_cert', 'text', (col) => col)
     .addColumn('ldap_config', 'jsonb', (col) => col.defaultTo(sql`'{}'::jsonb`))
@@ -34,10 +32,7 @@ export async function up(db: Kysely<any>): Promise<void> {
 }
 
 export async function down(db: Kysely<any>): Promise<void> {
-  await db.schema
-    .alterTable('users')
-    .dropColumn('has_generated_password')
-    .execute();
+  await db.schema.alterTable('users').dropColumn('has_generated_password').execute();
 
   await db.schema
     .alterTable('auth_providers')
@@ -53,10 +48,7 @@ export async function down(db: Kysely<any>): Promise<void> {
     .dropColumn('settings')
     .execute();
 
-  await db.schema
-    .createType('auth_provider_type')
-    .asEnum(['saml', 'oidc', 'google'])
-    .execute();
+  await db.schema.createType('auth_provider_type').asEnum(['saml', 'oidc', 'google']).execute();
 
   await db.deleteFrom('auth_providers').where('type', '=', 'ldap').execute();
 

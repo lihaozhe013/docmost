@@ -1,10 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type ReactNode
-} from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import classes from './card-carousel.module.css';

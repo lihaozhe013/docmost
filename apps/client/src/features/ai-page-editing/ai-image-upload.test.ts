@@ -23,9 +23,7 @@ describe('ai-image-upload helpers', () => {
     const files = Array.from({ length: MAX_AI_IMAGES }, (_, index) =>
       makeFile(`img-${index}.png`, 'image/png')
     );
-    expect(validateAiImageBatch(1, files)).toContain(
-      `at most ${MAX_AI_IMAGES} images`
-    );
+    expect(validateAiImageBatch(1, files)).toContain(`at most ${MAX_AI_IMAGES} images`);
     expect(validateAiImageBatch(0, files)).toBeNull();
   });
 

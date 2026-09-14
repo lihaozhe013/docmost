@@ -1,11 +1,6 @@
 // https://github.com/nhedger/nestjs-encryption - MIT
 import { Injectable } from '@nestjs/common';
-import {
-  createCipheriv,
-  createDecipheriv,
-  createHash,
-  randomBytes
-} from 'node:crypto';
+import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'node:crypto';
 import { UnableToDecrypt, UnableToInitialize } from './encryption.errors';
 import { EnvironmentService } from '../environment/environment.service';
 
@@ -29,19 +24,13 @@ export class EncryptionService {
     if (!appSecret) {
       throw new UnableToInitialize('APP_SECRET is not set.');
     }
-    this.key = createHash('sha256')
-      .update(KEY_DOMAIN)
-      .update(appSecret)
-      .digest();
+    this.key = createHash('sha256').update(KEY_DOMAIN).update(appSecret).digest();
   }
 
   public encrypt(plaintext: string): string {
     const iv = randomBytes(IV_LENGTH);
     const cipher = createCipheriv(ALGORITHM, this.key, iv);
-    const cipherText = Buffer.concat([
-      cipher.update(plaintext, 'utf8'),
-      cipher.final()
-    ]);
+    const cipherText = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
     const authTag = cipher.getAuthTag();
 
     const aead: AEADPayload<string> = {
@@ -58,10 +47,7 @@ export class EncryptionService {
       const { iv, authTag, cipherText } = this.decodeAEADPayload(encrypted);
       const decipher = createDecipheriv(ALGORITHM, this.key, iv);
       decipher.setAuthTag(authTag);
-      const decrypted = Buffer.concat([
-        decipher.update(cipherText),
-        decipher.final()
-      ]);
+      const decrypted = Buffer.concat([decipher.update(cipherText), decipher.final()]);
       return decrypted.toString('utf8');
     } catch (e: unknown) {
       throw new UnableToDecrypt((e as Error).message);
@@ -98,10 +84,7 @@ export class EncryptionService {
       );
     }
 
-    const cipherText = Buffer.from(
-      deserializedPkg.cipherText as string,
-      'base64'
-    );
+    const cipherText = Buffer.from(deserializedPkg.cipherText as string, 'base64');
 
     return { iv, authTag, cipherText };
   }

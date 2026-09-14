@@ -25,10 +25,7 @@ import { WorkspaceRepo } from '@docmost/db/repos/workspace/workspace.repo';
 import { LicenseCheckService } from '../../../integrations/environment/license-check.service';
 import { AuditEvent, AuditResource } from '../../../common/events/audit-events';
 import { diffAuditTrackedFields } from '../../../common/helpers';
-import {
-  AUDIT_SERVICE,
-  IAuditService
-} from '../../../integrations/audit/audit.service';
+import { AUDIT_SERVICE, IAuditService } from '../../../integrations/audit/audit.service';
 
 @Injectable()
 export class SpaceService {
@@ -55,13 +52,7 @@ export class SpaceService {
     await executeTx(
       this.db,
       async (trx) => {
-        space = await this.create(
-          authUser.id,
-          workspaceId,
-          createSpaceDto,
-          trx,
-          options
-        );
+        space = await this.create(authUser.id, workspaceId, createSpaceDto, trx, options);
 
         await this.spaceMemberService.addUserToSpace(
           authUser.id,
@@ -98,15 +89,9 @@ export class SpaceService {
     trx?: KyselyTransaction,
     options?: { isPersonal?: boolean }
   ): Promise<Space> {
-    const slugExists = await this.spaceRepo.slugExists(
-      createSpaceDto.slug,
-      workspaceId,
-      trx
-    );
+    const slugExists = await this.spaceRepo.slugExists(createSpaceDto.slug, workspaceId, trx);
     if (slugExists) {
-      throw new BadRequestException(
-        'Space slug exists. Please use a unique space slug'
-      );
+      throw new BadRequestException('Space slug exists. Please use a unique space slug');
     }
 
     return await this.spaceRepo.insertSpace(
@@ -122,20 +107,12 @@ export class SpaceService {
     );
   }
 
-  async updateSpace(
-    updateSpaceDto: UpdateSpaceDto,
-    workspaceId: string
-  ): Promise<Space> {
+  async updateSpace(updateSpaceDto: UpdateSpaceDto, workspaceId: string): Promise<Space> {
     if (updateSpaceDto?.slug) {
-      const slugExists = await this.spaceRepo.slugExists(
-        updateSpaceDto.slug,
-        workspaceId
-      );
+      const slugExists = await this.spaceRepo.slugExists(updateSpaceDto.slug, workspaceId);
 
       if (slugExists) {
-        throw new BadRequestException(
-          'Space slug exists. Please use a unique space slug'
-        );
+        throw new BadRequestException('Space slug exists. Please use a unique space slug');
       }
     }
 
@@ -147,31 +124,20 @@ export class SpaceService {
 
       if (
         typeof updateSpaceDto.disablePublicSharing !== 'undefined' &&
-        !this.licenseCheckService.hasFeature(
-          '',
-          Feature.SECURITY_SETTINGS,
-          workspace.plan
-        )
+        !this.licenseCheckService.hasFeature('', Feature.SECURITY_SETTINGS, workspace.plan)
       ) {
         throw new ForbiddenException('This feature requires a valid license');
       }
 
       if (
         typeof updateSpaceDto.allowViewerComments !== 'undefined' &&
-        !this.licenseCheckService.hasFeature(
-          '',
-          Feature.VIEWER_COMMENTS,
-          workspace.plan
-        )
+        !this.licenseCheckService.hasFeature('', Feature.VIEWER_COMMENTS, workspace.plan)
       ) {
         throw new ForbiddenException('This feature requires a valid license');
       }
     }
 
-    const spaceBefore = await this.spaceRepo.findById(
-      updateSpaceDto.spaceId,
-      workspaceId
-    );
+    const spaceBefore = await this.spaceRepo.findById(updateSpaceDto.spaceId, workspaceId);
     const settingsBefore = (spaceBefore?.settings ?? {}) as Record<string, any>;
 
     const before: Record<string, any> = {};

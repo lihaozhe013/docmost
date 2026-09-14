@@ -40,21 +40,18 @@ import { normalizePostgresUrl } from '../common/helpers';
       inject: [EnvironmentService],
       useFactory: (environmentService: EnvironmentService) => ({
         dialect: new PostgresJSDialect({
-          postgres: postgres(
-            normalizePostgresUrl(environmentService.getDatabaseURL()),
-            {
-              max: environmentService.getDatabaseMaxPool(),
-              onnotice: () => {},
-              types: {
-                bigint: {
-                  to: 20,
-                  from: [20, 1700],
-                  serialize: (value: number) => value.toString(),
-                  parse: (value: string) => Number.parseInt(value)
-                }
+          postgres: postgres(normalizePostgresUrl(environmentService.getDatabaseURL()), {
+            max: environmentService.getDatabaseMaxPool(),
+            onnotice: () => {},
+            types: {
+              bigint: {
+                to: 20,
+                from: [20, 1700],
+                serialize: (value: number) => value.toString(),
+                parse: (value: string) => Number.parseInt(value)
               }
             }
-          )
+          })
         }),
         plugins: [new CamelCasePlugin()],
         log: (event: LogEvent) => {
@@ -154,9 +151,7 @@ export class DatabaseModule implements OnApplicationBootstrap {
         }
 
         if (i < retryAttempts - 1) {
-          this.logger.log(
-            `Retrying [${i + 1}/${retryAttempts}] in ${retryDelay / 1000} seconds`
-          );
+          this.logger.log(`Retrying [${i + 1}/${retryAttempts}] in ${retryDelay / 1000} seconds`);
           await new Promise((resolve) => setTimeout(resolve, retryDelay));
         } else {
           this.logger.error(

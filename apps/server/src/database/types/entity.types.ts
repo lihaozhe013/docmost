@@ -68,9 +68,7 @@ export type UpdatableWorkspace = Updateable<Omit<Workspaces, 'id'>>;
 // WorkspaceInvitation
 export type WorkspaceInvitation = Selectable<WorkspaceInvitations>;
 export type InsertableWorkspaceInvitation = Insertable<WorkspaceInvitations>;
-export type UpdatableWorkspaceInvitation = Updateable<
-  Omit<WorkspaceInvitations, 'id'>
->;
+export type UpdatableWorkspaceInvitation = Updateable<Omit<WorkspaceInvitations, 'id'>>;
 
 // User
 export type User = Selectable<Users>;
@@ -157,17 +155,12 @@ export type UpdatableFavorite = Updateable<Omit<Favorites, 'id'>>;
 // Page Transclusion
 export type PageTransclusion = Selectable<PageTransclusions>;
 export type InsertablePageTransclusion = Insertable<PageTransclusions>;
-export type UpdatablePageTransclusion = Updateable<
-  Omit<PageTransclusions, 'id'>
->;
+export type UpdatablePageTransclusion = Updateable<Omit<PageTransclusions, 'id'>>;
 
 // Page Transclusion Reference
 export type PageTransclusionReference = Selectable<PageTransclusionReferences>;
-export type InsertablePageTransclusionReference =
-  Insertable<PageTransclusionReferences>;
-export type UpdatablePageTransclusionReference = Updateable<
-  Omit<PageTransclusionReferences, 'id'>
->;
+export type InsertablePageTransclusionReference = Insertable<PageTransclusionReferences>;
+export type UpdatablePageTransclusionReference = Updateable<Omit<PageTransclusionReferences, 'id'>>;
 
 // File Task
 export type FileTask = Selectable<FileTasks>;
@@ -233,9 +226,7 @@ export type UpdatablePagePermission = Updateable<Omit<_PagePermissions, 'id'>>;
 // Page Verification
 export type PageVerification = Selectable<_PageVerifications>;
 export type InsertablePageVerification = Insertable<_PageVerifications>;
-export type UpdatablePageVerification = Updateable<
-  Omit<_PageVerifications, 'id'>
->;
+export type UpdatablePageVerification = Updateable<Omit<_PageVerifications, 'id'>>;
 
 // Page Verifier
 export type PageVerifier = Selectable<_PageVerifiers>;

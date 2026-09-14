@@ -9,12 +9,7 @@ import { FileTaskController } from './file-task.controller';
 import { PageModule } from '../../core/page/page.module';
 
 @Module({
-  providers: [
-    ImportService,
-    FileImportTaskService,
-    FileTaskProcessor,
-    ImportAttachmentService
-  ],
+  providers: [ImportService, FileImportTaskService, FileTaskProcessor, ImportAttachmentService],
   exports: [ImportService, ImportAttachmentService],
   controllers: [ImportController, FileTaskController],
   imports: [StorageModule, PageModule]

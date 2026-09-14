@@ -6,9 +6,7 @@ import {
   IBacklinksListParams
 } from '@/features/page-details/types/backlink.types.ts';
 
-export async function getBacklinksCount(
-  pageId: string
-): Promise<IBacklinkCount> {
+export async function getBacklinksCount(pageId: string): Promise<IBacklinkCount> {
   const req = await api.post<IBacklinkCount>('/pages/backlinks-count', {
     pageId
   });
@@ -18,9 +16,6 @@ export async function getBacklinksCount(
 export async function getBacklinks(
   params: IBacklinksListParams
 ): Promise<IPagination<IBacklinkPageItem>> {
-  const req = await api.post<IPagination<IBacklinkPageItem>>(
-    '/pages/backlinks',
-    params
-  );
+  const req = await api.post<IPagination<IBacklinkPageItem>>('/pages/backlinks', params);
   return req.data;
 }

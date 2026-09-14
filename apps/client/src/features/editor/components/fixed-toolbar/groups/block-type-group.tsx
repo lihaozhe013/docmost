@@ -55,33 +55,25 @@ export const BlockTypeGroup: FC<Props> = ({ editor }) => {
       <Menu.Dropdown>
         <Menu.Item
           leftSection={<IconTypography size={16} />}
-          onClick={() =>
-            editor.chain().focus().toggleNode('paragraph', 'paragraph').run()
-          }
+          onClick={() => editor.chain().focus().toggleNode('paragraph', 'paragraph').run()}
         >
           {t('Text')}
         </Menu.Item>
         <Menu.Item
           leftSection={<IconH1 size={16} />}
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 1 }).run()
-          }
+          onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
         >
           {t('Heading 1')}
         </Menu.Item>
         <Menu.Item
           leftSection={<IconH2 size={16} />}
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 2 }).run()
-          }
+          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
         >
           {t('Heading 2')}
         </Menu.Item>
         <Menu.Item
           leftSection={<IconH3 size={16} />}
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 3 }).run()
-          }
+          onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
         >
           {t('Heading 3')}
         </Menu.Item>

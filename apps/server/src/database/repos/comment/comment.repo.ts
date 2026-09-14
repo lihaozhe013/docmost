@@ -2,11 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectKysely } from 'nestjs-kysely';
 import { KyselyDB, KyselyTransaction } from '../../types/kysely.types';
 import { dbOrTx } from '../../utils';
-import {
-  Comment,
-  InsertableComment,
-  UpdatableComment
-} from '@docmost/db/types/entity.types';
+import { Comment, InsertableComment, UpdatableComment } from '@docmost/db/types/entity.types';
 import { PaginationOptions } from '@docmost/db/pagination/pagination-options';
 import { executeWithCursorPagination } from '@docmost/db/pagination/cursor-pagination';
 import { ExpressionBuilder } from 'kysely';
@@ -54,11 +50,7 @@ export class CommentRepo {
     trx?: KyselyTransaction
   ) {
     const db = dbOrTx(this.db, trx);
-    await db
-      .updateTable('comments')
-      .set(updatableComment)
-      .where('id', '=', commentId)
-      .execute();
+    await db.updateTable('comments').set(updatableComment).where('id', '=', commentId).execute();
   }
 
   async insertComment(
@@ -66,11 +58,7 @@ export class CommentRepo {
     trx?: KyselyTransaction
   ): Promise<Comment> {
     const db = dbOrTx(this.db, trx);
-    return db
-      .insertInto('comments')
-      .values(insertableComment)
-      .returningAll()
-      .executeTakeFirst();
+    return db.insertInto('comments').values(insertableComment).returningAll().executeTakeFirst();
   }
 
   withCreator(eb: ExpressionBuilder<DB, 'comments'>) {
@@ -105,10 +93,7 @@ export class CommentRepo {
     return Number(result?.count) > 0;
   }
 
-  async hasChildrenFromOtherUsers(
-    commentId: string,
-    userId: string
-  ): Promise<boolean> {
+  async hasChildrenFromOtherUsers(commentId: string, userId: string): Promise<boolean> {
     const result = await this.db
       .selectFrom('comments')
       .select((eb) => eb.fn.count('id').as('count'))

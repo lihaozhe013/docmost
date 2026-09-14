@@ -33,8 +33,7 @@ export class SearchService {
     const labelIds = [...new Set(searchParams.labelIds ?? [])];
     // selected filters (labels, creator) are browsable without a query
     const browseByFilters =
-      query.length < 1 &&
-      (labelIds.length > 0 || Boolean(searchParams.creatorId));
+      query.length < 1 && (labelIds.length > 0 || Boolean(searchParams.creatorId));
 
     if (query.length < 1 && !browseByFilters) {
       return { items: [] };
@@ -48,12 +47,8 @@ export class SearchService {
     const rankColumn = browseByFilters
       ? sql<number>`0`.as('rank')
       : titleOnly
-        ? sql<number>`word_similarity(lower(${titleQuery}), lower(pages.title))`.as(
-            'rank'
-          )
-        : sql<number>`ts_rank(tsv, to_tsquery('english', f_unaccent(${searchQuery})))`.as(
-            'rank'
-          );
+        ? sql<number>`word_similarity(lower(${titleQuery}), lower(pages.title))`.as('rank')
+        : sql<number>`ts_rank(tsv, to_tsquery('english', f_unaccent(${searchQuery})))`.as('rank');
     const highlightColumn =
       browseByFilters || titleOnly
         ? sql<string>`''`.as('highlight')
@@ -76,20 +71,10 @@ export class SearchService {
         highlightColumn
       ])
       .$if(!browseByFilters && !titleOnly, (qb) =>
-        qb.where(
-          'tsv',
-          '@@',
-          sql<string>`to_tsquery('english', f_unaccent(${searchQuery}))`
-        )
+        qb.where('tsv', '@@', sql<string>`to_tsquery('english', f_unaccent(${searchQuery}))`)
       )
       .$if(!browseByFilters && titleOnly, (qb) =>
-        qb.where((eb) =>
-          eb(
-            sql`lower(pages.title)`,
-            'like',
-            sql`lower(${`%${titleLikeQuery}%`})`
-          )
-        )
+        qb.where((eb) => eb(sql`lower(pages.title)`, 'like', sql`lower(${`%${titleLikeQuery}%`})`))
       )
       .$if(Boolean(searchParams.creatorId), (qb) =>
         qb.where('creatorId', '=', searchParams.creatorId)
@@ -98,10 +83,7 @@ export class SearchService {
         qb.where(
           'id',
           'in',
-          this.db
-            .selectFrom('pageLabels')
-            .select('pageId')
-            .where('labelId', 'in', labelIds)
+          this.db.selectFrom('pageLabels').select('pageId').where('labelId', 'in', labelIds)
         )
       )
       .where('deletedAt', 'is', null)
@@ -119,11 +101,7 @@ export class SearchService {
     } else if (opts.userId && !searchParams.spaceId) {
       // only search spaces the user is a member of
       queryResults = queryResults
-        .where(
-          'spaceId',
-          'in',
-          this.spaceMemberRepo.getUserSpaceIdsQuery(opts.userId)
-        )
+        .where('spaceId', 'in', this.spaceMemberRepo.getUserSpaceIdsQuery(opts.userId))
         .where('workspaceId', '=', opts.workspaceId);
     } else if (searchParams.shareId && !searchParams.spaceId && !opts.userId) {
       // search in shares
@@ -133,22 +111,19 @@ export class SearchService {
         return { items: [] };
       }
 
-      const isRestricted = await this.pagePermissionRepo.hasRestrictedAncestor(
-        share.pageId
-      );
+      const isRestricted = await this.pagePermissionRepo.hasRestrictedAncestor(share.pageId);
       if (isRestricted) {
         return { items: [] };
       }
 
       const pageIdsToSearch = [];
       if (share.includeSubPages) {
-        const pageList =
-          await this.pageRepo.getPageAndDescendantsExcludingRestricted(
-            share.pageId,
-            {
-              includeContent: false
-            }
-          );
+        const pageList = await this.pageRepo.getPageAndDescendantsExcludingRestricted(
+          share.pageId,
+          {
+            includeContent: false
+          }
+        );
 
         pageIdsToSearch.push(...pageList.map((page) => page.id));
       } else {
@@ -172,12 +147,11 @@ export class SearchService {
     // Filter results by page-level permissions (if user is authenticated)
     if (opts.userId && results.length > 0) {
       const pageIds = results.map((r: any) => r.id);
-      const accessibleIds =
-        await this.pagePermissionRepo.filterAccessiblePageIds({
-          pageIds,
-          userId: opts.userId,
-          spaceId: searchParams.spaceId
-        });
+      const accessibleIds = await this.pagePermissionRepo.filterAccessiblePageIds({
+        pageIds,
+        userId: opts.userId,
+        spaceId: searchParams.spaceId
+      });
       const accessibleSet = new Set(accessibleIds);
       results = results.filter((r: any) => accessibleSet.has(r.id));
     }
@@ -185,9 +159,7 @@ export class SearchService {
     //@ts-ignore
     const searchResults = results.map((result: SearchResponseDto) => {
       if (result.highlight) {
-        result.highlight = result.highlight
-          .replace(/\r\n|\r|\n/g, ' ')
-          .replace(/\s+/g, ' ');
+        result.highlight = result.highlight.replace(/\r\n|\r|\n/g, ' ').replace(/\s+/g, ' ');
       }
       return result;
     });
@@ -195,11 +167,7 @@ export class SearchService {
     return { items: searchResults };
   }
 
-  async searchSuggestions(
-    suggestion: SearchSuggestionDTO,
-    userId: string,
-    workspaceId: string
-  ) {
+  async searchSuggestions(suggestion: SearchSuggestionDTO, userId: string, workspaceId: string) {
     let users = [];
     let groups = [];
     let pages = [];
@@ -215,11 +183,7 @@ export class SearchService {
         .where('deletedAt', 'is', null)
         .where((eb) =>
           eb.or([
-            eb(
-              sql`LOWER(f_unaccent(users.name))`,
-              'like',
-              sql`LOWER(f_unaccent(${`%${query}%`}))`
-            ),
+            eb(sql`LOWER(f_unaccent(users.name))`, 'like', sql`LOWER(f_unaccent(${`%${query}%`}))`),
             eb(sql`users.email`, 'ilike', sql`f_unaccent(${`%${query}%`})`)
           ])
         )
@@ -233,11 +197,7 @@ export class SearchService {
         .selectFrom('groups')
         .select(['id', 'name', 'description'])
         .where((eb) =>
-          eb(
-            sql`LOWER(f_unaccent(groups.name))`,
-            'like',
-            sql`LOWER(f_unaccent(${`%${query}%`}))`
-          )
+          eb(sql`LOWER(f_unaccent(groups.name))`, 'like', sql`LOWER(f_unaccent(${`%${query}%`}))`)
         )
         .where('workspaceId', '=', workspaceId)
         .limit(limit)
@@ -250,11 +210,7 @@ export class SearchService {
         .select(['id', 'slugId', 'title', 'icon', 'spaceId'])
         .select((eb) => this.pageRepo.withSpace(eb))
         .where((eb) =>
-          eb(
-            sql`LOWER(f_unaccent(pages.title))`,
-            'like',
-            sql`LOWER(f_unaccent(${`%${query}%`}))`
-          )
+          eb(sql`LOWER(f_unaccent(pages.title))`, 'like', sql`LOWER(f_unaccent(${`%${query}%`}))`)
         )
         .where('deletedAt', 'is', null)
         .where('workspaceId', '=', workspaceId)
@@ -279,11 +235,10 @@ export class SearchService {
       // Filter by page-level permissions
       if (pages.length > 0) {
         const pageIds = pages.map((p) => p.id);
-        const accessibleIds =
-          await this.pagePermissionRepo.filterAccessiblePageIds({
-            pageIds,
-            userId
-          });
+        const accessibleIds = await this.pagePermissionRepo.filterAccessiblePageIds({
+          pageIds,
+          userId
+        });
         const accessibleSet = new Set(accessibleIds);
         pages = pages.filter((p) => accessibleSet.has(p.id));
       }

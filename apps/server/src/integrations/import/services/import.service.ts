@@ -18,11 +18,7 @@ import { generateJitteredKeyBetween } from 'fractional-indexing-jittered';
 import { TiptapTransformer } from '@hocuspocus/transformer';
 import * as Y from 'yjs';
 import { markdownToHtml } from '@docmost/editor-ext';
-import {
-  FileTaskStatus,
-  FileTaskType,
-  getFileTaskFolderPath
-} from '../utils/file.utils';
+import { FileTaskStatus, FileTaskType, getFileTaskFolderPath } from '../utils/file.utils';
 import { v7 as uuid7 } from 'uuid';
 import { StorageService } from '../../storage/storage.service';
 import { InjectQueue } from '@nestjs/bullmq';
@@ -54,19 +50,14 @@ export class ImportService {
     const file = await filePromise;
     const fileBuffer = await file.toBuffer();
     const fileExtension = path.extname(file.filename).toLowerCase();
-    const fileName = sanitizeFileName(
-      path.basename(file.filename, fileExtension)
-    );
+    const fileName = sanitizeFileName(path.basename(file.filename, fileExtension));
     const fileContent = fileBuffer.toString();
 
     let prosemirrorState = null;
     let createdPage = null;
 
     // For DOCX, we need the page ID upfront so images can reference it
-    const pageId =
-      fileExtension === '.docx' || fileExtension === '.pdf'
-        ? uuid7()
-        : undefined;
+    const pageId = fileExtension === '.docx' || fileExtension === '.pdf' ? uuid7() : undefined;
 
     try {
       if (fileExtension.endsWith('.md')) {
@@ -74,21 +65,9 @@ export class ImportService {
       } else if (fileExtension.endsWith('.html')) {
         prosemirrorState = await this.processHTML(fileContent);
       } else if (fileExtension.endsWith('.docx')) {
-        prosemirrorState = await this.processDocx(
-          fileBuffer,
-          workspaceId,
-          spaceId,
-          pageId,
-          userId
-        );
+        prosemirrorState = await this.processDocx(fileBuffer, workspaceId, spaceId, pageId, userId);
       } else if (fileExtension.endsWith('.pdf')) {
-        prosemirrorState = await this.processPdf(
-          fileBuffer,
-          workspaceId,
-          spaceId,
-          pageId,
-          userId
-        );
+        prosemirrorState = await this.processPdf(fileBuffer, workspaceId, spaceId, pageId, userId);
       }
     } catch (err) {
       const message = 'Error processing file content';
@@ -102,10 +81,9 @@ export class ImportService {
       throw new BadRequestException(message);
     }
 
-    const { title, prosemirrorJson } = this.extractTitleAndRemoveHeading(
-      prosemirrorState,
-      { anyHeadingLevel: true }
-    );
+    const { title, prosemirrorJson } = this.extractTitleAndRemoveHeading(prosemirrorState, {
+      anyHeadingLevel: true
+    });
 
     const pageTitle = title || fileName;
 
@@ -171,18 +149,13 @@ export class ImportService {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       DocxImportModule = require('./../../../ee/document-import/docx-import.service');
     } catch (err) {
-      this.logger.error(
-        'DOCX import requested but EE module not bundled in this build'
-      );
-      throw new BadRequestException(
-        'This feature requires a valid enterprise license.'
-      );
+      this.logger.error('DOCX import requested but EE module not bundled in this build');
+      throw new BadRequestException('This feature requires a valid enterprise license.');
     }
 
-    const docxImportService = this.moduleRef.get(
-      DocxImportModule.DocxImportService,
-      { strict: false }
-    );
+    const docxImportService = this.moduleRef.get(DocxImportModule.DocxImportService, {
+      strict: false
+    });
 
     const html = await docxImportService.convertDocxToHtml(
       fileBuffer,
@@ -207,18 +180,13 @@ export class ImportService {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       PdfImportModule = require('./../../../ee/document-import/pdf-import.service');
     } catch (err) {
-      this.logger.error(
-        'PDF import requested but EE module not bundled in this build'
-      );
-      throw new BadRequestException(
-        'This feature requires a valid enterprise license.'
-      );
+      this.logger.error('PDF import requested but EE module not bundled in this build');
+      throw new BadRequestException('This feature requires a valid enterprise license.');
     }
 
-    const pdfImportService = this.moduleRef.get(
-      PdfImportModule.PdfImportService,
-      { strict: false }
-    );
+    const pdfImportService = this.moduleRef.get(PdfImportModule.PdfImportService, {
+      strict: false
+    });
 
     const html = await pdfImportService.convertPdfToHtml(
       fileBuffer,
@@ -235,11 +203,7 @@ export class ImportService {
     if (prosemirrorJson) {
       // this.logger.debug(`Converting prosemirror json state to ydoc`);
 
-      const ydoc = TiptapTransformer.toYdoc(
-        prosemirrorJson,
-        'default',
-        tiptapExtensions
-      );
+      const ydoc = TiptapTransformer.toYdoc(prosemirrorJson, 'default', tiptapExtensions);
 
       Y.encodeStateAsUpdate(ydoc);
 
@@ -248,18 +212,14 @@ export class ImportService {
     return null;
   }
 
-  extractTitleAndRemoveHeading(
-    prosemirrorState: any,
-    opts?: { anyHeadingLevel?: boolean }
-  ) {
+  extractTitleAndRemoveHeading(prosemirrorState: any, opts?: { anyHeadingLevel?: boolean }) {
     let title: string | null = null;
 
     const content = prosemirrorState.content ?? [];
     const firstNode = content[0];
 
     const isTitleHeading =
-      firstNode?.type === 'heading' &&
-      (opts?.anyHeadingLevel || firstNode.attrs?.level === 1);
+      firstNode?.type === 'heading' && (opts?.anyHeadingLevel || firstNode.attrs?.level === 1);
 
     if (isTitleHeading) {
       const headingText = (firstNode.content ?? [])
@@ -290,10 +250,7 @@ export class ImportService {
     };
   }
 
-  async getNewPagePosition(
-    spaceId: string,
-    parentPageId?: string
-  ): Promise<string> {
+  async getNewPagePosition(spaceId: string, parentPageId?: string): Promise<string> {
     let query = this.db
       .selectFrom('pages')
       .select(['id', 'position'])
@@ -325,9 +282,7 @@ export class ImportService {
   ) {
     const file = await filePromise;
     const fileExtension = path.extname(file.filename).toLowerCase();
-    const fileName = sanitizeFileName(
-      path.basename(file.filename, fileExtension)
-    );
+    const fileName = sanitizeFileName(path.basename(file.filename, fileExtension));
     const fileNameWithExt = fileName + fileExtension;
 
     const fileTaskId = uuid7();

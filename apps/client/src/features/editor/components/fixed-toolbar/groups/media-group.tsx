@@ -20,13 +20,7 @@ interface Props {
   templateMode?: boolean;
 }
 
-type UploadFn = (
-  file: File,
-  editor: Editor,
-  pos: number,
-  pageId: string,
-  ...rest: any[]
-) => void;
+type UploadFn = (file: File, editor: Editor, pos: number, pageId: string, ...rest: any[]) => void;
 
 function pickFile(
   editor: Editor,
@@ -68,12 +62,7 @@ export const MediaGroup: FC<Props> = ({ editor, templateMode }) => {
     <Menu shadow="md" position="bottom-start" withArrow={false}>
       <Menu.Target>
         <Tooltip label={t('Insert media')} withArrow>
-          <ActionIcon
-            variant="subtle"
-            color="dark"
-            size="md"
-            aria-label={t('Insert media')}
-          >
+          <ActionIcon variant="subtle" color="dark" size="md" aria-label={t('Insert media')}>
             <IconPhoto size={16} />
           </ActionIcon>
         </Tooltip>
@@ -105,18 +94,14 @@ export const MediaGroup: FC<Props> = ({ editor, templateMode }) => {
         )}
         <Menu.Item
           leftSection={<IconFileTypePdf size={16} />}
-          onClick={() =>
-            pickFile(editor, 'application/pdf', false, uploadPdfAction)
-          }
+          onClick={() => pickFile(editor, 'application/pdf', false, uploadPdfAction)}
         >
           PDF
         </Menu.Item>
         {!templateMode && (
           <Menu.Item
             leftSection={<IconPaperclip size={16} />}
-            onClick={() =>
-              pickFile(editor, '', true, uploadAttachmentAction, true)
-            }
+            onClick={() => pickFile(editor, '', true, uploadAttachmentAction, true)}
           >
             {t('File attachment')}
           </Menu.Item>

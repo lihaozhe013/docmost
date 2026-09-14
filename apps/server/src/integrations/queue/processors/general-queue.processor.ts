@@ -2,25 +2,16 @@ import { Logger, OnModuleDestroy } from '@nestjs/common';
 import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
 import { QueueJob, QueueName } from '../constants';
-import {
-  IAddPageWatchersJob,
-  IPageBacklinkJob
-} from '../constants/queue.interface';
+import { IAddPageWatchersJob, IPageBacklinkJob } from '../constants/queue.interface';
 import { InjectKysely } from 'nestjs-kysely';
 import { KyselyDB } from '@docmost/db/types/kysely.types';
 import { BacklinkRepo } from '@docmost/db/repos/backlink/backlink.repo';
-import {
-  WatcherRepo,
-  WatcherType
-} from '@docmost/db/repos/watcher/watcher.repo';
+import { WatcherRepo, WatcherType } from '@docmost/db/repos/watcher/watcher.repo';
 import { InsertableWatcher } from '@docmost/db/types/entity.types';
 import { processBacklinks } from '../tasks/backlinks.task';
 
 @Processor(QueueName.GENERAL_QUEUE)
-export class GeneralQueueProcessor
-  extends WorkerHost
-  implements OnModuleDestroy
-{
+export class GeneralQueueProcessor extends WorkerHost implements OnModuleDestroy {
   private readonly logger = new Logger(GeneralQueueProcessor.name);
   constructor(
     @InjectKysely() private readonly db: KyselyDB,
@@ -34,8 +25,7 @@ export class GeneralQueueProcessor
     try {
       switch (job.name) {
         case QueueJob.ADD_PAGE_WATCHERS: {
-          const { userIds, pageId, spaceId, workspaceId } =
-            job.data as IAddPageWatchersJob;
+          const { userIds, pageId, spaceId, workspaceId } = job.data as IAddPageWatchersJob;
           const watchers: InsertableWatcher[] = userIds.map((userId) => ({
             userId,
             pageId,
@@ -49,11 +39,7 @@ export class GeneralQueueProcessor
         }
 
         case QueueJob.PAGE_BACKLINKS: {
-          await processBacklinks(
-            this.db,
-            this.backlinkRepo,
-            job.data as IPageBacklinkJob
-          );
+          await processBacklinks(this.db, this.backlinkRepo, job.data as IPageBacklinkJob);
           break;
         }
       }
@@ -69,9 +55,7 @@ export class GeneralQueueProcessor
 
   @OnWorkerEvent('failed')
   onError(job: Job) {
-    this.logger.error(
-      `Error processing ${job.name} job. Reason: ${job.failedReason}`
-    );
+    this.logger.error(`Error processing ${job.name} job. Reason: ${job.failedReason}`);
   }
 
   @OnWorkerEvent('completed')

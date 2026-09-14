@@ -26,11 +26,7 @@ export interface BubbleMenuItem {
   isActive: () => boolean;
 }
 
-export const TextAlignmentSelector: FC<TextAlignmentProps> = ({
-  editor,
-  isOpen,
-  setIsOpen
-}) => {
+export const TextAlignmentSelector: FC<TextAlignmentProps> = ({ editor, isOpen, setIsOpen }) => {
   const { t } = useTranslation();
 
   const editorState = useEditorState({
@@ -91,12 +87,7 @@ export const TextAlignmentSelector: FC<TextAlignmentProps> = ({
       onChange={setIsOpen}
     >
       <Menu.Target>
-        <Tooltip
-          label={t('Text align')}
-          withArrow
-          disabled={isOpen}
-          withinPortal={false}
-        >
+        <Tooltip label={t('Text align')} withArrow disabled={isOpen} withinPortal={false}>
           <Button
             variant="default"
             style={{ border: 'none', height: '34px' }}
@@ -119,9 +110,7 @@ export const TextAlignmentSelector: FC<TextAlignmentProps> = ({
           <Menu.Item
             key={index}
             leftSection={<item.icon size={16} />}
-            rightSection={
-              activeItem.name === item.name ? <IconCheck size={16} /> : null
-            }
+            rightSection={activeItem.name === item.name ? <IconCheck size={16} /> : null}
             onClick={() => {
               if (isEditorReady(editor)) item.command();
               setIsOpen(false);

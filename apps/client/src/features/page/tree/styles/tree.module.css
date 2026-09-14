@@ -27,10 +27,7 @@
        second tap, requiring a double-tap to navigate. */
   @media (hover: hover) {
     &:hover {
-      background-color: light-dark(
-        var(--mantine-color-gray-3),
-        var(--mantine-color-dark-5)
-      );
+      background-color: light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-5));
     }
 
     &:hover .actions {
@@ -105,8 +102,7 @@
 }
 
 .node:focus-visible {
-  outline: 2px solid
-    light-dark(var(--mantine-color-blue-5), var(--mantine-color-blue-4));
+  outline: 2px solid light-dark(var(--mantine-color-blue-5), var(--mantine-color-blue-4));
   outline-offset: -2px;
 }
 
@@ -115,10 +111,7 @@
 }
 
 .node[data-selected='true'] {
-  background-color: light-dark(
-    var(--mantine-color-gray-3),
-    var(--mantine-color-dark-6)
-  );
+  background-color: light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-6));
 }
 
 .node[data-selected='true'] .actions {
@@ -127,20 +120,13 @@
 }
 
 .node[data-receiving-drop='make-child'] {
-  background-color: light-dark(
-    var(--mantine-color-blue-1),
-    rgba(56, 139, 253, 0.15)
-  );
-  outline: 2px solid
-    light-dark(var(--mantine-color-blue-5), var(--mantine-color-blue-7));
+  background-color: light-dark(var(--mantine-color-blue-1), rgba(56, 139, 253, 0.15));
+  outline: 2px solid light-dark(var(--mantine-color-blue-5), var(--mantine-color-blue-7));
   outline-offset: -1px;
 }
 
 .node[data-receiving-drop='make-child-blocked'] {
-  outline-color: light-dark(
-    var(--mantine-color-red-5),
-    var(--mantine-color-red-7)
-  );
+  outline-color: light-dark(var(--mantine-color-red-5), var(--mantine-color-red-7));
 }
 
 .dropLine {
@@ -148,10 +134,7 @@
   left: var(--drop-line-indent, 0);
   right: 8px;
   height: 2px;
-  background: light-dark(
-    var(--mantine-color-blue-5),
-    var(--mantine-color-blue-4)
-  );
+  background: light-dark(var(--mantine-color-blue-5), var(--mantine-color-blue-4));
   pointer-events: none;
   z-index: 1;
 }
@@ -170,10 +153,7 @@
 }
 
 .dropLine[data-blocked='true'] {
-  background: light-dark(
-    var(--mantine-color-red-5),
-    var(--mantine-color-red-4)
-  );
+  background: light-dark(var(--mantine-color-red-5), var(--mantine-color-red-4));
 }
 
 .dropLine[data-edge='top'] {

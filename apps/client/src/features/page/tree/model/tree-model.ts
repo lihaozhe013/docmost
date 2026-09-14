@@ -19,19 +19,13 @@ export const treeModel = {
     return findInternal(tree, id)?.node ?? null;
   },
 
-  path<T extends object>(
-    tree: TreeNode<T>[],
-    id: string
-  ): TreeNode<T>[] | null {
+  path<T extends object>(tree: TreeNode<T>[], id: string): TreeNode<T>[] | null {
     const found = findInternal(tree, id);
     if (!found) return null;
     return [...found.parents, found.node];
   },
 
-  siblingsOf<T extends object>(
-    tree: TreeNode<T>[],
-    id: string
-  ): SiblingsInfo<T> | null {
+  siblingsOf<T extends object>(tree: TreeNode<T>[], id: string): SiblingsInfo<T> | null {
     const found = findInternal(tree, id);
     if (!found) return null;
     const parent = found.parents[found.parents.length - 1];
@@ -54,10 +48,7 @@ export const treeModel = {
     return findInternal(ancestor.children, descendantId) !== null;
   },
 
-  visible<T extends object>(
-    tree: TreeNode<T>[],
-    openIds: ReadonlySet<string>
-  ): TreeNode<T>[] {
+  visible<T extends object>(tree: TreeNode<T>[], openIds: ReadonlySet<string>): TreeNode<T>[] {
     const out: TreeNode<T>[] = [];
     const walk = (nodes: TreeNode<T>[]) => {
       for (const node of nodes) {
@@ -194,8 +185,7 @@ export const treeModel = {
     sourceId: string,
     op: import('./tree-model.types').DropOp
   ): { tree: TreeNode<T>[]; result: import('./tree-model.types').DropResult } {
-    if (sourceId === op.targetId)
-      return { tree, result: { parentId: null, index: 0 } };
+    if (sourceId === op.targetId) return { tree, result: { parentId: null, index: 0 } };
     if (!treeModel.find(tree, sourceId) || !treeModel.find(tree, op.targetId)) {
       return { tree, result: { parentId: null, index: 0 } };
     }

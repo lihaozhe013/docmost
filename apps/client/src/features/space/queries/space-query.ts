@@ -96,9 +96,7 @@ export function useCreateSpaceMutation() {
   });
 }
 
-export function useGetSpaceBySlugQuery(
-  spaceId: string
-): UseQueryResult<ISpace, Error> {
+export function useGetSpaceBySlugQuery(spaceId: string): UseQueryResult<ISpace, Error> {
   return useQuery({
     queryKey: ['space', spaceId],
     queryFn: () => getSpaceById(spaceId),
@@ -116,10 +114,7 @@ export function useUpdateSpaceMutation() {
     onSuccess: (data, variables) => {
       notifications.show({ message: t('Space updated successfully') });
 
-      const space = queryClient.getQueryData([
-        'space',
-        variables.spaceId
-      ]) as ISpace;
+      const space = queryClient.getQueryData(['space', variables.spaceId]) as ISpace;
       if (space) {
         const updatedSpace = { ...space, ...data };
         queryClient.setQueryData(['space', variables.spaceId], updatedSpace);
@@ -194,8 +189,7 @@ export function useDeleteSpaceMutation() {
 export function useSpaceMembersInfiniteQuery(spaceId: string, query?: string) {
   return useInfiniteQuery({
     queryKey: ['spaceMembers', spaceId, query],
-    queryFn: ({ pageParam }) =>
-      getSpaceMembers(spaceId, { cursor: pageParam, limit: 50, query }),
+    queryFn: ({ pageParam }) => getSpaceMembers(spaceId, { cursor: pageParam, limit: 50, query }),
     enabled: !!spaceId,
     placeholderData: keepPreviousData,
     initialPageParam: undefined as string | undefined,

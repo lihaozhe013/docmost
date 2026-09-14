@@ -2,11 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectKysely } from 'nestjs-kysely';
 import { KyselyDB, KyselyTransaction } from '@docmost/db/types/kysely.types';
 import { dbOrTx } from '@docmost/db/utils';
-import {
-  InsertableSpace,
-  Space,
-  UpdatableSpace
-} from '@docmost/db/types/entity.types';
+import { InsertableSpace, Space, UpdatableSpace } from '@docmost/db/types/entity.types';
 import { ExpressionBuilder, sql } from 'kysely';
 import { PaginationOptions } from '../../pagination/pagination-options';
 import { executeWithCursorPagination } from '@docmost/db/pagination/cursor-pagination';
@@ -73,11 +69,7 @@ export class SpaceRepo {
       .executeTakeFirst();
   }
 
-  async slugExists(
-    slug: string,
-    workspaceId: string,
-    trx?: KyselyTransaction
-  ): Promise<boolean> {
+  async slugExists(slug: string, workspaceId: string, trx?: KyselyTransaction): Promise<boolean> {
     const db = dbOrTx(this.db, trx);
     let { count } = await db
       .selectFrom('spaces')
@@ -149,22 +141,12 @@ export class SpaceRepo {
       .executeTakeFirst();
   }
 
-  async insertSpace(
-    insertableSpace: InsertableSpace,
-    trx?: KyselyTransaction
-  ): Promise<Space> {
+  async insertSpace(insertableSpace: InsertableSpace, trx?: KyselyTransaction): Promise<Space> {
     const db = dbOrTx(this.db, trx);
-    return db
-      .insertInto('spaces')
-      .values(insertableSpace)
-      .returningAll()
-      .executeTakeFirst();
+    return db.insertInto('spaces').values(insertableSpace).returningAll().executeTakeFirst();
   }
 
-  async getSpacesInWorkspace(
-    workspaceId: string,
-    pagination: PaginationOptions
-  ) {
+  async getSpacesInWorkspace(workspaceId: string, pagination: PaginationOptions) {
     // todo: show spaces user have access based on visibility and memberships
     let query = this.db
       .selectFrom('spaces')
@@ -174,11 +156,7 @@ export class SpaceRepo {
 
     if (pagination.query) {
       query = query.where((eb) =>
-        eb(
-          sql`f_unaccent(name)`,
-          'ilike',
-          sql`f_unaccent(${'%' + pagination.query + '%'})`
-        ).or(
+        eb(sql`f_unaccent(name)`, 'ilike', sql`f_unaccent(${'%' + pagination.query + '%'})`).or(
           sql`f_unaccent(description)`,
           'ilike',
           sql`f_unaccent(${'%' + pagination.query + '%'})`

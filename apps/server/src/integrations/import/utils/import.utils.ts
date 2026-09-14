@@ -3,9 +3,7 @@ import { promises as fs } from 'fs';
 import * as path from 'path';
 import { ExportMetadata } from '../../../common/helpers/types/export-metadata.types';
 
-export async function buildAttachmentCandidates(
-  extractDir: string
-): Promise<Map<string, string>> {
+export async function buildAttachmentCandidates(extractDir: string): Promise<Map<string, string>> {
   const map = new Map<string, string>();
   async function walk(dir: string) {
     for (const ent of await fs.readdir(dir, { withFileTypes: true })) {
@@ -45,23 +43,14 @@ export function resolveRelativeAttachmentPath(
   // Confluence Server uses "/download/attachments/..." in HTML but the ZIP
   // stores files under "attachments/...". Strip the "download/" prefix so
   // the path can match candidates from the archive.
-  const confluenceStripped = mainRel.replace(
-    /^download\/attachments\//,
-    'attachments/'
-  );
+  const confluenceStripped = mainRel.replace(/^download\/attachments\//, 'attachments/');
 
-  const fallback = path
-    .normalize(path.join(pageDir, mainRel))
-    .split(path.sep)
-    .join('/');
+  const fallback = path.normalize(path.join(pageDir, mainRel)).split(path.sep).join('/');
 
   if (attachmentCandidates.has(mainRel)) {
     return mainRel;
   }
-  if (
-    confluenceStripped !== mainRel &&
-    attachmentCandidates.has(confluenceStripped)
-  ) {
+  if (confluenceStripped !== mainRel && attachmentCandidates.has(confluenceStripped)) {
     return confluenceStripped;
   }
   if (attachmentCandidates.has(fallback)) {
@@ -71,9 +60,7 @@ export function resolveRelativeAttachmentPath(
   return null;
 }
 
-export async function collectMarkdownAndHtmlFiles(
-  dir: string
-): Promise<string[]> {
+export async function collectMarkdownAndHtmlFiles(dir: string): Promise<string[]> {
   const results: string[] = [];
 
   async function walk(current: string) {
@@ -82,9 +69,7 @@ export async function collectMarkdownAndHtmlFiles(
       const fullPath = path.join(current, ent.name);
       if (ent.isDirectory()) {
         await walk(fullPath);
-      } else if (
-        ['.md', '.html'].includes(path.extname(ent.name).toLowerCase())
-      ) {
+      } else if (['.md', '.html'].includes(path.extname(ent.name).toLowerCase())) {
         results.push(fullPath);
       }
     }
@@ -99,10 +84,7 @@ export function stripNotionID(fileName: string): string {
   const notionIdPattern = /[ -]?[a-z0-9]{32}$/i;
   // Handle partial UUID format used for duplicate names: "Name abcd-ef12"
   const partialIdPattern = / [a-f0-9]{4}-[a-f0-9]{4}$/i;
-  return fileName
-    .replace(notionIdPattern, '')
-    .replace(partialIdPattern, '')
-    .trim();
+  return fileName.replace(notionIdPattern, '').replace(partialIdPattern, '').trim();
 }
 
 /**
@@ -125,9 +107,7 @@ export function encodeFilePath(filePath: string): string {
     .join('/');
 }
 
-export async function readDocmostMetadata(
-  extractDir: string
-): Promise<ExportMetadata | null> {
+export async function readDocmostMetadata(extractDir: string): Promise<ExportMetadata | null> {
   const metadataPath = path.join(extractDir, 'docmost-metadata.json');
   try {
     const content = await fs.readFile(metadataPath, 'utf-8');

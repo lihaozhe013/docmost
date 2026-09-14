@@ -11,13 +11,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { uploadFile } from '@/features/page/services/page-service.ts';
 import { useDisclosure } from '@mantine/hooks';
 import { getDrawioUrl } from '@/lib/config.ts';
-import {
-  DrawIoEmbed,
-  DrawIoEmbedRef,
-  EventExit,
-  EventExport,
-  EventSave
-} from 'react-drawio';
+import { DrawIoEmbed, DrawIoEmbedRef, EventExit, EventExport, EventSave } from 'react-drawio';
 import { IAttachment } from '@/features/attachments/types/attachment.types';
 import { decodeBase64ToSvgString, svgStringToFile } from '@/lib/utils';
 import clsx from 'clsx';
@@ -94,11 +88,7 @@ export default function DrawioView(props: NodeViewProps) {
 
     modals.openConfirmModal({
       title: t('Unsaved changes'),
-      children: (
-        <Text size="sm">
-          {t('You have unsaved changes that will be lost.')}
-        </Text>
-      ),
+      children: <Text size="sm">{t('You have unsaved changes that will be lost.')}</Text>,
       centered: true,
       labels: { confirm: t('Discard'), cancel: t('Cancel') },
       confirmProps: { color: 'red' },
@@ -200,11 +190,7 @@ export default function DrawioView(props: NodeViewProps) {
         className={clsx(selected ? 'ProseMirror-selectednode' : '')}
       >
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <ActionIcon
-            variant="transparent"
-            color="gray"
-            aria-label={t('Edit diagram')}
-          >
+          <ActionIcon variant="transparent" color="gray" aria-label={t('Edit diagram')}>
             <IconEdit size={18} />
           </ActionIcon>
 

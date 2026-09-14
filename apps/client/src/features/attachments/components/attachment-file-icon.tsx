@@ -40,16 +40,12 @@ interface AttachmentFileIconProps {
   mimeType?: string;
 }
 
-export function AttachmentFileIcon({
-  fileExt,
-  mimeType
-}: AttachmentFileIconProps) {
+export function AttachmentFileIcon({ fileExt, mimeType }: AttachmentFileIconProps) {
   const byExt = fileExt ? EXT_ICONS[fileExt.toLowerCase()] : undefined;
   const byMime = mimeType
     ? MIME_ICONS.find((entry) => mimeType.startsWith(entry.prefix))
     : undefined;
-  const { icon: FileIcon, color } = byExt ??
-    byMime ?? { icon: IconFile, color: 'gray' };
+  const { icon: FileIcon, color } = byExt ?? byMime ?? { icon: IconFile, color: 'gray' };
 
   return (
     <ThemeIcon variant="light" color={color} size={40} radius="md">

@@ -73,15 +73,7 @@ const CommentEditor = forwardRef(
         },
         handleDOMEvents: {
           keydown: (_view, event) => {
-            if (
-              [
-                'ArrowUp',
-                'ArrowDown',
-                'ArrowLeft',
-                'ArrowRight',
-                'Enter'
-              ].includes(event.key)
-            ) {
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter'].includes(event.key)) {
               const emojiCommand = document.querySelector('#emoji-command');
               const mentionPopup = document.querySelector('#mention');
               if (emojiCommand || mentionPopup) {
@@ -113,12 +105,7 @@ const CommentEditor = forwardRef(
     // websocket on another browser). Skip for editable editors to avoid
     // resetting the cursor position on every keystroke.
     useEffect(() => {
-      if (
-        !editable &&
-        commentEditor &&
-        !commentEditor.isDestroyed &&
-        defaultContent
-      ) {
+      if (!editable && commentEditor && !commentEditor.isDestroyed && defaultContent) {
         commentEditor.commands.setContent(defaultContent);
       }
     }, [defaultContent, editable, commentEditor]);

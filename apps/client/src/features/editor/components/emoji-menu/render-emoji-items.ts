@@ -1,13 +1,7 @@
 import { ReactRenderer } from '@tiptap/react';
 import type { SuggestionProps } from '@tiptap/suggestion';
 import EmojiList from './emoji-list';
-import {
-  autoUpdate,
-  computePosition,
-  flip,
-  offset,
-  shift
-} from '@floating-ui/dom';
+import { autoUpdate, computePosition, flip, offset, shift } from '@floating-ui/dom';
 
 const renderEmojiItems = () => {
   let component: ReactRenderer | null = null;
@@ -54,9 +48,7 @@ const renderEmojiItems = () => {
 
       const virtualElement = {
         getBoundingClientRect: () => {
-          return getReferenceClientRect
-            ? getReferenceClientRect()
-            : new DOMRect(0, 0, 0, 0);
+          return getReferenceClientRect ? getReferenceClientRect() : new DOMRect(0, 0, 0, 0);
         }
       };
 

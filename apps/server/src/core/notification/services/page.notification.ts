@@ -27,8 +27,7 @@ export class PageNotificationService {
   ) {}
 
   async processPageMention(data: IPageMentionNotificationJob) {
-    const { userMentions, oldMentionedUserIds, pageId, spaceId, workspaceId } =
-      data;
+    const { userMentions, oldMentionedUserIds, pageId, spaceId, workspaceId } = data;
 
     const oldIds = new Set(oldMentionedUserIds);
     const newMentions = userMentions.filter(
@@ -38,27 +37,20 @@ export class PageNotificationService {
     if (newMentions.length === 0) return;
 
     const candidateUserIds = newMentions.map((m) => m.userId);
-    const usersWithSpaceAccess =
-      await this.spaceMemberRepo.getUserIdsWithSpaceAccess(
-        candidateUserIds,
-        spaceId
-      );
+    const usersWithSpaceAccess = await this.spaceMemberRepo.getUserIdsWithSpaceAccess(
+      candidateUserIds,
+      spaceId
+    );
 
-    const usersWithPageAccess =
-      await this.pagePermissionRepo.getUserIdsWithPageAccess(pageId, [
-        ...usersWithSpaceAccess
-      ]);
+    const usersWithPageAccess = await this.pagePermissionRepo.getUserIdsWithPageAccess(pageId, [
+      ...usersWithSpaceAccess
+    ]);
     const usersWithAccess = new Set(usersWithPageAccess);
 
-    const accessibleMentions = newMentions.filter((m) =>
-      usersWithAccess.has(m.userId)
-    );
+    const accessibleMentions = newMentions.filter((m) => usersWithAccess.has(m.userId));
     if (accessibleMentions.length === 0) return;
 
-    const mentionsByCreator = new Map<
-      string,
-      { userId: string; mentionId: string }[]
-    >();
+    const mentionsByCreator = new Map<string, { userId: string; mentionId: string }[]>();
     for (const m of accessibleMentions) {
       const list = mentionsByCreator.get(m.creatorId) || [];
       list.push({ userId: m.userId, mentionId: m.mentionId });
@@ -85,8 +77,10 @@ export class PageNotificationService {
 
     if (userIds.length === 0) return;
 
-    const usersWithSpaceAccess =
-      await this.spaceMemberRepo.getUserIdsWithSpaceAccess(userIds, spaceId);
+    const usersWithSpaceAccess = await this.spaceMemberRepo.getUserIdsWithSpaceAccess(
+      userIds,
+      spaceId
+    );
 
     if (usersWithSpaceAccess.size === 0) return;
 
@@ -106,10 +100,7 @@ export class PageNotificationService {
   async processPageUpdate(data: IPageUpdateNotificationJob) {
     const { pageId, spaceId, workspaceId, actorIds } = data;
 
-    const watcherIds = await this.watcherRepo.getPageUpdateRecipientIds(
-      pageId,
-      spaceId
-    );
+    const watcherIds = await this.watcherRepo.getPageUpdateRecipientIds(pageId, spaceId);
 
     if (watcherIds.length === 0) return;
 
@@ -122,26 +113,23 @@ export class PageNotificationService {
 
     const afterPrefs = [...eligibleUsers.keys()];
 
-    const recentlyNotified =
-      await this.notificationRepo.getRecentlyNotifiedUserIds(
-        afterPrefs,
-        pageId,
-        NotificationType.PAGE_UPDATED,
-        PAGE_UPDATE_COOLDOWN_HOURS
-      );
+    const recentlyNotified = await this.notificationRepo.getRecentlyNotifiedUserIds(
+      afterPrefs,
+      pageId,
+      NotificationType.PAGE_UPDATED,
+      PAGE_UPDATE_COOLDOWN_HOURS
+    );
     const afterCooldown = afterPrefs.filter((id) => !recentlyNotified.has(id));
     if (afterCooldown.length === 0) return;
 
-    const usersWithSpaceAccess =
-      await this.spaceMemberRepo.getUserIdsWithSpaceAccess(
-        afterCooldown,
-        spaceId
-      );
+    const usersWithSpaceAccess = await this.spaceMemberRepo.getUserIdsWithSpaceAccess(
+      afterCooldown,
+      spaceId
+    );
 
-    const usersWithPageAccess =
-      await this.pagePermissionRepo.getUserIdsWithPageAccess(pageId, [
-        ...usersWithSpaceAccess
-      ]);
+    const usersWithPageAccess = await this.pagePermissionRepo.getUserIdsWithPageAccess(pageId, [
+      ...usersWithSpaceAccess
+    ]);
     if (usersWithPageAccess.length === 0) return;
 
     const recipientIds = new Set(usersWithPageAccess);
@@ -159,9 +147,7 @@ export class PageNotificationService {
     }
   }
 
-  private async getEligiblePageUpdateUsers(
-    userIds: string[]
-  ): Promise<Map<string, string>> {
+  private async getEligiblePageUpdateUsers(userIds: string[]): Promise<Map<string, string>> {
     if (userIds.length === 0) return new Map();
 
     const users = await this.db

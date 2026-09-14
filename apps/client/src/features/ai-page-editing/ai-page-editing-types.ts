@@ -25,13 +25,7 @@ export type ChatMessage = {
 };
 
 export type RunPhase =
-  | 'idle'
-  | 'thinking'
-  | 'reading'
-  | 'editing'
-  | 'inserting'
-  | 'applying'
-  | 'generating';
+  'idle' | 'thinking' | 'reading' | 'editing' | 'inserting' | 'applying' | 'generating';
 
 export type ChatMessageImage = {
   attachmentId: string;

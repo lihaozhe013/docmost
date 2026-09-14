@@ -25,10 +25,7 @@ export function resolveFrameHeadersForPath(
   path: string,
   configuredHeader: SecurityHeader | null
 ): SecurityHeader[] {
-  if (
-    path === OAUTH_CONSENT_PATH ||
-    path.startsWith(`${OAUTH_CONSENT_PATH}/`)
-  ) {
+  if (path === OAUTH_CONSENT_PATH || path.startsWith(`${OAUTH_CONSENT_PATH}/`)) {
     return [
       { name: 'X-Frame-Options', value: 'DENY' },
       { name: 'Content-Security-Policy', value: "frame-ancestors 'none'" }

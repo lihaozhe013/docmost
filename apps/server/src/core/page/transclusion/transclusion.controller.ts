@@ -1,11 +1,4 @@
-import {
-  Body,
-  Controller,
-  HttpCode,
-  HttpStatus,
-  Post,
-  UseGuards
-} from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 import { AuthUser } from '../../../common/decorators/auth-user.decorator';
 import { User } from '@docmost/db/types/entity.types';
@@ -22,11 +15,7 @@ export class TransclusionController {
   @HttpCode(HttpStatus.OK)
   @Post('lookup')
   async lookup(@Body() dto: LookupDto, @AuthUser() user: User) {
-    return this.transclusionService.lookup(
-      dto.references,
-      user.id,
-      user.workspaceId
-    );
+    return this.transclusionService.lookup(dto.references, user.id, user.workspaceId);
   }
 
   @HttpCode(HttpStatus.OK)
@@ -42,10 +31,7 @@ export class TransclusionController {
 
   @HttpCode(HttpStatus.OK)
   @Post('unsync-reference')
-  async unsyncReference(
-    @Body() dto: UnsyncReferenceDto,
-    @AuthUser() user: User
-  ) {
+  async unsyncReference(@Body() dto: UnsyncReferenceDto, @AuthUser() user: User) {
     return this.transclusionService.unsyncReference(
       dto.referencePageId,
       dto.sourcePageId,

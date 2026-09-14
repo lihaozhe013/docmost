@@ -104,8 +104,6 @@ export function policyNamesAddress(
   const family = isIPv4(ip) ? 'ipv4' : isIPv6(ip) ? 'ipv6' : null;
   if (!family) return false;
   return policy.entries.some(
-    (entry) =>
-      (entry.port === undefined || entry.port === port) &&
-      entry.list.check(ip, family)
+    (entry) => (entry.port === undefined || entry.port === port) && entry.list.check(ip, family)
   );
 }

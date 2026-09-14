@@ -1,13 +1,7 @@
 import { NodeViewContent, NodeViewProps, NodeViewWrapper } from '@tiptap/react';
 import { ActionIcon, Menu, Tooltip } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import {
-  IconCheck,
-  IconCopy,
-  IconDots,
-  IconLinkOff,
-  IconTrash
-} from '@tabler/icons-react';
+import { IconCheck, IconCopy, IconDots, IconLinkOff, IconTrash } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import classes from './transclusion.module.css';
@@ -17,8 +11,7 @@ export default function TransclusionView(props: NodeViewProps) {
   const { editor, node, deleteNode } = props;
   const { t } = useTranslation();
   const [openMenus, setOpenMenus] = useState(0);
-  const trackOpen = (open: boolean) =>
-    setOpenMenus((n) => Math.max(0, n + (open ? 1 : -1)));
+  const trackOpen = (open: boolean) => setOpenMenus((n) => Math.max(0, n + (open ? 1 : -1)));
 
   const isEditable = editor.isEditable;
   // @ts-ignore - editor.storage.pageId is set by the host editor (page-editor.tsx onCreate)
@@ -99,10 +92,7 @@ export default function TransclusionView(props: NodeViewProps) {
               </ActionIcon>
             </Menu.Target>
             <Menu.Dropdown>
-              <Menu.Item
-                leftSection={<IconLinkOff size={14} />}
-                onClick={handleUnsync}
-              >
+              <Menu.Item leftSection={<IconLinkOff size={14} />} onClick={handleUnsync}>
                 {t('Unsync')}
               </Menu.Item>
               <Menu.Item

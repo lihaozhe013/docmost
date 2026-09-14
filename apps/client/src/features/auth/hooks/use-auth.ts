@@ -1,9 +1,5 @@
 import { useState } from 'react';
-import {
-  login,
-  logout,
-  setupWorkspace
-} from '@/features/auth/services/auth-service';
+import { login, logout, setupWorkspace } from '@/features/auth/services/auth-service';
 import { useNavigate } from 'react-router-dom';
 import { useAtom } from 'jotai';
 import { currentUserAtom } from '@/features/user/atoms/current-user-atom';

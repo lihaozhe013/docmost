@@ -93,10 +93,7 @@ export class ImportAttachmentService {
     >();
 
     // Analyze attachments to identify Draw.io pairs
-    const { drawioPairs, skipFiles } = this.analyzeAttachments(
-      pageAttachments,
-      isConfluenceImport
-    );
+    const { drawioPairs, skipFiles } = this.analyzeAttachments(pageAttachments, isConfluenceImport);
 
     // Map to store processed Draw.io SVGs
     const drawioSvgMap = new Map<
@@ -117,9 +114,7 @@ export class ImportAttachmentService {
       const drawioAbsPath = attachmentCandidates.get(drawioHref);
       if (!drawioAbsPath) continue;
 
-      const pngAbsPath = pair.pngFile
-        ? attachmentCandidates.get(pair.pngFile.href)
-        : undefined;
+      const pngAbsPath = pair.pngFile ? attachmentCandidates.get(pair.pngFile.href) : undefined;
 
       try {
         // Create combined SVG with Draw.io data and PNG image
@@ -166,10 +161,7 @@ export class ImportAttachmentService {
           } catch (error) {
             uploadStats.failed++;
             uploadStats.failedFiles.push(fileName);
-            this.logger.error(
-              `Failed to upload Draw.io SVG ${fileName}:`,
-              error
-            );
+            this.logger.error(`Failed to upload Draw.io SVG ${fileName}:`, error);
           }
         });
 
@@ -183,10 +175,7 @@ export class ImportAttachmentService {
           });
         }
       } catch (error) {
-        this.logger.error(
-          `Failed to process Draw.io pair ${pair.baseName}:`,
-          error
-        );
+        this.logger.error(`Failed to process Draw.io pair ${pair.baseName}:`, error);
       }
     }
 
@@ -198,21 +187,14 @@ export class ImportAttachmentService {
     const pageDir = path.dirname(pageRelativePath);
     const attachmentNameByRelPath = new Map<string, string>();
     for (const attachment of pageAttachments) {
-      const relPath = resolveRelativeAttachmentPath(
-        attachment.href,
-        pageDir,
-        attachmentCandidates
-      );
+      const relPath = resolveRelativeAttachmentPath(attachment.href, pageDir, attachmentCandidates);
       if (relPath && attachment.fileName) {
         attachmentNameByRelPath.set(relPath, attachment.fileName);
 
         const dir = path.posix.dirname(relPath);
         const aliasKey = `${dir}/${attachment.fileName}`;
         if (!attachmentCandidates.has(aliasKey)) {
-          attachmentCandidates.set(
-            aliasKey,
-            attachmentCandidates.get(relPath)!
-          );
+          attachmentCandidates.set(aliasKey, attachmentCandidates.get(relPath)!);
           attachmentNameByRelPath.set(aliasKey, attachment.fileName);
         }
       }
@@ -226,8 +208,7 @@ export class ImportAttachmentService {
       const baseName = realName || path.basename(abs);
       const ext = path.extname(baseName);
 
-      const fileNameWithExt =
-        sanitizeFileName(path.basename(baseName, ext)) + ext.toLowerCase();
+      const fileNameWithExt = sanitizeFileName(path.basename(baseName, ext)) + ext.toLowerCase();
 
       const storageFilePath = `${getAttachmentFolderPath(
         AttachmentType.File,
@@ -279,11 +260,7 @@ export class ImportAttachmentService {
       const src = cleanUrlString($img.attr('src') ?? '')!;
       if (!src || src.startsWith('http')) continue;
 
-      const relPath = resolveRelativeAttachmentPath(
-        src,
-        pageDir,
-        attachmentCandidates
-      );
+      const relPath = resolveRelativeAttachmentPath(src, pageDir, attachmentCandidates);
       if (!relPath) continue;
 
       // Check if this image is part of a Draw.io pair
@@ -314,9 +291,7 @@ export class ImportAttachmentService {
           const natural = imageDimensionsFromData(new Uint8Array(buf));
           if (natural) {
             width = height
-              ? String(
-                  Math.round((natural.width / natural.height) * Number(height))
-                )
+              ? String(Math.round((natural.width / natural.height) * Number(height)))
               : String(natural.width);
           }
         } catch {
@@ -344,11 +319,7 @@ export class ImportAttachmentService {
       const src = cleanUrlString($vid.attr('src') ?? '')!;
       if (!src || src.startsWith('http')) continue;
 
-      const relPath = resolveRelativeAttachmentPath(
-        src,
-        pageDir,
-        attachmentCandidates
-      );
+      const relPath = resolveRelativeAttachmentPath(src, pageDir, attachmentCandidates);
       if (!relPath) continue;
 
       const { attachmentId, apiFilePath } = processFile(relPath);
@@ -371,11 +342,7 @@ export class ImportAttachmentService {
       const src = cleanUrlString($aud.attr('src') ?? '')!;
       if (!src || src.startsWith('http')) continue;
 
-      const relPath = resolveRelativeAttachmentPath(
-        src,
-        pageDir,
-        attachmentCandidates
-      );
+      const relPath = resolveRelativeAttachmentPath(src, pageDir, attachmentCandidates);
       if (!relPath) continue;
 
       const { attachmentId, apiFilePath } = processFile(relPath);
@@ -391,11 +358,7 @@ export class ImportAttachmentService {
       const rawUrl = cleanUrlString($oldDiv.attr('data-attachment-url') ?? '')!;
       if (!rawUrl || rawUrl.startsWith('http')) continue;
 
-      const relPath = resolveRelativeAttachmentPath(
-        rawUrl,
-        pageDir,
-        attachmentCandidates
-      );
+      const relPath = resolveRelativeAttachmentPath(rawUrl, pageDir, attachmentCandidates);
       if (!relPath) continue;
 
       const { attachmentId, apiFilePath, abs } = processFile(relPath);
@@ -419,11 +382,7 @@ export class ImportAttachmentService {
       const href = cleanUrlString($a.attr('href') ?? '')!;
       if (!href || href.startsWith('http')) continue;
 
-      const relPath = resolveRelativeAttachmentPath(
-        href,
-        pageDir,
-        attachmentCandidates
-      );
+      const relPath = resolveRelativeAttachmentPath(href, pageDir, attachmentCandidates);
       if (!relPath) continue;
 
       // Check if this is a Draw.io file
@@ -451,15 +410,7 @@ export class ImportAttachmentService {
       const { attachmentId, apiFilePath, abs } = processFile(relPath);
       const ext = path.extname(relPath).toLowerCase();
 
-      const audioExtensions = new Set([
-        '.mp3',
-        '.wav',
-        '.ogg',
-        '.m4a',
-        '.webm',
-        '.flac',
-        '.aac'
-      ]);
+      const audioExtensions = new Set(['.mp3', '.wav', '.ogg', '.m4a', '.webm', '.flac', '.aac']);
 
       if (ext === '.pdf') {
         const $pdf = $('<div>')
@@ -508,11 +459,7 @@ export class ImportAttachmentService {
         const rawSrc = cleanUrlString($oldDiv.attr('data-src') ?? '')!;
         if (!rawSrc || rawSrc.startsWith('http')) continue;
 
-        const relPath = resolveRelativeAttachmentPath(
-          rawSrc,
-          pageDir,
-          attachmentCandidates
-        );
+        const relPath = resolveRelativeAttachmentPath(rawSrc, pageDir, attachmentCandidates);
         if (!relPath) continue;
 
         const { attachmentId, apiFilePath, abs } = processFile(relPath);
@@ -581,11 +528,7 @@ export class ImportAttachmentService {
       }
 
       // Resolve the metadata href to the actual archive path
-      const resolvedHref = resolveRelativeAttachmentPath(
-        href,
-        pageDir,
-        attachmentCandidates
-      );
+      const resolvedHref = resolveRelativeAttachmentPath(href, pageDir, attachmentCandidates);
       if (!resolvedHref) continue;
 
       // Check if already processed (was referenced in HTML).
@@ -595,10 +538,7 @@ export class ImportAttachmentService {
       const absPath = attachmentCandidates.get(resolvedHref);
       const alreadyProcessed =
         processed.has(resolvedHref) ||
-        (absPath &&
-          Array.from(processed.values()).some(
-            (entry) => entry.abs === absPath
-          ));
+        (absPath && Array.from(processed.values()).some((entry) => entry.abs === absPath));
       if (alreadyProcessed) {
         continue;
       }
@@ -633,10 +573,7 @@ export class ImportAttachmentService {
       );
 
       if (uploadStats.failed > 0) {
-        this.logger.warn(
-          `Failed to upload ${uploadStats.failed} files:`,
-          uploadStats.failedFiles
-        );
+        this.logger.warn(`Failed to upload ${uploadStats.failed} files:`, uploadStats.failedFiles);
       }
     }
 
@@ -667,10 +604,7 @@ export class ImportAttachmentService {
             $el.attr('data-attachment-size', sizeStr);
           }
         } catch (error) {
-          this.logger.debug(
-            `Could not get size for ${processedEntry.abs}:`,
-            error
-          );
+          this.logger.debug(`Could not get size for ${processedEntry.abs}:`, error);
         }
       }
     }
@@ -791,8 +725,7 @@ export class ImportAttachmentService {
               // Verify filename match
               if (
                 png.fileName === `${baseName}.drawio.png` ||
-                (!drawio.fileName.endsWith('.drawio') &&
-                  png.fileName === `${baseName}.png`)
+                (!drawio.fileName.endsWith('.drawio') && png.fileName === `${baseName}.png`)
               ) {
                 matchingPng = png;
                 break;
@@ -809,10 +742,7 @@ export class ImportAttachmentService {
             matchingPng = png;
             break;
           }
-          if (
-            !drawio.fileName.endsWith('.drawio') &&
-            png.fileName === `${baseName}.png`
-          ) {
+          if (!drawio.fileName.endsWith('.drawio') && png.fileName === `${baseName}.png`) {
             matchingPng = png;
             break;
           }
@@ -820,9 +750,7 @@ export class ImportAttachmentService {
       }
 
       if (matchingPng) {
-        this.logger.debug(
-          `Found Draw.io pair: ${drawio.fileName} -> ${matchingPng.fileName}`
-        );
+        this.logger.debug(`Found Draw.io pair: ${drawio.fileName} -> ${matchingPng.fileName}`);
       } else {
         this.logger.debug(`No PNG found for Draw.io file: ${drawio.fileName}`);
       }
@@ -852,10 +780,7 @@ export class ImportAttachmentService {
     return { drawioPairs, skipFiles };
   }
 
-  private async createDrawioSvg(
-    drawioPath: string,
-    pngPath?: string
-  ): Promise<Buffer> {
+  private async createDrawioSvg(drawioPath: string, pngPath?: string): Promise<Buffer> {
     try {
       const drawioContent = await fs.readFile(drawioPath, 'utf-8');
       const drawioBase64 = Buffer.from(drawioContent).toString('base64');
@@ -869,10 +794,7 @@ export class ImportAttachmentService {
 
           imageElement = `<image href="data:image/png;base64,${pngBase64}" width="100%" height="100%"/>`;
         } catch (error) {
-          this.logger.warn(
-            `Could not read PNG file for Draw.io diagram: ${pngPath}`,
-            error
-          );
+          this.logger.warn(`Could not read PNG file for Draw.io diagram: ${pngPath}`, error);
         }
       }
 
@@ -980,9 +902,7 @@ export class ImportAttachmentService {
         uploadStats.completed++;
 
         if (uploadStats.completed % 10 === 0) {
-          this.logger.debug(
-            `Upload progress: ${uploadStats.completed}/${uploadStats.total}`
-          );
+          this.logger.debug(`Upload progress: ${uploadStats.completed}/${uploadStats.total}`);
         }
 
         return;
@@ -993,9 +913,7 @@ export class ImportAttachmentService {
         );
 
         if (attempt < this.MAX_RETRIES) {
-          await new Promise((resolve) =>
-            setTimeout(resolve, this.RETRY_DELAY * attempt)
-          );
+          await new Promise((resolve) => setTimeout(resolve, this.RETRY_DELAY * attempt));
         }
       }
     }

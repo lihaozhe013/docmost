@@ -20,19 +20,10 @@ const NAME_PATTERN = /^[a-z0-9_-][a-z0-9_~-]*$/;
 const MAX_LABEL_NAME_LENGTH = 100;
 
 function isValidLabelName(name: string): boolean {
-  return (
-    name.length > 0 &&
-    name.length <= MAX_LABEL_NAME_LENGTH &&
-    NAME_PATTERN.test(name)
-  );
+  return name.length > 0 && name.length <= MAX_LABEL_NAME_LENGTH && NAME_PATTERN.test(name);
 }
 
-export function LabelPicker({
-  applied,
-  enabled,
-  onAdd,
-  onClose
-}: LabelPickerProps) {
+export function LabelPicker({ applied, enabled, onAdd, onClose }: LabelPickerProps) {
   const { t } = useTranslation();
   const scheme = useComputedColorScheme('light');
   const [query, setQuery] = useState('');
@@ -42,10 +33,7 @@ export function LabelPicker({
   const normalized = normalizeLabelName(query);
   const { data } = useWorkspaceLabelsQuery(normalized, enabled);
 
-  const appliedNames = useMemo(
-    () => new Set(applied.map((l) => l.name.toLowerCase())),
-    [applied]
-  );
+  const appliedNames = useMemo(() => new Set(applied.map((l) => l.name.toLowerCase())), [applied]);
 
   const suggestions = useMemo(() => {
     const items = data?.items ?? [];
@@ -53,8 +41,7 @@ export function LabelPicker({
   }, [data, appliedNames]);
 
   const exact = suggestions.find((l) => l.name === normalized);
-  const canCreate =
-    !exact && !appliedNames.has(normalized) && isValidLabelName(normalized);
+  const canCreate = !exact && !appliedNames.has(normalized) && isValidLabelName(normalized);
 
   const total = suggestions.length + (canCreate ? 1 : 0);
 
@@ -121,17 +108,11 @@ export function LabelPicker({
             <button
               key={s.id}
               type="button"
-              className={clsx(
-                classes.popoverItem,
-                hover === i && classes.popoverItemHover
-              )}
+              className={clsx(classes.popoverItem, hover === i && classes.popoverItemHover)}
               onMouseEnter={() => setHover(i)}
               onClick={() => select(i)}
             >
-              <span
-                className={classes.popoverItemDot}
-                style={{ background: c.dot }}
-              />
+              <span className={classes.popoverItemDot} style={{ background: c.dot }} />
               <span className={classes.popoverItemName}>{s.name}</span>
             </button>
           );

@@ -35,10 +35,7 @@ export const collator = new Intl.Collator(undefined, {
   numeric: true
 });
 
-export function sortItems<T>(
-  data: SortableItem<T>[],
-  direction: SortDirection
-): SortableItem<T>[] {
+export function sortItems<T>(data: SortableItem<T>[], direction: SortDirection): SortableItem<T>[] {
   return [...data].sort((a, b) => {
     if (a.isEmpty && !b.isEmpty) return 1;
     if (!a.isEmpty && b.isEmpty) return -1;

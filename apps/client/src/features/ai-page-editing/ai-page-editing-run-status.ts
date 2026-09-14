@@ -1,8 +1,4 @@
-import type {
-  AiRunUsage,
-  RunPhase,
-  ToolStepStatus
-} from './ai-page-editing-types';
+import type { AiRunUsage, RunPhase, ToolStepStatus } from './ai-page-editing-types';
 
 const TOOL_PHASES: Record<string, RunPhase> = {
   read_buffer: 'reading',
@@ -46,10 +42,7 @@ const TOOL_STEP_LABELS: Record<string, Record<ToolStepStatus, string>> = {
   }
 };
 
-export function toolStepLabel(
-  toolName: string,
-  status: ToolStepStatus
-): string {
+export function toolStepLabel(toolName: string, status: ToolStepStatus): string {
   const labels = TOOL_STEP_LABELS[toolName];
   if (labels) return labels[status];
   if (status === 'running') return `Running ${toolName}…`;
@@ -89,16 +82,12 @@ export function formatElapsed(ms: number): string {
   return `${minutes}m ${Math.round(seconds % 60)}s`;
 }
 
-export function formatRunMeta(meta?: {
-  usage?: AiRunUsage;
-  elapsedMs?: number;
-}): string | null {
+export function formatRunMeta(meta?: { usage?: AiRunUsage; elapsedMs?: number }): string | null {
   if (!meta) return null;
   const parts: string[] = [];
   const usage = meta.usage;
   if (usage) {
-    const total =
-      usage.totalTokens ?? (usage.inputTokens || 0) + (usage.outputTokens || 0);
+    const total = usage.totalTokens ?? (usage.inputTokens || 0) + (usage.outputTokens || 0);
     if (total > 0) parts.push(`${formatTokenCount(total)} tokens`);
   }
   if (meta.elapsedMs !== undefined) {

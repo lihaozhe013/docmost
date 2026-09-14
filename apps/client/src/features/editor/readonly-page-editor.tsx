@@ -1,11 +1,5 @@
 import '@/features/editor/styles/index.css';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Editor, EditorProvider } from '@tiptap/react';
 import { mainExtensions } from '@/features/editor/extensions/extensions';
 import { Document } from '@tiptap/extension-document';
@@ -13,10 +7,7 @@ import { Heading, UniqueID } from '@docmost/editor-ext';
 import { Text } from '@tiptap/extension-text';
 import { Placeholder } from '@tiptap/extension-placeholder';
 import { useAtom } from 'jotai';
-import {
-  lightboxRequestAtom,
-  readOnlyEditorAtom
-} from '@/features/editor/atoms/editor-atoms.ts';
+import { lightboxRequestAtom, readOnlyEditorAtom } from '@/features/editor/atoms/editor-atoms.ts';
 import { useEditorScroll } from './hooks/use-editor-scroll';
 import { TransclusionLookupProvider } from '@/features/editor/components/transclusion/transclusion-lookup-context';
 import LightboxView, {
@@ -54,9 +45,7 @@ export default function ReadonlyPageEditor({
     () => isComponentMounted.current && editorCreated.current,
     [isComponentMounted, editorCreated]
   );
-  const initialScrollTo = window.location.hash
-    ? window.location.hash.slice(1)
-    : '';
+  const initialScrollTo = window.location.hash ? window.location.hash.slice(1) : '';
   const { handleScrollTo } = useEditorScroll({ canScroll, initialScrollTo });
 
   useEffect(() => {
@@ -73,9 +62,7 @@ export default function ReadonlyPageEditor({
       'uniqueID',
       ...(printMode ? ['tableHeaderPin', 'tableReadonlySort'] : [])
     ]);
-    const filteredExtensions = mainExtensions.filter(
-      (ext) => !excludedExtensions.has(ext.name)
-    );
+    const filteredExtensions = mainExtensions.filter((ext) => !excludedExtensions.has(ext.name));
 
     return [
       ...filteredExtensions,

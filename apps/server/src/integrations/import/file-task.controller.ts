@@ -11,10 +11,7 @@ import {
 import SpaceAbilityFactory from '../../core/casl/abilities/space-ability.factory';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { User, Workspace } from '@docmost/db/types/entity.types';
-import {
-  SpaceCaslAction,
-  SpaceCaslSubject
-} from '../../core/casl/interfaces/space-ability.type';
+import { SpaceCaslAction, SpaceCaslSubject } from '../../core/casl/interfaces/space-ability.type';
 import {
   WorkspaceCaslAction,
   WorkspaceCaslSubject
@@ -47,20 +44,14 @@ export class FileTaskController {
     @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
-    if (
-      ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Settings)
-    ) {
+    if (ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Settings)) {
       throw new ForbiddenException();
     }
 
     const query = this.db
       .selectFrom('fileTasks')
       .selectAll()
-      .where(
-        'spaceId',
-        'in',
-        this.spaceMemberRepo.getUserSpaceIdsQuery(user.id)
-      );
+      .where('spaceId', 'in', this.spaceMemberRepo.getUserSpaceIdsQuery(user.id));
 
     return executeWithCursorPagination(query, {
       perPage: pagination.limit,
@@ -85,10 +76,7 @@ export class FileTaskController {
       throw new NotFoundException('File task not found');
     }
 
-    const ability = await this.spaceAbility.createForUser(
-      user,
-      fileTask.spaceId
-    );
+    const ability = await this.spaceAbility.createForUser(user, fileTask.spaceId);
     if (ability.cannot(SpaceCaslAction.Read, SpaceCaslSubject.Page)) {
       throw new ForbiddenException();
     }

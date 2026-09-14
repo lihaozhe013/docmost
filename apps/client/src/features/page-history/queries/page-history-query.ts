@@ -44,9 +44,7 @@ export function usePageHistoryListQuery(
   });
 }
 
-export function usePageHistoryQuery(
-  historyId: string
-): UseQueryResult<IPageHistory, Error> {
+export function usePageHistoryQuery(historyId: string): UseQueryResult<IPageHistory, Error> {
   return useQuery({
     queryKey: ['page-history', historyId],
     queryFn: () => getPageHistoryById(historyId),

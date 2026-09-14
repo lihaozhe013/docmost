@@ -20,9 +20,7 @@ export async function createPage(data: Partial<IPage>): Promise<IPage> {
   return req.data;
 }
 
-export async function getPageById(
-  pageInput: Partial<IPageInput>
-): Promise<IPage> {
+export async function getPageById(pageInput: Partial<IPageInput>): Promise<IPage> {
   const req = await api.post<IPage>('/pages/info', pageInput);
   return req.data;
 }
@@ -32,10 +30,7 @@ export async function updatePage(data: Partial<IPageInput>): Promise<IPage> {
   return req.data;
 }
 
-export async function deletePage(
-  pageId: string,
-  permanentlyDelete = false
-): Promise<void> {
+export async function deletePage(pageId: string, permanentlyDelete = false): Promise<void> {
   await api.post('/pages/delete', { pageId, permanentlyDelete });
 }
 
@@ -65,9 +60,7 @@ export async function duplicatePage(data: ICopyPageToSpace): Promise<IPage> {
   return req.data;
 }
 
-export async function getSidebarPages(
-  params: SidebarPagesParams
-): Promise<IPagination<IPage>> {
+export async function getSidebarPages(params: SidebarPagesParams): Promise<IPagination<IPage>> {
   const req = await api.post('/pages/sidebar-pages', params);
   return req.data;
 }
@@ -99,9 +92,7 @@ export async function getAllSidebarPages(
   };
 }
 
-export async function getPageBreadcrumbs(
-  pageId: string
-): Promise<Partial<IPage[]>> {
+export async function getPageBreadcrumbs(pageId: string): Promise<Partial<IPage[]>> {
   const req = await api.post('/pages/breadcrumbs', { pageId });
   return req.data;
 }
@@ -125,9 +116,7 @@ export async function exportPage(data: IExportPageParams): Promise<void> {
     responseType: 'blob'
   });
 
-  const fileName = req?.headers['content-disposition']
-    .split('filename=')[1]
-    .replace(/"/g, '');
+  const fileName = req?.headers['content-disposition'].split('filename=')[1].replace(/"/g, '');
 
   let decodedFileName = fileName;
   try {
@@ -139,16 +128,12 @@ export async function exportPage(data: IExportPageParams): Promise<void> {
   saveAs(req.data, decodedFileName);
 }
 
-export async function exportPageToDocx(data: {
-  pageId: string;
-}): Promise<void> {
+export async function exportPageToDocx(data: { pageId: string }): Promise<void> {
   const req = await api.post('/docx-export', data, {
     responseType: 'blob'
   });
 
-  const fileName = req?.headers['content-disposition']
-    .split('filename=')[1]
-    .replace(/"/g, '');
+  const fileName = req?.headers['content-disposition'].split('filename=')[1].replace(/"/g, '');
 
   let decodedFileName = fileName;
   try {
@@ -174,11 +159,7 @@ export async function importPage(file: File, spaceId: string) {
   return req.data;
 }
 
-export async function importZip(
-  file: File,
-  spaceId: string,
-  source?: string
-): Promise<IFileTask> {
+export async function importZip(file: File, spaceId: string, source?: string): Promise<IFileTask> {
   const formData = new FormData();
   formData.append('spaceId', spaceId);
   formData.append('source', source);
@@ -193,9 +174,7 @@ export async function importZip(
   return req.data;
 }
 
-export async function getAttachmentInfo(
-  attachmentId: string
-): Promise<IAttachment> {
+export async function getAttachmentInfo(attachmentId: string): Promise<IAttachment> {
   const req = await api.post<IAttachment>('/files/info', {
     attachmentId
   });

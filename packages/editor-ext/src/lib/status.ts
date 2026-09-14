@@ -18,12 +18,7 @@ declare module '@tiptap/core' {
 }
 
 export type StatusColor =
-  | 'gray'
-  | 'blue'
-  | 'green'
-  | 'yellow'
-  | 'red'
-  | 'purple';
+  'gray' | 'blue' | 'green' | 'yellow' | 'red' | 'purple';
 
 export interface StatusOption {
   HTMLAttributes: Record<string, any>;

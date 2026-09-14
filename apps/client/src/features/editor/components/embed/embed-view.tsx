@@ -18,11 +18,7 @@ import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { notifications } from '@mantine/notifications';
 import { useTranslation } from 'react-i18next';
 import i18n from 'i18next';
-import {
-  getEmbedProviderById,
-  getEmbedUrlAndProvider,
-  sanitizeUrl
-} from '@docmost/editor-ext';
+import { getEmbedProviderById, getEmbedUrlAndProvider, sanitizeUrl } from '@docmost/editor-ext';
 import { ResizableWrapper } from '../common/resizable-wrapper';
 import classes from './embed-view.module.css';
 
@@ -111,13 +107,7 @@ export default function EmbedView(props: NodeViewProps) {
           </ResizableWrapper>
         </div>
       ) : (
-        <Popover
-          width={300}
-          position="bottom"
-          withArrow
-          shadow="md"
-          disabled={!editor.isEditable}
-        >
+        <Popover width={300} position="bottom" withArrow shadow="md" disabled={!editor.isEditable}>
           <Popover.Target>
             <Card
               radius="md"
@@ -131,11 +121,7 @@ export default function EmbedView(props: NodeViewProps) {
               className={clsx(selected ? 'ProseMirror-selectednode' : '')}
             >
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <ActionIcon
-                  variant="transparent"
-                  color="gray"
-                  aria-label={t('Edit embed')}
-                >
+                <ActionIcon variant="transparent" color="gray" aria-label={t('Edit embed')}>
                   <IconEdit size={18} />
                 </ActionIcon>
 

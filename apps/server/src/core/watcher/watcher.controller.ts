@@ -39,12 +39,7 @@ export class WatcherController {
 
     await this.pageAccessService.validateCanView(page, user);
 
-    await this.watcherService.watchPage(
-      user.id,
-      page.id,
-      page.spaceId,
-      workspace.id
-    );
+    await this.watcherService.watchPage(user.id, page.id, page.spaceId, workspace.id);
 
     return { watching: true };
   }
@@ -59,12 +54,7 @@ export class WatcherController {
 
     await this.pageAccessService.validateCanView(page, user);
 
-    await this.watcherService.unwatchPage(
-      user.id,
-      page.id,
-      page.spaceId,
-      page.workspaceId
-    );
+    await this.watcherService.unwatchPage(user.id, page.id, page.spaceId, page.workspaceId);
 
     return { watching: false };
   }

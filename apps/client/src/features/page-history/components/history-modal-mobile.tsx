@@ -87,12 +87,7 @@ export default function HistoryModalMobile({ pageId, pageTitle }: Props) {
       setActiveHistoryId(historyItems[0].id);
       setActiveHistoryPrevId(historyItems[1]?.id ?? '');
     }
-  }, [
-    historyItems,
-    activeHistoryId,
-    setActiveHistoryId,
-    setActiveHistoryPrevId
-  ]);
+  }, [historyItems, activeHistoryId, setActiveHistoryId, setActiveHistoryPrevId]);
 
   const handleDropdownScroll = useCallback(() => {
     const viewport = dropdownViewportRef.current;
@@ -151,14 +146,8 @@ export default function HistoryModalMobile({ pageId, pageTitle }: Props) {
         />
       </Box>
 
-      <ScrollArea
-        className={classes.editorArea}
-        viewportRef={scrollViewportRef}
-        scrollbarSize={5}
-      >
-        <Box className={classes.editorContent}>
-          {activeHistoryId && <HistoryView />}
-        </Box>
+      <ScrollArea className={classes.editorArea} viewportRef={scrollViewportRef} scrollbarSize={5}>
+        <Box className={classes.editorContent}>{activeHistoryId && <HistoryView />}</Box>
       </ScrollArea>
 
       {canRestore && (
@@ -171,13 +160,7 @@ export default function HistoryModalMobile({ pageId, pageTitle }: Props) {
       )}
 
       {activeHistoryId && (
-        <Paper
-          shadow="sm"
-          radius="xl"
-          px="md"
-          py="xs"
-          className={classes.floatingBar}
-        >
+        <Paper shadow="sm" radius="xl" px="md" py="xs" className={classes.floatingBar}>
           <Group gap="sm" wrap="nowrap">
             <Switch
               label={t('Highlight changes')}
@@ -191,18 +174,10 @@ export default function HistoryModalMobile({ pageId, pageTitle }: Props) {
                 <Text size="sm" c="dimmed" style={{ whiteSpace: 'nowrap' }}>
                   {currentChangeIndex} of {diffCounts.total}
                 </Text>
-                <ActionIcon
-                  variant="subtle"
-                  size="sm"
-                  onClick={handlePrevChange}
-                >
+                <ActionIcon variant="subtle" size="sm" onClick={handlePrevChange}>
                   <IconChevronUp size={16} />
                 </ActionIcon>
-                <ActionIcon
-                  variant="subtle"
-                  size="sm"
-                  onClick={handleNextChange}
-                >
+                <ActionIcon variant="subtle" size="sm" onClick={handleNextChange}>
                   <IconChevronDown size={16} />
                 </ActionIcon>
               </Group>

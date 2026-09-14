@@ -1,20 +1,6 @@
 import { NodeViewProps, NodeViewWrapper } from '@tiptap/react';
-import {
-  ActionIcon,
-  Button,
-  Card,
-  Group,
-  Text,
-  useComputedColorScheme
-} from '@mantine/core';
-import {
-  lazy,
-  Suspense,
-  useCallback,
-  useEffect,
-  useRef,
-  useState
-} from 'react';
+import { ActionIcon, Button, Card, Group, Text, useComputedColorScheme } from '@mantine/core';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { uploadFile } from '@/features/page/services/page-service.ts';
 import { svgStringToFile } from '@/lib';
 import { useDisclosure } from '@mantine/hooks';
@@ -40,8 +26,7 @@ export default function ExcalidrawView(props: NodeViewProps) {
   const { node, updateAttributes, editor, selected } = props;
   const { attachmentId } = node.attrs;
 
-  const [excalidrawAPI, setExcalidrawAPI] =
-    useState<ExcalidrawImperativeAPI>(null);
+  const [excalidrawAPI, setExcalidrawAPI] = useState<ExcalidrawImperativeAPI>(null);
   useHandleLibrary({
     excalidrawAPI,
     adapter: localStorageLibraryAdapter
@@ -102,11 +87,7 @@ export default function ExcalidrawView(props: NodeViewProps) {
 
         let attachment: IAttachment = null;
         if (attachmentId) {
-          attachment = await uploadFile(
-            excalidrawSvgFile,
-            pageId,
-            attachmentId
-          );
+          attachment = await uploadFile(excalidrawSvgFile, pageId, attachmentId);
         } else {
           attachment = await uploadFile(excalidrawSvgFile, pageId);
         }
@@ -150,11 +131,7 @@ export default function ExcalidrawView(props: NodeViewProps) {
 
     modals.openConfirmModal({
       title: t('Unsaved changes'),
-      children: (
-        <Text size="sm">
-          {t('You have unsaved changes that will be lost.')}
-        </Text>
-      ),
+      children: <Text size="sm">{t('You have unsaved changes that will be lost.')}</Text>,
       centered: true,
       labels: { confirm: t('Discard'), cancel: t('Cancel') },
       confirmProps: { color: 'red' },
@@ -195,17 +172,8 @@ export default function ExcalidrawView(props: NodeViewProps) {
           }
         }}
       >
-        <Group
-          justify="flex-end"
-          wrap="nowrap"
-          bg="var(--mantine-color-body)"
-          p="xs"
-        >
-          <Button
-            onClick={handleSaveAndExit}
-            size={'compact-sm'}
-            loading={isSaving}
-          >
+        <Group justify="flex-end" wrap="nowrap" bg="var(--mantine-color-body)" p="xs">
+          <Button onClick={handleSaveAndExit} size={'compact-sm'} loading={isSaving}>
             {t('Save & Exit')}
           </Button>
           <Button onClick={handleClose} color="red" size={'compact-sm'}>
@@ -251,11 +219,7 @@ export default function ExcalidrawView(props: NodeViewProps) {
         className={clsx(selected ? 'ProseMirror-selectednode' : '')}
       >
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <ActionIcon
-            variant="transparent"
-            color="gray"
-            aria-label={t('Edit drawing')}
-          >
+          <ActionIcon variant="transparent" color="gray" aria-label={t('Edit drawing')}>
             <IconEdit size={18} />
           </ActionIcon>
 

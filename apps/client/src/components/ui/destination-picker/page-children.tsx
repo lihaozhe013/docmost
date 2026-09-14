@@ -38,8 +38,7 @@ export function PageChildren({
         cursor: pageParam
       }),
     initialPageParam: undefined as string | undefined,
-    getNextPageParam: (lastPage: IPagination<IPage>) =>
-      lastPage.meta?.nextCursor ?? undefined
+    getNextPageParam: (lastPage: IPagination<IPage>) => lastPage.meta?.nextCursor ?? undefined
   });
 
   const pages = data?.pages.flatMap((page) => page.items) ?? [];

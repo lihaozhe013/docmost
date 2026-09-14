@@ -16,14 +16,7 @@ type PageRowProps = {
   onSelect: (page: Partial<IPage>) => void;
 };
 
-export function PageRow({
-  page,
-  depth,
-  limit,
-  selectedId,
-  excludePageId,
-  onSelect
-}: PageRowProps) {
+export function PageRow({ page, depth, limit, selectedId, excludePageId, onSelect }: PageRowProps) {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
 
@@ -84,20 +77,13 @@ export function PageRow({
           {page.icon ? (
             page.icon
           ) : (
-            <ActionIcon
-              component="div"
-              variant="transparent"
-              c="gray"
-              size={22}
-            >
+            <ActionIcon component="div" variant="transparent" c="gray" size={22}>
               <IconFileDescription size={18} />
             </ActionIcon>
           )}
         </div>
 
-        <div className={classes.pageTitle}>
-          {getPageTitle(page.title, page.isBase, t)}
-        </div>
+        <div className={classes.pageTitle}>{getPageTitle(page.title, page.isBase, t)}</div>
       </div>
 
       {expanded && page.hasChildren && (

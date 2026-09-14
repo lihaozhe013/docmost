@@ -1,11 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import {
-  Group,
-  ScrollArea,
-  Text,
-  TextInput,
-  UnstyledButton
-} from '@mantine/core';
+import { Group, ScrollArea, Text, TextInput, UnstyledButton } from '@mantine/core';
 import { IconFileDescription, IconLink, IconWorld } from '@tabler/icons-react';
 import { useLinkEditorState } from '@/features/editor/components/link/use-link-editor-state.tsx';
 import { LinkEditorPanelProps } from '@/features/editor/components/link/types.ts';
@@ -19,11 +13,7 @@ import { AutoTooltipText } from '@/components/ui/auto-tooltip-text.tsx';
 import clsx from 'clsx';
 import classes from './link.module.css';
 
-export const LinkEditorPanel = ({
-  onSetLink,
-  initialUrl,
-  onUnsetLink
-}: LinkEditorPanelProps) => {
+export const LinkEditorPanel = ({ onSetLink, initialUrl, onUnsetLink }: LinkEditorPanelProps) => {
   const { t } = useTranslation();
   const { spaceSlug } = useParams();
   const { data: space } = useSpaceQuery(spaceSlug);
@@ -48,11 +38,7 @@ export const LinkEditorPanel = ({
 
   const selectPage = useCallback(
     (page: Partial<IPage>) => {
-      const url = buildPageUrl(
-        page.space?.slug || spaceSlug,
-        page.slugId,
-        page.title
-      );
+      const url = buildPageUrl(page.space?.slug || spaceSlug, page.slugId, page.title);
       onSetLink(url, true);
     },
     [onSetLink, spaceSlug]
@@ -60,10 +46,8 @@ export const LinkEditorPanel = ({
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      const hasUrlItem =
-        state.url.length > 0 && (state.isValidUrl || state.isSearchQuery);
-      const total =
-        (hasUrlItem ? 1 : 0) + (state.isValidUrl ? 0 : pages.length);
+      const hasUrlItem = state.url.length > 0 && (state.isValidUrl || state.isSearchQuery);
+      const total = (hasUrlItem ? 1 : 0) + (state.isValidUrl ? 0 : pages.length);
       if (total === 0) return;
 
       if (e.key === 'ArrowDown') {
@@ -84,15 +68,7 @@ export const LinkEditorPanel = ({
         }
       }
     },
-    [
-      pages,
-      selectedIndex,
-      selectPage,
-      state.isValidUrl,
-      state.isSearchQuery,
-      state.url,
-      onSetLink
-    ]
+    [pages, selectedIndex, selectPage, state.isValidUrl, state.isSearchQuery, state.url, onSetLink]
   );
 
   useEffect(() => {
@@ -102,21 +78,14 @@ export const LinkEditorPanel = ({
   }, [selectedIndex]);
 
   const showPages = pages.length > 0 && !state.isValidUrl;
-  const showUrlItem =
-    state.url.length > 0 && (state.isValidUrl || state.isSearchQuery);
+  const showUrlItem = state.url.length > 0 && (state.isValidUrl || state.isSearchQuery);
   const showDropdown = showPages || showUrlItem;
 
   return (
     <div>
       <form onSubmit={state.handleSubmit}>
         <TextInput
-          leftSection={
-            <IconLink
-              size={16}
-              stroke={1.5}
-              color="var(--mantine-color-dimmed)"
-            />
-          }
+          leftSection={<IconLink size={16} stroke={1.5} color="var(--mantine-color-dimmed)" />}
           classNames={{ input: classes.linkInput }}
           placeholder={t('Paste link or search pages')}
           aria-label={t('Paste link or search pages')}
@@ -124,9 +93,7 @@ export const LinkEditorPanel = ({
           aria-expanded={showDropdown}
           aria-controls="link-editor-results"
           aria-autocomplete="list"
-          aria-activedescendant={
-            showDropdown ? `link-editor-option-${selectedIndex}` : undefined
-          }
+          aria-activedescendant={showDropdown ? `link-editor-option-${selectedIndex}` : undefined}
           value={state.url}
           onChange={state.onChange}
           onKeyDown={handleKeyDown}
@@ -199,9 +166,7 @@ export const LinkEditorPanel = ({
                   >
                     <Group gap={10} wrap="nowrap" align="flex-start">
                       <span className={classes.pageIcon}>
-                        {page.icon || (
-                          <IconFileDescription size={18} stroke={1.5} />
-                        )}
+                        {page.icon || <IconFileDescription size={18} stroke={1.5} />}
                       </span>
 
                       <div style={{ flex: 1, minWidth: 0 }}>
@@ -209,12 +174,7 @@ export const LinkEditorPanel = ({
                           {getPageTitle(page.title, page.isBase, t)}
                         </AutoTooltipText>
                         {page.space?.name && (
-                          <AutoTooltipText
-                            size="xs"
-                            c="dimmed"
-                            truncate
-                            lh={1.4}
-                          >
+                          <AutoTooltipText size="xs" c="dimmed" truncate lh={1.4}>
                             {page.space.name}
                           </AutoTooltipText>
                         )}

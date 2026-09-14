@@ -115,9 +115,7 @@ export default function SessionList() {
                 <Group gap="xs">
                   <IconDevices size={18} stroke={1.5} />
                   <div>
-                    <Text size="sm">
-                      {session.deviceName || t('Unknown device')}
-                    </Text>
+                    <Text size="sm">{session.deviceName || t('Unknown device')}</Text>
                     {session?.isCurrentDevice && (
                       <Text size="xs" c="blue">
                         {t('This Device')}
@@ -157,11 +155,7 @@ export default function SessionList() {
       </Table>
 
       {hasMore && (
-        <Button
-          variant="subtle"
-          size="xs"
-          onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
-        >
+        <Button variant="subtle" size="xs" onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}>
           {t('Load more')}
         </Button>
       )}

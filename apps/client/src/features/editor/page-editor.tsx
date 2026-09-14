@@ -1,12 +1,5 @@
 import '@/features/editor/styles/index.css';
-import React, {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState
-} from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { IndexeddbPersistence } from 'y-indexeddb';
 import { WebSocketStatus, onStatelessParameters } from '@hocuspocus/provider';
 import {
@@ -15,17 +8,8 @@ import {
   useHocuspocusEvent,
   useHocuspocusProvider
 } from '@hocuspocus/provider-react';
-import {
-  Editor,
-  EditorContent,
-  EditorProvider,
-  useEditor,
-  useEditorState
-} from '@tiptap/react';
-import {
-  collabExtensions,
-  mainExtensions
-} from '@/features/editor/extensions/extensions';
+import { Editor, EditorContent, EditorProvider, useEditor, useEditorState } from '@tiptap/react';
+import { collabExtensions, mainExtensions } from '@/features/editor/extensions/extensions';
 import { useAtom, useAtomValue } from 'jotai';
 import { currentUserAtom } from '@/features/user/atoms/current-user-atom';
 import {
@@ -90,12 +74,7 @@ interface PageEditorProps {
   canComment?: boolean;
 }
 
-export default function PageEditor({
-  pageId,
-  editable,
-  content,
-  canComment
-}: PageEditorProps) {
+export default function PageEditor({ pageId, editable, content, canComment }: PageEditorProps) {
   const { t } = useTranslation();
   const { data: collabQuery, refetch: refetchCollabToken } = useCollabToken();
   const { pageSlug } = useParams();
@@ -163,12 +142,7 @@ export default function PageEditor({
   );
 }
 
-function CollabPageEditor({
-  pageId,
-  editable,
-  content,
-  canComment
-}: PageEditorProps) {
+function CollabPageEditor({ pageId, editable, content, canComment }: PageEditorProps) {
   const { t } = useTranslation();
   const provider = useHocuspocusProvider();
   const isComponentMounted = useRef(false);
@@ -187,9 +161,7 @@ function CollabPageEditor({
   const [lightboxRequest, setLightboxRequest] = useAtom(lightboxRequestAtom);
   const [isLocalSynced, setIsLocalSynced] = useState(false);
   const [isRemoteSynced, setIsRemoteSynced] = useState(false);
-  const [yjsConnectionStatus, setYjsConnectionStatus] = useAtom(
-    yjsConnectionStatusAtom
-  );
+  const [yjsConnectionStatus, setYjsConnectionStatus] = useAtom(yjsConnectionStatusAtom);
   const [, setYjsSynced] = useAtom(yjsSyncedAtom);
   const menuContainerRef = useRef(null);
   const { isIdle, resetIdle } = useIdle(FIVE_MINUTES, { initialState: false });
@@ -205,10 +177,7 @@ function CollabPageEditor({
   const user = currentUser?.user;
 
   useEffect(() => {
-    const local = new IndexeddbPersistence(
-      provider.configuration.name,
-      provider.document
-    );
+    const local = new IndexeddbPersistence(provider.configuration.name, provider.document);
     local.on('synced', () => setIsLocalSynced(true));
     return () => {
       local.destroy();
@@ -222,18 +191,11 @@ function CollabPageEditor({
   useEffect(() => {
     const socket = provider.configuration.websocketProvider;
 
-    if (
-      isIdle &&
-      documentState === 'hidden' &&
-      yjsConnectionStatus === WebSocketStatus.Connected
-    ) {
+    if (isIdle && documentState === 'hidden' && yjsConnectionStatus === WebSocketStatus.Connected) {
       socket.disconnect();
       return;
     }
-    if (
-      documentState === 'visible' &&
-      yjsConnectionStatus === WebSocketStatus.Disconnected
-    ) {
+    if (documentState === 'visible' && yjsConnectionStatus === WebSocketStatus.Disconnected) {
       resetIdle();
       socket.connect();
     }
@@ -287,15 +249,7 @@ function CollabPageEditor({
                 return true;
               }
             }
-            if (
-              [
-                'ArrowUp',
-                'ArrowDown',
-                'ArrowLeft',
-                'ArrowRight',
-                'Enter'
-              ].includes(event.key)
-            ) {
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter'].includes(event.key)) {
               const emojiCommand = document.querySelector('#emoji-command');
               if (emojiCommand) {
                 return true;
@@ -306,12 +260,7 @@ function CollabPageEditor({
         handlePaste: (_view, event) => {
           if (!editorRef.current) return false;
 
-          return handlePaste(
-            editorRef.current,
-            event,
-            pageId,
-            currentUser?.user.id
-          );
+          return handlePaste(editorRef.current, event, pageId, currentUser?.user.id);
         },
         handleDrop: (_view, event, _slice, moved) => {
           if (!editorRef.current) return false;
@@ -403,10 +352,7 @@ function CollabPageEditor({
   useEffect(() => {
     document.addEventListener('ACTIVE_COMMENT_EVENT', handleActiveCommentEvent);
     return () => {
-      document.removeEventListener(
-        'ACTIVE_COMMENT_EVENT',
-        handleActiveCommentEvent
-      );
+      document.removeEventListener('ACTIVE_COMMENT_EVENT', handleActiveCommentEvent);
     };
   }, []);
 
@@ -465,9 +411,7 @@ function CollabPageEditor({
       <div ref={menuContainerRef}>
         <EditorContent editor={editor} />
 
-        {editor && (
-          <SearchAndReplaceDialog editor={editor} editable={editable} />
-        )}
+        {editor && <SearchAndReplaceDialog editor={editor} editable={editable} />}
 
         {editor && editorIsEditable && (
           <div>
@@ -498,9 +442,7 @@ function CollabPageEditor({
           />
         )}
         {showCommentPopup && <CommentDialog editor={editor} pageId={pageId} />}
-        {showReadOnlyCommentPopup && (
-          <CommentDialog editor={editor} pageId={pageId} readOnly />
-        )}
+        {showReadOnlyCommentPopup && <CommentDialog editor={editor} pageId={pageId} readOnly />}
       </div>
       <div
         onClick={() => {
@@ -512,13 +454,7 @@ function CollabPageEditor({
   );
 }
 
-function StaticPageEditor({
-  content,
-  ariaLabel
-}: {
-  content: any;
-  ariaLabel: string;
-}) {
+function StaticPageEditor({ content, ariaLabel }: { content: any; ariaLabel: string }) {
   return (
     <EditorProvider
       editable={false}

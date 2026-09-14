@@ -1,10 +1,4 @@
-import {
-  Group,
-  Menu,
-  Text,
-  UnstyledButton,
-  useMantineColorScheme
-} from '@mantine/core';
+import { Group, Menu, Text, UnstyledButton, useMantineColorScheme } from '@mantine/core';
 import {
   IconBrightnessFilled,
   IconBrush,
@@ -84,11 +78,7 @@ export default function TopMenu() {
           <Menu.Label>{t('Account')}</Menu.Label>
           <Menu.Item component={Link} to={APP_ROUTE.SETTINGS.ACCOUNT.PROFILE}>
             <Group wrap={'nowrap'}>
-              <CustomAvatar
-                size={'sm'}
-                avatarUrl={user.avatarUrl}
-                name={user.name}
-              />
+              <CustomAvatar size={'sm'} avatarUrl={user.avatarUrl} name={user.name} />
 
               <div style={{ width: 190 }}>
                 <Text size="sm" fw={500} lineClamp={1}>
@@ -127,27 +117,21 @@ export default function TopMenu() {
               <Menu.Item
                 onClick={() => setColorScheme('light')}
                 leftSection={<IconSun size={16} />}
-                rightSection={
-                  colorScheme === 'light' ? <IconCheck size={16} /> : null
-                }
+                rightSection={colorScheme === 'light' ? <IconCheck size={16} /> : null}
               >
                 {t('Light')}
               </Menu.Item>
               <Menu.Item
                 onClick={() => setColorScheme('dark')}
                 leftSection={<IconMoon size={16} />}
-                rightSection={
-                  colorScheme === 'dark' ? <IconCheck size={16} /> : null
-                }
+                rightSection={colorScheme === 'dark' ? <IconCheck size={16} /> : null}
               >
                 {t('Dark')}
               </Menu.Item>
               <Menu.Item
                 onClick={() => setColorScheme('auto')}
                 leftSection={<IconDeviceDesktop size={16} />}
-                rightSection={
-                  colorScheme === 'auto' ? <IconCheck size={16} /> : null
-                }
+                rightSection={colorScheme === 'auto' ? <IconCheck size={16} /> : null}
               >
                 {t('System settings')}
               </Menu.Item>

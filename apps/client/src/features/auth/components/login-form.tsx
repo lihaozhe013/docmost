@@ -2,14 +2,7 @@ import { z } from 'zod/v4';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import useAuth from '@/features/auth/hooks/use-auth';
-import {
-  Container,
-  Title,
-  TextInput,
-  Button,
-  PasswordInput,
-  Box
-} from '@mantine/core';
+import { Container, Title, TextInput, Button, PasswordInput, Box } from '@mantine/core';
 import classes from './auth.module.css';
 import { useRedirectIfAuthenticated } from '@/features/auth/hooks/use-redirect-if-authenticated.ts';
 import { useTranslation } from 'react-i18next';
@@ -28,12 +21,7 @@ export function LoginForm() {
   const { t } = useTranslation();
   const { signIn, isLoading } = useAuth();
   useRedirectIfAuthenticated();
-  const {
-    data,
-    isLoading: isDataLoading,
-    isError,
-    error
-  } = useWorkspacePublicDataQuery();
+  const { data, isLoading: isDataLoading, isError, error } = useWorkspacePublicDataQuery();
 
   const form = useForm<FormValues>({
     validate: zod4Resolver(formSchema),

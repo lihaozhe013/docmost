@@ -9,10 +9,7 @@ import { recreateTransform } from '@docmost/editor-ext';
 import { DOMSerializer, Node } from '@tiptap/pm/model';
 import { ChangeSet, simplifyChanges } from '@tiptap/pm/changeset';
 import { useAtom } from 'jotai';
-import {
-  diffCountsAtom,
-  highlightChangesAtom
-} from '@/features/page-history/atoms/history-atoms';
+import { diffCountsAtom, highlightChangesAtom } from '@/features/page-history/atoms/history-atoms';
 
 export interface HistoryEditorProps {
   title: string;
@@ -20,11 +17,7 @@ export interface HistoryEditorProps {
   previousContent?: any;
 }
 
-export function HistoryEditor({
-  title,
-  content,
-  previousContent
-}: HistoryEditorProps) {
+export function HistoryEditor({ title, content, previousContent }: HistoryEditorProps) {
   const [highlightChanges] = useAtom(highlightChangesAtom);
   const [, setDiffCounts] = useAtom(diffCountsAtom);
 
@@ -53,11 +46,7 @@ export function HistoryEditor({
           simplifyDiff: true
         });
 
-        const changeSet = ChangeSet.create(oldContent).addSteps(
-          tr.doc,
-          tr.mapping.maps,
-          []
-        );
+        const changeSet = ChangeSet.create(oldContent).addSteps(tr.doc, tr.mapping.maps, []);
         const changes = simplifyChanges(changeSet.changes, newContent);
 
         editor.commands.setContent(content);
@@ -95,8 +84,7 @@ export function HistoryEditor({
             });
 
             if (foundSpecialNode) {
-              const nodeEnd =
-                foundSpecialNode.pos + foundSpecialNode.node.nodeSize;
+              const nodeEnd = foundSpecialNode.pos + foundSpecialNode.node.nodeSize;
               decorations.push(
                 Decoration.node(foundSpecialNode.pos, nodeEnd, {
                   class: 'history-diff-node-added',
@@ -140,11 +128,7 @@ export function HistoryEditor({
                 })
               );
             } else {
-              const deletedText = oldContent.textBetween(
-                change.fromA,
-                change.toA,
-                ''
-              );
+              const deletedText = oldContent.textBetween(change.fromA, change.toA, '');
               if (deletedText) {
                 decorations.push(
                   Decoration.widget(change.fromB, () => {
@@ -176,28 +160,15 @@ export function HistoryEditor({
     editor.setOptions({
       editorProps: {
         ...editor.options.editorProps,
-        decorations: () =>
-          highlightChanges ? decorationSet : DecorationSet.empty
+        decorations: () => (highlightChanges ? decorationSet : DecorationSet.empty)
       }
     });
-  }, [
-    title,
-    content,
-    editor,
-    previousContent,
-    highlightChanges,
-    setDiffCounts
-  ]);
+  }, [title, content, editor, previousContent, highlightChanges, setDiffCounts]);
 
   return (
     <div>
       <Title order={1}>{title}</Title>
-      {editor && (
-        <EditorContent
-          editor={editor}
-          className={historyClasses.historyEditor}
-        />
-      )}
+      {editor && <EditorContent editor={editor} className={historyClasses.historyEditor} />}
     </div>
   );
 }

@@ -1,10 +1,4 @@
-import {
-  Group,
-  Text,
-  useMantineColorScheme,
-  Select,
-  MantineColorScheme
-} from '@mantine/core';
+import { Group, Text, useMantineColorScheme, Select, MantineColorScheme } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 
 export default function AccountTheme() {

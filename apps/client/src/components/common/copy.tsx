@@ -19,11 +19,7 @@ export default function CopyTextButton({ text, size, label }: CopyProps) {
   return (
     <CopyButton value={text} timeout={2000}>
       {({ copied, copy }) => (
-        <Tooltip
-          label={copied ? t('Copied') : copyLabel}
-          withArrow
-          position="right"
-        >
+        <Tooltip label={copied ? t('Copied') : copyLabel} withArrow position="right">
           <ActionIcon
             color={copied ? 'teal' : 'gray'}
             variant="subtle"

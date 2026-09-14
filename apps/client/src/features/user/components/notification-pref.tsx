@@ -41,8 +41,7 @@ const notificationItems: {
     key: 'comment.created',
     dtoField: 'notificationCommentCreated',
     label: 'New comments',
-    description:
-      'Get notified about new comments on threads you participate in.'
+    description: 'Get notified about new comments on threads you participate in.'
   },
   {
     key: 'comment.resolved',
@@ -67,9 +66,7 @@ function NotificationToggle({
   const switchId = useId();
   const descriptionId = useId();
   const [user, setUser] = useAtom(userAtom);
-  const [checked, setChecked] = useState(
-    user.settings?.notifications?.[settingKey] !== false
-  );
+  const [checked, setChecked] = useState(user.settings?.notifications?.[settingKey] !== false);
 
   const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.currentTarget.checked;
@@ -85,12 +82,7 @@ function NotificationToggle({
   return (
     <ResponsiveSettingsRow>
       <ResponsiveSettingsContent>
-        <Text
-          component="label"
-          htmlFor={switchId}
-          size="md"
-          style={{ cursor: 'pointer' }}
-        >
+        <Text component="label" htmlFor={switchId} size="md" style={{ cursor: 'pointer' }}>
           {t(label)}
         </Text>
         <Text id={descriptionId} size="sm" c="dimmed">

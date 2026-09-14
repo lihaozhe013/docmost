@@ -58,12 +58,8 @@ function CommentListWithTabs() {
       (comment: IComment) => comment.parentCommentId === null
     );
 
-    const active = parentComments.filter(
-      (comment: IComment) => !comment.resolvedAt
-    );
-    const resolved = parentComments.filter(
-      (comment: IComment) => comment.resolvedAt
-    );
+    const active = parentComments.filter((comment: IComment) => !comment.resolvedAt);
+    const resolved = parentComments.filter((comment: IComment) => comment.resolvedAt);
 
     return { activeComments: active, resolvedComments: resolved };
   }, [comments]);
@@ -169,10 +165,7 @@ function CommentListWithTabs() {
   const totalComments = activeComments.length + resolvedComments.length;
 
   const pageCommentInput = canComment ? (
-    <PageCommentInput
-      onSave={handleAddPageComment}
-      isLoading={isPageCommentLoading}
-    />
+    <PageCommentInput onSave={handleAddPageComment} isLoading={isPageCommentLoading} />
   ) : null;
 
   return (
@@ -217,21 +210,13 @@ function CommentListWithTabs() {
           </Tabs.Tab>
         </Tabs.List>
 
-        <ScrollArea
-          style={{ flex: '1 1 auto' }}
-          scrollbarSize={5}
-          type="scroll"
-        >
+        <ScrollArea style={{ flex: '1 1 auto' }} scrollbarSize={5} type="scroll">
           <div style={{ paddingBottom: '8px' }}>
             <Tabs.Panel value="open" pt="xs">
               {activeComments.length === 0 ? (
                 <Center py="xl">
                   <Stack align="center" gap="xs">
-                    <IconMessageOff
-                      size={32}
-                      stroke={1.5}
-                      color="var(--mantine-color-dimmed)"
-                    />
+                    <IconMessageOff size={32} stroke={1.5} color="var(--mantine-color-dimmed)" />
                     <Text size="sm" c="dimmed">
                       {t('No open comments.')}
                     </Text>
@@ -246,11 +231,7 @@ function CommentListWithTabs() {
               {resolvedComments.length === 0 ? (
                 <Center py="xl">
                   <Stack align="center" gap="xs">
-                    <IconMessageOff
-                      size={32}
-                      stroke={1.5}
-                      color="var(--mantine-color-dimmed)"
-                    />
+                    <IconMessageOff size={32} stroke={1.5} color="var(--mantine-color-dimmed)" />
                     <Text size="sm" c="dimmed">
                       {t('No resolved comments.')}
                     </Text>
@@ -284,9 +265,7 @@ const ChildComments = ({
 }: ChildCommentsProps) => {
   const getChildComments = useCallback(
     (parentId: string) =>
-      comments.items.filter(
-        (comment: IComment) => comment.parentCommentId === parentId
-      ),
+      comments.items.filter((comment: IComment) => comment.parentCommentId === parentId),
     [comments.items]
   );
 
@@ -315,12 +294,7 @@ const ChildComments = ({
 
 const MemoizedChildComments = memo(ChildComments);
 
-const CommentEditorWithActions = ({
-  commentId,
-  onSave,
-  isLoading,
-  placeholder = undefined
-}) => {
+const CommentEditorWithActions = ({ commentId, onSave, isLoading, placeholder = undefined }) => {
   const [content, setContent] = useState('');
   const { ref, focused } = useFocusWithin();
   const commentEditorRef = useRef(null);

@@ -125,12 +125,8 @@ export class FavoriteController {
     }
 
     if (dto.type === 'template') {
-      if (!dto.templateId)
-        throw new BadRequestException('templateId is required');
-      const template = await this.templateRepo.findById(
-        dto.templateId,
-        workspaceId
-      );
+      if (!dto.templateId) throw new BadRequestException('templateId is required');
+      const template = await this.templateRepo.findById(dto.templateId, workspaceId);
       if (!template) throw new NotFoundException('Template not found');
       if (template.spaceId) {
         await this.validateSpaceAccess(user.id, template.spaceId);
@@ -141,10 +137,7 @@ export class FavoriteController {
     throw new BadRequestException('Invalid favorite type');
   }
 
-  private async validateSpaceAccess(
-    userId: string,
-    spaceId: string
-  ): Promise<void> {
+  private async validateSpaceAccess(userId: string, spaceId: string): Promise<void> {
     const userSpaceIds = await this.spaceMemberRepo.getUserSpaceIds(userId);
     if (!userSpaceIds.includes(spaceId)) {
       throw new ForbiddenException();

@@ -13,9 +13,7 @@ interface MultiGroupSelectProps {
   mt?: string;
 }
 
-const renderMultiSelectOption: MultiSelectProps['renderOption'] = ({
-  option
-}) => (
+const renderMultiSelectOption: MultiSelectProps['renderOption'] = ({ option }) => (
   <Group gap="sm">
     {<IconUsersGroup size={18} />}
     <div>
@@ -24,12 +22,7 @@ const renderMultiSelectOption: MultiSelectProps['renderOption'] = ({
   </Group>
 );
 
-export function MultiGroupSelect({
-  onChange,
-  label,
-  description,
-  mt
-}: MultiGroupSelectProps) {
+export function MultiGroupSelect({ onChange, label, description, mt }: MultiGroupSelectProps) {
   const { t } = useTranslation();
   const [searchValue, setSearchValue] = useState('');
   const [debouncedQuery] = useDebouncedValue(searchValue, 500);
@@ -52,8 +45,7 @@ export function MultiGroupSelect({
 
       // Filter out existing groups by their ids
       const filteredGroupData = groupsData.filter(
-        (group) =>
-          !data.find((existingGroup) => existingGroup.value === group.value)
+        (group) => !data.find((existingGroup) => existingGroup.value === group.value)
       );
 
       // Combine existing data with new search data

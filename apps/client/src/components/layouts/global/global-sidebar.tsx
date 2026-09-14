@@ -33,22 +33,17 @@ export default function GlobalSidebar() {
     { label: 'Favorites', icon: IconStar, path: '/favorites' },
     { label: 'Spaces', icon: IconLayoutGrid, path: '/spaces' }
   ];
-  const { data: favoriteSpacesData, isPending: isFavoritesPending } =
-    useFavoritesQuery('space');
-  const favoriteSpaces =
-    favoriteSpacesData?.pages.flatMap((p) => p.items) ?? [];
+  const { data: favoriteSpacesData, isPending: isFavoritesPending } = useFavoritesQuery('space');
+  const favoriteSpaces = favoriteSpacesData?.pages.flatMap((p) => p.items) ?? [];
   const sortedFavoriteSpaces = [...favoriteSpaces]
     .filter((fav) => fav.space)
     .sort((a, b) => {
-      const cmp = (a.space!.name ?? '').localeCompare(
-        b.space!.name ?? '',
-        undefined,
-        { sensitivity: 'base' }
-      );
+      const cmp = (a.space!.name ?? '').localeCompare(b.space!.name ?? '', undefined, {
+        sensitivity: 'base'
+      });
       return cmp !== 0 ? cmp : a.id.localeCompare(b.id);
     });
-  const [inviteOpened, { open: openInvite, close: closeInvite }] =
-    useDisclosure(false);
+  const [inviteOpened, { open: openInvite, close: closeInvite }] = useDisclosure(false);
 
   useEffect(() => {
     setActive(location.pathname);
@@ -111,11 +106,7 @@ export default function GlobalSidebar() {
                 </Link>
               ))}
               {sortedFavoriteSpaces.length > 10 && (
-                <Link
-                  className={classes.spaceItem}
-                  to="/spaces"
-                  onClick={handleNavClick}
-                >
+                <Link className={classes.spaceItem} to="/spaces" onClick={handleNavClick}>
                   <Text size="xs" c="dimmed">
                     {t('View all')}
                   </Text>

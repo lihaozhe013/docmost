@@ -1,11 +1,4 @@
-import {
-  IsBoolean,
-  IsIn,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  IsUUID
-} from 'class-validator';
+import { IsBoolean, IsIn, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 import { ContentFormat } from './create-page.dto';

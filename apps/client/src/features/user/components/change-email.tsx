@@ -1,11 +1,4 @@
-import {
-  Modal,
-  TextInput,
-  Button,
-  Text,
-  Group,
-  PasswordInput
-} from '@mantine/core';
+import { Modal, TextInput, Button, Text, Group, PasswordInput } from '@mantine/core';
 import { z } from 'zod/v4';
 import { useState } from 'react';
 import { useAtom } from 'jotai';
@@ -44,9 +37,7 @@ export default function ChangeEmail() {
         closeButtonProps={{ 'aria-label': t('Close') }}
       >
         <Text mb="md">
-          {t(
-            'To change your email, you have to enter your password and new email.'
-          )}
+          {t('To change your email, you have to enter your password and new email.')}
         </Text>
         <ChangeEmailForm />
       </Modal>

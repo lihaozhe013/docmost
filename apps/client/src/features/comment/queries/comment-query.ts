@@ -1,9 +1,4 @@
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQueryClient,
-  InfiniteData
-} from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQueryClient, InfiniteData } from '@tanstack/react-query';
 import {
   createComment,
   deleteComment,
@@ -11,11 +6,7 @@ import {
   updateComment,
   resolveComment
 } from '@/features/comment/services/comment-service';
-import {
-  ICommentParams,
-  IComment,
-  IResolveComment
-} from '@/features/comment/types/comment.types';
+import { ICommentParams, IComment, IResolveComment } from '@/features/comment/types/comment.types';
 import { notifications } from '@mantine/notifications';
 import { IPagination } from '@/lib/types.ts';
 import { useTranslation } from 'react-i18next';
@@ -63,8 +54,7 @@ export function useCreateCommentMutation() {
     mutationFn: (data) => createComment(data),
     onSuccess: (newComment) => {
       const cache = queryClient.getQueryData(RQ_KEY(newComment.pageId)) as
-        | InfiniteData<IPagination<IComment>>
-        | undefined;
+        InfiniteData<IPagination<IComment>> | undefined;
 
       if (cache && cache.pages.length > 0) {
         const alreadyExists = cache.pages.some((page) =>
@@ -76,9 +66,7 @@ export function useCreateCommentMutation() {
         queryClient.setQueryData(RQ_KEY(newComment.pageId), {
           ...cache,
           pages: cache.pages.map((page, i) =>
-            i === lastIdx
-              ? { ...page, items: [...page.items, newComment] }
-              : page
+            i === lastIdx ? { ...page, items: [...page.items, newComment] } : page
           )
         });
       }
@@ -102,8 +90,7 @@ export function useUpdateCommentMutation() {
     mutationFn: (data) => updateComment(data),
     onSuccess: (updatedComment) => {
       const cache = queryClient.getQueryData(RQ_KEY(updatedComment.pageId)) as
-        | InfiniteData<IPagination<IComment>>
-        | undefined;
+        InfiniteData<IPagination<IComment>> | undefined;
 
       if (cache) {
         queryClient.setQueryData(RQ_KEY(updatedComment.pageId), {
@@ -136,8 +123,7 @@ export function useDeleteCommentMutation(pageId?: string) {
     mutationFn: (commentId: string) => deleteComment(commentId),
     onSuccess: (_data, commentId) => {
       const cache = queryClient.getQueryData(RQ_KEY(pageId)) as
-        | InfiniteData<IPagination<IComment>>
-        | undefined;
+        InfiniteData<IPagination<IComment>> | undefined;
 
       if (cache) {
         queryClient.setQueryData(RQ_KEY(pageId), {
@@ -172,9 +158,7 @@ export function useResolveCommentMutation() {
       await queryClient.cancelQueries({ queryKey: RQ_KEY(variables.pageId) });
       const previousCache = queryClient.getQueryData(RQ_KEY(variables.pageId));
 
-      const cache = previousCache as
-        | InfiniteData<IPagination<IComment>>
-        | undefined;
+      const cache = previousCache as InfiniteData<IPagination<IComment>> | undefined;
       if (cache) {
         queryClient.setQueryData(
           RQ_KEY(variables.pageId),
@@ -197,10 +181,7 @@ export function useResolveCommentMutation() {
     },
     onError: (_err, variables, context) => {
       if (context?.previousCache) {
-        queryClient.setQueryData(
-          RQ_KEY(variables.pageId),
-          context.previousCache
-        );
+        queryClient.setQueryData(RQ_KEY(variables.pageId), context.previousCache);
       }
       notifications.show({
         message: t('Failed to resolve comment'),
@@ -209,8 +190,7 @@ export function useResolveCommentMutation() {
     },
     onSuccess: (data: IComment, variables) => {
       const cache = queryClient.getQueryData(RQ_KEY(data.pageId)) as
-        | InfiniteData<IPagination<IComment>>
-        | undefined;
+        InfiniteData<IPagination<IComment>> | undefined;
 
       if (cache) {
         queryClient.setQueryData(
@@ -242,9 +222,7 @@ function updateCommentInCache(
     ...cache,
     pages: cache.pages.map((page) => ({
       ...page,
-      items: page.items.map((comment) =>
-        comment.id === commentId ? updater(comment) : comment
-      )
+      items: page.items.map((comment) => (comment.id === commentId ? updater(comment) : comment))
     }))
   };
 }

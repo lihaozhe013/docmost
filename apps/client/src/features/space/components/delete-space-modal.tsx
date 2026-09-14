@@ -29,10 +29,7 @@ export default function DeleteSpaceModal({ space }: DeleteSpaceModalProps) {
   });
 
   const handleDelete = async () => {
-    if (
-      confirmNameField.getValue().trim().toLowerCase() !==
-      space.name.trim().toLowerCase()
-    ) {
+    if (confirmNameField.getValue().trim().toLowerCase() !== space.name.trim().toLowerCase()) {
       confirmNameField.validate();
       return;
     }

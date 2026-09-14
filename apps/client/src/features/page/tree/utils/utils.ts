@@ -48,10 +48,7 @@ export function findBreadcrumbPath(
     }
 
     if (node.children) {
-      const newPath = findBreadcrumbPath(node.children, pageId, [
-        ...path,
-        node
-      ]);
+      const newPath = findBreadcrumbPath(node.children, pageId, [...path, node]);
       if (newPath) {
         return newPath;
       }
@@ -98,10 +95,7 @@ export const updateTreeNodeIcon = (
   });
 };
 
-export const deleteTreeNode = (
-  nodes: SpaceTreeNode[],
-  nodeId: string
-): SpaceTreeNode[] => {
+export const deleteTreeNode = (nodes: SpaceTreeNode[], nodeId: string): SpaceTreeNode[] => {
   return nodes
     .map((node) => {
       if (node.id === nodeId) {
@@ -167,9 +161,7 @@ export function appendNodeChildren(
       const newIds = new Set(children.map((c) => c.id));
 
       const existingMap = new Map(
-        (node.children ?? [])
-          .filter((c) => newIds.has(c.id))
-          .map((c) => [c.id, c])
+        (node.children ?? []).filter((c) => newIds.has(c.id)).map((c) => [c.id, c])
       );
 
       const merged = children.map((newChild) => {

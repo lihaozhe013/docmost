@@ -20,12 +20,8 @@ import { AuthLayout } from './auth-layout.tsx';
 const formSchema = z.object({
   workspaceName: z.string().trim().max(50).optional(),
   name: z.string().min(1, { message: 'Name is required' }).max(50),
-  email: z
-    .email({ message: 'Invalid email address' })
-    .min(1, { message: 'Email is required' }),
-  password: z
-    .string()
-    .min(8, { message: 'Password must be at least 8 characters' })
+  email: z.email({ message: 'Invalid email address' }).min(1, { message: 'Email is required' }),
+  password: z.string().min(8, { message: 'Password must be at least 8 characters' })
 });
 type FormValues = z.infer<typeof formSchema>;
 

@@ -91,9 +91,7 @@ export class FileTaskProcessor extends WorkerHost implements OnModuleDestroy {
 
     if (job.name === QueueJob.IMPORT_TASK) {
       try {
-        const fileTask = await this.fileTaskService.getFileTask(
-          job.data.fileTaskId
-        );
+        const fileTask = await this.fileTaskService.getFileTask(job.data.fileTaskId);
         if (fileTask) {
           await this.storageService.delete(fileTask.filePath);
           this.logger.debug(`Deleted imported zip file: ${fileTask.filePath}`);
@@ -110,11 +108,7 @@ export class FileTaskProcessor extends WorkerHost implements OnModuleDestroy {
       const fileTaskId = job.data.fileTaskId;
       const reason = job.failedReason || 'Unknown error';
 
-      await this.fileTaskService.updateTaskStatus(
-        fileTaskId,
-        FileTaskStatus.Failed,
-        reason
-      );
+      await this.fileTaskService.updateTaskStatus(fileTaskId, FileTaskStatus.Failed, reason);
 
       const fileTask = await this.fileTaskService.getFileTask(fileTaskId);
       if (fileTask) {

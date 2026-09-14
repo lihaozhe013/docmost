@@ -1,12 +1,6 @@
 import { NodeViewProps, NodeViewWrapper } from '@tiptap/react';
 import { ActionIcon, Menu, Tooltip } from '@mantine/core';
-import {
-  IconDots,
-  IconLinkOff,
-  IconPencil,
-  IconRefresh,
-  IconTrash
-} from '@tabler/icons-react';
+import { IconDots, IconLinkOff, IconPencil, IconRefresh, IconTrash } from '@tabler/icons-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -29,8 +23,7 @@ export default function TransclusionReferenceView(props: NodeViewProps) {
   const sourcePageId: string | null = props.node.attrs.sourcePageId ?? null;
   const transclusionId: string | null = props.node.attrs.transclusionId ?? null;
   const [openMenus, setOpenMenus] = useState(0);
-  const trackOpen = (open: boolean) =>
-    setOpenMenus((n) => Math.max(0, n + (open ? 1 : -1)));
+  const trackOpen = (open: boolean) => setOpenMenus((n) => Math.max(0, n + (open ? 1 : -1)));
 
   return (
     <NodeViewWrapper
@@ -40,10 +33,7 @@ export default function TransclusionReferenceView(props: NodeViewProps) {
       data-menu-open={openMenus > 0 ? 'true' : 'false'}
       contentEditable={false}
     >
-      <ErrorBoundary
-        resetKeys={[sourcePageId, transclusionId]}
-        fallback={<ErrorPlaceholder />}
-      >
+      <ErrorBoundary resetKeys={[sourcePageId, transclusionId]} fallback={<ErrorPlaceholder />}>
         <TransclusionReferenceBody {...props} trackOpen={trackOpen} />
       </ErrorBoundary>
     </NodeViewWrapper>
@@ -62,10 +52,7 @@ function TransclusionReferenceBody({
   const transclusionId: string | null = node.attrs.transclusionId ?? null;
   const isEditable = editor.isEditable;
 
-  const { result, refresh } = useTransclusionLookup(
-    sourcePageId,
-    transclusionId
-  );
+  const { result, refresh } = useTransclusionLookup(sourcePageId, transclusionId);
   const [refreshing, setRefreshing] = useState(false);
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -81,11 +68,7 @@ function TransclusionReferenceBody({
   // Cached against the dropdown's identical query so the source link target
   // is ready as soon as the controls fade in on hover, without a second
   // fetch.
-  const referencesQuery = useReferencesQuery(
-    sourcePageId,
-    transclusionId,
-    isEditable
-  );
+  const referencesQuery = useReferencesQuery(sourcePageId, transclusionId, isEditable);
   const sourcePageHref = (() => {
     const source = referencesQuery.data?.source;
     const base = source?.spaceSlug
@@ -178,10 +161,7 @@ function TransclusionReferenceBody({
                 leftSection={<IconLinkOff size={14} />}
                 onClick={handleUnsync}
                 disabled={
-                  unsyncMutation.isPending ||
-                  !hostPageId ||
-                  !sourcePageId ||
-                  !transclusionId
+                  unsyncMutation.isPending || !hostPageId || !sourcePageId || !transclusionId
                 }
               >
                 {t('Unsync')}

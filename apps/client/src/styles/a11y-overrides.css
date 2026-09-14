@@ -42,10 +42,7 @@
  * fills) and keeps every child at its already-passing resting contrast.
  */
 .mantine-Spotlight-action[data-selected] {
-  background-color: light-dark(
-    var(--mantine-color-gray-1),
-    var(--mantine-color-dark-5)
-  );
+  background-color: light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-5));
   color: var(--mantine-color-text);
   --action-description-color: var(--mantine-color-dimmed);
   --action-description-opacity: 1;
@@ -56,8 +53,5 @@
  * modes read identically (WCAG 2.4.7 focus visible).
  */
 .mantine-Spotlight-action:focus-visible {
-  background-color: light-dark(
-    var(--mantine-color-gray-1),
-    var(--mantine-color-dark-5)
-  );
+  background-color: light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-5));
 }

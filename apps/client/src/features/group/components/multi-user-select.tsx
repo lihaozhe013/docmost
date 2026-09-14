@@ -11,15 +11,9 @@ interface MultiUserSelectProps {
   label?: string;
 }
 
-const renderMultiSelectOption: MultiSelectProps['renderOption'] = ({
-  option
-}) => (
+const renderMultiSelectOption: MultiSelectProps['renderOption'] = ({ option }) => (
   <Group gap="sm" wrap="nowrap">
-    <CustomAvatar
-      avatarUrl={option?.['avatarUrl']}
-      name={option.label}
-      size={36}
-    />
+    <CustomAvatar avatarUrl={option?.['avatarUrl']} name={option.label} size={36} />
     <div>
       <Text size="sm" lineClamp={1}>
         {option.label}
@@ -54,8 +48,7 @@ export function MultiUserSelect({ onChange, label }: MultiUserSelectProps) {
 
       // Filter out existing users by their ids
       const filteredUsersData = usersData.filter(
-        (user) =>
-          !data.find((existingUser) => existingUser.value === user.value)
+        (user) => !data.find((existingUser) => existingUser.value === user.value)
       );
 
       // Combine existing data with new search data

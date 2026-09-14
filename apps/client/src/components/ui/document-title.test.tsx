@@ -3,8 +3,7 @@ import { render } from '@testing-library/react';
 import { HelmetProvider } from 'react-helmet-async';
 import { DocumentTitle } from './document-title.tsx';
 
-const renderTitle = (ui: React.ReactNode) =>
-  render(<HelmetProvider>{ui}</HelmetProvider>);
+const renderTitle = (ui: React.ReactNode) => render(<HelmetProvider>{ui}</HelmetProvider>);
 
 describe('DocumentTitle', () => {
   beforeEach(() => {
@@ -38,10 +37,8 @@ describe('DocumentTitle', () => {
         <meta name="robots" content="noindex" />
       </DocumentTitle>
     );
-    expect(
-      document
-        .querySelector('head > meta[name="robots"]')
-        ?.getAttribute('content')
-    ).toBe('noindex');
+    expect(document.querySelector('head > meta[name="robots"]')?.getAttribute('content')).toBe(
+      'noindex'
+    );
   });
 });

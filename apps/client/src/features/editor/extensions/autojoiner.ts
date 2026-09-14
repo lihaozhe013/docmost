@@ -8,11 +8,7 @@ import { Transaction } from '@tiptap/pm/state';
 
 // https://discuss.prosemirror.net/t/how-to-autojoin-all-the-time/2957/4
 // Adapted from prosemirror-commands wrapDispatchForJoin
-function autoJoin(
-  transactions: readonly Transaction[],
-  newTr: Transaction,
-  nodeTypes: NodeType[]
-) {
+function autoJoin(transactions: readonly Transaction[], newTr: Transaction, nodeTypes: NodeType[]) {
   // Collect changed ranges across all transactions, mapping earlier ranges
   // forward through later mappings so every position lands in newTr.doc space.
   const ranges: number[] = [];
@@ -35,17 +31,12 @@ function autoJoin(
     const $from = newTr.doc.resolve(from),
       depth = $from.sharedDepth(to),
       parent = $from.node(depth);
-    for (
-      let index = $from.indexAfter(depth), pos = $from.after(depth + 1);
-      pos <= to;
-      ++index
-    ) {
+    for (let index = $from.indexAfter(depth), pos = $from.after(depth + 1); pos <= to; ++index) {
       const after = parent.maybeChild(index);
       if (!after) break;
       if (index && joinable.indexOf(pos) == -1) {
         const before = parent.child(index - 1);
-        if (before.type == after.type && nodeTypes.includes(before.type))
-          joinable.push(pos);
+        if (before.type == after.type && nodeTypes.includes(before.type)) joinable.push(pos);
       }
       pos += after.nodeSize;
     }

@@ -22,21 +22,11 @@ export default function Paginate({
 
   return (
     <Group mt="md" justify="flex-end">
-      <Button
-        variant="default"
-        size="compact-sm"
-        onClick={onPrev}
-        disabled={!hasPrevPage}
-      >
+      <Button variant="default" size="compact-sm" onClick={onPrev} disabled={!hasPrevPage}>
         {t('Prev')}
       </Button>
 
-      <Button
-        variant="default"
-        size="compact-sm"
-        onClick={onNext}
-        disabled={!hasNextPage}
-      >
+      <Button variant="default" size="compact-sm" onClick={onNext} disabled={!hasNextPage}>
         {t('Next')}
       </Button>
     </Group>

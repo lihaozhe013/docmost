@@ -67,10 +67,7 @@ import {
   Footnote,
   FootnoteReference
 } from '@docmost/editor-ext';
-import {
-  randomElement,
-  userColors
-} from '@/features/editor/extensions/utils.ts';
+import { randomElement, userColors } from '@/features/editor/extensions/utils.ts';
 import { IUser } from '@/features/user/types/user.types.ts';
 import {
   createImageHandle,

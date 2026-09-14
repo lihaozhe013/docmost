@@ -10,10 +10,7 @@ describe('LocalDriver._fullPath', () => {
 
   describe('legitimate inputs (behavior preserved)', () => {
     it.each([
-      [
-        'workspace-id/avatars/uuid.png',
-        `${ROOT}${sep}workspace-id${sep}avatars${sep}uuid.png`
-      ],
+      ['workspace-id/avatars/uuid.png', `${ROOT}${sep}workspace-id${sep}avatars${sep}uuid.png`],
       [
         'workspace-id/files/uuid/file.pdf',
         `${ROOT}${sep}workspace-id${sep}files${sep}uuid${sep}file.pdf`
@@ -43,26 +40,19 @@ describe('LocalDriver._fullPath', () => {
   });
 
   describe('absolute path rejected', () => {
-    it.each(['/etc/passwd', '/root/.ssh/id_rsa', sep + 'absolute'])(
-      'throws for %j',
-      (input) => {
-        expect(() => fullPath(input)).toThrow('Invalid file path');
-      }
-    );
+    it.each(['/etc/passwd', '/root/.ssh/id_rsa', sep + 'absolute'])('throws for %j', (input) => {
+      expect(() => fullPath(input)).toThrow('Invalid file path');
+    });
   });
 
   describe('prefix-confusion rejected', () => {
     it('rejects a sibling directory whose name starts with the storage root', () => {
       const siblingDriver = new LocalDriver({ storagePath: '/data/storage' });
-      const siblingFullPath = (
-        (siblingDriver as any)._fullPath as FullPath
-      ).bind(siblingDriver);
+      const siblingFullPath = ((siblingDriver as any)._fullPath as FullPath).bind(siblingDriver);
       // Attempt to reach /data/storage-evil/secret by traversal:
       // resolve('/data/storage', '../storage-evil/secret') === '/data/storage-evil/secret'
       // Without the `+ sep` guard, a startsWith check would match.
-      expect(() => siblingFullPath('../storage-evil/secret')).toThrow(
-        'Invalid file path'
-      );
+      expect(() => siblingFullPath('../storage-evil/secret')).toThrow('Invalid file path');
     });
   });
 

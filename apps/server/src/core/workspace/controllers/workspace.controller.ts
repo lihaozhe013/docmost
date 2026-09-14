@@ -73,16 +73,11 @@ export class WorkspaceController {
     @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
-    if (
-      ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Settings)
-    ) {
+    if (ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Settings)) {
       throw new ForbiddenException();
     }
 
-    const updatedWorkspace = await this.workspaceService.update(
-      workspace.id,
-      dto
-    );
+    const updatedWorkspace = await this.workspaceService.update(workspace.id, dto);
 
     if (
       dto.hostname &&
@@ -121,9 +116,7 @@ export class WorkspaceController {
     @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
-    if (
-      ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Member)
-    ) {
+    if (ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Member)) {
       throw new ForbiddenException();
     }
     await this.workspaceService.deactivateUser(user, dto.userId, workspace.id);
@@ -137,9 +130,7 @@ export class WorkspaceController {
     @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
-    if (
-      ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Member)
-    ) {
+    if (ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Member)) {
       throw new ForbiddenException();
     }
     await this.workspaceService.activateUser(user, dto.userId, workspace.id);
@@ -153,9 +144,7 @@ export class WorkspaceController {
     @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
-    if (
-      ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Member)
-    ) {
+    if (ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Member)) {
       throw new ForbiddenException();
     }
     await this.workspaceService.deleteUser(user, dto.userId, workspace.id);
@@ -169,17 +158,11 @@ export class WorkspaceController {
     @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
-    if (
-      ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Member)
-    ) {
+    if (ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Member)) {
       throw new ForbiddenException();
     }
 
-    return this.workspaceService.updateWorkspaceUserRole(
-      user,
-      workspaceUserRoleDto,
-      workspace.id
-    );
+    return this.workspaceService.updateWorkspaceUserRole(user, workspaceUserRoleDto, workspace.id);
   }
 
   @HttpCode(HttpStatus.OK)
@@ -190,9 +173,7 @@ export class WorkspaceController {
     @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
-    if (
-      ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Member)
-    ) {
+    if (ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Member)) {
       throw new ForbiddenException();
     }
 
@@ -207,9 +188,7 @@ export class WorkspaceController {
     @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
-    if (
-      ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Member)
-    ) {
+    if (ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Member)) {
       throw new ForbiddenException();
     }
 

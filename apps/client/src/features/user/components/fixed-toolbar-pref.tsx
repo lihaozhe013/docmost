@@ -13,9 +13,7 @@ import {
 export default function FixedToolbarPref() {
   const { t } = useTranslation();
   const [user, setUser] = useAtom(userAtom);
-  const [checked, setChecked] = useState(
-    user.settings?.preferences?.editorToolbar ?? false
-  );
+  const [checked, setChecked] = useState(user.settings?.preferences?.editorToolbar ?? false);
 
   const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.currentTarget.checked;
@@ -38,9 +36,7 @@ export default function FixedToolbarPref() {
           </Badge>
         </Group>
         <Text size="sm" c="dimmed">
-          {t(
-            'Show a formatting toolbar above the editor with quick access to common actions.'
-          )}
+          {t('Show a formatting toolbar above the editor with quick access to common actions.')}
         </Text>
       </ResponsiveSettingsContent>
 

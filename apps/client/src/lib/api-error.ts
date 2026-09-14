@@ -1,9 +1,6 @@
 import { isAxiosError } from 'axios';
 
-export function getApiErrorMessage(
-  error: unknown,
-  fallback = 'An error occurred'
-): string {
+export function getApiErrorMessage(error: unknown, fallback = 'An error occurred'): string {
   if (isAxiosError(error)) {
     const message = error.response?.data?.message;
     if (Array.isArray(message)) {

@@ -25,9 +25,7 @@ describe('MarkdownContent', () => {
     expect(container.querySelector('strong')?.textContent).toBe('Bold');
     expect(container.querySelector('em')?.textContent).toBe('italic');
     expect(container.querySelectorAll('li')).toHaveLength(2);
-    expect(container.querySelector('pre code')?.textContent).toContain(
-      'const answer = 42;'
-    );
+    expect(container.querySelector('pre code')?.textContent).toContain('const answer = 42;');
   });
 
   it('renders GFM tables and task lists', () => {
@@ -59,9 +57,7 @@ describe('MarkdownContent', () => {
 
     expect(container.querySelector('script')).toBeNull();
     expect(container.querySelector('[onerror]')).toBeNull();
-    expect(
-      container.querySelector('a')?.getAttribute('href') ?? null
-    ).toBeNull();
+    expect(container.querySelector('a')?.getAttribute('href') ?? null).toBeNull();
     expect(container.textContent).toContain('unsafe');
   });
 

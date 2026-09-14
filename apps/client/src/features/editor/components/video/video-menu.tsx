@@ -82,27 +82,15 @@ export function VideoMenu({ editor }: EditorMenuProps) {
   }, [editor]);
 
   const alignLeft = useCallback(() => {
-    editor
-      .chain()
-      .focus(undefined, { scrollIntoView: false })
-      .setVideoAlign('left')
-      .run();
+    editor.chain().focus(undefined, { scrollIntoView: false }).setVideoAlign('left').run();
   }, [editor]);
 
   const alignCenter = useCallback(() => {
-    editor
-      .chain()
-      .focus(undefined, { scrollIntoView: false })
-      .setVideoAlign('center')
-      .run();
+    editor.chain().focus(undefined, { scrollIntoView: false }).setVideoAlign('center').run();
   }, [editor]);
 
   const alignRight = useCallback(() => {
-    editor
-      .chain()
-      .focus(undefined, { scrollIntoView: false })
-      .setVideoAlign('right')
-      .run();
+    editor.chain().focus(undefined, { scrollIntoView: false }).setVideoAlign('right').run();
   }, [editor]);
 
   const handleDownload = useCallback(() => {
@@ -157,11 +145,7 @@ export function VideoMenu({ editor }: EditorMenuProps) {
             </ActionIcon>
           </Tooltip>
 
-          <Tooltip
-            position="top"
-            label={t('Align center')}
-            withinPortal={false}
-          >
+          <Tooltip position="top" label={t('Align center')} withinPortal={false}>
             <ActionIcon
               onClick={alignCenter}
               size="lg"
@@ -220,12 +204,7 @@ export function VideoMenu({ editor }: EditorMenuProps) {
           </Tooltip>
 
           <Tooltip position="top" label={t('Delete')} withinPortal={false}>
-            <ActionIcon
-              onClick={handleDelete}
-              size="lg"
-              aria-label={t('Delete')}
-              variant="subtle"
-            >
+            <ActionIcon onClick={handleDelete} size="lg" aria-label={t('Delete')} variant="subtle">
               <IconTrash size={18} />
             </ActionIcon>
           </Tooltip>

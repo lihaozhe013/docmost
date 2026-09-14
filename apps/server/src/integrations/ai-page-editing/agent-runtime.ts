@@ -15,10 +15,7 @@ export interface RuntimeToolDefinition<TSchema extends z.ZodType = z.ZodType> {
   description: string;
   inputSchema: TSchema;
   normalizeInput?: (input: unknown) => unknown;
-  execute: (
-    input: z.infer<TSchema>,
-    context: RuntimeToolContext
-  ) => Promise<unknown>;
+  execute: (input: z.infer<TSchema>, context: RuntimeToolContext) => Promise<unknown>;
 }
 
 export interface RuntimeToolError {
@@ -44,13 +41,7 @@ export interface RuntimeMessage {
 }
 
 export interface AgentRuntimeEvent {
-  type:
-    | 'text-delta'
-    | 'tool-start'
-    | 'tool-result'
-    | 'tool-error'
-    | 'finish'
-    | 'error';
+  type: 'text-delta' | 'tool-start' | 'tool-result' | 'tool-error' | 'finish' | 'error';
   toolCallId?: string;
   toolName?: string;
   input?: unknown;
@@ -83,9 +74,7 @@ function jsonSchemaFor(schema: z.ZodType): Record<string, unknown> {
   return parameters;
 }
 
-function runtimeTools(
-  definitions: Record<string, RuntimeToolDefinition>
-): ResponsesFunctionTool[] {
+function runtimeTools(definitions: Record<string, RuntimeToolDefinition>): ResponsesFunctionTool[] {
   return Object.entries(definitions).map(([name, definition]) => ({
     type: 'function',
     name,
@@ -128,9 +117,7 @@ function cancellationError(): Error {
   return error;
 }
 
-function inputFromMessages(
-  messages: RuntimeMessage[] | undefined
-): ResponsesInputItem[] {
+function inputFromMessages(messages: RuntimeMessage[] | undefined): ResponsesInputItem[] {
   return (messages || []).map((message) => ({
     role: message.role,
     content: message.content
@@ -301,9 +288,7 @@ export class AgentRuntime {
               const attempts = (failedToolAttempts.get(fingerprint) || 0) + 1;
               failedToolAttempts.set(fingerprint, attempts);
               throw new AgentRuntimeError(
-                isFatalToolError(cached.error)
-                  ? cached.error.code
-                  : 'TOOL_RETRY_LIMIT',
+                isFatalToolError(cached.error) ? cached.error.code : 'TOOL_RETRY_LIMIT',
                 isFatalToolError(cached.error)
                   ? cached.error.message
                   : `The ${call.name} tool failed twice with the same arguments; stopping to preserve partial changes`,
@@ -344,17 +329,14 @@ export class AgentRuntime {
                   'INVALID_CONTENT',
                   `Invalid JSON arguments for ${call.name}`,
                   {
-                    issues: [
-                      { path: '$', message: 'Arguments must be valid JSON' }
-                    ]
+                    issues: [{ path: '$', message: 'Arguments must be valid JSON' }]
                   }
                 );
               }
               const normalizedArguments = definition.normalizeInput
                 ? definition.normalizeInput(parsedArguments)
                 : parsedArguments;
-              const parsed =
-                definition.inputSchema.safeParse(normalizedArguments);
+              const parsed = definition.inputSchema.safeParse(normalizedArguments);
               if (!parsed.success) {
                 throw new AgentRuntimeError(
                   'INVALID_CONTENT',
@@ -435,10 +417,7 @@ export class AgentRuntime {
         }
       }
 
-      throw new AgentRuntimeError(
-        'STEP_LIMIT',
-        `The AI run exceeded its ${maxSteps}-step limit`
-      );
+      throw new AgentRuntimeError('STEP_LIMIT', `The AI run exceeded its ${maxSteps}-step limit`);
     } catch (error) {
       await options.onEvent?.({ type: 'error', error });
       throw error;

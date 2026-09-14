@@ -1,8 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-  FavoriteRepo,
-  FavoriteType
-} from '@docmost/db/repos/favorite/favorite.repo';
+import { FavoriteRepo, FavoriteType } from '@docmost/db/repos/favorite/favorite.repo';
 import { PaginationOptions } from '@docmost/db/pagination/pagination-options';
 import { InsertableFavorite } from '@docmost/db/types/entity.types';
 import { PagePermissionRepo } from '@docmost/db/repos/page/page-permission.repo';
@@ -16,29 +13,18 @@ export class FavoriteService {
     private readonly spaceMemberRepo: SpaceMemberRepo
   ) {}
 
-  async getFavoriteIds(
-    userId: string,
-    workspaceId: string,
-    type: FavoriteType,
-    spaceId?: string
-  ) {
-    const result = await this.favoriteRepo.getFavoriteIds(
-      userId,
-      workspaceId,
-      type,
-      spaceId
-    );
+  async getFavoriteIds(userId: string, workspaceId: string, type: FavoriteType, spaceId?: string) {
+    const result = await this.favoriteRepo.getFavoriteIds(userId, workspaceId, type, spaceId);
 
     if (result.items.length === 0) {
       return result;
     }
 
     if (type === FavoriteType.PAGE) {
-      const accessibleIds =
-        await this.pagePermissionRepo.filterAccessiblePageIds({
-          pageIds: result.items,
-          userId
-        });
+      const accessibleIds = await this.pagePermissionRepo.filterAccessiblePageIds({
+        pageIds: result.items,
+        userId
+      });
       const accessibleSet = new Set(accessibleIds);
       result.items = result.items.filter((id) => accessibleSet.has(id));
     }
@@ -114,18 +100,15 @@ export class FavoriteService {
     const userSpaceIds = await this.spaceMemberRepo.getUserSpaceIds(userId);
     const spaceSet = new Set(userSpaceIds);
 
-    const pageFavorites = result.items.filter(
-      (f) => f.type === FavoriteType.PAGE && f.pageId
-    );
+    const pageFavorites = result.items.filter((f) => f.type === FavoriteType.PAGE && f.pageId);
 
     let accessiblePageSet: Set<string> | undefined;
     if (pageFavorites.length > 0) {
       const pageIds = pageFavorites.map((f) => f.pageId as string);
-      const accessibleIds =
-        await this.pagePermissionRepo.filterAccessiblePageIds({
-          pageIds,
-          userId
-        });
+      const accessibleIds = await this.pagePermissionRepo.filterAccessiblePageIds({
+        pageIds,
+        userId
+      });
       accessiblePageSet = new Set(accessibleIds);
     }
 

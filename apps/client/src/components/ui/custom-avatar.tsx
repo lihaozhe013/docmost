@@ -48,14 +48,8 @@ function sanitizeInitialsSource(name: string) {
   return sanitized || name;
 }
 
-export const CustomAvatar = React.forwardRef<
-  HTMLInputElement,
-  CustomAvatarProps
->(
-  (
-    { avatarUrl, name, type, color, variant, ...props }: CustomAvatarProps,
-    ref
-  ) => {
+export const CustomAvatar = React.forwardRef<HTMLInputElement, CustomAvatarProps>(
+  ({ avatarUrl, name, type, color, variant, ...props }: CustomAvatarProps, ref) => {
     const avatarLink = getAvatarUrl(avatarUrl, type);
     const isInitials = !color || color === 'initials';
     const pickedColor = isInitials ? pickInitialsColor(name ?? '') : color;

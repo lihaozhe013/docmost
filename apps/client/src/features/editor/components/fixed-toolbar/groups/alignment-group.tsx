@@ -18,11 +18,5 @@ export const AlignmentGroup: FC<Props> = ({ editor }) => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen]);
 
-  return (
-    <TextAlignmentSelector
-      editor={editor}
-      isOpen={isOpen}
-      setIsOpen={setIsOpen}
-    />
-  );
+  return <TextAlignmentSelector editor={editor} isOpen={isOpen} setIsOpen={setIsOpen} />;
 };

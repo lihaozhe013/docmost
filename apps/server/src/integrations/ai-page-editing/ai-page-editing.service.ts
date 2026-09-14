@@ -5,11 +5,7 @@ import { UserRepo } from '@docmost/db/repos/user/user.repo';
 import { PageRepo } from '@docmost/db/repos/page/page.repo';
 import { PageAccessService } from '../../core/page/page-access/page-access.service';
 import { isUserDisabled } from '../../common/helpers';
-import {
-  AgentRuntime,
-  RuntimeMessage,
-  RuntimeToolDefinition
-} from './agent-runtime';
+import { AgentRuntime, RuntimeMessage, RuntimeToolDefinition } from './agent-runtime';
 import { OpenAiResponsesClientFactory } from './model';
 import { AiPageEditingImageService } from './ai-page-editing-image.service';
 import {
@@ -40,13 +36,7 @@ const readBufferSchema = z.object({
     .max(10_000)
     .optional()
     .describe('Optional zero-based block offset.'),
-  limit: z
-    .number()
-    .int()
-    .min(1)
-    .max(100)
-    .optional()
-    .describe('Maximum number of blocks to return.')
+  limit: z.number().int().min(1).max(100).optional().describe('Maximum number of blocks to return.')
 });
 
 const editOperationSchema = z.discriminatedUnion('type', [
@@ -109,24 +99,16 @@ const editBufferSchema = z.object({
 
 const insertionTargetSchema = z.discriminatedUnion('kind', [
   z.object({
-    kind: z
-      .literal('document_start')
-      .describe('Insert before the first top-level block.')
+    kind: z.literal('document_start').describe('Insert before the first top-level block.')
   }),
   z.object({
-    kind: z
-      .literal('document_end')
-      .describe('Insert after the last top-level block.')
+    kind: z.literal('document_end').describe('Insert after the last top-level block.')
   }),
   z.object({
     kind: z
       .enum(['before_block', 'after_block'])
       .describe('Insert relative to the referenced top-level block.'),
-    blockId: z
-      .string()
-      .min(1)
-      .max(128)
-      .describe('The top-level block ID from read_buffer.')
+    blockId: z.string().min(1).max(128).describe('The top-level block ID from read_buffer.')
   })
 ]);
 
@@ -158,11 +140,7 @@ export function normalizeInsertBlocksInput(input: unknown): unknown {
 
   try {
     const parsedTarget: unknown = JSON.parse(value.target);
-    if (
-      parsedTarget &&
-      typeof parsedTarget === 'object' &&
-      !Array.isArray(parsedTarget)
-    ) {
+    if (parsedTarget && typeof parsedTarget === 'object' && !Array.isArray(parsedTarget)) {
       return { ...value, target: parsedTarget };
     }
   } catch {
@@ -251,14 +229,12 @@ function safeValidationDetails(details: unknown):
       if (typeof value.message !== 'string') return undefined;
       return {
         path: typeof value.path === 'string' ? value.path.slice(0, 128) : '$',
-        code:
-          typeof value.code === 'string' ? value.code.slice(0, 80) : 'invalid',
+        code: typeof value.code === 'string' ? value.code.slice(0, 80) : 'invalid',
         message: value.message.slice(0, 500)
       };
     })
     .filter(
-      (issue): issue is { path: string; code: string; message: string } =>
-        issue !== undefined
+      (issue): issue is { path: string; code: string; message: string } => issue !== undefined
     );
   return normalized.length ? { issues: normalized } : undefined;
 }
@@ -271,8 +247,7 @@ function errorToEvent(error: unknown): AiPageEditingEvent['error'] {
   const details = safeValidationDetails(value.details);
   return {
     ...(typeof value.code === 'string' ? { code: value.code } : {}),
-    message:
-      typeof value.message === 'string' ? value.message : errorToMessage(error),
+    message: typeof value.message === 'string' ? value.message : errorToMessage(error),
     ...(details !== undefined ? { details } : {})
   };
 }
@@ -290,26 +265,19 @@ function normalizeUsage(usage: unknown): AiPageEditingEvent['usage'] {
   if (!usage || typeof usage !== 'object') return undefined;
   const value = usage as Record<string, unknown>;
   const numberOrUndefined = (candidate: unknown) =>
-    typeof candidate === 'number' && Number.isFinite(candidate)
-      ? candidate
-      : undefined;
+    typeof candidate === 'number' && Number.isFinite(candidate) ? candidate : undefined;
   const normalized = {
     inputTokens: numberOrUndefined(value.inputTokens),
     outputTokens: numberOrUndefined(value.outputTokens),
     totalTokens: numberOrUndefined(value.totalTokens)
   };
-  return Object.values(normalized).some(
-    (tokenCount) => tokenCount !== undefined
-  )
+  return Object.values(normalized).some((tokenCount) => tokenCount !== undefined)
     ? normalized
     : undefined;
 }
 
 function boundedHistory(
-  items: Extract<
-    AiPageEditingMessage,
-    { operation: 'aiPageEditing.start' }
-  >['messages']
+  items: Extract<AiPageEditingMessage, { operation: 'aiPageEditing.start' }>['messages']
 ): RuntimeMessage[] {
   if (!items?.length) return [];
 
@@ -318,10 +286,7 @@ function boundedHistory(
   for (let index = items.length - 1; index >= 0; index -= 1) {
     const item = items[index];
     const content = item.content.slice(0, 20_000);
-    if (
-      selected.length > 0 &&
-      totalChars + content.length > MAX_HISTORY_CHARS
-    ) {
+    if (selected.length > 0 && totalChars + content.length > MAX_HISTORY_CHARS) {
       break;
     }
     selected.unshift({ role: item.role, content });
@@ -373,9 +338,7 @@ function initialBufferContext(result: BrowserToolResult): string {
       : '';
     const next = `[block: ${blockId} | type: ${type}${language ? ` | language: ${language}` : ''} | editable: ${editable} | capabilities: ${capabilities.length ? capabilities.join(',') : 'none'}${segments ? ` | segments: ${segments}` : ''}${item.truncated === true ? ' | truncated: true' : ''}]\n${text}`;
     if (lines.join('\n').length + next.length + 1 > MAX_INITIAL_CONTEXT_CHARS) {
-      lines.push(
-        '[buffer context truncated; use read_buffer for the remaining blocks]'
-      );
+      lines.push('[buffer context truncated; use read_buffer for the remaining blocks]');
       break;
     }
     lines.push(next);
@@ -387,10 +350,7 @@ function initialBufferContext(result: BrowserToolResult): string {
 function isWithinToolResultLimit(value: unknown): boolean {
   try {
     const serialized = JSON.stringify(value);
-    return (
-      typeof serialized === 'string' &&
-      serialized.length <= MAX_TOOL_RESULT_CHARS
-    );
+    return typeof serialized === 'string' && serialized.length <= MAX_TOOL_RESULT_CHARS;
   } catch {
     return false;
   }
@@ -423,12 +383,7 @@ export class AiPageEditingService {
 
     const parsed = aiPageEditingMessageSchema.safeParse(rawMessage);
     if (!parsed.success) {
-      this.emitError(
-        client,
-        undefined,
-        'INVALID_MESSAGE',
-        'Invalid AI page editing message'
-      );
+      this.emitError(client, undefined, 'INVALID_MESSAGE', 'Invalid AI page editing message');
       return;
     }
 
@@ -449,11 +404,7 @@ export class AiPageEditingService {
   handleDisconnect(client: Socket): void {
     const state = this.runs.get(client.id);
     if (!state) return;
-    this.stopState(
-      state,
-      'SESSION_UNAVAILABLE',
-      'The editor connection closed'
-    );
+    this.stopState(state, 'SESSION_UNAVAILABLE', 'The editor connection closed');
   }
 
   private async start(
@@ -494,15 +445,8 @@ export class AiPageEditingService {
       user = await this.userRepo.findById(userId, workspaceId);
       page = await this.pageRepo.findById(message.pageId);
     } catch (error) {
-      this.logger.error(
-        `[ai_page_editing] failed to load session scope: ${errorToMessage(error)}`
-      );
-      this.emitError(
-        client,
-        undefined,
-        'RUN_FAILED',
-        'The page could not be loaded'
-      );
+      this.logger.error(`[ai_page_editing] failed to load session scope: ${errorToMessage(error)}`);
+      this.emitError(client, undefined, 'RUN_FAILED', 'The page could not be loaded');
       return;
     }
 
@@ -513,24 +457,14 @@ export class AiPageEditingService {
       page.deletedAt ||
       page.workspaceId !== workspaceId
     ) {
-      this.emitError(
-        client,
-        undefined,
-        'ACCESS_DENIED',
-        'The page is unavailable'
-      );
+      this.emitError(client, undefined, 'ACCESS_DENIED', 'The page is unavailable');
       return;
     }
 
     try {
       await this.pageAccessService.validateCanEdit(page, user);
     } catch {
-      this.emitError(
-        client,
-        undefined,
-        'ACCESS_DENIED',
-        'You cannot edit this page'
-      );
+      this.emitError(client, undefined, 'ACCESS_DENIED', 'You cannot edit this page');
       return;
     }
 
@@ -579,14 +513,11 @@ export class AiPageEditingService {
       const messages = boundedHistory(message.messages);
       // Image failures propagate to the shared catch below, which reports
       // them as run.failed with the structured error code.
-      const images = await this.imageService.resolveImages(
-        message.attachmentIds ?? [],
-        {
-          userId: state.userId,
-          workspaceId: state.workspaceId,
-          pageId: state.pageId
-        }
-      );
+      const images = await this.imageService.resolveImages(message.attachmentIds ?? [], {
+        userId: state.userId,
+        workspaceId: state.workspaceId,
+        pageId: state.pageId
+      });
       const selectionContext = message.selection?.text
         ? `\nThe user selected this text when submitting the request:\n<selection>\n${message.selection.text}\n</selection>`
         : '';
@@ -650,9 +581,7 @@ export class AiPageEditingService {
             });
           } else if (event.type === 'tool-error') {
             const toolError = errorToEvent(event.error);
-            const validationDetails = validationDetailsForLog(
-              toolError?.details
-            );
+            const validationDetails = validationDetailsForLog(toolError?.details);
             this.logger.warn(
               `[ai_page_editing] tool failed: run=${state.runId} call=${event.toolCallId || 'unknown'} tool=${event.toolName || 'unknown'} code=${toolError?.code || 'TOOL_FAILED'} message=${(toolError?.message || 'unknown').slice(0, 240)}${validationDetails ? ` details=${validationDetails}` : ''}`
             );
@@ -692,14 +621,10 @@ export class AiPageEditingService {
           error: {
             code: runError?.code || 'RUN_FAILED',
             message: runError?.message || errorToMessage(error),
-            ...(runError?.details !== undefined
-              ? { details: runError.details }
-              : {})
+            ...(runError?.details !== undefined ? { details: runError.details } : {})
           }
         });
-        this.logger.error(
-          `[ai_page_editing] run failed: ${state.runId}: ${errorToMessage(error)}`
-        );
+        this.logger.error(`[ai_page_editing] run failed: ${state.runId}: ${errorToMessage(error)}`);
       }
     } finally {
       clearTimeout(runTimeout);
@@ -721,24 +646,14 @@ export class AiPageEditingService {
           'Read the current page buffer. The result includes revision, block IDs, editable status, and capabilities. Never mutate a block with editable=false or without the required capability.',
         inputSchema: readBufferSchema,
         execute: (input, context) =>
-          this.executeBrowserTool(
-            state,
-            context.toolCallId,
-            'read_buffer',
-            input
-          )
+          this.executeBrowserTool(state, context.toolCallId, 'read_buffer', input)
       },
       edit_buffer: {
         description:
           'Apply exact replacements or delete supported blocks. Use replace_text for ordinary paragraph text (provide segmentIndex when the paragraph contains inline formulas), replace_code for a complete code or Mermaid source, replace_math for a complete block LaTeX source, replace_inline_math for a segment returned as mathInline, and replace_text_with_math to convert one text segment into an inline formula. Every operation requires the latest revision and an editable block. Code and block formula replacements may contain line breaks; inline formula replacements may not. Operations are atomic, so do not include protected or unsupported blocks in the same batch.',
         inputSchema: editBufferSchema,
         execute: (input, context) =>
-          this.executeBrowserTool(
-            state,
-            context.toolCallId,
-            'edit_buffer',
-            input
-          )
+          this.executeBrowserTool(state, context.toolCallId, 'edit_buffer', input)
       },
       insert_blocks: {
         description:
@@ -746,12 +661,7 @@ export class AiPageEditingService {
         inputSchema: insertBlocksSchema,
         normalizeInput: normalizeInsertBlocksInput,
         execute: (input, context) =>
-          this.executeBrowserTool(
-            state,
-            context.toolCallId,
-            'insert_blocks',
-            input
-          )
+          this.executeBrowserTool(state, context.toolCallId, 'insert_blocks', input)
       }
     };
   }
@@ -774,11 +684,7 @@ export class AiPageEditingService {
       };
     }
     if (!state.socket.connected) {
-      this.stopState(
-        state,
-        'SESSION_UNAVAILABLE',
-        'The editor connection is unavailable'
-      );
+      this.stopState(state, 'SESSION_UNAVAILABLE', 'The editor connection is unavailable');
       return {
         ok: false,
         error: {
@@ -788,11 +694,7 @@ export class AiPageEditingService {
       };
     }
     if (++state.toolRequests > MAX_TOOL_REQUESTS) {
-      this.stopState(
-        state,
-        'TOOL_LIMIT',
-        'The run exceeded its tool request limit'
-      );
+      this.stopState(state, 'TOOL_LIMIT', 'The run exceeded its tool request limit');
       return {
         ok: false,
         error: {
@@ -805,10 +707,7 @@ export class AiPageEditingService {
     if (toolName === 'edit_buffer' || toolName === 'insert_blocks') {
       const accessError = await this.validateMutationAccess(state);
       if (accessError) {
-        if (
-          accessError.code === 'ACCESS_DENIED' ||
-          accessError.code === 'SESSION_UNAVAILABLE'
-        ) {
+        if (accessError.code === 'ACCESS_DENIED' || accessError.code === 'SESSION_UNAVAILABLE') {
           this.stopState(state, accessError.code, accessError.message);
         }
         return { ok: false, error: accessError };
@@ -840,11 +739,7 @@ export class AiPageEditingService {
       };
       this.recordToolResult(state, toolCallId, result);
       resolvePending(result);
-      this.stopState(
-        state,
-        'RESULT_UNKNOWN',
-        'The editor did not confirm the tool result in time'
-      );
+      this.stopState(state, 'RESULT_UNKNOWN', 'The editor did not confirm the tool result in time');
     }, TOOL_TIMEOUT_MS);
     state.pending.set(toolCallId, {
       promise,
@@ -861,10 +756,7 @@ export class AiPageEditingService {
 
   private resolveToolResult(
     client: Socket,
-    message: Extract<
-      AiPageEditingMessage,
-      { operation: 'aiPageEditing.toolResult' }
-    >
+    message: Extract<AiPageEditingMessage, { operation: 'aiPageEditing.toolResult' }>
   ): void {
     const state = this.runs.get(client.id);
     if (!state || state.runId !== message.runId) return;
@@ -891,19 +783,11 @@ export class AiPageEditingService {
     this.recordToolResult(state, message.toolCallId, result);
     pending.resolve(result);
     if (resultTooLarge) {
-      this.stopState(
-        state,
-        'RESULT_UNKNOWN',
-        'The tool result exceeded the response size limit'
-      );
+      this.stopState(state, 'RESULT_UNKNOWN', 'The tool result exceeded the response size limit');
     }
   }
 
-  private recordToolResult(
-    state: RunState,
-    toolCallId: string,
-    result: BrowserToolResult
-  ): void {
+  private recordToolResult(state: RunState, toolCallId: string, result: BrowserToolResult): void {
     state.toolResults.set(toolCallId, result);
     if (state.toolResults.size > MAX_TOOL_REQUESTS) {
       const oldest = state.toolResults.keys().next().value;
@@ -977,15 +861,10 @@ export class AiPageEditingService {
         error: { code, message }
       });
     }
-    this.logger.debug(
-      `[ai_page_editing] run stopped: ${state.runId} code=${code}`
-    );
+    this.logger.debug(`[ai_page_editing] run stopped: ${state.runId} code=${code}`);
   }
 
-  private emitEvent(
-    client: Socket,
-    message: AiPageEditingEvent | AiPageEditingToolRequest
-  ): void {
+  private emitEvent(client: Socket, message: AiPageEditingEvent | AiPageEditingToolRequest): void {
     if (!client.connected) return;
     const state = this.runs.get(client.id);
     const outbound = state

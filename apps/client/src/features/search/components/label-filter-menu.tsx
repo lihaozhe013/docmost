@@ -1,12 +1,5 @@
 import { ReactNode, useMemo, useState } from 'react';
-import {
-  Group,
-  Menu,
-  ScrollArea,
-  Text,
-  TextInput,
-  useComputedColorScheme
-} from '@mantine/core';
+import { Group, Menu, ScrollArea, Text, TextInput, useComputedColorScheme } from '@mantine/core';
 import { useDebouncedValue } from '@mantine/hooks';
 import { IconCheck, IconSearch } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -19,13 +12,7 @@ type LabelFilterMenuProps = {
   onChange: (labelIds: string[]) => void;
   children: ReactNode;
   width?: number;
-  position?:
-    | 'bottom-start'
-    | 'bottom-end'
-    | 'bottom'
-    | 'top-start'
-    | 'top-end'
-    | 'top';
+  position?: 'bottom-start' | 'bottom-end' | 'bottom' | 'top-start' | 'top-end' | 'top';
   zIndex?: number;
   opened?: boolean;
   onOpenChange?: (opened: boolean) => void;

@@ -35,12 +35,9 @@ export function getHTMLFromFragment(
   let result: string;
 
   try {
-    const fragment = DOMSerializer.fromSchema(schema).serializeFragment(
-      doc.content,
-      {
-        document: localWindow.document as unknown as Document
-      }
-    );
+    const fragment = DOMSerializer.fromSchema(schema).serializeFragment(doc.content, {
+      document: localWindow.document as unknown as Document
+    });
 
     const serializer = new localWindow.XMLSerializer();
     result = serializer.serializeToString(fragment as any);

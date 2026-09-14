@@ -42,13 +42,7 @@ import { MessageList } from './message-list';
 import { RunStatus } from './run-status';
 import classes from './ai-page-editing-panel.module.css';
 
-export function AiPageEditingPanel({
-  pageId,
-  enabled
-}: {
-  pageId: string;
-  enabled: boolean;
-}) {
+export function AiPageEditingPanel({ pageId, enabled }: { pageId: string; enabled: boolean }) {
   const [socket] = useAtom(socketAtom);
   const [editor] = useAtom(pageEditorAtom);
   const [open, setOpen] = useState(false);
@@ -105,14 +99,9 @@ export function AiPageEditingPanel({
   const handleAddImages = (files: File[]) => {
     const supported = files.filter(isSupportedAiImage);
     if (supported.length !== files.length) {
-      reportLocalError(
-        `Unsupported files were ignored. Allowed image types: ${AI_IMAGE_ACCEPT}`
-      );
+      reportLocalError(`Unsupported files were ignored. Allowed image types: ${AI_IMAGE_ACCEPT}`);
     }
-    const rejection = validateAiImageBatch(
-      pendingImagesRef.current.length,
-      supported
-    );
+    const rejection = validateAiImageBatch(pendingImagesRef.current.length, supported);
     if (rejection) {
       reportLocalError(rejection);
       return;
@@ -171,9 +160,7 @@ export function AiPageEditingPanel({
   const handleSend = () => {
     const value = prompt.trim();
     const readyImages = pendingImages
-      .filter(
-        (image) => image.status === 'ready' && image.attachmentId && image.url
-      )
+      .filter((image) => image.status === 'ready' && image.attachmentId && image.url)
       .map((image) => ({
         attachmentId: image.attachmentId as string,
         url: image.url as string,
@@ -196,14 +183,11 @@ export function AiPageEditingPanel({
     clearPendingImages();
   };
 
-  const readyImageCount = pendingImages.filter(
-    (image) => image.status === 'ready'
-  ).length;
+  const readyImageCount = pendingImages.filter((image) => image.status === 'ready').length;
   const blockedByPendingImages = pendingImages.some(
     (image) => image.status === 'uploading' || image.status === 'error'
   );
-  const canSend =
-    !blockedByPendingImages && (Boolean(prompt.trim()) || readyImageCount > 0);
+  const canSend = !blockedByPendingImages && (Boolean(prompt.trim()) || readyImageCount > 0);
 
   return (
     <div className={classes.root}>
@@ -216,11 +200,7 @@ export function AiPageEditingPanel({
             </Group>
             <Group gap={4}>
               <Tooltip label="New session">
-                <ActionIcon
-                  variant="subtle"
-                  onClick={handleNewSession}
-                  aria-label="New session"
-                >
+                <ActionIcon variant="subtle" onClick={handleNewSession} aria-label="New session">
                   <IconPlus size={16} />
                 </ActionIcon>
               </Tooltip>
@@ -238,15 +218,10 @@ export function AiPageEditingPanel({
             <Stack gap="sm">
               {messages.length === 0 && (
                 <Text size="sm" c="dimmed">
-                  Ask me to rewrite or extend this page. Changes are applied to
-                  the open editor.
+                  Ask me to rewrite or extend this page. Changes are applied to the open editor.
                 </Text>
               )}
-              <MessageList
-                messages={messages}
-                running={running}
-                phase={phase}
-              />
+              <MessageList messages={messages} running={running} phase={phase} />
             </Stack>
           </ScrollArea>
           {running && (
@@ -257,11 +232,7 @@ export function AiPageEditingPanel({
           {pendingImages.length > 0 && (
             <Group gap="xs" mt="sm" wrap="nowrap">
               {pendingImages.map((image) => (
-                <div
-                  key={image.localId}
-                  className={classes.imageChip}
-                  data-status={image.status}
-                >
+                <div key={image.localId} className={classes.imageChip} data-status={image.status}>
                   <img
                     src={image.previewUrl}
                     alt={image.file.name}
@@ -276,10 +247,7 @@ export function AiPageEditingPanel({
                   {image.status === 'error' && (
                     <Tooltip label={image.error || 'Upload failed'}>
                       <Box className={classes.imageChipOverlay}>
-                        <IconAlertTriangle
-                          size={14}
-                          color="var(--mantine-color-red-filled)"
-                        />
+                        <IconAlertTriangle size={14} color="var(--mantine-color-red-filled)" />
                       </Box>
                     </Tooltip>
                   )}

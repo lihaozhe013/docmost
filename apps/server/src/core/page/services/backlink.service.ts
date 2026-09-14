@@ -29,11 +29,7 @@ export class BacklinkService {
     userId: string,
     pagination: PaginationOptions
   ) {
-    const accessibleIds = await this.accessibleRelatedIds(
-      pageId,
-      direction,
-      userId
-    );
+    const accessibleIds = await this.accessibleRelatedIds(pageId, direction, userId);
     return this.backlinkRepo.findPagesByIdsPaginated(accessibleIds, pagination);
   }
 
@@ -42,11 +38,7 @@ export class BacklinkService {
     direction: BacklinkDirection,
     userId: string
   ): Promise<string[]> {
-    const candidateIds = await this.backlinkRepo.findRelatedPageIds(
-      pageId,
-      direction,
-      userId
-    );
+    const candidateIds = await this.backlinkRepo.findRelatedPageIds(pageId, direction, userId);
     if (candidateIds.length === 0) return [];
     return this.pagePermissionRepo.filterAccessiblePageIds({
       pageIds: candidateIds,

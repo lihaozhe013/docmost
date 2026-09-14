@@ -43,15 +43,11 @@ export default function SpaceHomeTabs() {
 
       <Space my="md" />
 
-      <Tabs.Panel value="recent">
-        {space?.id && <RecentChanges spaceId={space.id} />}
-      </Tabs.Panel>
+      <Tabs.Panel value="recent">{space?.id && <RecentChanges spaceId={space.id} />}</Tabs.Panel>
       <Tabs.Panel value="favorites">
         {space?.id && <FavoritesPages spaceId={space.id} />}
       </Tabs.Panel>
-      <Tabs.Panel value="created">
-        {space?.id && <CreatedByMe spaceId={space.id} />}
-      </Tabs.Panel>
+      <Tabs.Panel value="created">{space?.id && <CreatedByMe spaceId={space.id} />}</Tabs.Panel>
     </Tabs>
   );
 }

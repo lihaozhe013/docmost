@@ -142,8 +142,7 @@ export default function PdfView(props: NodeViewProps) {
             onLoad={(e) => {
               try {
                 const iframe = e.currentTarget;
-                const status =
-                  iframe.contentDocument?.querySelector('pre')?.textContent;
+                const status = iframe.contentDocument?.querySelector('pre')?.textContent;
                 if (status && status.includes('"statusCode":404')) {
                   setHasError(true);
                 }
@@ -154,11 +153,7 @@ export default function PdfView(props: NodeViewProps) {
           />
           {editor.isEditable && (
             <div className={classes.hoverMenu}>
-              <Tooltip
-                position="top"
-                label={t('Convert to attachment')}
-                withinPortal
-              >
+              <Tooltip position="top" label={t('Convert to attachment')} withinPortal>
                 <ActionIcon
                   size="sm"
                   variant="filled"

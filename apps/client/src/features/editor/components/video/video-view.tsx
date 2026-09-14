@@ -17,8 +17,7 @@ export default function VideoView(props: NodeViewProps) {
     return 'alignCenter';
   }, [align]);
   const previewSrc = useMemo(() => {
-    editor.storage.shared.videoPreviews =
-      editor.storage.shared.videoPreviews || {};
+    editor.storage.shared.videoPreviews = editor.storage.shared.videoPreviews || {};
 
     if (placeholder?.id) {
       return editor.storage.shared.videoPreviews[placeholder.id];

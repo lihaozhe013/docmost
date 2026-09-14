@@ -104,13 +104,7 @@ export function useTreeMutation(spaceId: string): UseTreeMutation {
         hasChildren: source.hasChildren
       };
 
-      updateCacheOnMovePage(
-        spaceId,
-        sourceId,
-        oldParentId,
-        payload.parentPageId,
-        pageData
-      );
+      updateCacheOnMovePage(spaceId, sourceId, oldParentId, payload.parentPageId, pageData);
 
       setTimeout(() => {
         emit({
@@ -180,11 +174,7 @@ export function useTreeMutation(spaceId: string): UseTreeMutation {
         });
       }, 50);
 
-      const pageUrl = buildPageUrl(
-        spaceSlug,
-        createdPage.slugId,
-        createdPage.title
-      );
+      const pageUrl = buildPageUrl(spaceSlug, createdPage.slugId, createdPage.title);
       navigate(pageUrl);
     },
     [spaceId, createPageMutation, setData, store, emit, navigate, spaceSlug]
@@ -192,9 +182,7 @@ export function useTreeMutation(spaceId: string): UseTreeMutation {
 
   const handleRename = useCallback(
     async (id: string, name: string) => {
-      setData((prev) =>
-        treeModel.update(prev, id, { name } as Partial<SpaceTreeNode>)
-      );
+      setData((prev) => treeModel.update(prev, id, { name } as Partial<SpaceTreeNode>));
       try {
         await updatePageMutation.mutateAsync({ pageId: id, title: name });
       } catch (error) {
@@ -206,10 +194,7 @@ export function useTreeMutation(spaceId: string): UseTreeMutation {
 
   const handleDelete = useCallback(
     async (id: string) => {
-      const node = treeModel.find(
-        store.get(treeDataAtom),
-        id
-      ) as SpaceTreeNode | null;
+      const node = treeModel.find(store.get(treeDataAtom), id) as SpaceTreeNode | null;
       const parentPageId = node?.parentPageId ?? null;
       try {
         await removePageMutation.mutateAsync(id);
@@ -232,8 +217,7 @@ export function useTreeMutation(spaceId: string): UseTreeMutation {
         if (
           node &&
           pageSlug &&
-          (node.slugId === pageSlug.split('-')[1] ||
-            isPageInNode(node, pageSlug.split('-')[1]))
+          (node.slugId === pageSlug.split('-')[1] || isPageInNode(node, pageSlug.split('-')[1]))
         ) {
           navigate(getSpaceUrl(spaceSlug));
         }
@@ -250,16 +234,7 @@ export function useTreeMutation(spaceId: string): UseTreeMutation {
         console.error('Failed to delete page:', error);
       }
     },
-    [
-      removePageMutation,
-      setData,
-      store,
-      pageSlug,
-      navigate,
-      spaceSlug,
-      emit,
-      spaceId
-    ]
+    [removePageMutation, setData, store, pageSlug, navigate, spaceSlug, emit, spaceId]
   );
 
   return { handleMove, handleCreate, handleRename, handleDelete };

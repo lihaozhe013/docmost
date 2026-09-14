@@ -1,9 +1,6 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
-import {
-  FastifyAdapter,
-  NestFastifyApplication
-} from '@nestjs/platform-fastify';
+import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { Logger, NotFoundException, ValidationPipe } from '@nestjs/common';
 import { Logger as PinoLogger } from 'nestjs-pino';
 import { TransformHttpResponseInterceptor } from './common/interceptors/http-response.interceptor';
@@ -13,10 +10,7 @@ import fastifyCookie from '@fastify/cookie';
 import fastifyIp from 'fastify-ip';
 import { InternalLogFilter } from './common/logger/internal-log-filter';
 import { EnvironmentService } from './integrations/environment/environment.service';
-import {
-  resolveFrameHeader,
-  resolveFrameHeadersForPath
-} from './common/helpers';
+import { resolveFrameHeader, resolveFrameHeadersForPath } from './common/helpers';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -97,18 +91,14 @@ async function bootstrap() {
   app
     .getHttpAdapter()
     .getInstance()
-    .addContentTypeParser(
-      'application/scim+json',
-      { parseAs: 'string' },
-      (_, body, done) => {
-        try {
-          const json = JSON.parse(body.toString());
-          done(null, json);
-        } catch (err: any) {
-          done(err);
-        }
+    .addContentTypeParser('application/scim+json', { parseAs: 'string' }, (_, body, done) => {
+      try {
+        const json = JSON.parse(body.toString());
+        done(null, json);
+      } catch (err: any) {
+        done(err);
       }
-    );
+    });
 
   app
     .getHttpAdapter()
@@ -169,9 +159,7 @@ async function bootstrap() {
   const port = process.env.PORT || 3000;
   const host = process.env.HOST || '0.0.0.0';
   await app.listen(port, host, () => {
-    logger.log(
-      `Listening on http://127.0.0.1:${port} / ${process.env.APP_URL}`
-    );
+    logger.log(`Listening on http://127.0.0.1:${port} / ${process.env.APP_URL}`);
   });
 }
 

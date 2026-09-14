@@ -3,10 +3,7 @@ import { atomWithStorage } from 'jotai/utils';
 import { ICurrentUser, IUser } from '@/features/user/types/user.types';
 import { IWorkspace } from '@/features/workspace/types/workspace.types';
 
-export const currentUserAtom = atomWithStorage<ICurrentUser | null>(
-  'currentUser',
-  null
-);
+export const currentUserAtom = atomWithStorage<ICurrentUser | null>('currentUser', null);
 
 export const userAtom = atom(
   (get) => {

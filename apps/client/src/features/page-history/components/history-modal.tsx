@@ -34,10 +34,7 @@ export default function HistoryModal({ pageId, pageTitle }: Props) {
             </Modal.Title>
             <Modal.CloseButton aria-label={t('Close')} />
           </Modal.Header>
-          <Modal.Body
-            p={0}
-            style={{ height: 'calc(100vh - 60px)', overflow: 'hidden' }}
-          >
+          <Modal.Body p={0} style={{ height: 'calc(100vh - 60px)', overflow: 'hidden' }}>
             <HistoryModalMobile pageId={pageId} pageTitle={pageTitle} />
           </Modal.Body>
         </Modal.Content>

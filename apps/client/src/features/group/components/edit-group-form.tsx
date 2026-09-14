@@ -1,9 +1,6 @@
 import { Group, Box, Button, TextInput, Stack, Textarea } from '@mantine/core';
 import React, { useEffect } from 'react';
-import {
-  useGroupQuery,
-  useUpdateGroupMutation
-} from '@/features/group/queries/group-query.ts';
+import { useGroupQuery, useUpdateGroupMutation } from '@/features/group/queries/group-query.ts';
 import { useForm } from '@mantine/form';
 import { z } from 'zod/v4';
 import { useParams } from 'react-router-dom';
@@ -21,10 +18,7 @@ interface EditGroupFormProps {
   onClose?: () => void;
   group?: IGroup;
 }
-export function EditGroupForm({
-  onClose,
-  group: groupProp
-}: EditGroupFormProps) {
+export function EditGroupForm({ onClose, group: groupProp }: EditGroupFormProps) {
   const { t } = useTranslation();
   const updateGroupMutation = useUpdateGroupMutation();
   const { isSuccess } = updateGroupMutation;
@@ -49,10 +43,7 @@ export function EditGroupForm({
     }
   });
 
-  const handleSubmit = async (data: {
-    name?: string;
-    description?: string;
-  }) => {
+  const handleSubmit = async (data: { name?: string; description?: string }) => {
     const groupData = {
       groupId: groupId,
       name: data.name,

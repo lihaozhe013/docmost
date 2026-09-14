@@ -23,11 +23,7 @@ import { AiPageEditingService } from '../integrations/ai-page-editing/ai-page-ed
   transports: ['websocket']
 })
 export class WsGateway
-  implements
-    OnGatewayConnection,
-    OnGatewayDisconnect,
-    OnGatewayInit,
-    OnModuleDestroy
+  implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, OnModuleDestroy
 {
   @WebSocketServer()
   server: Server;
@@ -79,10 +75,7 @@ export class WsGateway
 
   @SubscribeMessage('message')
   async handleMessage(client: Socket, data: any): Promise<void> {
-    if (
-      data?.operation &&
-      String(data.operation).startsWith('aiPageEditing.')
-    ) {
+    if (data?.operation && String(data.operation).startsWith('aiPageEditing.')) {
       await this.aiPageEditingService.handleMessage(client, data);
       return;
     }

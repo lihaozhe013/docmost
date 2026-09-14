@@ -13,16 +13,10 @@ interface MultiMemberSelectProps {
   onChange: (value: string[]) => void;
 }
 
-const renderMultiSelectOption: MultiSelectProps['renderOption'] = ({
-  option
-}) => (
+const renderMultiSelectOption: MultiSelectProps['renderOption'] = ({ option }) => (
   <Group gap="sm" wrap="nowrap">
     {option['type'] === 'user' && (
-      <CustomAvatar
-        avatarUrl={option['avatarUrl']}
-        size={20}
-        name={option.label}
-      />
+      <CustomAvatar avatarUrl={option['avatarUrl']} size={20} name={option.label} />
     )}
     {option['type'] === 'group' && <IconGroupCircle />}
     <div>

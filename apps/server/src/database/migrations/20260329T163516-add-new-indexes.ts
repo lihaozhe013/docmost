@@ -242,74 +242,35 @@ export async function down(db: Kysely<any>): Promise<void> {
   await db.schema.dropIndex('idx_group_users_user_id').ifExists().execute();
   await db.schema.dropIndex('idx_space_members_user_id').ifExists().execute();
   await db.schema.dropIndex('idx_space_members_group_id').ifExists().execute();
-  await db.schema
-    .dropIndex('idx_pages_space_parent_position')
-    .ifExists()
-    .execute();
+  await db.schema.dropIndex('idx_pages_space_parent_position').ifExists().execute();
   await db.schema.dropIndex('idx_pages_parent_page_id').ifExists().execute();
   await db.schema.dropIndex('idx_pages_space_updated').ifExists().execute();
   await db.schema.dropIndex('idx_pages_space_deleted').ifExists().execute();
-  await db.schema
-    .dropIndex('idx_workspaces_hostname_lower')
-    .ifExists()
-    .execute();
+  await db.schema.dropIndex('idx_workspaces_hostname_lower').ifExists().execute();
   await db.schema.dropIndex('idx_workspaces_created_at').ifExists().execute();
   await db.schema.dropIndex('idx_users_workspace_deleted').ifExists().execute();
-  await db.schema
-    .dropIndex('idx_spaces_slug_lower_workspace')
-    .ifExists()
-    .execute();
+  await db.schema.dropIndex('idx_spaces_slug_lower_workspace').ifExists().execute();
   await db.schema.dropIndex('idx_spaces_workspace_id').ifExists().execute();
-  await db.schema
-    .dropIndex('idx_groups_name_lower_workspace')
-    .ifExists()
-    .execute();
+  await db.schema.dropIndex('idx_groups_name_lower_workspace').ifExists().execute();
   await db.schema.dropIndex('idx_groups_workspace_id').ifExists().execute();
   await db.schema.dropIndex('idx_shares_page_id').ifExists().execute();
   await db.schema.dropIndex('idx_attachments_page_id').ifExists().execute();
   await db.schema.dropIndex('idx_attachments_space_id').ifExists().execute();
   await db.schema.dropIndex('idx_comments_page_id').ifExists().execute();
-  await db.schema
-    .dropIndex('idx_comments_parent_comment_id')
-    .ifExists()
-    .execute();
-  await db.schema
-    .dropIndex('idx_page_history_page_created')
-    .ifExists()
-    .execute();
-  await db.schema
-    .dropIndex('idx_attachments_workspace_id')
-    .ifExists()
-    .execute();
-  await db.schema
-    .dropIndex('idx_backlinks_target_page_id')
-    .ifExists()
-    .execute();
+  await db.schema.dropIndex('idx_comments_parent_comment_id').ifExists().execute();
+  await db.schema.dropIndex('idx_page_history_page_created').ifExists().execute();
+  await db.schema.dropIndex('idx_attachments_workspace_id').ifExists().execute();
+  await db.schema.dropIndex('idx_backlinks_target_page_id').ifExists().execute();
   await db.schema.dropIndex('idx_pages_workspace_id').ifExists().execute();
   await db.schema.dropIndex('idx_pages_creator_id').ifExists().execute();
   await db.schema.dropIndex('idx_notifications_page_id').ifExists().execute();
   await db.schema.dropIndex('idx_notifications_space_id').ifExists().execute();
-  await db.schema
-    .dropIndex('idx_notifications_comment_id')
-    .ifExists()
-    .execute();
+  await db.schema.dropIndex('idx_notifications_comment_id').ifExists().execute();
   await db.schema.dropIndex('idx_watchers_user_workspace').ifExists().execute();
   await db.schema.dropIndex('idx_watchers_space_id').ifExists().execute();
-  await db.schema
-    .dropIndex('idx_auth_providers_workspace_id')
-    .ifExists()
-    .execute();
-  await db.schema
-    .dropIndex('idx_auth_accounts_provider_user_id')
-    .ifExists()
-    .execute();
-  await db.schema
-    .dropIndex('idx_workspace_invitations_workspace_id')
-    .ifExists()
-    .execute();
+  await db.schema.dropIndex('idx_auth_providers_workspace_id').ifExists().execute();
+  await db.schema.dropIndex('idx_auth_accounts_provider_user_id').ifExists().execute();
+  await db.schema.dropIndex('idx_workspace_invitations_workspace_id').ifExists().execute();
   await db.schema.dropIndex('idx_api_keys_workspace_id').ifExists().execute();
-  await db.schema
-    .dropIndex('idx_user_sessions_user_workspace')
-    .ifExists()
-    .execute();
+  await db.schema.dropIndex('idx_user_sessions_user_workspace').ifExists().execute();
 }

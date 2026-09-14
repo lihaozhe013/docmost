@@ -1,16 +1,10 @@
 import { Node } from '@tiptap/pm/model';
-import {
-  jsonToNode,
-  tiptapExtensions
-} from '../../../collaboration/collaboration.util';
+import { jsonToNode, tiptapExtensions } from '../../../collaboration/collaboration.util';
 import { validate as isValidUUID } from 'uuid';
 import { Transform } from '@tiptap/pm/transform';
 import { TiptapTransformer } from '@hocuspocus/transformer';
 import * as Y from 'yjs';
-import {
-  INTERNAL_LINK_REGEX,
-  extractPageSlugId
-} from '../../../integrations/export/utils';
+import { INTERNAL_LINK_REGEX, extractPageSlugId } from '../../../integrations/export/utils';
 import { isAttachmentNode } from './attachment-node-types';
 
 export interface MentionNode {
@@ -27,10 +21,7 @@ export function extractMentions(prosemirrorJson: any) {
 
   doc.descendants((node: Node) => {
     if (node.type.name === 'mention') {
-      if (
-        node.attrs.id &&
-        !mentionList.some((mention) => mention.id === node.attrs.id)
-      ) {
+      if (node.attrs.id && !mentionList.some((mention) => mention.id === node.attrs.id)) {
         mentionList.push({
           id: node.attrs.id,
           label: node.attrs.label,
@@ -59,9 +50,7 @@ export function extractPageMentions(mentionList: MentionNode[]): MentionNode[] {
   for (const mention of mentionList) {
     if (
       mention.entityType === 'page' &&
-      !pageMentionList.some(
-        (pageMention) => pageMention.entityId === mention.entityId
-      )
+      !pageMentionList.some((pageMention) => pageMention.entityId === mention.entityId)
     ) {
       pageMentionList.push(mention);
     }
@@ -156,11 +145,7 @@ export function removeMarkTypeFromDoc(doc: Node, markName: string): Node {
 
 export function createYdocFromJson(prosemirrorJson: any): Buffer | null {
   if (prosemirrorJson) {
-    const ydoc = TiptapTransformer.toYdoc(
-      prosemirrorJson,
-      'default',
-      tiptapExtensions
-    );
+    const ydoc = TiptapTransformer.toYdoc(prosemirrorJson, 'default', tiptapExtensions);
 
     Y.encodeStateAsUpdate(ydoc);
 

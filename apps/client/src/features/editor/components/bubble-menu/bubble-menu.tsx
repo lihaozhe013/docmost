@@ -17,17 +17,10 @@ import { ActionIcon, rem, Tooltip } from '@mantine/core';
 import { ColorSelector } from './color-selector';
 import { NodeSelector } from './node-selector';
 import { TextAlignmentSelector } from './text-alignment-selector';
-import {
-  draftCommentIdAtom,
-  showCommentPopupAtom
-} from '@/features/comment/atoms/comment-atom';
+import { draftCommentIdAtom, showCommentPopupAtom } from '@/features/comment/atoms/comment-atom';
 import { useAtom, useAtomValue } from 'jotai';
 import { v7 as uuid7 } from 'uuid';
-import {
-  isCellSelection,
-  isEditorReady,
-  isTextSelected
-} from '@docmost/editor-ext';
+import { isCellSelection, isEditorReady, isTextSelected } from '@docmost/editor-ext';
 import { LinkSelector } from '@/features/editor/components/bubble-menu/link-selector.tsx';
 import { showLinkMenuAtom } from '@/features/editor/atoms/editor-atoms';
 import { userAtom } from '@/features/user/atoms/current-user-atom';
@@ -49,8 +42,7 @@ export const EditorBubbleMenu: FC<EditorBubbleMenuProps> = (props) => {
   const { t } = useTranslation();
   const [showCommentPopup, setShowCommentPopup] = useAtom(showCommentPopupAtom);
   const user = useAtomValue(userAtom);
-  const editorToolbarEnabled =
-    user?.settings?.preferences?.editorToolbar ?? false;
+  const editorToolbarEnabled = user?.settings?.preferences?.editorToolbar ?? false;
   const [, setDraftCommentId] = useAtom(draftCommentIdAtom);
   const showCommentPopupRef = useRef(showCommentPopup);
   const [showLinkMenu] = useAtom(showLinkMenuAtom);
@@ -166,10 +158,7 @@ export const EditorBubbleMenu: FC<EditorBubbleMenuProps> = (props) => {
   if (showLinkMenu) return;
 
   return (
-    <BubbleMenu
-      {...bubbleMenuProps}
-      style={{ zIndex: 199, position: 'relative' }}
-    >
+    <BubbleMenu {...bubbleMenuProps} style={{ zIndex: 199, position: 'relative' }}>
       <div className={classes.bubbleMenu}>
         {!editorToolbarEnabled && (
           <>
@@ -195,12 +184,7 @@ export const EditorBubbleMenu: FC<EditorBubbleMenuProps> = (props) => {
 
             <ActionIcon.Group>
               {items.map((item, index) => (
-                <Tooltip
-                  key={index}
-                  label={t(item.name)}
-                  withArrow
-                  withinPortal={false}
-                >
+                <Tooltip key={index} label={t(item.name)} withArrow withinPortal={false}>
                   <ActionIcon
                     key={index}
                     variant="default"
@@ -209,9 +193,7 @@ export const EditorBubbleMenu: FC<EditorBubbleMenuProps> = (props) => {
                     aria-label={t(item.name)}
                     className={clsx({ [classes.active]: item.isActive() })}
                     style={{ border: 'none' }}
-                    onClick={() =>
-                      isEditorReady(props.editor) && item.command()
-                    }
+                    onClick={() => isEditorReady(props.editor) && item.command()}
                   >
                     <item.icon style={{ width: rem(16) }} stroke={2} />
                   </ActionIcon>
@@ -241,9 +223,7 @@ export const EditorBubbleMenu: FC<EditorBubbleMenuProps> = (props) => {
               radius="6px"
               aria-label={t(commentItem.name)}
               style={{ border: 'none' }}
-              onClick={() =>
-                isEditorReady(props.editor) && commentItem.command()
-              }
+              onClick={() => isEditorReady(props.editor) && commentItem.command()}
             >
               <IconMessage size={16} stroke={2} />
             </ActionIcon>

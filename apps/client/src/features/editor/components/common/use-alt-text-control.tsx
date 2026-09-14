@@ -1,14 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Editor } from '@tiptap/react';
-import {
-  ActionIcon,
-  Button,
-  Group,
-  Paper,
-  Text,
-  Textarea,
-  Tooltip
-} from '@mantine/core';
+import { ActionIcon, Button, Group, Paper, Text, Textarea, Tooltip } from '@mantine/core';
 import { IconAlt } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 
@@ -27,11 +19,7 @@ type UseAltTextControlArgs = {
   currentAlt: string;
 };
 
-export function useAltTextControl({
-  editor,
-  nodeName,
-  currentAlt
-}: UseAltTextControlArgs) {
+export function useAltTextControl({ editor, nodeName, currentAlt }: UseAltTextControlArgs) {
   const { t } = useTranslation();
   const [showInput, setShowInput] = useState(false);
   const [draft, setDraft] = useState('');
@@ -81,12 +69,7 @@ export function useAltTextControl({
 
   const button = (
     <Tooltip position="top" label={t('Alt text')} withinPortal={false}>
-      <ActionIcon
-        onClick={open}
-        size="lg"
-        aria-label={t('Alt text')}
-        variant="subtle"
-      >
+      <ActionIcon onClick={open} size="lg" aria-label={t('Alt text')} variant="subtle">
         <IconAlt size={18} />
       </ActionIcon>
     </Tooltip>

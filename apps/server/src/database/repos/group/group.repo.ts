@@ -2,11 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectKysely } from 'nestjs-kysely';
 import { KyselyDB, KyselyTransaction } from '@docmost/db/types/kysely.types';
 import { dbOrTx } from '@docmost/db/utils';
-import {
-  Group,
-  InsertableGroup,
-  UpdatableGroup
-} from '@docmost/db/types/entity.types';
+import { Group, InsertableGroup, UpdatableGroup } from '@docmost/db/types/entity.types';
 import { ExpressionBuilder, sql } from 'kysely';
 import { PaginationOptions } from '../../pagination/pagination-options';
 import { DB, Groups } from '@docmost/db/types/db';
@@ -86,10 +82,7 @@ export class GroupRepo {
       .execute();
   }
 
-  async insertGroup(
-    insertableGroup: InsertableGroup,
-    trx?: KyselyTransaction
-  ): Promise<Group> {
+  async insertGroup(insertableGroup: InsertableGroup, trx?: KyselyTransaction): Promise<Group> {
     const db = dbOrTx(this.db, trx);
     return db
       .insertInto('groups')
@@ -98,10 +91,7 @@ export class GroupRepo {
       .executeTakeFirst();
   }
 
-  async getDefaultGroup(
-    workspaceId: string,
-    trx: KyselyTransaction
-  ): Promise<Group> {
+  async getDefaultGroup(workspaceId: string, trx: KyselyTransaction): Promise<Group> {
     const db = dbOrTx(this.db, trx);
     return (
       db
@@ -138,11 +128,7 @@ export class GroupRepo {
 
     if (pagination.query) {
       baseQuery = baseQuery.where((eb) =>
-        eb(
-          sql`f_unaccent(name)`,
-          'ilike',
-          sql`f_unaccent(${'%' + pagination.query + '%'})`
-        ).or(
+        eb(sql`f_unaccent(name)`, 'ilike', sql`f_unaccent(${'%' + pagination.query + '%'})`).or(
           sql`f_unaccent(description)`,
           'ilike',
           sql`f_unaccent(${'%' + pagination.query + '%'})`

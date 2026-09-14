@@ -1,13 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import cx from 'clsx';
-import {
-  Button,
-  Menu,
-  Text,
-  Badge,
-  Group,
-  getDefaultZIndex
-} from '@mantine/core';
+import { Button, Menu, Text, Badge, Group, getDefaultZIndex } from '@mantine/core';
 import {
   IconChevronDown,
   IconBuilding,
@@ -33,22 +26,13 @@ interface SearchSpotlightFiltersProps {
   spaceId?: string;
 }
 
-export function SearchSpotlightFilters({
-  onFiltersChange,
-  spaceId
-}: SearchSpotlightFiltersProps) {
+export function SearchSpotlightFilters({ onFiltersChange, spaceId }: SearchSpotlightFiltersProps) {
   const { t } = useTranslation();
   const hasAttachmentIndexing = useHasFeature(Feature.ATTACHMENT_INDEXING);
-  const [selectedSpaceId, setSelectedSpaceId] = useState<string | null>(
-    spaceId || null
-  );
+  const [selectedSpaceId, setSelectedSpaceId] = useState<string | null>(spaceId || null);
   const [contentType, setContentType] = useState<string | null>('page');
-  const [selectedCreatorId, setSelectedCreatorId] = useState<string | null>(
-    null
-  );
-  const [selectedCreatorName, setSelectedCreatorName] = useState<string | null>(
-    null
-  );
+  const [selectedCreatorId, setSelectedCreatorId] = useState<string | null>(null);
+  const [selectedCreatorName, setSelectedCreatorName] = useState<string | null>(null);
   const [selectedLabelIds, setSelectedLabelIds] = useState<string[]>([]);
   const [titleOnly, setTitleOnly] = useState(false);
   const [openedFilter, setOpenedFilter] = useState<string | null>(null);
@@ -119,8 +103,7 @@ export function SearchSpotlightFilters({
   const isFilterVisible = (key: string) => {
     if (openedFilter === key) return true;
     if (key === 'creator') return !!selectedCreatorId;
-    if (key === 'labels')
-      return contentType !== 'attachment' && selectedLabelIds.length > 0;
+    if (key === 'labels') return contentType !== 'attachment' && selectedLabelIds.length > 0;
     return false;
   };
 
@@ -158,12 +141,7 @@ export function SearchSpotlightFilters({
         </Button>
       </SpaceFilterMenu>
 
-      <Menu
-        shadow="md"
-        width={220}
-        position="bottom-start"
-        zIndex={getDefaultZIndex('max')}
-      >
+      <Menu shadow="md" width={220} position="bottom-start" zIndex={getDefaultZIndex('max')}>
         <Menu.Target>
           <Button
             variant="subtle"
@@ -201,9 +179,7 @@ export function SearchSpotlightFilters({
                     </Badge>
                   )}
                 </div>
-                {contentType === option.value && (
-                  <IconCheck size={20} aria-hidden />
-                )}
+                {contentType === option.value && <IconCheck size={20} aria-hidden />}
               </Group>
             </Menu.Item>
           ))}
@@ -216,10 +192,7 @@ export function SearchSpotlightFilters({
         size="sm"
         radius="xl"
         leftSection={<IconLetterCase size={16} />}
-        className={cx(
-          classes.filterButton,
-          titleOnly && classes.filterButtonActive
-        )}
+        className={cx(classes.filterButton, titleOnly && classes.filterButtonActive)}
         fw={500}
         aria-pressed={titleOnly}
         onClick={() => setTitleOnly(!titleOnly)}
@@ -238,9 +211,7 @@ export function SearchSpotlightFilters({
               width={250}
               zIndex={getDefaultZIndex('max')}
               opened={openedFilter === 'creator'}
-              onOpenChange={(opened) =>
-                setOpenedFilter(opened ? 'creator' : null)
-              }
+              onOpenChange={(opened) => setOpenedFilter(opened ? 'creator' : null)}
             >
               <Button
                 variant="subtle"
@@ -269,9 +240,7 @@ export function SearchSpotlightFilters({
               width={250}
               zIndex={getDefaultZIndex('max')}
               opened={openedFilter === 'labels'}
-              onOpenChange={(opened) =>
-                setOpenedFilter(opened ? 'labels' : null)
-              }
+              onOpenChange={(opened) => setOpenedFilter(opened ? 'labels' : null)}
             >
               <Button
                 variant="subtle"
@@ -294,12 +263,7 @@ export function SearchSpotlightFilters({
       })}
 
       {addableFilters.length > 0 && (
-        <Menu
-          shadow="md"
-          width={200}
-          position="bottom-end"
-          zIndex={getDefaultZIndex('max')}
-        >
+        <Menu shadow="md" width={200} position="bottom-end" zIndex={getDefaultZIndex('max')}>
           <Menu.Target>
             <Button
               variant="subtle"

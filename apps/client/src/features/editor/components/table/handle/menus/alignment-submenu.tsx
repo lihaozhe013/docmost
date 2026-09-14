@@ -1,11 +1,7 @@
 import React from 'react';
 import type { Editor } from '@tiptap/react';
 import { Menu } from '@mantine/core';
-import {
-  IconAlignCenter,
-  IconAlignLeft,
-  IconAlignRight
-} from '@tabler/icons-react';
+import { IconAlignCenter, IconAlignLeft, IconAlignRight } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 
 interface AlignmentSubmenuProps {

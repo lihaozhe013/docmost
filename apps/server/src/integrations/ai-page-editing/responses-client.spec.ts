@@ -34,45 +34,26 @@ describe('OpenAiResponsesHttpClient', () => {
   it.each([
     ['https://api.openai.com', 'https://api.openai.com/v1/responses'],
     ['https://api.openai.com/v1/', 'https://api.openai.com/v1/responses'],
-    [
-      'https://api.openai.com/chat/completions',
-      'https://api.openai.com/v1/responses'
-    ],
-    [
-      'https://api.openai.com/v1/chat/completions',
-      'https://api.openai.com/v1/responses'
-    ],
+    ['https://api.openai.com/chat/completions', 'https://api.openai.com/v1/responses'],
+    ['https://api.openai.com/v1/chat/completions', 'https://api.openai.com/v1/responses'],
     ['https://api.deepseek.com', 'https://api.deepseek.com/responses'],
-    [
-      'https://api.deepseek.com/responses/',
-      'https://api.deepseek.com/responses'
-    ],
+    ['https://api.deepseek.com/responses/', 'https://api.deepseek.com/responses'],
     ['https://gateway.example/v1', 'https://gateway.example/v1/responses'],
-    [
-      'https://gateway.example/v1/chat/completions',
-      'https://gateway.example/v1/responses'
-    ],
-    [
-      'https://gateway.example/proxy/openai',
-      'https://gateway.example/proxy/openai/responses'
-    ]
+    ['https://gateway.example/v1/chat/completions', 'https://gateway.example/v1/responses'],
+    ['https://gateway.example/proxy/openai', 'https://gateway.example/proxy/openai/responses']
   ])('resolves %s to %s', (rawUrl, expected) => {
     expect(resolveResponsesEndpoint(rawUrl)).toBe(expected);
   });
 
   it('preserves query parameters and removes URL fragments', () => {
     expect(
-      resolveResponsesEndpoint(
-        'https://gateway.example/v1?api-version=2026-01-01#responses'
-      )
+      resolveResponsesEndpoint('https://gateway.example/v1?api-version=2026-01-01#responses')
     ).toBe('https://gateway.example/v1/responses?api-version=2026-01-01');
   });
 
   it('redacts credentials and query data from endpoint logs', () => {
     expect(
-      redactResponsesEndpoint(
-        'https://user:secret@gateway.example/v1/responses?token=secret'
-      )
+      redactResponsesEndpoint('https://user:secret@gateway.example/v1/responses?token=secret')
     ).toBe('https://gateway.example/v1/responses');
   });
 
@@ -137,10 +118,7 @@ describe('OpenAiResponsesHttpClient', () => {
     );
     globalThis.fetch = fetchMock;
     const textDeltas: string[] = [];
-    const client = new OpenAiResponsesHttpClient(
-      'https://example.test/v1',
-      'secret-key'
-    );
+    const client = new OpenAiResponsesHttpClient('https://example.test/v1', 'secret-key');
 
     const result = await client.stream({
       model: 'test-model',
@@ -176,9 +154,7 @@ describe('OpenAiResponsesHttpClient', () => {
 
     const request = fetchMock.mock.calls[0]?.[1] as RequestInit | undefined;
     const body = JSON.parse(String(request?.body));
-    expect(fetchMock.mock.calls[0]?.[0]).toBe(
-      'https://example.test/v1/responses'
-    );
+    expect(fetchMock.mock.calls[0]?.[0]).toBe('https://example.test/v1/responses');
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(request?.headers).toMatchObject({
       authorization: 'Bearer secret-key',
@@ -197,13 +173,10 @@ describe('OpenAiResponsesHttpClient', () => {
   it('rejects HTTP failures and incomplete streams', async () => {
     const failedFetch = jest.fn() as jest.MockedFunction<typeof fetch>;
     failedFetch.mockResolvedValue(
-      new Response(
-        JSON.stringify({ error: { message: 'provider unavailable' } }),
-        {
-          status: 503,
-          headers: { 'content-type': 'application/json' }
-        }
-      )
+      new Response(JSON.stringify({ error: { message: 'provider unavailable' } }), {
+        status: 503,
+        headers: { 'content-type': 'application/json' }
+      })
     );
     globalThis.fetch = failedFetch;
     const client = new OpenAiResponsesHttpClient('https://example.test', 'key');
@@ -215,28 +188,22 @@ describe('OpenAiResponsesHttpClient', () => {
       signal: new AbortController().signal
     };
 
-    await expect(client.stream(options)).rejects.toThrow(
-      'HTTP 503: provider unavailable'
-    );
+    await expect(client.stream(options)).rejects.toThrow('HTTP 503: provider unavailable');
 
     const incompleteFetch = jest.fn() as jest.MockedFunction<typeof fetch>;
     incompleteFetch.mockResolvedValue(
-      responseWithChunks([
-        sseEvent({ type: 'response.output_text.delta', delta: 'partial' })
-      ])
+      responseWithChunks([sseEvent({ type: 'response.output_text.delta', delta: 'partial' })])
     );
     globalThis.fetch = incompleteFetch;
-    await expect(client.stream(options)).rejects.toThrow(
-      'before response.completed'
-    );
+    await expect(client.stream(options)).rejects.toThrow('before response.completed');
   });
 
   it('requires all connection settings when creating the configured client', () => {
     expect(() => createOpenAiResponsesClient('', 'key')).toThrow(
       'AI page editing is not configured'
     );
-    expect(() =>
-      createOpenAiResponsesClient('https://example.test', '')
-    ).toThrow('AI page editing is not configured');
+    expect(() => createOpenAiResponsesClient('https://example.test', '')).toThrow(
+      'AI page editing is not configured'
+    );
   });
 });

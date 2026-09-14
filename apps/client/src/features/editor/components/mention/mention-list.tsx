@@ -33,10 +33,7 @@ import {
 } from '@/features/editor/components/mention/mention.type.ts';
 import { IPage } from '@/features/page/types/page.types';
 import { getPageTitle } from '@/features/page/page.utils';
-import {
-  useCreatePageMutation,
-  usePageQuery
-} from '@/features/page/queries/page-query';
+import { useCreatePageMutation, usePageQuery } from '@/features/page/queries/page-query';
 import { treeDataAtom } from '@/features/page/tree/atoms/tree-data-atom';
 import { treeModel } from '@/features/page/tree/model/tree-model';
 import { SpaceTreeNode } from '@/features/page/tree/types';
@@ -197,9 +194,7 @@ const MentionList = forwardRef<any, MentionListProps>((props, ref) => {
       setCountAnnouncement(t('No results'));
       return;
     }
-    setCountAnnouncement(
-      t('{{count}} result available', { count: selectableCount })
-    );
+    setCountAnnouncement(t('{{count}} result available', { count: selectableCount }));
   }, [renderItems.length, selectableCount, t]);
 
   useEffect(() => {
@@ -324,9 +319,7 @@ const MentionList = forwardRef<any, MentionListProps>((props, ref) => {
   }
 
   const hasUsers = renderItems.some((item) => item.entityType === 'user');
-  const hasPages = renderItems.some(
-    (item) => item.entityType === 'page' && item.id !== null
-  );
+  const hasPages = renderItems.some((item) => item.entityType === 'page' && item.id !== null);
   const createPageItemData = renderItems.find(
     (item) => item.entityType === 'page' && item.id === null
   );
@@ -392,11 +385,7 @@ const MentionList = forwardRef<any, MentionListProps>((props, ref) => {
                 px="sm"
               >
                 <Group gap="sm">
-                  <CustomAvatar
-                    size={'sm'}
-                    avatarUrl={item.avatarUrl}
-                    name={item.label}
-                  />
+                  <CustomAvatar size={'sm'} avatarUrl={item.avatarUrl} name={item.label} />
 
                   <div style={{ flex: 1 }}>
                     <AutoTooltipText size="sm" fw={500}>
@@ -428,9 +417,7 @@ const MentionList = forwardRef<any, MentionListProps>((props, ref) => {
                     color="gray"
                     size="sm"
                   >
-                    {item.icon || (
-                      <IconFileDescription size={18} stroke={1.5} />
-                    )}
+                    {item.icon || <IconFileDescription size={18} stroke={1.5} />}
                   </ActionIcon>
 
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -458,15 +445,10 @@ const MentionList = forwardRef<any, MentionListProps>((props, ref) => {
               data-item-index={renderItems.indexOf(createPageItemData)}
               id={`mention-option-${renderItems.indexOf(createPageItemData)}`}
               role="option"
-              aria-selected={
-                renderItems.indexOf(createPageItemData) === selectedIndex
-              }
-              onClick={() =>
-                selectItem(renderItems.indexOf(createPageItemData))
-              }
+              aria-selected={renderItems.indexOf(createPageItemData) === selectedIndex}
+              onClick={() => selectItem(renderItems.indexOf(createPageItemData))}
               className={clsx(classes.menuBtn, {
-                [classes.selectedItem]:
-                  renderItems.indexOf(createPageItemData) === selectedIndex
+                [classes.selectedItem]: renderItems.indexOf(createPageItemData) === selectedIndex
               })}
               px="sm"
             >

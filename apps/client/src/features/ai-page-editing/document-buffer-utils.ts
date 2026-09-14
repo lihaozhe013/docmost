@@ -76,15 +76,9 @@ export function isRecord(value: unknown): value is Record<string, any> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-export function isValidEditOperation(
-  value: unknown
-): value is BufferEditOperation {
+export function isValidEditOperation(value: unknown): value is BufferEditOperation {
   if (!isRecord(value)) return false;
-  if (
-    typeof value.blockId !== 'string' ||
-    value.blockId.length < 1 ||
-    value.blockId.length > 128
-  ) {
+  if (typeof value.blockId !== 'string' || value.blockId.length < 1 || value.blockId.length > 128) {
     return false;
   }
   if (value.type === 'delete_block') return true;
@@ -97,17 +91,14 @@ export function isValidEditOperation(
     return false;
   }
   if (
-    (value.type === 'replace_text' ||
-      value.type === 'replace_text_with_math') &&
+    (value.type === 'replace_text' || value.type === 'replace_text_with_math') &&
     value.oldText.length < 1
   ) {
     return false;
   }
   if (
     value.segmentIndex !== undefined &&
-    (!Number.isInteger(value.segmentIndex) ||
-      value.segmentIndex < 0 ||
-      value.segmentIndex > 100)
+    (!Number.isInteger(value.segmentIndex) || value.segmentIndex < 0 || value.segmentIndex > 100)
   ) {
     return false;
   }
@@ -121,14 +112,9 @@ export function isValidEditOperation(
         !/[\r\n]/.test(value.language))
     );
   }
-  if (
-    value.type === 'replace_inline_math' ||
-    value.type === 'replace_text_with_math'
-  ) {
+  if (value.type === 'replace_inline_math' || value.type === 'replace_text_with_math') {
     return (
-      Number.isInteger(value.segmentIndex) &&
-      value.segmentIndex >= 0 &&
-      value.segmentIndex <= 100
+      Number.isInteger(value.segmentIndex) && value.segmentIndex >= 0 && value.segmentIndex <= 100
     );
   }
   return false;
@@ -149,15 +135,11 @@ export function isValidInsertInput(value: unknown): value is BufferInsertInput {
   ) {
     return false;
   }
-  if (
-    value.target.kind === 'document_start' ||
-    value.target.kind === 'document_end'
-  ) {
+  if (value.target.kind === 'document_start' || value.target.kind === 'document_end') {
     return true;
   }
   return (
-    (value.target.kind === 'before_block' ||
-      value.target.kind === 'after_block') &&
+    (value.target.kind === 'before_block' || value.target.kind === 'after_block') &&
     typeof value.target.blockId === 'string' &&
     value.target.blockId.length > 0 &&
     value.target.blockId.length <= 128
@@ -202,11 +184,7 @@ export function getInlineSegments(node: ProseMirrorNode): BufferSegment[] {
     .filter((segment): segment is BufferSegment => segment !== undefined);
 }
 
-export function compactChange(change: {
-  blockId: string;
-  before: string;
-  after: string;
-}): {
+export function compactChange(change: { blockId: string; before: string; after: string }): {
   blockId: string;
   before: string;
   after: string;
@@ -218,8 +196,7 @@ export function compactChange(change: {
     blockId: change.blockId,
     before,
     after,
-    ...(before.length !== change.before.length ||
-    after.length !== change.after.length
+    ...(before.length !== change.before.length || after.length !== change.after.length
       ? { truncated: true }
       : {})
   };
@@ -302,11 +279,7 @@ function hasRawHtmlOutsideLiterals(markdown: string): boolean {
         continue;
       }
       const delimiter = character.repeat(length);
-      const closing = findUnescapedDelimiter(
-        markdown,
-        delimiter,
-        index + length
-      );
+      const closing = findUnescapedDelimiter(markdown, delimiter, index + length);
       if (closing !== -1) {
         index = closing + length - 1;
         continue;
@@ -315,15 +288,8 @@ function hasRawHtmlOutsideLiterals(markdown: string): boolean {
     if (character === '$') {
       const length = markdown[index + 1] === '$' ? 2 : 1;
       const delimiter = '$'.repeat(length);
-      const closing = findUnescapedDelimiter(
-        markdown,
-        delimiter,
-        index + length
-      );
-      if (
-        closing !== -1 &&
-        (length === 2 || isInlineMathRange(markdown, index, closing))
-      ) {
+      const closing = findUnescapedDelimiter(markdown, delimiter, index + length);
+      if (closing !== -1 && (length === 2 || isInlineMathRange(markdown, index, closing))) {
         index = closing + length - 1;
         continue;
       }
@@ -338,21 +304,13 @@ function hasRawHtmlOutsideLiterals(markdown: string): boolean {
   return false;
 }
 
-function findUnescapedDelimiter(
-  markdown: string,
-  delimiter: string,
-  start: number
-): number {
+function findUnescapedDelimiter(markdown: string, delimiter: string, start: number): number {
   let index = start;
   while (index < markdown.length) {
     const candidate = markdown.indexOf(delimiter, index);
     if (candidate === -1) return -1;
     let backslashes = 0;
-    for (
-      let cursor = candidate - 1;
-      cursor >= 0 && markdown[cursor] === '\\';
-      cursor -= 1
-    ) {
+    for (let cursor = candidate - 1; cursor >= 0 && markdown[cursor] === '\\'; cursor -= 1) {
       backslashes += 1;
     }
     if (backslashes % 2 === 0) return candidate;
@@ -361,11 +319,7 @@ function findUnescapedDelimiter(
   return -1;
 }
 
-function isInlineMathRange(
-  markdown: string,
-  opening: number,
-  closing: number
-): boolean {
+function isInlineMathRange(markdown: string, opening: number, closing: number): boolean {
   const contentStart = opening + 1;
   return (
     (opening === 0 || markdown[opening - 1] === ' ') &&
@@ -399,10 +353,7 @@ export function rangesOverlap(
   }
   for (const step of steps) {
     const candidate = step as Step & { from?: number; to?: number };
-    if (
-      typeof candidate.from !== 'number' ||
-      typeof candidate.to !== 'number'
-    ) {
+    if (typeof candidate.from !== 'number' || typeof candidate.to !== 'number') {
       continue;
     }
     for (const range of ranges) {
@@ -452,12 +403,7 @@ export function rebaseFallbackBindings(
     });
     const from = transaction.mapping.mapResult(binding.position, 1);
     const to = transaction.mapping.mapResult(binding.end, -1);
-    if (
-      removedByStep ||
-      from.deletedAcross ||
-      to.deletedAcross ||
-      from.pos > to.pos
-    ) {
+    if (removedByStep || from.deletedAcross || to.deletedAcross || from.pos > to.pos) {
       bindings.delete(blockId);
       continue;
     }

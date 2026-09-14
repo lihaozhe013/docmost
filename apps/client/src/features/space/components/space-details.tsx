@@ -26,8 +26,7 @@ interface SpaceDetailsProps {
 export default function SpaceDetails({ spaceId, readOnly }: SpaceDetailsProps) {
   const { t } = useTranslation();
   const { data: space, isLoading, refetch } = useSpaceQuery(spaceId);
-  const [exportOpened, { open: openExportModal, close: closeExportModal }] =
-    useDisclosure(false);
+  const [exportOpened, { open: openExportModal, close: closeExportModal }] = useDisclosure(false);
   const [isIconUploading, setIsIconUploading] = useState(false);
 
   const handleIconUpload = async (file: File) => {

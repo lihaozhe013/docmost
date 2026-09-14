@@ -2,10 +2,7 @@
   .codeBlock {
     padding: 4px;
     border-radius: var(--mantine-radius-default);
-    background-color: light-dark(
-      var(--mantine-color-gray-0),
-      var(--mantine-color-dark-8)
-    );
+    background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-8));
   }
 
   pre {
@@ -35,10 +32,7 @@
     /* Code styling */
     .hljs-comment,
     .hljs-quote {
-      color: light-dark(
-        var(--mantine-color-gray-6),
-        var(--mantine-color-dark-2)
-      );
+      color: light-dark(var(--mantine-color-gray-6), var(--mantine-color-dark-2));
     }
 
     .hljs-variable,
@@ -61,10 +55,7 @@
     .hljs-literal,
     .hljs-type,
     .hljs-params {
-      color: light-dark(
-        var(--mantine-color-blue-7),
-        var(--mantine-color-cyan-5)
-      );
+      color: light-dark(var(--mantine-color-blue-7), var(--mantine-color-cyan-5));
     }
 
     .hljs-string,
@@ -75,18 +66,12 @@
 
     .hljs-title,
     .hljs-section {
-      color: light-dark(
-        var(--mantine-color-pink-7),
-        var(--mantine-color-yellow-5)
-      );
+      color: light-dark(var(--mantine-color-pink-7), var(--mantine-color-yellow-5));
     }
 
     .hljs-keyword,
     .hljs-selector-tag {
-      color: light-dark(
-        var(--mantine-color-violet-7),
-        var(--mantine-color-violet-3)
-      );
+      color: light-dark(var(--mantine-color-violet-7), var(--mantine-color-violet-3));
     }
 
     .hljs-emphasis {

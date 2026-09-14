@@ -12,10 +12,7 @@ const iconProps = {
   size: 18
 };
 
-const renderSelectOption: SelectProps['renderOption'] = ({
-  option,
-  checked
-}) => (
+const renderSelectOption: SelectProps['renderOption'] = ({ option, checked }) => (
   <Group flex="1" gap="xs">
     <div>
       <Text size="sm">{option.label}</Text>
@@ -23,9 +20,7 @@ const renderSelectOption: SelectProps['renderOption'] = ({
         {option['description']}
       </Text>
     </div>{' '}
-    {checked && (
-      <IconCheck style={{ marginInlineStart: 'auto' }} {...iconProps} />
-    )}
+    {checked && <IconCheck style={{ marginInlineStart: 'auto' }} {...iconProps} />}
   </Group>
 );
 
@@ -35,11 +30,7 @@ interface SpaceMemberRoleProps {
   label?: string;
 }
 
-export function SpaceMemberRole({
-  onSelect,
-  defaultRole,
-  label
-}: SpaceMemberRoleProps) {
+export function SpaceMemberRole({ onSelect, defaultRole, label }: SpaceMemberRoleProps) {
   const { t } = useTranslation();
 
   return (

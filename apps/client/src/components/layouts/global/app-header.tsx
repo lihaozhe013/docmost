@@ -1,12 +1,4 @@
-import {
-  ActionIcon,
-  Badge,
-  Box,
-  Group,
-  Text,
-  Tooltip,
-  UnstyledButton
-} from '@mantine/core';
+import { ActionIcon, Badge, Box, Group, Text, Tooltip, UnstyledButton } from '@mantine/core';
 import classes from './app-header.module.css';
 import React from 'react';
 import TopMenu from '@/components/layouts/global/top-menu.tsx';
@@ -24,10 +16,7 @@ import {
   SearchControl,
   SearchMobileControl
 } from '@/features/search/components/search-control.tsx';
-import {
-  searchSpotlight,
-  shareSearchSpotlight
-} from '@/features/search/constants.ts';
+import { searchSpotlight, shareSearchSpotlight } from '@/features/search/constants.ts';
 import { NotificationPopover } from '@/features/notification/components/notification-popover.tsx';
 
 const links = [{ link: APP_ROUTE.HOME, label: 'Home' }];
@@ -72,19 +61,9 @@ export function AppHeader() {
 
           <Link to="/home" className={classes.brand} aria-label="Docmost">
             <Box hiddenFrom="sm" className={classes.brandIcon}>
-              <img
-                src="/icons/favicon-32x32.png"
-                alt="Docmost"
-                width={22}
-                height={22}
-              />
+              <img src="/icons/favicon-32x32.png" alt="Docmost" width={22} height={22} />
             </Box>
-            <Text
-              size="lg"
-              fw={600}
-              style={{ userSelect: 'none' }}
-              visibleFrom="sm"
-            >
+            <Text size="lg" fw={600} style={{ userSelect: 'none' }} visibleFrom="sm">
               Docmost
             </Text>
           </Link>

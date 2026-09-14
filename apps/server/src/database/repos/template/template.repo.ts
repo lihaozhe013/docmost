@@ -71,9 +71,7 @@ export class TemplateRepo {
       query = query.where((eb) =>
         eb.or([
           eb('spaceId', 'is', null),
-          ...(accessibleSpaceIds.length > 0
-            ? [eb('spaceId', 'in', accessibleSpaceIds)]
-            : [])
+          ...(accessibleSpaceIds.length > 0 ? [eb('spaceId', 'in', accessibleSpaceIds)] : [])
         ])
       );
     }
@@ -83,11 +81,7 @@ export class TemplateRepo {
       query = query.where((eb) =>
         eb.or([
           eb(sql`f_unaccent(title)`, 'ilike', sql`f_unaccent(${searchTerm})`),
-          eb(
-            sql`f_unaccent(description)`,
-            'ilike',
-            sql`f_unaccent(${searchTerm})`
-          )
+          eb(sql`f_unaccent(description)`, 'ilike', sql`f_unaccent(${searchTerm})`)
         ])
       );
     }
@@ -112,11 +106,7 @@ export class TemplateRepo {
     trx?: KyselyTransaction
   ): Promise<{ id: string }> {
     const db = dbOrTx(this.db, trx);
-    return db
-      .insertInto('templates')
-      .values(insertableTemplate)
-      .returning('id')
-      .executeTakeFirst();
+    return db.insertInto('templates').values(insertableTemplate).returning('id').executeTakeFirst();
   }
 
   async updateTemplate(

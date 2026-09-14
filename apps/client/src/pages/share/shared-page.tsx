@@ -32,8 +32,7 @@ export default function SharedPage() {
     if (shareId && data) {
       if (data.share.key !== shareId) {
         // Check if the current page is part of the active sharing tree (sidebar) - If we are part of it, we will not redirect, keeping the sidebar visible.
-        const isPartOfTree =
-          sharedTreeData && isPageInTree(sharedTreeData, data.page.slugId);
+        const isPartOfTree = sharedTreeData && isPageInTree(sharedTreeData, data.page.slugId);
 
         if (!isPartOfTree) {
           navigate(`/share/${data.share.key}/p/${pageSlug}`, { replace: true });
@@ -55,13 +54,8 @@ export default function SharedPage() {
 
   return (
     <div>
-      <DocumentTitle
-        title={data?.page?.title || t('untitled')}
-        withAppName={false}
-      >
-        {!data?.share.searchIndexing && (
-          <meta name="robots" content="noindex" />
-        )}
+      <DocumentTitle title={data?.page?.title || t('untitled')} withAppName={false}>
+        {!data?.share.searchIndexing && <meta name="robots" content="noindex" />}
       </DocumentTitle>
 
       <Container fluid={fullWidth} size={fullWidth ? undefined : 900} p={0}>

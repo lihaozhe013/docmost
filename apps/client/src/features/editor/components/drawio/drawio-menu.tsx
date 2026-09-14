@@ -30,13 +30,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { getDrawioUrl, getFileUrl } from '@/lib/config.ts';
 import { uploadFile } from '@/features/page/services/page-service.ts';
-import {
-  DrawIoEmbed,
-  DrawIoEmbedRef,
-  EventExit,
-  EventExport,
-  EventSave
-} from 'react-drawio';
+import { DrawIoEmbed, DrawIoEmbedRef, EventExit, EventExport, EventSave } from 'react-drawio';
 import { decodeBase64ToSvgString, svgStringToFile } from '@/lib/utils';
 import { IAttachment } from '@/features/attachments/types/attachment.types';
 import { modals } from '@mantine/modals';
@@ -110,27 +104,15 @@ export function DrawioMenu({ editor }: EditorMenuProps) {
   }, [editor]);
 
   const alignLeft = useCallback(() => {
-    editor
-      .chain()
-      .focus(undefined, { scrollIntoView: false })
-      .setDrawioAlign('left')
-      .run();
+    editor.chain().focus(undefined, { scrollIntoView: false }).setDrawioAlign('left').run();
   }, [editor]);
 
   const alignCenter = useCallback(() => {
-    editor
-      .chain()
-      .focus(undefined, { scrollIntoView: false })
-      .setDrawioAlign('center')
-      .run();
+    editor.chain().focus(undefined, { scrollIntoView: false }).setDrawioAlign('center').run();
   }, [editor]);
 
   const alignRight = useCallback(() => {
-    editor
-      .chain()
-      .focus(undefined, { scrollIntoView: false })
-      .setDrawioAlign('right')
-      .run();
+    editor.chain().focus(undefined, { scrollIntoView: false }).setDrawioAlign('right').run();
   }, [editor]);
 
   const handleDownload = useCallback(() => {
@@ -203,11 +185,7 @@ export function DrawioMenu({ editor }: EditorMenuProps) {
 
     modals.openConfirmModal({
       title: t('Unsaved changes'),
-      children: (
-        <Text size="sm">
-          {t('You have unsaved changes that will be lost.')}
-        </Text>
-      ),
+      children: <Text size="sm">{t('You have unsaved changes that will be lost.')}</Text>,
       centered: true,
       labels: { confirm: t('Discard'), cancel: t('Cancel') },
       confirmProps: { color: 'red' },
@@ -289,11 +267,7 @@ export function DrawioMenu({ editor }: EditorMenuProps) {
           altTextPanel
         ) : (
           <div className={classes.toolbar}>
-            <Tooltip
-              position="top"
-              label={t('Align left')}
-              withinPortal={false}
-            >
+            <Tooltip position="top" label={t('Align left')} withinPortal={false}>
               <ActionIcon
                 onClick={alignLeft}
                 size="lg"
@@ -305,11 +279,7 @@ export function DrawioMenu({ editor }: EditorMenuProps) {
               </ActionIcon>
             </Tooltip>
 
-            <Tooltip
-              position="top"
-              label={t('Align center')}
-              withinPortal={false}
-            >
+            <Tooltip position="top" label={t('Align center')} withinPortal={false}>
               <ActionIcon
                 onClick={alignCenter}
                 size="lg"
@@ -397,12 +367,7 @@ export function DrawioMenu({ editor }: EditorMenuProps) {
         )}
       </BaseBubbleMenu>
 
-      <Modal.Root
-        opened={opened}
-        onClose={handleClose}
-        fullScreen
-        closeOnEscape={false}
-      >
+      <Modal.Root opened={opened} onClose={handleClose} fullScreen closeOnEscape={false}>
         <Modal.Overlay />
         <Modal.Content style={{ overflow: 'hidden' }}>
           <Modal.Body pos="relative">

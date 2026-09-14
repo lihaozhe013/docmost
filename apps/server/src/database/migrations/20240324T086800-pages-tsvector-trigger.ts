@@ -11,9 +11,7 @@ export async function up(db: Kysely<any>): Promise<void> {
         $$ LANGUAGE plpgsql;`.execute(db);
 
   await sql`CREATE OR REPLACE TRIGGER pages_tsvector_update BEFORE INSERT OR UPDATE
-                ON pages FOR EACH ROW EXECUTE FUNCTION pages_tsvector_trigger();`.execute(
-    db
-  );
+                ON pages FOR EACH ROW EXECUTE FUNCTION pages_tsvector_trigger();`.execute(db);
 }
 
 export async function down(db: Kysely<any>): Promise<void> {

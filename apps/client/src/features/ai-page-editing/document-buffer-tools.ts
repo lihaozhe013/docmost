@@ -1,18 +1,12 @@
 import { BufferError } from './document-buffer-types';
-import {
-  isRecord,
-  isValidEditOperation,
-  MAX_READ_BLOCKS
-} from './document-buffer-utils';
+import { isRecord, isValidEditOperation, MAX_READ_BLOCKS } from './document-buffer-utils';
 
 function hasInvalidBlockIds(blockIds: unknown): boolean {
   return (
     !Array.isArray(blockIds) ||
     blockIds.some(
       (blockId: unknown) =>
-        typeof blockId !== 'string' ||
-        blockId.length < 1 ||
-        blockId.length > 128
+        typeof blockId !== 'string' || blockId.length < 1 || blockId.length > 128
     )
   );
 }
@@ -25,19 +19,13 @@ export function assertToolInput(toolName: string, input: any): void {
   if (toolName === 'read_buffer') {
     if (
       (input !== undefined && !isRecord(input)) ||
-      (input !== undefined &&
-        input.blockIds !== undefined &&
-        hasInvalidBlockIds(input.blockIds)) ||
+      (input !== undefined && input.blockIds !== undefined && hasInvalidBlockIds(input.blockIds)) ||
       (input !== undefined &&
         input.offset !== undefined &&
-        (!Number.isInteger(input.offset) ||
-          input.offset < 0 ||
-          input.offset > 10_000)) ||
+        (!Number.isInteger(input.offset) || input.offset < 0 || input.offset > 10_000)) ||
       (input !== undefined &&
         input.limit !== undefined &&
-        (!Number.isInteger(input.limit) ||
-          input.limit < 1 ||
-          input.limit > MAX_READ_BLOCKS))
+        (!Number.isInteger(input.limit) || input.limit < 1 || input.limit > MAX_READ_BLOCKS))
     ) {
       throw new BufferError(
         'INVALID_CONTENT',
@@ -56,14 +44,9 @@ export function assertToolInput(toolName: string, input: any): void {
       !Array.isArray(input.operations) ||
       input.operations.length < 1 ||
       input.operations.length > 20 ||
-      input.operations.some(
-        (operation: unknown) => !isValidEditOperation(operation)
-      )
+      input.operations.some((operation: unknown) => !isValidEditOperation(operation))
     ) {
-      throw new BufferError(
-        'INVALID_CONTENT',
-        'edit_buffer requires a revision and operations'
-      );
+      throw new BufferError('INVALID_CONTENT', 'edit_buffer requires a revision and operations');
     }
     return;
   }
@@ -78,12 +61,9 @@ export function assertToolInput(toolName: string, input: any): void {
       typeof input.markdown !== 'string' ||
       !input.markdown.trim() ||
       input.markdown.length > 40_000 ||
-      ![
-        'document_start',
-        'document_end',
-        'before_block',
-        'after_block'
-      ].includes(input.target.kind) ||
+      !['document_start', 'document_end', 'before_block', 'after_block'].includes(
+        input.target.kind
+      ) ||
       (['before_block', 'after_block'].includes(input.target.kind) &&
         (typeof input.target.blockId !== 'string' ||
           input.target.blockId.length < 1 ||

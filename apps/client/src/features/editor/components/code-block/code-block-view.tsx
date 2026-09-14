@@ -16,9 +16,7 @@ export default function CodeBlockView(props: NodeViewProps) {
   const { t } = useTranslation();
   const { node, updateAttributes, extension, editor, getPos } = props;
   const { language } = node.attrs;
-  const [languageValue, setLanguageValue] = useState<string | null>(
-    language || null
-  );
+  const [languageValue, setLanguageValue] = useState<string | null>(language || null);
   const [isSelected, setIsSelected] = useState(false);
 
   useEffect(() => {
@@ -47,11 +45,7 @@ export default function CodeBlockView(props: NodeViewProps) {
 
   return (
     <NodeViewWrapper className="codeBlock">
-      <Group
-        justify="flex-end"
-        contentEditable={false}
-        className={classes.menuGroup}
-      >
+      <Group justify="flex-end" contentEditable={false} className={classes.menuGroup}>
         <Select
           placeholder="auto"
           checkIconPosition="right"
@@ -66,16 +60,8 @@ export default function CodeBlockView(props: NodeViewProps) {
 
         <CopyButton value={node?.textContent} timeout={2000}>
           {({ copied, copy }) => (
-            <Tooltip
-              label={copied ? t('Copied') : t('Copy')}
-              withArrow
-              position="right"
-            >
-              <ActionIcon
-                color={copied ? 'teal' : 'gray'}
-                variant="subtle"
-                onClick={copy}
-              >
+            <Tooltip label={copied ? t('Copied') : t('Copy')} withArrow position="right">
+              <ActionIcon color={copied ? 'teal' : 'gray'} variant="subtle" onClick={copy}>
                 {copied ? <IconCheck size={16} /> : <IconCopy size={16} />}
               </ActionIcon>
             </Tooltip>

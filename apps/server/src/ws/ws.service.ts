@@ -47,8 +47,7 @@ export class WsService {
       return;
     }
 
-    const isRestricted =
-      await this.pagePermissionRepo.hasRestrictedAncestor(pageId);
+    const isRestricted = await this.pagePermissionRepo.hasRestrictedAncestor(pageId);
     if (!isRestricted) {
       client.broadcast.to(room).emit('message', data);
       return;
@@ -58,16 +57,10 @@ export class WsService {
   }
 
   async invalidateSpaceRestrictionCache(spaceId: string): Promise<void> {
-    await this.cacheManager.del(
-      `${WS_SPACE_RESTRICTION_CACHE_PREFIX}${spaceId}`
-    );
+    await this.cacheManager.del(`${WS_SPACE_RESTRICTION_CACHE_PREFIX}${spaceId}`);
   }
 
-  async emitCommentEvent(
-    spaceId: string,
-    pageId: string,
-    data: any
-  ): Promise<void> {
+  async emitCommentEvent(spaceId: string, pageId: string, data: any): Promise<void> {
     const room = getSpaceRoomName(spaceId);
 
     const hasRestrictions = await this.spaceHasRestrictions(spaceId);
@@ -76,8 +69,7 @@ export class WsService {
       return;
     }
 
-    const isRestricted =
-      await this.pagePermissionRepo.hasRestrictedAncestor(pageId);
+    const isRestricted = await this.pagePermissionRepo.hasRestrictedAncestor(pageId);
     if (!isRestricted) {
       this.server.to(room).emit('message', data);
       return;
@@ -144,11 +136,10 @@ export class WsService {
     const candidateUserIds = Array.from(userSocketMap.keys());
     if (candidateUserIds.length === 0) return;
 
-    const authorizedUserIds =
-      await this.pagePermissionRepo.getUserIdsWithPageAccess(
-        pageId,
-        candidateUserIds
-      );
+    const authorizedUserIds = await this.pagePermissionRepo.getUserIdsWithPageAccess(
+      pageId,
+      candidateUserIds
+    );
 
     const authorizedSet = new Set(authorizedUserIds);
     for (const [userId, userSockets] of userSocketMap) {
@@ -168,8 +159,7 @@ export class WsService {
       return cached;
     }
 
-    const hasRestrictions =
-      await this.pagePermissionRepo.hasRestrictedPagesInSpace(spaceId);
+    const hasRestrictions = await this.pagePermissionRepo.hasRestrictedPagesInSpace(spaceId);
 
     await this.cacheManager.set(cacheKey, hasRestrictions, WS_CACHE_TTL_MS);
 

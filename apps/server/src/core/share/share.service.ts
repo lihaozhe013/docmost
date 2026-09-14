@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  Logger,
-  NotFoundException
-} from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateShareDto, ShareInfoDto, UpdateShareDto } from './dto/share.dto';
 import { InjectKysely } from 'nestjs-kysely';
 import { KyselyDB } from '@docmost/db/types/kysely.types';
@@ -46,19 +41,15 @@ export class ShareService {
       throw new NotFoundException('Share not found');
     }
 
-    const isRestricted = await this.pagePermissionRepo.hasRestrictedAncestor(
-      share.pageId
-    );
+    const isRestricted = await this.pagePermissionRepo.hasRestrictedAncestor(share.pageId);
     if (isRestricted) {
       throw new NotFoundException('Share not found');
     }
 
     if (share.includeSubPages) {
-      const pageTree =
-        await this.pageRepo.getPageAndDescendantsExcludingRestricted(
-          share.pageId,
-          { includeContent: false }
-        );
+      const pageTree = await this.pageRepo.getPageAndDescendantsExcludingRestricted(share.pageId, {
+        includeContent: false
+      });
 
       return { share, pageTree };
     } else {
@@ -130,9 +121,7 @@ export class ShareService {
     }
 
     // Block access to restricted pages
-    const isRestricted = await this.pagePermissionRepo.hasRestrictedAncestor(
-      page.id
-    );
+    const isRestricted = await this.pagePermissionRepo.hasRestrictedAncestor(page.id);
     if (isRestricted) {
       throw new NotFoundException('Shared page not found');
     }
@@ -228,10 +217,7 @@ export class ShareService {
     };
   }
 
-  async getShareAncestorPage(
-    ancestorPageId: string,
-    childPageId: string
-  ): Promise<any> {
+  async getShareAncestorPage(ancestorPageId: string, childPageId: string): Promise<any> {
     let ancestor = null;
     try {
       ancestor = await this.db
@@ -308,17 +294,12 @@ export class ShareService {
     if (!share || share.workspaceId !== workspaceId) {
       throw new NotFoundException('Share not found');
     }
-    const sharingAllowed = await this.isSharingAllowed(
-      workspaceId,
-      share.spaceId
-    );
+    const sharingAllowed = await this.isSharingAllowed(workspaceId, share.spaceId);
     if (!sharingAllowed) {
       throw new NotFoundException('Share not found');
     }
 
-    const candidatePageIds = Array.from(
-      new Set(references.map((r) => r.sourcePageId))
-    );
+    const candidatePageIds = Array.from(new Set(references.map((r) => r.sourcePageId)));
 
     // TODO: Reduce DB round trips at scale by replacing the per-page chain
     // with bulk repo methods that take all candidate pageIds at once:
@@ -349,8 +330,7 @@ export class ShareService {
         const sourceShare = await this.getShareForPage(pageId, workspaceId);
         if (!sourceShare) return null;
         if (!(await isSharingAllowedFor(sourceShare.spaceId))) return null;
-        const restricted =
-          await this.pagePermissionRepo.hasRestrictedAncestor(pageId);
+        const restricted = await this.pagePermissionRepo.hasRestrictedAncestor(pageId);
         if (restricted) return null;
         return pageId;
       })
@@ -371,11 +351,7 @@ export class ShareService {
     const tokenized = await Promise.all(
       items.map(async (item) => {
         if ('status' in item) return item;
-        const doc = await this.prepareContentForShare(
-          item.content,
-          item.sourcePageId,
-          workspaceId
-        );
+        const doc = await this.prepareContentForShare(item.content, item.sourcePageId, workspaceId);
         return { ...item, content: doc?.toJSON() ?? item.content };
       })
     );
@@ -396,37 +372,25 @@ export class ShareService {
     return { items: sanitized };
   }
 
-  async isSharingAllowed(
-    workspaceId: string,
-    spaceId: string
-  ): Promise<boolean> {
+  async isSharingAllowed(workspaceId: string, spaceId: string): Promise<boolean> {
     const result = await this.db
       .selectFrom('workspaces')
       .innerJoin('spaces', 'spaces.workspaceId', 'workspaces.id')
-      .select([
-        'workspaces.settings as workspaceSettings',
-        'spaces.settings as spaceSettings'
-      ])
+      .select(['workspaces.settings as workspaceSettings', 'spaces.settings as spaceSettings'])
       .where('workspaces.id', '=', workspaceId)
       .where('spaces.id', '=', spaceId)
       .executeTakeFirst();
 
     if (!result) return false;
 
-    const workspaceDisabled =
-      (result.workspaceSettings as any)?.sharing?.disabled === true;
-    const spaceDisabled =
-      (result.spaceSettings as any)?.sharing?.disabled === true;
+    const workspaceDisabled = (result.workspaceSettings as any)?.sharing?.disabled === true;
+    const spaceDisabled = (result.spaceSettings as any)?.sharing?.disabled === true;
 
     return !workspaceDisabled && !spaceDisabled;
   }
 
   async updatePublicAttachments(page: Page): Promise<any> {
-    const doc = await this.prepareContentForShare(
-      page.content,
-      page.id,
-      page.workspaceId
-    );
+    const doc = await this.prepareContentForShare(page.content, page.id, page.workspaceId);
     return doc?.toJSON() ?? page.content;
   }
 

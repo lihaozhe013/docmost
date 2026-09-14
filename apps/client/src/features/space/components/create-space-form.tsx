@@ -1,12 +1,4 @@
-import {
-  Group,
-  Box,
-  Button,
-  TextInput,
-  Stack,
-  Textarea,
-  Text
-} from '@mantine/core';
+import { Group, Box, Button, TextInput, Stack, Textarea, Text } from '@mantine/core';
 import React, { useEffect } from 'react';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
@@ -53,8 +45,7 @@ export function CreateSpaceForm() {
 
     // Check if the last character is a space or if the last word is a single character (indicating it's in progress)
     const lastChar = name[name.length - 1];
-    const lastWordIsIncomplete =
-      words.length > 1 && words[words.length - 1].length === 1;
+    const lastWordIsIncomplete = words.length > 1 && words[words.length - 1].length === 1;
 
     if (lastChar !== ' ' || lastWordIsIncomplete) {
       const slug = computeSpaceSlug(name);
@@ -62,11 +53,7 @@ export function CreateSpaceForm() {
     }
   }, [form.values.name]);
 
-  const handleSubmit = async (data: {
-    name?: string;
-    slug?: string;
-    description?: string;
-  }) => {
+  const handleSubmit = async (data: { name?: string; slug?: string; description?: string }) => {
     const spaceData = {
       name: data.name,
       slug: data.slug,
@@ -87,12 +74,7 @@ export function CreateSpaceForm() {
   return (
     <>
       <Box maw="500" mx="auto">
-        <form
-          onSubmit={form.onSubmit(
-            (values) => handleSubmit(values),
-            handleValidationFailure
-          )}
-        >
+        <form onSubmit={form.onSubmit((values) => handleSubmit(values), handleValidationFailure)}>
           <Text size="sm" c="dimmed" mb="sm">
             {t('* indicates required fields')}
           </Text>

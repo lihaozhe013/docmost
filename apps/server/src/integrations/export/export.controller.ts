@@ -18,23 +18,13 @@ import SpaceAbilityFactory from '../../core/casl/abilities/space-ability.factory
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { PageRepo } from '@docmost/db/repos/page/page.repo';
 import { PageAccessService } from '../../core/page/page-access/page-access.service';
-import {
-  SpaceCaslAction,
-  SpaceCaslSubject
-} from '../../core/casl/interfaces/space-ability.type';
+import { SpaceCaslAction, SpaceCaslSubject } from '../../core/casl/interfaces/space-ability.type';
 import { FastifyReply } from 'fastify';
 import { getExportExtension } from './utils';
-import {
-  getMimeType,
-  getPageTitle,
-  sanitizeFileName
-} from '../../common/helpers';
+import { getMimeType, getPageTitle, sanitizeFileName } from '../../common/helpers';
 import * as path from 'path';
 import { AuditEvent, AuditResource } from '../../common/events/audit-events';
-import {
-  AUDIT_SERVICE,
-  IAuditService
-} from '../../integrations/audit/audit.service';
+import { AUDIT_SERVICE, IAuditService } from '../../integrations/audit/audit.service';
 
 @Controller()
 export class ExportController {
@@ -49,11 +39,7 @@ export class ExportController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @Post('pages/export')
-  async exportPage(
-    @Body() dto: ExportPageDto,
-    @AuthUser() user: User,
-    @Res() res: FastifyReply
-  ) {
+  async exportPage(@Body() dto: ExportPageDto, @AuthUser() user: User, @Res() res: FastifyReply) {
     const page = await this.pageRepo.findById(dto.pageId, {
       includeContent: true
     });
@@ -88,27 +74,22 @@ export class ExportController {
 
     if (result.type === 'file') {
       const ext = getExportExtension(dto.format);
-      const fileName =
-        sanitizeFileName(page.title || 'untitled', { preserveSpaces: true }) +
-        ext;
+      const fileName = sanitizeFileName(page.title || 'untitled', { preserveSpaces: true }) + ext;
       const contentType = getMimeType(path.extname(fileName));
 
       res.headers({
         'Content-Type': contentType,
-        'Content-Disposition':
-          'attachment; filename="' + encodeURIComponent(fileName) + '"'
+        'Content-Disposition': 'attachment; filename="' + encodeURIComponent(fileName) + '"'
       });
 
       res.send(result.content);
     } else {
       const fileName =
-        sanitizeFileName(page.title || 'untitled', { preserveSpaces: true }) +
-        '.zip';
+        sanitizeFileName(page.title || 'untitled', { preserveSpaces: true }) + '.zip';
 
       res.headers({
         'Content-Type': 'application/zip',
-        'Content-Disposition':
-          'attachment; filename="' + encodeURIComponent(fileName) + '"'
+        'Content-Disposition': 'attachment; filename="' + encodeURIComponent(fileName) + '"'
       });
 
       res.send(result.stream);
@@ -118,11 +99,7 @@ export class ExportController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @Post('spaces/export')
-  async exportSpace(
-    @Body() dto: ExportSpaceDto,
-    @AuthUser() user: User,
-    @Res() res: FastifyReply
-  ) {
+  async exportSpace(@Body() dto: ExportSpaceDto, @AuthUser() user: User, @Res() res: FastifyReply) {
     const ability = await this.spaceAbility.createForUser(user, dto.spaceId);
     if (ability.cannot(SpaceCaslAction.Manage, SpaceCaslSubject.Settings)) {
       throw new ForbiddenException();
@@ -151,9 +128,7 @@ export class ExportController {
       'Content-Type': 'application/zip',
       'Content-Disposition':
         'attachment; filename="' +
-        encodeURIComponent(
-          sanitizeFileName(exportFile.fileName, { preserveSpaces: true })
-        ) +
+        encodeURIComponent(sanitizeFileName(exportFile.fileName, { preserveSpaces: true })) +
         '"'
     });
 

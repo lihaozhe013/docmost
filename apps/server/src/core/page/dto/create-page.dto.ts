@@ -1,11 +1,4 @@
-import {
-  IsBoolean,
-  IsIn,
-  IsOptional,
-  IsString,
-  IsUUID,
-  ValidateIf
-} from 'class-validator';
+import { IsBoolean, IsIn, IsOptional, IsString, IsUUID, ValidateIf } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export type ContentFormat = 'json' | 'markdown' | 'html';

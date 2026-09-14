@@ -1,13 +1,4 @@
-import {
-  Text,
-  SimpleGrid,
-  Card,
-  rem,
-  Group,
-  Box,
-  Button,
-  Title
-} from '@mantine/core';
+import { Text, SimpleGrid, Card, rem, Group, Box, Button, Title } from '@mantine/core';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -33,9 +24,7 @@ export default function FavoriteSpacesGrid() {
 
   if (allSpaces.length === 0) return null;
 
-  const visibleSpaces = expanded
-    ? allSpaces
-    : allSpaces.slice(0, INITIAL_COUNT);
+  const visibleSpaces = expanded ? allSpaces : allSpaces.slice(0, INITIAL_COUNT);
 
   return (
     <Box mb="xl">
@@ -57,12 +46,7 @@ export default function FavoriteSpacesGrid() {
           >
             <Card.Section className={spaceClasses.cardSection} h={40}>
               <div className={spaceClasses.starButton} data-favorited="true">
-                <StarButton
-                  type="space"
-                  spaceId={fav.space!.id}
-                  name={fav.space!.name}
-                  size={16}
-                />
+                <StarButton type="space" spaceId={fav.space!.id} name={fav.space!.name} size={16} />
               </div>
             </Card.Section>
             <CustomAvatar

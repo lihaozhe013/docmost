@@ -80,10 +80,7 @@ describe('DocumentBuffer', () => {
     expect(paragraph).toMatchObject({
       type: 'paragraph',
       text: 'Euler: $e^{i\\pi}+1=0$ is famous.',
-      capabilities: expect.arrayContaining([
-        'replace_inline_math',
-        'replace_text_with_math'
-      ])
+      capabilities: expect.arrayContaining(['replace_inline_math', 'replace_text_with_math'])
     });
     expect(paragraph.segments).toEqual([
       { index: 0, type: 'text', text: 'Euler: ' },
@@ -173,9 +170,7 @@ describe('DocumentBuffer', () => {
   it('inserts mixed formulas, code, and Mermaid while preserving source', async () => {
     const editor = createRichEditor({
       type: 'doc',
-      content: [
-        { type: 'paragraph', content: [{ type: 'text', text: 'Before' }] }
-      ]
+      content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Before' }] }]
     });
     const buffer = new DocumentBuffer(editor, 'page-1');
     const revision = buffer.read().revision;
@@ -353,9 +348,7 @@ describe('DocumentBuffer', () => {
   it('inserts supported Markdown and undoes only the inserted change', async () => {
     const editor = createEditor({
       type: 'doc',
-      content: [
-        { type: 'paragraph', content: [{ type: 'text', text: 'Existing' }] }
-      ]
+      content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Existing' }] }]
     });
     const buffer = new DocumentBuffer(editor, 'page-1');
     const revision = buffer.read().revision;
@@ -484,9 +477,7 @@ describe('DocumentBuffer', () => {
     ]);
 
     const secondTextPosition = editor.state.doc.child(0).nodeSize + 1;
-    editor.view.dispatch(
-      editor.state.tr.insertText('User ', secondTextPosition)
-    );
+    editor.view.dispatch(editor.state.tr.insertText('User ', secondTextPosition));
 
     buffer.undo(change.changeId);
     expect(editor.state.doc.textContent).toBe('FirstUser Second');
@@ -498,9 +489,7 @@ describe('DocumentBuffer', () => {
   it('rejects undo when a user edit overlaps the AI change', async () => {
     const editor = createEditor({
       type: 'doc',
-      content: [
-        { type: 'paragraph', content: [{ type: 'text', text: 'First' }] }
-      ]
+      content: [{ type: 'paragraph', content: [{ type: 'text', text: 'First' }] }]
     });
     const buffer = new DocumentBuffer(editor, 'page-1');
     const change = await buffer.edit(buffer.read().revision, [
@@ -509,9 +498,7 @@ describe('DocumentBuffer', () => {
 
     editor.view.dispatch(editor.state.tr.insertText('!', 2));
 
-    expect(() => buffer.undo(change.changeId)).toThrowError(
-      /cannot be undone safely/
-    );
+    expect(() => buffer.undo(change.changeId)).toThrowError(/cannot be undone safely/);
     expect(editor.state.doc.textContent).toBe('1!st');
 
     editor.destroy();
@@ -521,9 +508,7 @@ describe('DocumentBuffer', () => {
   it('rejects undo when an overlapping user mark change affects the AI range', async () => {
     const editor = createEditor({
       type: 'doc',
-      content: [
-        { type: 'paragraph', content: [{ type: 'text', text: 'First' }] }
-      ]
+      content: [{ type: 'paragraph', content: [{ type: 'text', text: 'First' }] }]
     });
     const buffer = new DocumentBuffer(editor, 'page-1');
     const change = await buffer.edit(buffer.read().revision, [
@@ -532,9 +517,7 @@ describe('DocumentBuffer', () => {
     const bold = editor.schema.marks.bold.create();
     editor.view.dispatch(editor.state.tr.addMark(1, 4, bold));
 
-    expect(() => buffer.undo(change.changeId)).toThrowError(
-      /cannot be undone safely/
-    );
+    expect(() => buffer.undo(change.changeId)).toThrowError(/cannot be undone safely/);
 
     editor.destroy();
     buffer.destroy();
@@ -551,10 +534,7 @@ describe('DocumentBuffer', () => {
     });
     const buffer = new DocumentBuffer(editor, 'page-1');
     const firstPage = await buffer.executeTool('read_buffer', { limit: 2 });
-    expect(firstPage.blocks?.map((block) => block.text)).toEqual([
-      'First',
-      'Second'
-    ]);
+    expect(firstPage.blocks?.map((block) => block.text)).toEqual(['First', 'Second']);
     expect(firstPage.complete).toBe(false);
     expect(firstPage.nextOffset).toBe(2);
 
@@ -582,9 +562,7 @@ describe('DocumentBuffer', () => {
   it('keeps the document valid when deleting its final block', async () => {
     const editor = createEditor({
       type: 'doc',
-      content: [
-        { type: 'paragraph', content: [{ type: 'text', text: 'Only block' }] }
-      ]
+      content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Only block' }] }]
     });
     const buffer = new DocumentBuffer(editor, 'page-1');
 
@@ -655,9 +633,7 @@ describe('DocumentBuffer', () => {
   it('rejects raw HTML insertion without changing the document', async () => {
     const editor = createEditor({
       type: 'doc',
-      content: [
-        { type: 'paragraph', content: [{ type: 'text', text: 'Keep' }] }
-      ]
+      content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Keep' }] }]
     });
     const buffer = new DocumentBuffer(editor, 'page-1');
 
@@ -677,9 +653,7 @@ describe('DocumentBuffer', () => {
   it('does not treat unmatched literal delimiters as protected source', async () => {
     const editor = createEditor({
       type: 'doc',
-      content: [
-        { type: 'paragraph', content: [{ type: 'text', text: 'Keep' }] }
-      ]
+      content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Keep' }] }]
     });
     const buffer = new DocumentBuffer(editor, 'page-1');
 
@@ -699,9 +673,7 @@ describe('DocumentBuffer', () => {
   it('does not start a cancelled tool operation', async () => {
     const editor = createEditor({
       type: 'doc',
-      content: [
-        { type: 'paragraph', content: [{ type: 'text', text: 'Keep' }] }
-      ]
+      content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Keep' }] }]
     });
     const buffer = new DocumentBuffer(editor, 'page-1');
     const controller = new AbortController();
@@ -755,9 +727,9 @@ describe('DocumentBuffer', () => {
     const item = initial.blocks.find((block) => block.type === 'paragraph');
 
     expect(item).toMatchObject({ editable: true, parentBlockId: 'b0' });
-    expect(
-      initial.blocks.find((block) => block.blockId === 'b0')
-    ).toMatchObject({ editable: false });
+    expect(initial.blocks.find((block) => block.blockId === 'b0')).toMatchObject({
+      editable: false
+    });
 
     const change = await buffer.edit(initial.revision, [
       {
@@ -771,9 +743,7 @@ describe('DocumentBuffer', () => {
     expect(editor.state.doc.textContent).toBe('Updated item');
 
     await expect(
-      buffer.edit(change.revision, [
-        { type: 'delete_block', blockId: item!.blockId }
-      ])
+      buffer.edit(change.revision, [{ type: 'delete_block', blockId: item!.blockId }])
     ).rejects.toThrowError(/nested and cannot be deleted/);
 
     editor.destroy();
@@ -783,9 +753,7 @@ describe('DocumentBuffer', () => {
   it('inserts quotes and edits their nested paragraphs', async () => {
     const editor = createEditor({
       type: 'doc',
-      content: [
-        { type: 'paragraph', content: [{ type: 'text', text: 'Seed' }] }
-      ]
+      content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Seed' }] }]
     });
     const buffer = new DocumentBuffer(editor, 'page-1');
 
@@ -799,13 +767,8 @@ describe('DocumentBuffer', () => {
     const read = buffer.read();
     const quote = read.blocks.find((block) => block.type === 'blockquote');
     expect(quote).toBeDefined();
-    const nested = read.blocks.filter(
-      (block) => block.parentBlockId === quote!.blockId
-    );
-    expect(nested.map((block) => block.text)).toEqual([
-      'quoted one',
-      'quoted two'
-    ]);
+    const nested = read.blocks.filter((block) => block.parentBlockId === quote!.blockId);
+    expect(nested.map((block) => block.text)).toEqual(['quoted one', 'quoted two']);
     expect(nested.every((block) => block.editable)).toBe(true);
 
     const change = await buffer.edit(read.revision, [
@@ -820,9 +783,7 @@ describe('DocumentBuffer', () => {
     expect(editor.state.doc.textContent).toContain('replaced quote line');
 
     await expect(
-      buffer.edit(change.revision, [
-        { type: 'delete_block', blockId: nested[1].blockId }
-      ])
+      buffer.edit(change.revision, [{ type: 'delete_block', blockId: nested[1].blockId }])
     ).rejects.toThrowError(/nested and cannot be deleted/);
 
     editor.destroy();
@@ -832,9 +793,7 @@ describe('DocumentBuffer', () => {
   it('inserts task lists, callouts, tables, and horizontal rules', async () => {
     const editor = createContainerEditor({
       type: 'doc',
-      content: [
-        { type: 'paragraph', content: [{ type: 'text', text: 'Seed' }] }
-      ]
+      content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Seed' }] }]
     });
     const buffer = new DocumentBuffer(editor, 'page-1');
 
@@ -866,9 +825,7 @@ describe('DocumentBuffer', () => {
     ]);
 
     const read = buffer.read();
-    expect(read.blocks.some((block) => block.type === 'horizontalRule')).toBe(
-      true
-    );
+    expect(read.blocks.some((block) => block.type === 'horizontalRule')).toBe(true);
 
     const list = read.blocks.find((block) => block.type === 'taskList')!;
     // marked keeps the space after the "[ ]" checkbox, like the paste path.
@@ -880,21 +837,12 @@ describe('DocumentBuffer', () => {
 
     const note = read.blocks.find((block) => block.type === 'callout')!;
     expect(
-      read.blocks
-        .filter((block) => block.parentBlockId === note.blockId)
-        .map((block) => block.text)
+      read.blocks.filter((block) => block.parentBlockId === note.blockId).map((block) => block.text)
     ).toEqual(['Pay attention']);
 
     const grid = read.blocks.find((block) => block.type === 'table')!;
-    const cells = read.blocks.filter(
-      (block) => block.parentBlockId === grid.blockId
-    );
-    expect(cells.map((block) => block.text)).toEqual([
-      'name',
-      'value',
-      'alpha',
-      '1'
-    ]);
+    const cells = read.blocks.filter((block) => block.parentBlockId === grid.blockId);
+    expect(cells.map((block) => block.text)).toEqual(['name', 'value', 'alpha', '1']);
 
     const edited = await buffer.edit(read.revision, [
       {

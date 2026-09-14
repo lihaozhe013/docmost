@@ -1,18 +1,10 @@
 import { Menu, ActionIcon, Text } from '@mantine/core';
 import React from 'react';
-import {
-  IconCopy,
-  IconDots,
-  IconFileDescription,
-  IconTrash
-} from '@tabler/icons-react';
+import { IconCopy, IconDots, IconFileDescription, IconTrash } from '@tabler/icons-react';
 import { modals } from '@mantine/modals';
 import { useTranslation } from 'react-i18next';
 import { ISharedItem } from '@/features/share/types/share.types.ts';
-import {
-  buildPageUrl,
-  buildSharedPageUrl
-} from '@/features/page/page.utils.ts';
+import { buildPageUrl, buildSharedPageUrl } from '@/features/page/page.utils.ts';
 import { useClipboard } from '@/hooks/use-clipboard';
 import { notifications } from '@mantine/notifications';
 import { useNavigate } from 'react-router-dom';
@@ -28,11 +20,7 @@ export default function ShareActionMenu({ share }: Props) {
   const deleteShareMutation = useDeleteShareMutation();
 
   const openPage = () => {
-    const pageLink = buildPageUrl(
-      share.space.slug,
-      share.page.slugId,
-      share.page.title
-    );
+    const pageLink = buildPageUrl(share.space.slug, share.page.slugId, share.page.title);
     navigate(pageLink);
   };
 
@@ -53,11 +41,7 @@ export default function ShareActionMenu({ share }: Props) {
   const openDeleteModal = () =>
     modals.openConfirmModal({
       title: t('Delete public share link'),
-      children: (
-        <Text size="sm">
-          {t('Are you sure you want to delete this shared link?')}
-        </Text>
-      ),
+      children: <Text size="sm">{t('Are you sure you want to delete this shared link?')}</Text>,
       centered: true,
       labels: { confirm: t('Delete'), cancel: t("Don't") },
       confirmProps: { color: 'red' },
@@ -85,10 +69,7 @@ export default function ShareActionMenu({ share }: Props) {
             {t('Copy link')}
           </Menu.Item>
 
-          <Menu.Item
-            onClick={openPage}
-            leftSection={<IconFileDescription size={16} />}
-          >
+          <Menu.Item onClick={openPage} leftSection={<IconFileDescription size={16} />}>
             {t('Open page')}
           </Menu.Item>
           <Menu.Item

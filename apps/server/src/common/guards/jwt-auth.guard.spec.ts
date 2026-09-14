@@ -1,8 +1,4 @@
-import {
-  ExecutionContext,
-  ForbiddenException,
-  UnauthorizedException
-} from '@nestjs/common';
+import { ExecutionContext, ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { OAUTH_SCOPE_KEY } from '../decorators/oauth-scope.decorator';
 import { REQUIRE_SESSION_AUTH_KEY } from '../decorators/require-session-auth.decorator';
@@ -44,17 +40,13 @@ describe('JwtAuthGuard.handleRequest', () => {
     const { guard } = createGuard();
     const err = new UnauthorizedException('bad token');
 
-    expect(() => guard.handleRequest(err, null, null, createCtx())).toThrow(
-      err
-    );
+    expect(() => guard.handleRequest(err, null, null, createCtx())).toThrow(err);
   });
 
   it('throws UnauthorizedException when there is no user', () => {
     const { guard } = createGuard();
 
-    expect(() => guard.handleRequest(null, null, null, createCtx())).toThrow(
-      UnauthorizedException
-    );
+    expect(() => guard.handleRequest(null, null, null, createCtx())).toThrow(UnauthorizedException);
   });
 
   it('returns a non-oauth user untouched without consulting scope metadata', () => {
@@ -90,9 +82,9 @@ describe('JwtAuthGuard.handleRequest', () => {
   it('forbids read scope on a write route with insufficient_scope', () => {
     const { guard } = createGuard('write');
 
-    expect(() =>
-      guard.handleRequest(null, oauthUser(['read']), null, createCtx())
-    ).toThrow('insufficient_scope');
+    expect(() => guard.handleRequest(null, oauthUser(['read']), null, createCtx())).toThrow(
+      'insufficient_scope'
+    );
   });
 
   it('passes write scope on a read route', () => {
@@ -119,9 +111,7 @@ describe('JwtAuthGuard.handleRequest', () => {
     it('allows a signed-in session', () => {
       const { guard } = createGuard(undefined, true);
 
-      expect(guard.handleRequest(null, sessionUser, null, createCtx())).toBe(
-        sessionUser
-      );
+      expect(guard.handleRequest(null, sessionUser, null, createCtx())).toBe(sessionUser);
     });
 
     it('forbids an api key', () => {
@@ -132,9 +122,9 @@ describe('JwtAuthGuard.handleRequest', () => {
         authType: JwtType.API_KEY
       };
 
-      expect(() =>
-        guard.handleRequest(null, apiKeyUser, null, createCtx())
-      ).toThrow('This action requires an interactive user session');
+      expect(() => guard.handleRequest(null, apiKeyUser, null, createCtx())).toThrow(
+        'This action requires an interactive user session'
+      );
     });
 
     it('forbids an oauth token even when it carries write scope', () => {
@@ -154,9 +144,7 @@ describe('JwtAuthGuard.handleRequest', () => {
         authType: JwtType.API_KEY
       };
 
-      expect(guard.handleRequest(null, apiKeyUser, null, createCtx())).toBe(
-        apiKeyUser
-      );
+      expect(guard.handleRequest(null, apiKeyUser, null, createCtx())).toBe(apiKeyUser);
     });
   });
 
@@ -183,8 +171,8 @@ describe('JwtAuthGuard.handleRequest', () => {
     } as any;
     const guard = new JwtAuthGuard(reflector, environmentService);
 
-    expect(() =>
-      guard.handleRequest(null, oauthUser(['read']), null, createCtx())
-    ).toThrow('insufficient_scope');
+    expect(() => guard.handleRequest(null, oauthUser(['read']), null, createCtx())).toThrow(
+      'insufficient_scope'
+    );
   });
 });

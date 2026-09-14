@@ -14,10 +14,7 @@ export function evaluate(
   // typeOptions.ast); ctx.depth separately bounds nested-formula hops.
   const depth = astDepth + 1;
   if (depth > MAX_EVAL_DEPTH) {
-    return makeErrorCell(
-      'DEPTH_EXCEEDED',
-      `formula too deeply nested (max ${MAX_EVAL_DEPTH})`
-    );
+    return makeErrorCell('DEPTH_EXCEEDED', `formula too deeply nested (max ${MAX_EVAL_DEPTH})`);
   }
 
   switch (ast.t) {
@@ -59,8 +56,7 @@ export function evaluate(
     }
     case 'call': {
       const fn = ctx.registry.get(ast.fn.toLowerCase());
-      if (!fn)
-        return makeErrorCell('MISSING_PROP', `unknown function ${ast.fn}`);
+      if (!fn) return makeErrorCell('MISSING_PROP', `unknown function ${ast.fn}`);
       const xs = ast.args;
       const args: Value[] = new Array(xs.length);
       for (let i = 0; i < xs.length; i++) {
@@ -100,8 +96,7 @@ function evalProp(
 function normalize(v: unknown): Value {
   if (v === undefined) return null;
   if (v === null) return null;
-  if (typeof v === 'number' || typeof v === 'string' || typeof v === 'boolean')
-    return v;
+  if (typeof v === 'number' || typeof v === 'string' || typeof v === 'boolean') return v;
   if (isErrorCell(v)) return v;
   return null;
 }
@@ -133,13 +128,11 @@ function evalOp(
       return a == null || b == null ? null : Number(a) * Number(b);
     case '/':
       if (a == null || b == null) return null;
-      if (Number(b) === 0)
-        return makeErrorCell('DIV_BY_ZERO', 'division by zero');
+      if (Number(b) === 0) return makeErrorCell('DIV_BY_ZERO', 'division by zero');
       return Number(a) / Number(b);
     case '%':
       if (a == null || b == null) return null;
-      if (Number(b) === 0)
-        return makeErrorCell('DIV_BY_ZERO', 'modulo by zero');
+      if (Number(b) === 0) return makeErrorCell('DIV_BY_ZERO', 'modulo by zero');
       return Number(a) % Number(b);
     case '==':
       return a === b;

@@ -47,22 +47,8 @@ export const RowHandleMenu = React.memo(function RowHandleMenu({
       .run();
   };
 
-  const moveUp = useTableMoveRowColumn(
-    editor,
-    'row',
-    index,
-    'up',
-    tableNode,
-    tablePos
-  );
-  const moveDown = useTableMoveRowColumn(
-    editor,
-    'row',
-    index,
-    'down',
-    tableNode,
-    tablePos
-  );
+  const moveUp = useTableMoveRowColumn(editor, 'row', index, 'up', tableNode, tablePos);
+  const moveDown = useTableMoveRowColumn(editor, 'row', index, 'down', tableNode, tablePos);
   const clearRow = useTableClear(editor, tableNode, tablePos, {
     kind: 'row',
     index

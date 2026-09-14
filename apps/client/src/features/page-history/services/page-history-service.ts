@@ -13,9 +13,7 @@ export async function getPageHistoryList(
   return req.data;
 }
 
-export async function getPageHistoryById(
-  historyId: string
-): Promise<IPageHistory> {
+export async function getPageHistoryById(historyId: string): Promise<IPageHistory> {
   const req = await api.post<IPageHistory>('/pages/history/info', {
     historyId
   });

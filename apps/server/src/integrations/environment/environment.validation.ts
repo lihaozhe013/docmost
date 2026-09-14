@@ -81,8 +81,7 @@ export class EnvironmentVariables {
       allow_underscores: true
     },
     {
-      message:
-        'TYPESENSE_URL must be a valid typesense url e.g http://localhost:8108'
+      message: 'TYPESENSE_URL must be a valid typesense url e.g http://localhost:8108'
     }
   )
   @ValidateIf((obj) => obj.SEARCH_DRIVER === 'typesense')
@@ -124,8 +123,7 @@ export class EnvironmentVariables {
   @IsUrl(
     { protocols: ['http', 'https'], require_tld: false },
     {
-      message:
-        'CLICKHOUSE_URL must be a valid URL e.g http://user:password@localhost:8123/docmost'
+      message: 'CLICKHOUSE_URL must be a valid URL e.g http://user:password@localhost:8123/docmost'
     }
   )
   CLICKHOUSE_URL: string;
@@ -137,17 +135,13 @@ export function validate(config: Record<string, any>) {
   const errors = validateSync(validatedConfig);
 
   if (errors.length > 0) {
-    console.error(
-      'The Environment variables has failed the following validations:'
-    );
+    console.error('The Environment variables has failed the following validations:');
 
     errors.map((error) => {
       console.error(JSON.stringify(error.constraints));
     });
 
-    console.error(
-      'Please fix the environment variables and try again. Exiting program...'
-    );
+    console.error('Please fix the environment variables and try again. Exiting program...');
     process.exit(1);
   }
 

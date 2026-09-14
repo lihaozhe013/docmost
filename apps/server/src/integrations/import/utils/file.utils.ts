@@ -19,10 +19,7 @@ export enum FileTaskStatus {
   Failed = 'failed'
 }
 
-export function getFileTaskFolderPath(
-  type: FileTaskType,
-  workspaceId: string
-): string {
+export function getFileTaskFolderPath(type: FileTaskType, workspaceId: string): string {
   switch (type) {
     case FileTaskType.Import:
       return `${workspaceId}/imports`;
@@ -37,15 +34,9 @@ const MAX_ENTRIES = 250_000;
 
 type SizeBudget = { used: number; max: number };
 
-export async function extractZip(
-  source: string,
-  target: string
-): Promise<void> {
+export async function extractZip(source: string, target: string): Promise<void> {
   const { size: compressedSize } = await fs.promises.stat(source);
-  const max = Math.max(
-    compressedSize * COMPRESSION_HEADROOM,
-    MIN_EXTRACTED_BYTES
-  );
+  const max = Math.max(compressedSize * COMPRESSION_HEADROOM, MIN_EXTRACTED_BYTES);
   return extractZipInternal(source, target, true, { used: 0, max });
 }
 
@@ -72,9 +63,7 @@ function extractZipInternal(
           zipfile.readEntry();
           zipfile.once('entry', (entry) => {
             const name = entry.fileName.toString('utf8').replace(/^\/+/, '');
-            const isZip =
-              !/\/$/.test(entry.fileName) &&
-              name.toLowerCase().endsWith('.zip');
+            const isZip = !/\/$/.test(entry.fileName) && name.toLowerCase().endsWith('.zip');
             if (isZip) {
               // temporary name to avoid overwriting file
               const nestedPath = source.endsWith('.zip')
@@ -83,11 +72,7 @@ function extractZipInternal(
 
               budget.used += entry.uncompressedSize;
               if (budget.used > budget.max) {
-                return reject(
-                  new Error(
-                    'Import archive exceeds the allowed extracted size limit'
-                  )
-                );
+                return reject(new Error('Import archive exceeds the allowed extracted size limit'));
               }
 
               zipfile.openReadStream(entry, (openErr, rs) => {
@@ -108,10 +93,7 @@ function extractZipInternal(
               });
             } else {
               zipfile.close();
-              extractZipInternal(source, target, false, budget).then(
-                resolve,
-                reject
-              );
+              extractZipInternal(source, target, false, budget).then(resolve, reject);
             }
           });
           zipfile.once('error', reject);
@@ -170,11 +152,7 @@ function extractZipInternal(
 
           budget.used += entry.uncompressedSize;
           if (budget.used > budget.max) {
-            return reject(
-              new Error(
-                'Import archive exceeds the allowed extracted size limit'
-              )
-            );
+            return reject(new Error('Import archive exceeds the allowed extracted size limit'));
           }
 
           // Handle files
@@ -182,9 +160,7 @@ function extractZipInternal(
             fs.mkdirSync(path.dirname(fullPath), { recursive: true });
           } catch (mkdirErr: any) {
             if (mkdirErr.code === 'ENAMETOOLONG') {
-              console.warn(
-                `Skipping file directory creation (path too long): ${fullPath}`
-              );
+              console.warn(`Skipping file directory creation (path too long): ${fullPath}`);
               zipfile.readEntry();
               return;
             }
@@ -199,9 +175,7 @@ function extractZipInternal(
               ws = fs.createWriteStream(fullPath);
             } catch (openWsErr: any) {
               if (openWsErr.code === 'ENAMETOOLONG') {
-                console.warn(
-                  `Skipping file write (path too long): ${fullPath}`
-                );
+                console.warn(`Skipping file write (path too long): ${fullPath}`);
                 zipfile.readEntry();
                 return;
               }
@@ -211,9 +185,7 @@ function extractZipInternal(
             rs.on('error', (err) => reject(err));
             ws.on('error', (err) => {
               if ((err as any).code === 'ENAMETOOLONG') {
-                console.warn(
-                  `Skipping file write on stream (path too long): ${fullPath}`
-                );
+                console.warn(`Skipping file write on stream (path too long): ${fullPath}`);
                 zipfile.readEntry();
               } else {
                 reject(err);

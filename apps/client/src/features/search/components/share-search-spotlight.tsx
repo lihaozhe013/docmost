@@ -24,9 +24,7 @@ export function ShareSearchSpotlight({ shareId }: ShareSearchSpotlightProps) {
     shareId
   });
 
-  const pages = (
-    searchResults && searchResults.length > 0 ? searchResults : []
-  ).map((page) => (
+  const pages = (searchResults && searchResults.length > 0 ? searchResults : []).map((page) => (
     <Spotlight.Action
       key={page.id}
       component={Link}

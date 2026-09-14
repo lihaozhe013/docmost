@@ -1,10 +1,5 @@
 import { useMemo } from 'react';
-import {
-  useQuery,
-  useInfiniteQuery,
-  useMutation,
-  useQueryClient
-} from '@tanstack/react-query';
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   addFavorite,
   removeFavorite,
@@ -17,8 +12,7 @@ import { FavoriteType } from '../types/favorite.types';
 export function useFavoritesQuery(type?: FavoriteType, spaceId?: string) {
   return useInfiniteQuery({
     queryKey: ['favorites', type, spaceId],
-    queryFn: ({ pageParam }) =>
-      getFavorites({ type, spaceId, cursor: pageParam, limit: 15 }),
+    queryFn: ({ pageParam }) => getFavorites({ type, spaceId, cursor: pageParam, limit: 15 }),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) =>
       lastPage.meta.hasNextPage ? lastPage.meta.nextCursor : undefined,
@@ -26,10 +20,7 @@ export function useFavoritesQuery(type?: FavoriteType, spaceId?: string) {
   });
 }
 
-export function useFavoriteIds(
-  type: FavoriteType,
-  spaceId?: string
-): Set<string> {
+export function useFavoriteIds(type: FavoriteType, spaceId?: string): Set<string> {
   const { data } = useQuery({
     queryKey: ['favorite-ids', type, spaceId],
     queryFn: () => getFavoriteIds(type, spaceId),

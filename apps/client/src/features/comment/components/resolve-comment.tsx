@@ -12,12 +12,7 @@ interface ResolveCommentProps {
   resolvedAt?: Date;
 }
 
-function ResolveComment({
-  editor,
-  commentId,
-  pageId,
-  resolvedAt
-}: ResolveCommentProps) {
+function ResolveComment({ editor, commentId, pageId, resolvedAt }: ResolveCommentProps) {
   const { t } = useTranslation();
   const resolveCommentMutation = useResolveCommentMutation();
 
@@ -41,10 +36,7 @@ function ResolveComment({
   };
 
   return (
-    <Tooltip
-      label={isResolved ? t('Re-Open comment') : t('Resolve comment')}
-      position="top"
-    >
+    <Tooltip label={isResolved ? t('Re-Open comment') : t('Resolve comment')} position="top">
       <ActionIcon
         onClick={handleResolveToggle}
         variant="subtle"
@@ -53,11 +45,7 @@ function ResolveComment({
         loading={resolveCommentMutation.isPending}
         disabled={resolveCommentMutation.isPending}
       >
-        {isResolved ? (
-          <IconCircleCheckFilled size={18} />
-        ) : (
-          <IconCircleCheck size={18} />
-        )}
+        {isResolved ? <IconCircleCheckFilled size={18} /> : <IconCircleCheck size={18} />}
       </ActionIcon>
     </Tooltip>
   );

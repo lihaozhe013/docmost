@@ -27,9 +27,7 @@ export class SessionActivityService {
         if (result === null) return; // key already exists, throttled
 
         this.userSessionRepo.updateLastActiveAt(sessionId).catch(() => {});
-        this.userRepo
-          .updateUser({ lastActiveAt: new Date() }, userId, workspaceId)
-          .catch(() => {});
+        this.userRepo.updateUser({ lastActiveAt: new Date() }, userId, workspaceId).catch(() => {});
       })
       .catch(() => {});
   }

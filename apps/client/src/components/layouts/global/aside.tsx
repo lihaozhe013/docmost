@@ -1,11 +1,4 @@
-import {
-  ActionIcon,
-  Box,
-  Group,
-  ScrollArea,
-  Title,
-  Tooltip
-} from '@mantine/core';
+import { ActionIcon, Box, Group, ScrollArea, Title, Tooltip } from '@mantine/core';
 import { IconX } from '@tabler/icons-react';
 import { useAtom } from 'jotai';
 import { asideStateAtom } from '@/components/layouts/global/hooks/atoms/sidebar-atom.ts';
@@ -19,14 +12,14 @@ const CommentListWithTabs = lazy(
   () => import('@/features/comment/components/comment-list-with-tabs.tsx')
 );
 const TableOfContents = lazy(() =>
-  import('@/features/editor/components/table-of-contents/table-of-contents.tsx').then(
-    (m) => ({ default: m.TableOfContents })
-  )
+  import('@/features/editor/components/table-of-contents/table-of-contents.tsx').then((m) => ({
+    default: m.TableOfContents
+  }))
 );
 const PageDetailsAside = lazy(() =>
-  import('@/features/page-details/components/page-details-aside.tsx').then(
-    (m) => ({ default: m.PageDetailsAside })
-  )
+  import('@/features/page-details/components/page-details-aside.tsx').then((m) => ({
+    default: m.PageDetailsAside
+  }))
 );
 
 export default function Aside() {
@@ -62,10 +55,7 @@ export default function Aside() {
   }
 
   return (
-    <Box
-      p="md"
-      style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-    >
+    <Box p="md" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       {component && (
         <>
           <Group justify="space-between" wrap="nowrap" mb="md">
@@ -88,11 +78,7 @@ export default function Aside() {
             {tab === 'comments' ? (
               component
             ) : (
-              <ScrollArea
-                style={{ height: '85vh' }}
-                scrollbarSize={5}
-                type="scroll"
-              >
+              <ScrollArea style={{ height: '85vh' }} scrollbarSize={5} type="scroll">
                 <div style={{ paddingBottom: '200px' }}>{component}</div>
               </ScrollArea>
             )}

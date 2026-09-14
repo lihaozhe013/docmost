@@ -134,16 +134,8 @@ describe('isAlwaysBlockedAddress / isPrivateNetworkAddress', () => {
   );
 
   it('the two lists together are exactly isPrivateAddress', () => {
-    for (const ip of [
-      '10.0.0.5',
-      '127.0.0.1',
-      '8.8.8.8',
-      'fe80::1',
-      'fc00::1'
-    ]) {
-      expect(isAlwaysBlockedAddress(ip) || isPrivateNetworkAddress(ip)).toBe(
-        isPrivateAddress(ip)
-      );
+    for (const ip of ['10.0.0.5', '127.0.0.1', '8.8.8.8', 'fe80::1', 'fc00::1']) {
+      expect(isAlwaysBlockedAddress(ip) || isPrivateNetworkAddress(ip)).toBe(isPrivateAddress(ip));
     }
   });
 });
@@ -152,9 +144,9 @@ describe('OutboundUrlGuard.validate', () => {
   const publicV4 = { address: '93.184.216.34', family: 4 };
 
   it('rejects http on cloud', async () => {
-    await expect(
-      guard(true, [publicV4]).validate('http://siem.example.com/x')
-    ).rejects.toThrow(OutboundUrlError);
+    await expect(guard(true, [publicV4]).validate('http://siem.example.com/x')).rejects.toThrow(
+      OutboundUrlError
+    );
   });
 
   it('rejects hosts that resolve to a private range on cloud', async () => {
@@ -166,17 +158,15 @@ describe('OutboundUrlGuard.validate', () => {
   });
 
   it('rejects the cloud metadata address literal', async () => {
-    await expect(
-      guard(true, []).validate('https://169.254.169.254/latest')
-    ).rejects.toThrow(/private or reserved/);
+    await expect(guard(true, []).validate('https://169.254.169.254/latest')).rejects.toThrow(
+      /private or reserved/
+    );
   });
 
   it('allows LAN hosts and http on self-hosted when private networks are allowed', async () => {
-    const pinned = await guard(
-      false,
-      [{ address: '10.0.5.20', family: 4 }],
-      'all'
-    ).validate('http://splunk.internal:8088/services/collector/event');
+    const pinned = await guard(false, [{ address: '10.0.5.20', family: 4 }], 'all').validate(
+      'http://splunk.internal:8088/services/collector/event'
+    );
     expect(pinned).toEqual({
       hostname: 'splunk.internal',
       address: '10.0.5.20',
@@ -200,22 +190,17 @@ describe('OutboundUrlGuard.validate', () => {
     await expect(
       guard(false, [publicV4]).validate('https://user:pw@siem.example.com')
     ).rejects.toThrow(/credentials/);
-    await expect(
-      guard(false, []).validate('https://nope.example.com')
-    ).rejects.toThrow(/Could not resolve/);
+    await expect(guard(false, []).validate('https://nope.example.com')).rejects.toThrow(
+      /Could not resolve/
+    );
   });
 
   it('marks resolution failures retryable and configuration failures not', async () => {
-    const throwing = new OutboundUrlGuard(
-      { isCloud: () => false } as any,
-      async () => {
-        throw new Error('EAI_AGAIN');
-      }
-    );
+    const throwing = new OutboundUrlGuard({ isCloud: () => false } as any, async () => {
+      throw new Error('EAI_AGAIN');
+    });
 
-    const dnsError = await throwing
-      .validate('https://siem.example.com')
-      .catch((e) => e);
+    const dnsError = await throwing.validate('https://siem.example.com').catch((e) => e);
     expect(dnsError).toBeInstanceOf(OutboundUrlError);
     expect(dnsError.retryable).toBe(true);
 
@@ -224,11 +209,7 @@ describe('OutboundUrlGuard.validate', () => {
       .catch((e) => e);
     expect(emptyError.retryable).toBe(true);
 
-    for (const url of [
-      'not-a-url',
-      'ftp://siem.example.com',
-      'https://user:pw@siem.example.com'
-    ]) {
+    for (const url of ['not-a-url', 'ftp://siem.example.com', 'https://user:pw@siem.example.com']) {
       const err = await guard(false, [publicV4])
         .validate(url)
         .catch((e) => e);
@@ -243,12 +224,7 @@ describe('OutboundUrlGuard.validate', () => {
   });
 
   const hardBlocked = ['169.254.169.254', '0.0.0.0', 'fe80::1', 'ff02::1'];
-  const loopbackOrReserved = [
-    '127.0.0.1',
-    '::1',
-    '::ffff:127.0.0.1',
-    '192.0.2.1'
-  ];
+  const loopbackOrReserved = ['127.0.0.1', '::1', '::ffff:127.0.0.1', '192.0.2.1'];
 
   it.each(hardBlocked)(
     'self-hosted refuses %s under every ALLOWED_PRIVATE_NETWORKS value',
@@ -264,35 +240,26 @@ describe('OutboundUrlGuard.validate', () => {
           guard(false, [{ address: ip, family: family(ip) }], value).validate(
             'http://siem.internal'
           )
-        ).rejects.toThrow(
-          /link-local, metadata or reserved address .* which is never allowed/
-        );
+        ).rejects.toThrow(/link-local, metadata or reserved address .* which is never allowed/);
       }
     }
   );
 
-  it.each(loopbackOrReserved)(
-    'self-hosted refuses %s unless an entry names it',
-    async (ip) => {
-      for (const value of ['all', 'none']) {
-        await expect(
-          guard(false, [{ address: ip, family: family(ip) }], value).validate(
-            'http://siem.internal'
-          )
-        ).rejects.toThrow(
-          /resolves to a loopback or reserved address .* Set ALLOWED_PRIVATE_NETWORKS on the server to allow it/
-        );
-      }
+  it.each(loopbackOrReserved)('self-hosted refuses %s unless an entry names it', async (ip) => {
+    for (const value of ['all', 'none']) {
+      await expect(
+        guard(false, [{ address: ip, family: family(ip) }], value).validate('http://siem.internal')
+      ).rejects.toThrow(
+        /resolves to a loopback or reserved address .* Set ALLOWED_PRIVATE_NETWORKS on the server to allow it/
+      );
     }
-  );
+  });
 
   it.each(['10.1.2.3', '192.168.1.10'])(
     'self-hosted refuses private network %s by default',
     async (ip) => {
       await expect(
-        guard(false, [{ address: ip, family: 4 }]).validate(
-          'http://siem.internal'
-        )
+        guard(false, [{ address: ip, family: 4 }]).validate('http://siem.internal')
       ).rejects.toThrow(
         /resolves to a private address .* Set ALLOWED_PRIVATE_NETWORKS on the server to allow it/
       );
@@ -302,20 +269,16 @@ describe('OutboundUrlGuard.validate', () => {
   it.each(['10.1.2.3', '192.168.1.10', 'fc00::1', '100.64.0.1'])(
     'all accepts private network %s',
     async (ip) => {
-      const pinned = await guard(
-        false,
-        [{ address: ip, family: family(ip) }],
-        'all'
-      ).validate('http://siem.internal');
+      const pinned = await guard(false, [{ address: ip, family: family(ip) }], 'all').validate(
+        'http://siem.internal'
+      );
       expect(pinned.address).toBe(ip);
     }
   );
 
   it('all still refuses loopback, and a loopback entry opts it back in', async () => {
     await expect(
-      guard(false, [{ address: '127.0.0.1', family: 4 }], 'all').validate(
-        'http://siem.internal'
-      )
+      guard(false, [{ address: '127.0.0.1', family: 4 }], 'all').validate('http://siem.internal')
     ).rejects.toThrow(/loopback or reserved/);
 
     const allowed = await guard(
@@ -342,11 +305,9 @@ describe('OutboundUrlGuard.validate', () => {
   it('an entry with a port matches only that port', async () => {
     const policy = 'none,192.168.1.20/32:8088';
 
-    const allowed = await guard(
-      false,
-      [{ address: '192.168.1.20', family: 4 }],
-      policy
-    ).validate('https://192.168.1.20:8088/services/collector/event');
+    const allowed = await guard(false, [{ address: '192.168.1.20', family: 4 }], policy).validate(
+      'https://192.168.1.20:8088/services/collector/event'
+    );
     expect(allowed.address).toBe('192.168.1.20');
 
     await expect(
@@ -365,26 +326,18 @@ describe('OutboundUrlGuard.validate', () => {
   it('a bracketed IPv6 entry with a port accepts only that port', async () => {
     const policy = '[::1/128]:8088';
 
-    const allowed = await guard(
-      false,
-      [{ address: '::1', family: 6 }],
-      policy
-    ).validate('http://[::1]:8088/ingest');
+    const allowed = await guard(false, [{ address: '::1', family: 6 }], policy).validate(
+      'http://[::1]:8088/ingest'
+    );
     expect(allowed).toEqual({ hostname: '::1', address: '::1', family: 6 });
 
     await expect(
-      guard(false, [{ address: '::1', family: 6 }], policy).validate(
-        'http://[::1]/ingest'
-      )
+      guard(false, [{ address: '::1', family: 6 }], policy).validate('http://[::1]/ingest')
     ).rejects.toThrow(/loopback or reserved/);
   });
 
   it('an entry without a port matches every port', async () => {
-    for (const url of [
-      'http://127.0.0.1:8088',
-      'https://127.0.0.1',
-      'http://127.0.0.1'
-    ]) {
+    for (const url of ['http://127.0.0.1:8088', 'https://127.0.0.1', 'http://127.0.0.1']) {
       const allowed = await guard(
         false,
         [{ address: '127.0.0.1', family: 4 }],
@@ -403,30 +356,18 @@ describe('OutboundUrlGuard.validate', () => {
     expect(allowed.address).toBe('192.168.1.10');
 
     await expect(
-      guard(
-        false,
-        [{ address: '10.1.2.3', family: 4 }],
-        '192.168.1.0/24'
-      ).validate('http://siem.internal')
+      guard(false, [{ address: '10.1.2.3', family: 4 }], '192.168.1.0/24').validate(
+        'http://siem.internal'
+      )
     ).rejects.toThrow(/private address/);
   });
 
   it('an unparseable value denies everything private or reserved and logs once per process', async () => {
-    const errorSpy = jest
-      .spyOn(Logger.prototype, 'error')
-      .mockImplementation(() => undefined);
-    const g = guard(
-      false,
-      [{ address: '10.1.2.3', family: 4 }],
-      'all,10.0.0.0/8, not-a-cidr'
-    );
+    const errorSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
+    const g = guard(false, [{ address: '10.1.2.3', family: 4 }], 'all,10.0.0.0/8, not-a-cidr');
 
-    await expect(g.validate('http://siem.internal')).rejects.toThrow(
-      /private address/
-    );
-    await expect(g.validate('http://siem.internal')).rejects.toThrow(
-      /private address/
-    );
+    await expect(g.validate('http://siem.internal')).rejects.toThrow(/private address/);
+    await expect(g.validate('http://siem.internal')).rejects.toThrow(/private address/);
 
     expect(errorSpy).toHaveBeenCalledTimes(1);
     expect(errorSpy.mock.calls[0][0]).toMatch(/ALLOWED_PRIVATE_NETWORKS/);
@@ -434,12 +375,7 @@ describe('OutboundUrlGuard.validate', () => {
   });
 
   it('cloud ignores ALLOWED_PRIVATE_NETWORKS and always refuses private and reserved ranges', async () => {
-    for (const ip of [
-      ...hardBlocked,
-      ...loopbackOrReserved,
-      '10.1.2.3',
-      '192.168.1.10'
-    ]) {
+    for (const ip of [...hardBlocked, ...loopbackOrReserved, '10.1.2.3', '192.168.1.10']) {
       for (const value of ['all', 'none', '127.0.0.0/8', 'all,10.0.0.0/8']) {
         await expect(
           guard(true, [{ address: ip, family: family(ip) }], value).validate(
@@ -452,35 +388,27 @@ describe('OutboundUrlGuard.validate', () => {
 
   it('refuses a resolved address that is not an IP address', async () => {
     await expect(
-      guard(false, [{ address: 'not-an-ip', family: 4 }], 'all').validate(
-        'http://siem.internal'
-      )
+      guard(false, [{ address: 'not-an-ip', family: 4 }], 'all').validate('http://siem.internal')
     ).rejects.toThrow(/is not an IP address/);
   });
 
   it('refuses the whole host when any one of its addresses is refused', async () => {
     await expect(
-      guard(
-        false,
-        [publicV4, { address: '10.1.2.3', family: 4 }],
-        'none'
-      ).validate('http://siem.internal')
+      guard(false, [publicV4, { address: '10.1.2.3', family: 4 }], 'none').validate(
+        'http://siem.internal'
+      )
     ).rejects.toThrow(/private address/);
 
     await expect(
-      guard(
-        false,
-        [publicV4, { address: '127.0.0.1', family: 4 }],
-        'all'
-      ).validate('http://siem.internal')
+      guard(false, [publicV4, { address: '127.0.0.1', family: 4 }], 'all').validate(
+        'http://siem.internal'
+      )
     ).rejects.toThrow(/loopback or reserved/);
 
     await expect(
-      guard(
-        false,
-        [publicV4, { address: '169.254.169.254', family: 4 }],
-        'all'
-      ).validate('http://siem.internal')
+      guard(false, [publicV4, { address: '169.254.169.254', family: 4 }], 'all').validate(
+        'http://siem.internal'
+      )
     ).rejects.toThrow(/never allowed/);
   });
 
@@ -493,9 +421,7 @@ describe('OutboundUrlGuard.validate', () => {
   });
 
   it('a public address is allowed in every mode', async () => {
-    const errorSpy = jest
-      .spyOn(Logger.prototype, 'error')
-      .mockImplementation(() => undefined);
+    const errorSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
 
     for (const value of ['all', 'none', '', '192.168.1.0/24', 'garbage']) {
       await expect(

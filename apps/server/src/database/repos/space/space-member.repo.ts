@@ -16,10 +16,7 @@ import { executeWithCursorPagination } from '@docmost/db/pagination/cursor-pagin
 import { GroupRepo } from '@docmost/db/repos/group/group.repo';
 import { SpaceRepo } from '@docmost/db/repos/space/space.repo';
 import { withCache } from '../../../common/helpers/with-cache';
-import {
-  CacheKey,
-  PERMISSION_CACHE_TTL_MS
-} from '../../../common/helpers/cache-keys';
+import { CacheKey, PERMISSION_CACHE_TTL_MS } from '../../../common/helpers/cache-keys';
 
 @Injectable()
 export class SpaceMemberRepo {
@@ -35,11 +32,7 @@ export class SpaceMemberRepo {
     trx?: KyselyTransaction
   ): Promise<void> {
     const db = dbOrTx(this.db, trx);
-    await db
-      .insertInto('spaceMembers')
-      .values(insertableSpaceMember)
-      .returningAll()
-      .execute();
+    await db.insertInto('spaceMembers').values(insertableSpaceMember).returningAll().execute();
   }
 
   async updateSpaceMember(
@@ -66,10 +59,7 @@ export class SpaceMemberRepo {
     trx?: KyselyTransaction
   ): Promise<SpaceMember> {
     const db = dbOrTx(this.db, trx);
-    let query = db
-      .selectFrom('spaceMembers')
-      .selectAll()
-      .where('spaceId', '=', spaceId);
+    let query = db.selectFrom('spaceMembers').selectAll().where('spaceId', '=', spaceId);
     if (opts.userId) {
       query = query.where('userId', '=', opts.userId);
     } else if (opts.groupId) {
@@ -110,10 +100,7 @@ export class SpaceMemberRepo {
     return count as number;
   }
 
-  async getSpaceMembersPaginated(
-    spaceId: string,
-    pagination: PaginationOptions
-  ) {
+  async getSpaceMembersPaginated(spaceId: string, pagination: PaginationOptions) {
     let baseQuery = this.db
       .selectFrom('spaceMembers')
       .leftJoin('users', 'users.id', 'spaceMembers.userId')
@@ -131,11 +118,7 @@ export class SpaceMemberRepo {
         'spaceMembers.createdAt'
       ])
       .select((eb) => this.groupRepo.withMemberCount(eb))
-      .select(
-        sql<number>`case when groups.id is not null then 1 else 0 end`.as(
-          'isGroup'
-        )
-      )
+      .select(sql<number>`case when groups.id is not null then 1 else 0 end`.as('isGroup'))
       .select(
         sql<number>`case "space_members"."role" when 'admin' then 1 when 'writer' then 2 when 'reader' then 3 else 4 end`.as(
           'roleOrder'
@@ -146,16 +129,8 @@ export class SpaceMemberRepo {
 
     if (pagination.query) {
       baseQuery = baseQuery.where((eb) =>
-        eb(
-          sql`f_unaccent(users.name)`,
-          'ilike',
-          sql`f_unaccent(${'%' + pagination.query + '%'})`
-        )
-          .or(
-            sql`users.email`,
-            'ilike',
-            sql`f_unaccent(${'%' + pagination.query + '%'})`
-          )
+        eb(sql`f_unaccent(users.name)`, 'ilike', sql`f_unaccent(${'%' + pagination.query + '%'})`)
+          .or(sql`users.email`, 'ilike', sql`f_unaccent(${'%' + pagination.query + '%'})`)
           .or(
             sql`f_unaccent(groups.name)`,
             'ilike',
@@ -225,10 +200,7 @@ export class SpaceMemberRepo {
    * if the user has no space permission it should return an empty array,
    * maybe we should throw an exception?
    */
-  async getUserSpaceRoles(
-    userId: string,
-    spaceId: string
-  ): Promise<UserSpaceRole[]> {
+  async getUserSpaceRoles(userId: string, spaceId: string): Promise<UserSpaceRole[]> {
     return withCache(
       this.cacheManager,
       CacheKey.SPACE_ROLES(userId, spaceId),
@@ -242,11 +214,7 @@ export class SpaceMemberRepo {
           .unionAll(
             this.db
               .selectFrom('spaceMembers')
-              .innerJoin(
-                'groupUsers',
-                'groupUsers.groupId',
-                'spaceMembers.groupId'
-              )
+              .innerJoin('groupUsers', 'groupUsers.groupId', 'spaceMembers.groupId')
               .select(['groupUsers.userId', 'spaceMembers.role'])
               .where('groupUsers.userId', '=', userId)
               .where('spaceMembers.spaceId', '=', spaceId)
@@ -261,10 +229,7 @@ export class SpaceMemberRepo {
     );
   }
 
-  async getUserIdsWithSpaceAccess(
-    userIds: string[],
-    spaceId: string
-  ): Promise<Set<string>> {
+  async getUserIdsWithSpaceAccess(userIds: string[], spaceId: string): Promise<Set<string>> {
     if (userIds.length === 0) return new Set();
 
     const rows = await this.db
@@ -347,11 +312,7 @@ export class SpaceMemberRepo {
 
     if (pagination.query) {
       query = query.where((eb) =>
-        eb(
-          sql`f_unaccent(name)`,
-          'ilike',
-          sql`f_unaccent(${'%' + pagination.query + '%'})`
-        ).or(
+        eb(sql`f_unaccent(name)`, 'ilike', sql`f_unaccent(${'%' + pagination.query + '%'})`).or(
           sql`f_unaccent(description)`,
           'ilike',
           sql`f_unaccent(${'%' + pagination.query + '%'})`

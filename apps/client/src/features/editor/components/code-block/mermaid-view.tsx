@@ -41,9 +41,7 @@ export default function MermaidView({ props }: MermaidViewProps) {
               `<div class="${classes.error}">${t('Mermaid diagram error:')} ${DOMPurify.sanitize(err)}</div>`
             );
           } else {
-            setPreview(
-              `<div class="${classes.error}">${t('Invalid Mermaid diagram')}</div>`
-            );
+            setPreview(`<div class="${classes.error}">${t('Invalid Mermaid diagram')}</div>`);
           }
         });
     }

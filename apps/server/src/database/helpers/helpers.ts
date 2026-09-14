@@ -5,10 +5,7 @@ export async function isPageEmbeddingsTableExists(db: KyselyDB) {
   return tableExists({ db, tableName: 'page_embeddings' });
 }
 
-export async function tableExists(opts: {
-  db: KyselyDB;
-  tableName: string;
-}): Promise<boolean> {
+export async function tableExists(opts: { db: KyselyDB; tableName: string }): Promise<boolean> {
   const { db, tableName } = opts;
   const result = await sql<{ exists: boolean }>`
       SELECT EXISTS (

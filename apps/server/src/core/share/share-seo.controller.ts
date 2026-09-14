@@ -42,14 +42,7 @@ export class ShareSeoController {
       workspace = await this.workspaceRepo.findByHostname(subdomain);
     }
 
-    const clientDistPath = join(
-      __dirname,
-      '..',
-      '..',
-      '..',
-      '..',
-      'client/dist'
-    );
+    const clientDistPath = join(__dirname, '..', '..', '..', '..', 'client/dist');
 
     if (fs.existsSync(clientDistPath)) {
       const indexFilePath = join(clientDistPath, 'index.html');
@@ -60,18 +53,14 @@ export class ShareSeoController {
 
       const pageId = this.extractPageSlugId(pageSlug);
 
-      const share = await this.shareService.getShareForPage(
-        pageId,
-        workspace.id
-      );
+      const share = await this.shareService.getShareForPage(pageId, workspace.id);
 
       if (!share) {
         return this.sendIndex(indexFilePath, res);
       }
 
       const rawTitle = htmlEscape(share?.sharedPage.title ?? 'untitled');
-      const metaTitle =
-        rawTitle.length > 80 ? `${rawTitle.slice(0, 77)}…` : rawTitle;
+      const metaTitle = rawTitle.length > 80 ? `${rawTitle.slice(0, 77)}…` : rawTitle;
 
       const metaTagVar = '<!--meta-tags-->';
 

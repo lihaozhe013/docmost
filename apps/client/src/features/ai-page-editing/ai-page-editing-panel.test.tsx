@@ -1,10 +1,4 @@
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor
-} from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { Provider, createStore } from 'jotai';
 import { MantineProvider } from '@mantine/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -153,9 +147,7 @@ describe('AiPageEditingPanel', () => {
   });
 
   function attachPanelImage(name = 'shot.png') {
-    const fileInput = document.querySelector(
-      'input[type="file"]'
-    ) as HTMLInputElement;
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     expect(fileInput).toBeTruthy();
     fireEvent.change(fileInput, {
       target: {
@@ -328,9 +320,7 @@ describe('AiPageEditingPanel', () => {
     );
 
     const sendButton = screen.getByLabelText('Send to Page AI');
-    await waitFor(() =>
-      expect((sendButton as HTMLButtonElement).disabled).toBe(false)
-    );
+    await waitFor(() => expect((sendButton as HTMLButtonElement).disabled).toBe(false));
     fireEvent.click(sendButton);
 
     expect(socket.emit).toHaveBeenCalledWith(
@@ -366,9 +356,7 @@ describe('AiPageEditingPanel', () => {
         url: 'http://localhost:3000/api/files/att-1/shot.png'
       });
     });
-    await waitFor(() =>
-      expect((sendButton as HTMLButtonElement).disabled).toBe(false)
-    );
+    await waitFor(() => expect((sendButton as HTMLButtonElement).disabled).toBe(false));
     fireEvent.click(sendButton);
 
     expect(socket.emit).toHaveBeenCalledWith(

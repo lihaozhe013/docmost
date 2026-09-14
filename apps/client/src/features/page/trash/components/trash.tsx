@@ -1,15 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useGetSpaceBySlugQuery } from '@/features/space/queries/space-query';
-import {
-  Container,
-  Title,
-  Table,
-  Group,
-  ActionIcon,
-  Text,
-  Stack,
-  Menu
-} from '@mantine/core';
+import { Container, Title, Table, Group, ActionIcon, Text, Stack, Menu } from '@mantine/core';
 import { IconDots, IconRestore, IconTrash } from '@tabler/icons-react';
 import { TrashBanner } from '@/features/page/trash/components/trash-banner.tsx';
 import {
@@ -102,12 +93,8 @@ export default function Trash() {
               <Table.Thead>
                 <Table.Tr>
                   <Table.Th>{t('Page')}</Table.Th>
-                  <Table.Th style={{ whiteSpace: 'nowrap' }}>
-                    {t('Deleted by')}
-                  </Table.Th>
-                  <Table.Th style={{ whiteSpace: 'nowrap' }}>
-                    {t('Deleted at')}
-                  </Table.Th>
+                  <Table.Th style={{ whiteSpace: 'nowrap' }}>{t('Deleted by')}</Table.Th>
+                  <Table.Th style={{ whiteSpace: 'nowrap' }}>{t('Deleted at')}</Table.Th>
                   <Table.Th aria-label={t('Action')} />
                 </Table.Tr>
               </Table.Thead>
@@ -132,23 +119,14 @@ export default function Trash() {
                       <UserInfo user={page.deletedBy} size="sm" />
                     </Table.Td>
                     <Table.Td>
-                      <Text
-                        c="dimmed"
-                        style={{ whiteSpace: 'nowrap' }}
-                        size="xs"
-                        fw={500}
-                      >
+                      <Text c="dimmed" style={{ whiteSpace: 'nowrap' }} size="xs" fw={500}>
                         {formattedDate(page.deletedAt)}
                       </Text>
                     </Table.Td>
                     <Table.Td>
                       <Menu>
                         <Menu.Target>
-                          <ActionIcon
-                            variant="subtle"
-                            color="gray"
-                            aria-label={t('Page actions')}
-                          >
+                          <ActionIcon variant="subtle" color="gray" aria-label={t('Page actions')}>
                             <IconDots size={20} stroke={1.5} />
                           </ActionIcon>
                         </Menu.Target>

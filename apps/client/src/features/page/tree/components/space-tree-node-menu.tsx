@@ -50,24 +50,18 @@ export function NodeMenu({ node, canEdit }: NodeMenuProps) {
   const { handleDelete } = useTreeMutation(node.spaceId);
   const [data, setData] = useAtom(treeDataAtom);
   const emit = useQueryEmit();
-  const [exportOpened, { open: openExportModal, close: closeExportModal }] =
+  const [exportOpened, { open: openExportModal, close: closeExportModal }] = useDisclosure(false);
+  const [movePageModalOpened, { open: openMovePageModal, close: closeMoveSpaceModal }] =
     useDisclosure(false);
-  const [
-    movePageModalOpened,
-    { open: openMovePageModal, close: closeMoveSpaceModal }
-  ] = useDisclosure(false);
-  const [
-    copyPageModalOpened,
-    { open: openCopyPageModal, close: closeCopySpaceModal }
-  ] = useDisclosure(false);
+  const [copyPageModalOpened, { open: openCopyPageModal, close: closeCopySpaceModal }] =
+    useDisclosure(false);
   const favoriteIds = useFavoriteIds('page', node.spaceId);
   const addFavorite = useAddFavoriteMutation();
   const removeFavorite = useRemoveFavoriteMutation();
   const isFavorited = favoriteIds.has(node.id);
 
   const handleCopyLink = () => {
-    const pageUrl =
-      getAppUrl() + buildPageUrl(spaceSlug, node.slugId, node.name);
+    const pageUrl = getAppUrl() + buildPageUrl(spaceSlug, node.slugId, node.name);
     clipboard.copy(pageUrl);
     notifications.show({ message: t('Link copied') });
   };
@@ -95,9 +89,7 @@ export function NodeMenu({ node, canEdit }: NodeMenuProps) {
         children: []
       };
 
-      setData((prev) =>
-        treeModel.insert(prev, parentId, treeNodeData, newIndex)
-      );
+      setData((prev) => treeModel.insert(prev, parentId, treeNodeData, newIndex));
 
       setTimeout(() => {
         emit({
@@ -137,10 +129,7 @@ export function NodeMenu({ node, canEdit }: NodeMenuProps) {
               e.stopPropagation();
             }}
           >
-            <IconDotsVertical
-              style={{ width: rem(20), height: rem(20) }}
-              stroke={2}
-            />
+            <IconDotsVertical style={{ width: rem(20), height: rem(20) }} stroke={2} />
           </ActionIcon>
         </Menu.Target>
 
@@ -157,13 +146,7 @@ export function NodeMenu({ node, canEdit }: NodeMenuProps) {
           </Menu.Item>
 
           <Menu.Item
-            leftSection={
-              isFavorited ? (
-                <IconStarFilled size={16} />
-              ) : (
-                <IconStar size={16} />
-              )
-            }
+            leftSection={isFavorited ? <IconStarFilled size={16} /> : <IconStar size={16} />}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -257,12 +240,7 @@ export function NodeMenu({ node, canEdit }: NodeMenuProps) {
         open={copyPageModalOpened}
       />
 
-      <ExportModal
-        type="page"
-        id={node.id}
-        open={exportOpened}
-        onClose={closeExportModal}
-      />
+      <ExportModal type="page" id={node.id} open={exportOpened} onClose={closeExportModal} />
     </>
   );
 }

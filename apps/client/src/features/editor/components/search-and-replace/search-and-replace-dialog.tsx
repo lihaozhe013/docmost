@@ -1,13 +1,4 @@
-import {
-  ActionIcon,
-  Button,
-  Dialog,
-  Flex,
-  Input,
-  Stack,
-  Text,
-  Tooltip
-} from '@mantine/core';
+import { ActionIcon, Button, Dialog, Flex, Input, Stack, Text, Tooltip } from '@mantine/core';
 import {
   IconArrowNarrowDown,
   IconArrowNarrowUp,
@@ -31,10 +22,7 @@ interface PageFindDialogDialogProps {
   editable?: boolean;
 }
 
-function SearchAndReplaceDialog({
-  editor,
-  editable = true
-}: PageFindDialogDialogProps) {
+function SearchAndReplaceDialog({ editor, editable = true }: PageFindDialogDialogProps) {
   const { t } = useTranslation();
   const [searchText, setSearchText] = useState('');
   const [replaceText, setReplaceText] = useState('');
@@ -87,8 +75,7 @@ function SearchAndReplaceDialog({
     editor.commands.setTextSelection(position);
 
     const element = document.querySelector('.search-result-current');
-    if (element)
-      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (element) element.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
     editor.commands.setTextSelection(0);
   };
@@ -151,10 +138,7 @@ function SearchAndReplaceDialog({
 
     return () => {
       document.removeEventListener('openFindDialogFromEditor', handleOpenEvent);
-      document.removeEventListener(
-        'closeFindDialogFromEditor',
-        handleCloseEvent
-      );
+      document.removeEventListener('closeFindDialogFromEditor', handleCloseEvent);
     };
   }, [pageFindState.isOpen]);
 
@@ -222,9 +206,7 @@ function SearchAndReplaceDialog({
               ['Enter', next],
               ['shift+Enter', previous],
               ['alt+C', caseSensitiveToggle],
-              ...(editable
-                ? ([['alt+R', replaceButtonToggle]] as [string, () => void][])
-                : [])
+              ...(editable ? ([['alt+R', replaceButtonToggle]] as [string, () => void][]) : [])
             ])}
           />
 
@@ -236,10 +218,7 @@ function SearchAndReplaceDialog({
                 onClick={previous}
                 aria-label={t('Previous match (Shift+Enter)')}
               >
-                <IconArrowNarrowUp
-                  style={{ width: '70%', height: '70%' }}
-                  stroke={1.5}
-                />
+                <IconArrowNarrowUp style={{ width: '70%', height: '70%' }} stroke={1.5} />
               </ActionIcon>
             </Tooltip>
             <Tooltip label={t('Next match (Enter)')}>
@@ -249,10 +228,7 @@ function SearchAndReplaceDialog({
                 onClick={next}
                 aria-label={t('Next match (Enter)')}
               >
-                <IconArrowNarrowDown
-                  style={{ width: '70%', height: '70%' }}
-                  stroke={1.5}
-                />
+                <IconArrowNarrowDown style={{ width: '70%', height: '70%' }} stroke={1.5} />
               </ActionIcon>
             </Tooltip>
             <Tooltip label={t('Match case (Alt+C)')}>
@@ -263,10 +239,7 @@ function SearchAndReplaceDialog({
                 aria-label={t('Match case (Alt+C)')}
                 aria-pressed={caseSensitive.isCaseSensitive}
               >
-                <IconLetterCase
-                  style={{ width: '70%', height: '70%' }}
-                  stroke={1.5}
-                />
+                <IconLetterCase style={{ width: '70%', height: '70%' }} stroke={1.5} />
               </ActionIcon>
             </Tooltip>
             {editable && (
@@ -278,10 +251,7 @@ function SearchAndReplaceDialog({
                   aria-label={t('Replace')}
                   aria-pressed={replaceButton.isReplaceShow}
                 >
-                  <IconReplace
-                    style={{ width: '70%', height: '70%' }}
-                    stroke={1.5}
-                  />
+                  <IconReplace style={{ width: '70%', height: '70%' }} stroke={1.5} />
                 </ActionIcon>
               </Tooltip>
             )}
@@ -317,22 +287,12 @@ function SearchAndReplaceDialog({
             />
             <ActionIcon.Group>
               <Tooltip label={t('Replace (Enter)')}>
-                <Button
-                  size="xs"
-                  variant="subtle"
-                  color="gray"
-                  onClick={replace}
-                >
+                <Button size="xs" variant="subtle" color="gray" onClick={replace}>
                   {t('Replace')}
                 </Button>
               </Tooltip>
               <Tooltip label={t('Replace all (Ctrl+Alt+Enter)')}>
-                <Button
-                  size="xs"
-                  variant="subtle"
-                  color="gray"
-                  onClick={replaceAll}
-                >
+                <Button size="xs" variant="subtle" color="gray" onClick={replaceAll}>
                   {t('Replace all')}
                 </Button>
               </Tooltip>

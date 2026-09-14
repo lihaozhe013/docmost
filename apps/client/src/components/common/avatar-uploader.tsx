@@ -34,9 +34,7 @@ export default function AvatarUploader({
   const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileInputChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleFileInputChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || disabled) {
       return;
@@ -90,9 +88,7 @@ export default function AvatarUploader({
   // visible text. When no image is set, the avatar renders the name's
   // initials, so prepend the name to the action label.
   const ariaLabel =
-    !currentImageUrl && fallbackName
-      ? `${fallbackName} – ${actionLabel}`
-      : actionLabel;
+    !currentImageUrl && fallbackName ? `${fallbackName} – ${actionLabel}` : actionLabel;
 
   const handleRemove = async () => {
     if (disabled) return;

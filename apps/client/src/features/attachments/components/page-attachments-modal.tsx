@@ -27,11 +27,7 @@ interface PageAttachmentsModalProps {
   onClose: () => void;
 }
 
-export default function PageAttachmentsModal({
-  pageId,
-  open,
-  onClose
-}: PageAttachmentsModalProps) {
+export default function PageAttachmentsModal({ pageId, open, onClose }: PageAttachmentsModalProps) {
   const { t } = useTranslation();
 
   return (
@@ -50,20 +46,10 @@ export default function PageAttachmentsModal({
 function PageAttachmentsList({ pageId }: { pageId: string }) {
   const { t } = useTranslation();
   const [search, setSearch] = useState('');
-  const {
-    data,
-    isLoading,
-    isError,
-    isFetching,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage
-  } = usePageAttachmentsQuery(pageId, search);
+  const { data, isLoading, isError, isFetching, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    usePageAttachmentsQuery(pageId, search);
 
-  const attachments = useMemo(
-    () => data?.pages.flatMap((page) => page.items) ?? [],
-    [data]
-  );
+  const attachments = useMemo(() => data?.pages.flatMap((page) => page.items) ?? [], [data]);
 
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
@@ -88,10 +74,7 @@ function PageAttachmentsList({ pageId }: { pageId: string }) {
 
   return (
     <>
-      <SearchInput
-        onSearch={handleSearch}
-        placeholder={t('Search attachments...')}
-      />
+      <SearchInput onSearch={handleSearch} placeholder={t('Search attachments...')} />
 
       {isLoading ? (
         <Center py="xl">
@@ -106,9 +89,7 @@ function PageAttachmentsList({ pageId }: { pageId: string }) {
       ) : attachments.length === 0 ? (
         <Center py="xl">
           <Text size="sm" c="dimmed">
-            {search
-              ? t('No results found')
-              : t('No attachments on this page yet.')}
+            {search ? t('No results found') : t('No attachments on this page yet.')}
           </Text>
         </Center>
       ) : (
@@ -134,10 +115,7 @@ function AttachmentRow({ attachment }: { attachment: IPageAttachment }) {
 
   return (
     <Group wrap="nowrap" gap="md" py="sm" pr="xs">
-      <AttachmentFileIcon
-        fileExt={attachment.fileExt}
-        mimeType={attachment.mimeType}
-      />
+      <AttachmentFileIcon fileExt={attachment.fileExt} mimeType={attachment.mimeType} />
 
       <div style={{ flex: 1, minWidth: 0 }}>
         <Anchor
@@ -160,10 +138,7 @@ function AttachmentRow({ attachment }: { attachment: IPageAttachment }) {
       </div>
 
       {attachment.creator && (
-        <Tooltip
-          label={t('Uploaded by {{name}}', { name: attachment.creator.name })}
-          withArrow
-        >
+        <Tooltip label={t('Uploaded by {{name}}', { name: attachment.creator.name })} withArrow>
           <CustomAvatar
             avatarUrl={attachment.creator.avatarUrl}
             name={attachment.creator.name}

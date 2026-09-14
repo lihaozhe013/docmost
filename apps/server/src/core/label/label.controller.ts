@@ -10,11 +10,7 @@ import {
   UseGuards
 } from '@nestjs/common';
 import { LabelService } from './label.service';
-import {
-  FindPagesByLabelDto,
-  LabelInfoDto,
-  ListLabelsDto
-} from './dto/label.dto';
+import { FindPagesByLabelDto, LabelInfoDto, ListLabelsDto } from './dto/label.dto';
 import { AuthUser } from '../../common/decorators/auth-user.decorator';
 import { AuthWorkspace } from '../../common/decorators/auth-workspace.decorator';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -23,10 +19,7 @@ import { LabelRepo, LabelType } from '@docmost/db/repos/label/label.repo';
 import { PaginationOptions } from '@docmost/db/pagination/pagination-options';
 import { emptyCursorPaginationResult } from '@docmost/db/pagination/cursor-pagination';
 import SpaceAbilityFactory from '../casl/abilities/space-ability.factory';
-import {
-  SpaceCaslAction,
-  SpaceCaslSubject
-} from '../casl/interfaces/space-ability.type';
+import { SpaceCaslAction, SpaceCaslSubject } from '../casl/interfaces/space-ability.type';
 
 @UseGuards(JwtAuthGuard)
 @Controller('labels')
@@ -45,12 +38,7 @@ export class LabelController {
     @AuthUser() user: User,
     @AuthWorkspace() workspace: Workspace
   ) {
-    return this.labelService.getLabels(
-      workspace.id,
-      user.id,
-      dto.type,
-      pagination
-    );
+    return this.labelService.getLabels(workspace.id, user.id, dto.type, pagination);
   }
 
   @HttpCode(HttpStatus.OK)

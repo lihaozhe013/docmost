@@ -35,10 +35,7 @@ export default function WorkspaceMembers() {
 
       <WorkspaceMembersTable />
 
-      <CreateMemberModal
-        opened={createModalOpened}
-        onClose={() => setCreateModalOpened(false)}
-      />
+      <CreateMemberModal opened={createModalOpened} onClose={() => setCreateModalOpened(false)} />
     </>
   );
 }

@@ -8,11 +8,7 @@ type DocumentTitleProps = {
   children?: React.ReactNode;
 };
 
-export function DocumentTitle({
-  title,
-  withAppName = true,
-  children
-}: DocumentTitleProps) {
+export function DocumentTitle({ title, withAppName = true, children }: DocumentTitleProps) {
   const appName = getAppName();
 
   let documentTitle = appName;

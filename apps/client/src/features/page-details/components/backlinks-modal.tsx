@@ -9,11 +9,7 @@ interface BacklinksModalProps {
   onClose: () => void;
 }
 
-export function BacklinksModal({
-  pageId,
-  opened,
-  onClose
-}: BacklinksModalProps) {
+export function BacklinksModal({ pageId, opened, onClose }: BacklinksModalProps) {
   const { t } = useTranslation();
   const { data: counts } = useBacklinksCountQuery(pageId);
 

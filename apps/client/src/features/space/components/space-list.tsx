@@ -16,8 +16,7 @@ import rowClasses from '@/components/ui/clickable-table-row.module.css';
 
 export default function SpaceList() {
   const { t } = useTranslation();
-  const { search, cursor, goNext, goPrev, handleSearch } =
-    usePaginateAndSearch();
+  const { search, cursor, goNext, goPrev, handleSearch } = usePaginateAndSearch();
   const { data, isLoading } = useGetSpacesQuery({ cursor, query: search });
   const [opened, { open, close }] = useDisclosure(false);
   const [selectedSpaceId, setSelectedSpaceId] = useState<string>(null);
@@ -101,11 +100,7 @@ export default function SpaceList() {
       )}
 
       {selectedSpaceId && (
-        <SpaceSettingsModal
-          opened={opened}
-          onClose={close}
-          spaceId={selectedSpaceId}
-        />
+        <SpaceSettingsModal opened={opened} onClose={close} spaceId={selectedSpaceId} />
       )}
     </>
   );

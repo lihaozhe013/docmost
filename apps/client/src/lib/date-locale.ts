@@ -1,18 +1,5 @@
 import { format as dateFnsFormat, type Locale } from 'date-fns';
-import {
-  de,
-  enUS,
-  es,
-  fr,
-  it,
-  ja,
-  ko,
-  nl,
-  ptBR,
-  ru,
-  uk,
-  zhCN
-} from 'date-fns/locale';
+import { de, enUS, es, fr, it, ja, ko, nl, ptBR, ru, uk, zhCN } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
 import i18n from '@/i18n.ts';
 

@@ -14,8 +14,7 @@ export function usePageAttachmentsQuery(
 ): UseInfiniteQueryResult<InfiniteData<IPagination<IPageAttachment>, unknown>> {
   return useInfiniteQuery({
     queryKey: ['page-attachments', pageId, search],
-    queryFn: ({ pageParam }) =>
-      getPageAttachments(pageId, { cursor: pageParam, query: search }),
+    queryFn: ({ pageParam }) => getPageAttachments(pageId, { cursor: pageParam, query: search }),
     enabled: !!pageId,
     gcTime: 0,
     placeholderData: keepPreviousData,

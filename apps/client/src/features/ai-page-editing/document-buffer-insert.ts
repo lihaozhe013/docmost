@@ -15,10 +15,7 @@ import type { BlockLocation } from './document-buffer-locations';
  * Converts Markdown into a validated fragment that is safe to insert into the
  * editor document.
  */
-export async function prepareInsertContent(
-  editor: Editor,
-  markdown: string
-): Promise<Fragment> {
+export async function prepareInsertContent(editor: Editor, markdown: string): Promise<Fragment> {
   let content;
   try {
     const html = await markdownToHtml(markdown);
@@ -39,10 +36,7 @@ export async function prepareInsertContent(
   }
 
   if (!content.size || !content.content.every(isSupportedInsertedNode)) {
-    throw new BufferError(
-      'INVALID_CONTENT',
-      'The insertion contains unsupported or empty content'
-    );
+    throw new BufferError('INVALID_CONTENT', 'The insertion contains unsupported or empty content');
   }
 
   validateFormulaContent(content);
@@ -64,8 +58,7 @@ export function resolveInsertTarget(
 } {
   const isEmptyDocument =
     locations.length === 1 &&
-    (locations[0].node.type.name === 'paragraph' ||
-      locations[0].node.type.name === 'heading') &&
+    (locations[0].node.type.name === 'paragraph' || locations[0].node.type.name === 'heading') &&
     locations[0].node.content.size === 0;
   switch (input.target.kind) {
     case 'document_start':
@@ -76,8 +69,7 @@ export function resolveInsertTarget(
       };
     case 'document_end': {
       const trailingFootnotes = locations[locations.length - 1];
-      const hasTrailingFootnotes =
-        trailingFootnotes?.node.type.name === 'footnotes';
+      const hasTrailingFootnotes = trailingFootnotes?.node.type.name === 'footnotes';
       if (isEmptyDocument && !hasTrailingFootnotes) {
         return {
           position: locations[0].position,
@@ -86,35 +78,20 @@ export function resolveInsertTarget(
         };
       }
       return {
-        position: hasTrailingFootnotes
-          ? trailingFootnotes.position
-          : docContentSize,
-        insertionIndex: hasTrailingFootnotes
-          ? locations.length - 1
-          : locations.length,
+        position: hasTrailingFootnotes ? trailingFootnotes.position : docContentSize,
+        insertionIndex: hasTrailingFootnotes ? locations.length - 1 : locations.length,
         replaceEmptyDocument: false
       };
     }
     case 'before_block':
     case 'after_block': {
       const target = input.target;
-      const location = locations.find(
-        (item) => item.blockId === target.blockId
-      );
+      const location = locations.find((item) => item.blockId === target.blockId);
       if (!location) {
-        throw new BufferError(
-          'BLOCK_NOT_FOUND',
-          `Block ${target.blockId} was not found`
-        );
+        throw new BufferError('BLOCK_NOT_FOUND', `Block ${target.blockId} was not found`);
       }
-      if (
-        target.kind === 'after_block' &&
-        location.node.type.name === 'footnotes'
-      ) {
-        throw new BufferError(
-          'UNSUPPORTED_RANGE',
-          'Content cannot be inserted after footnotes'
-        );
+      if (target.kind === 'after_block' && location.node.type.name === 'footnotes') {
+        throw new BufferError('UNSUPPORTED_RANGE', 'Content cannot be inserted after footnotes');
       }
       return {
         position:

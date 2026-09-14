@@ -1,11 +1,4 @@
-import {
-  Body,
-  Controller,
-  HttpCode,
-  HttpStatus,
-  Post,
-  UseGuards
-} from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthUser } from '../../common/decorators/auth-user.decorator';
@@ -26,13 +19,8 @@ export class UserController {
   @HttpCode(HttpStatus.OK)
   @Post('me')
   @OAuthScope('read')
-  async getUserInfo(
-    @AuthUser() authUser: User,
-    @AuthWorkspace() workspace: Workspace
-  ) {
-    const memberCount = await this.workspaceRepo.getActiveUserCount(
-      workspace.id
-    );
+  async getUserInfo(@AuthUser() authUser: User, @AuthWorkspace() workspace: Workspace) {
+    const memberCount = await this.workspaceRepo.getActiveUserCount(workspace.id);
 
     const workspaceInfo = {
       ...workspace,

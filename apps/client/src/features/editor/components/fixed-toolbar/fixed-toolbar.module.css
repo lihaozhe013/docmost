@@ -8,8 +8,7 @@
   align-items: center;
   min-height: 45px;
   background: var(--mantine-color-body);
-  border-bottom: 1px solid
-    light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-4));
+  border-bottom: 1px solid light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-4));
   overflow-x: auto;
 }
 
@@ -22,10 +21,7 @@
 }
 
 .fixedToolbar::-webkit-scrollbar-thumb {
-  background: light-dark(
-    var(--mantine-color-gray-4),
-    var(--mantine-color-dark-3)
-  );
+  background: light-dark(var(--mantine-color-gray-4), var(--mantine-color-dark-3));
   border-radius: 1px;
 }
 
@@ -51,19 +47,13 @@
   width: 1px;
   height: 20px;
   margin: 0 4px;
-  background: light-dark(
-    var(--mantine-color-gray-3),
-    var(--mantine-color-dark-4)
-  );
+  background: light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
 }
 
 .active,
 .active:hover {
   color: var(--mantine-color-blue-6);
-  background-color: light-dark(
-    var(--mantine-color-gray-1),
-    var(--mantine-color-dark-5)
-  );
+  background-color: light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-5));
 }
 
 @media print {

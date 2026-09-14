@@ -55,9 +55,7 @@ import { parseRedisUrl } from '../../common/helpers';
   ],
   controllers: [
     AppController,
-    ...(process.env.COLLAB_SHOW_STATS?.toLowerCase() === 'true'
-      ? [CollaborationController]
-      : [])
+    ...(process.env.COLLAB_SHOW_STATS?.toLowerCase() === 'true' ? [CollaborationController] : [])
   ],
   providers: [AppService]
 })

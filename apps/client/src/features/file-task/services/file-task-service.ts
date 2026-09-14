@@ -9,9 +9,7 @@ export async function getFileTaskById(fileTaskId: string): Promise<IFileTask> {
   return req.data;
 }
 
-export async function getFileTasks(
-  params?: QueryParams
-): Promise<IPagination<IFileTask>> {
+export async function getFileTasks(params?: QueryParams): Promise<IPagination<IFileTask>> {
   const req = await api.post('/file-tasks', { ...params });
   return req.data;
 }

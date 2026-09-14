@@ -24,25 +24,11 @@ import {
   rebaseFallbackBindings
 } from './document-buffer-utils';
 import type { FallbackBinding } from './document-buffer-utils';
-import {
-  collectLocations,
-  readEditorSelection,
-  toBufferBlock
-} from './document-buffer-locations';
+import { collectLocations, readEditorSelection, toBufferBlock } from './document-buffer-locations';
 import type { BlockLocation } from './document-buffer-locations';
-import {
-  applyPreparedOperations,
-  prepareEditOperations
-} from './document-buffer-edit';
-import {
-  prepareInsertContent,
-  resolveInsertTarget
-} from './document-buffer-insert';
-import {
-  captureInverseSteps,
-  mapAffectedRanges,
-  rebaseUndoEntries
-} from './document-buffer-undo';
+import { applyPreparedOperations, prepareEditOperations } from './document-buffer-edit';
+import { prepareInsertContent, resolveInsertTarget } from './document-buffer-insert';
+import { captureInverseSteps, mapAffectedRanges, rebaseUndoEntries } from './document-buffer-undo';
 import type { UndoEntry } from './document-buffer-undo';
 import { assertToolInput } from './document-buffer-tools';
 
@@ -81,11 +67,7 @@ export class DocumentBuffer {
   private operationQueue: Promise<void> = Promise.resolve();
   private destroyed = false;
 
-  private readonly handleTransaction = ({
-    transaction
-  }: {
-    transaction: any;
-  }) => {
+  private readonly handleTransaction = ({ transaction }: { transaction: any }) => {
     if (!transaction.docChanged) return;
     this.revisionNumber += 1;
     rebaseFallbackBindings(this.fallbackBindings, transaction);
@@ -120,9 +102,7 @@ export class DocumentBuffer {
     input: any,
     signal?: AbortSignal
   ): Promise<BrowserToolResult> {
-    const operation = this.operationQueue.then(() =>
-      this.executeToolNow(toolName, input, signal)
-    );
+    const operation = this.operationQueue.then(() => this.executeToolNow(toolName, input, signal));
     this.operationQueue = operation.then(
       () => undefined,
       () => undefined
@@ -147,17 +127,11 @@ export class DocumentBuffer {
         assertToolInput(toolName, input);
         return this.insert(input as BufferInsertInput, signal);
       default:
-        throw new BufferError(
-          'INVALID_CONTENT',
-          `Unknown document tool: ${toolName}`
-        );
+        throw new BufferError('INVALID_CONTENT', `Unknown document tool: ${toolName}`);
     }
   }
 
-  read(
-    blockIds?: string[],
-    options: { offset?: number; limit?: number } = {}
-  ): BufferReadResult {
+  read(blockIds?: string[], options: { offset?: number; limit?: number } = {}): BufferReadResult {
     this.ensureAvailable();
     if (!isRecord(options)) {
       throw new BufferError('INVALID_CONTENT', 'The read options are invalid');
@@ -167,30 +141,20 @@ export class DocumentBuffer {
       (!Array.isArray(blockIds) ||
         blockIds.length > MAX_READ_BLOCKS ||
         blockIds.some(
-          (blockId) =>
-            typeof blockId !== 'string' ||
-            blockId.length < 1 ||
-            blockId.length > 128
+          (blockId) => typeof blockId !== 'string' || blockId.length < 1 || blockId.length > 128
         ))
     ) {
-      throw new BufferError(
-        'INVALID_CONTENT',
-        'read_buffer requires valid block IDs'
-      );
+      throw new BufferError('INVALID_CONTENT', 'read_buffer requires valid block IDs');
     }
     if (
       options.offset !== undefined &&
-      (!Number.isInteger(options.offset) ||
-        options.offset < 0 ||
-        options.offset > 10_000)
+      (!Number.isInteger(options.offset) || options.offset < 0 || options.offset > 10_000)
     ) {
       throw new BufferError('INVALID_CONTENT', 'The read offset is invalid');
     }
     if (
       options.limit !== undefined &&
-      (!Number.isInteger(options.limit) ||
-        options.limit < 1 ||
-        options.limit > MAX_READ_BLOCKS)
+      (!Number.isInteger(options.limit) || options.limit < 1 || options.limit > MAX_READ_BLOCKS)
     ) {
       throw new BufferError('INVALID_CONTENT', 'The read limit is invalid');
     }
@@ -200,10 +164,7 @@ export class DocumentBuffer {
     if (requested) {
       for (const blockId of requested) {
         if (!locations.some((location) => location.blockId === blockId)) {
-          throw new BufferError(
-            'BLOCK_NOT_FOUND',
-            `Block ${blockId} was not found`
-          );
+          throw new BufferError('BLOCK_NOT_FOUND', `Block ${blockId} was not found`);
         }
       }
     }
@@ -215,17 +176,10 @@ export class DocumentBuffer {
     );
     const blocks: BufferBlock[] = [];
     let resultChars = 0;
-    for (
-      let index = offset;
-      index < visibleLocations.length && blocks.length < limit;
-      index += 1
-    ) {
+    for (let index = offset; index < visibleLocations.length && blocks.length < limit; index += 1) {
       const block = toBufferBlock(visibleLocations[index]);
       const blockChars = JSON.stringify(block).length + 1;
-      if (
-        blocks.length > 0 &&
-        resultChars + blockChars > MAX_READ_RESULT_CHARS
-      ) {
+      if (blocks.length > 0 && resultChars + blockChars > MAX_READ_RESULT_CHARS) {
         break;
       }
       blocks.push(block);
@@ -256,45 +210,29 @@ export class DocumentBuffer {
       expectedRevision.length < 1 ||
       expectedRevision.length > 128
     ) {
-      throw new BufferError(
-        'INVALID_CONTENT',
-        'edit_buffer requires a valid revision'
-      );
+      throw new BufferError('INVALID_CONTENT', 'edit_buffer requires a valid revision');
     }
     this.ensureRevision(expectedRevision);
     if (!Array.isArray(operations) || !operations.length) {
-      throw new BufferError(
-        'INVALID_CONTENT',
-        'At least one edit operation is required'
-      );
+      throw new BufferError('INVALID_CONTENT', 'At least one edit operation is required');
     }
     if (
       operations.length > 20 ||
       operations.some((operation) => !isValidEditOperation(operation))
     ) {
-      throw new BufferError(
-        'INVALID_CONTENT',
-        'edit_buffer contains invalid operations'
-      );
+      throw new BufferError('INVALID_CONTENT', 'edit_buffer contains invalid operations');
     }
     await this.validateEditContent(expectedRevision, operations, signal);
     this.ensureEditable();
     ensureNotAborted(signal);
 
     const locations = this.getLocations();
-    const byId = new Map(
-      locations.map((location) => [location.blockId, location])
-    );
+    const byId = new Map(locations.map((location) => [location.blockId, location]));
     const prepared = prepareEditOperations(byId, operations);
 
     const beforeDoc = this.editor.state.doc;
     const transaction = this.editor.state.tr;
-    const changes = applyPreparedOperations(
-      this.editor,
-      transaction,
-      locations,
-      prepared
-    );
+    const changes = applyPreparedOperations(this.editor, transaction, locations, prepared);
     this.dispatch(
       transaction,
       beforeDoc,
@@ -311,10 +249,7 @@ export class DocumentBuffer {
     };
   }
 
-  async insert(
-    input: BufferInsertInput,
-    signal?: AbortSignal
-  ): Promise<BufferInsertResult> {
+  async insert(input: BufferInsertInput, signal?: AbortSignal): Promise<BufferInsertResult> {
     this.ensureEditable();
     ensureNotAborted(signal);
     if (!isValidInsertInput(input)) {
@@ -330,16 +265,15 @@ export class DocumentBuffer {
     ensureNotAborted(signal);
     this.ensureRevision(input.expectedRevision);
     const locations = this.getTopLevelLocations();
-    const { position, insertionIndex, replaceEmptyDocument } =
-      resolveInsertTarget(input, locations, this.editor.state.doc.content.size);
+    const { position, insertionIndex, replaceEmptyDocument } = resolveInsertTarget(
+      input,
+      locations,
+      this.editor.state.doc.content.size
+    );
 
     const beforeDoc = this.editor.state.doc;
     const transaction = replaceEmptyDocument
-      ? this.editor.state.tr.replaceWith(
-          position,
-          position + locations[0].node.nodeSize,
-          content
-        )
+      ? this.editor.state.tr.replaceWith(position, position + locations[0].node.nodeSize, content)
       : this.editor.state.tr.insert(position, content);
     const provisionalChanges = [
       {
@@ -367,9 +301,7 @@ export class DocumentBuffer {
       affectedBlockIds: changes.length
         ? changes.map((change) => change.blockId)
         : provisionalChanges.map((change) => change.blockId),
-      changes: changes.length
-        ? changes.map(compactChange)
-        : provisionalChanges.map(compactChange)
+      changes: changes.length ? changes.map(compactChange) : provisionalChanges.map(compactChange)
     };
   }
 
@@ -381,16 +313,13 @@ export class DocumentBuffer {
     this.ensureAvailable();
     ensureNotAborted(signal);
     this.ensureRevision(expectedRevision);
-    const locations = new Map(
-      this.getLocations().map((location) => [location.blockId, location])
-    );
+    const locations = new Map(this.getLocations().map((location) => [location.blockId, location]));
     for (const operation of operations) {
       ensureNotAborted(signal);
       if (operation.type !== 'replace_code') continue;
       const location = locations.get(operation.blockId);
       if (!location || location.node.type.name !== 'codeBlock') continue;
-      const language =
-        operation.language ?? String(location.node.attrs?.language ?? '');
+      const language = operation.language ?? String(location.node.attrs?.language ?? '');
       if (language === 'mermaid') {
         await validateMermaidSource(operation.newText, operation.blockId);
       }
@@ -406,10 +335,7 @@ export class DocumentBuffer {
       ? this.undoEntries.find((candidate) => candidate.changeId === changeId)
       : this.undoEntries[this.undoEntries.length - 1];
     if (!entry) {
-      throw new BufferError(
-        'UNSUPPORTED_RANGE',
-        'No AI change is available to undo'
-      );
+      throw new BufferError('UNSUPPORTED_RANGE', 'No AI change is available to undo');
     }
     if (entry !== this.undoEntries[this.undoEntries.length - 1]) {
       throw new BufferError(
@@ -456,19 +382,11 @@ export class DocumentBuffer {
   revealBlock(blockId: string): void {
     this.ensureAvailable();
     if (typeof blockId !== 'string' || !blockId.length) {
-      throw new BufferError(
-        'BLOCK_NOT_FOUND',
-        'The requested block is invalid'
-      );
+      throw new BufferError('BLOCK_NOT_FOUND', 'The requested block is invalid');
     }
-    const location = this.getLocations().find(
-      (candidate) => candidate.blockId === blockId
-    );
+    const location = this.getLocations().find((candidate) => candidate.blockId === blockId);
     if (!location) {
-      throw new BufferError(
-        'BLOCK_NOT_FOUND',
-        `Block ${blockId} was not found`
-      );
+      throw new BufferError('BLOCK_NOT_FOUND', `Block ${blockId} was not found`);
     }
     const from = location.position + 1;
     const to = Math.max(from, location.position + location.node.nodeSize - 1);
@@ -490,16 +408,10 @@ export class DocumentBuffer {
     affectedRanges: Array<{ from: number; to: number }>
   ): void {
     if (transaction.docChanged === false) {
-      throw new BufferError(
-        'INVALID_CONTENT',
-        'The edit produced no document change'
-      );
+      throw new BufferError('INVALID_CONTENT', 'The edit produced no document change');
     }
     if (!changes.length) {
-      throw new BufferError(
-        'INVALID_CONTENT',
-        'The edit did not produce a change summary'
-      );
+      throw new BufferError('INVALID_CONTENT', 'The edit did not produce a change summary');
     }
     const inverseSteps = captureInverseSteps(transaction, beforeDoc);
     transaction.setMeta('aiPageEditingMutation', true);
@@ -539,10 +451,7 @@ export class DocumentBuffer {
 
   private ensureAvailable(): void {
     if (this.destroyed || this.editor.isDestroyed) {
-      throw new BufferError(
-        'SESSION_UNAVAILABLE',
-        'The page editor is unavailable'
-      );
+      throw new BufferError('SESSION_UNAVAILABLE', 'The page editor is unavailable');
     }
   }
 

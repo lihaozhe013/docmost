@@ -41,21 +41,14 @@ function CommentMenu({
   return (
     <Menu shadow="md" width={200}>
       <Menu.Target>
-        <ActionIcon
-          variant="default"
-          style={{ border: 'none' }}
-          aria-label={t('Comment menu')}
-        >
+        <ActionIcon variant="default" style={{ border: 'none' }} aria-label={t('Comment menu')}>
           <IconDots size={20} stroke={2} />
         </ActionIcon>
       </Menu.Target>
 
       <Menu.Dropdown>
         {canEdit && (
-          <Menu.Item
-            onClick={onEditComment}
-            leftSection={<IconEdit size={14} />}
-          >
+          <Menu.Item onClick={onEditComment} leftSection={<IconEdit size={14} />}>
             {t('Edit comment')}
           </Menu.Item>
         )}
@@ -63,20 +56,13 @@ function CommentMenu({
           <Menu.Item
             onClick={onResolveComment}
             leftSection={
-              isResolved ? (
-                <IconCircleCheckFilled size={14} />
-              ) : (
-                <IconCircleCheck size={14} />
-              )
+              isResolved ? <IconCircleCheckFilled size={14} /> : <IconCircleCheck size={14} />
             }
           >
             {isResolved ? t('Re-open comment') : t('Resolve comment')}
           </Menu.Item>
         )}
-        <Menu.Item
-          leftSection={<IconTrash size={14} />}
-          onClick={openDeleteModal}
-        >
+        <Menu.Item leftSection={<IconTrash size={14} />} onClick={openDeleteModal}>
           {t('Delete comment')}
         </Menu.Item>
       </Menu.Dropdown>

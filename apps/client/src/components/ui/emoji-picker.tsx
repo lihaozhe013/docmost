@@ -1,10 +1,5 @@
 import React, { ReactNode, useEffect, useState } from 'react';
-import {
-  ActionIcon,
-  Popover,
-  Button,
-  useMantineColorScheme
-} from '@mantine/core';
+import { ActionIcon, Popover, Button, useMantineColorScheme } from '@mantine/core';
 import { useClickOutside, useDisclosure, useWindowEvent } from '@mantine/hooks';
 import { Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -51,11 +46,7 @@ function EmojiPicker({
   const [target, setTarget] = useState<HTMLElement | null>(null);
   const [dropdown, setDropdown] = useState<HTMLDivElement | null>(null);
 
-  useClickOutside(
-    () => handlers.close(),
-    ['mousedown', 'touchstart'],
-    [dropdown, target]
-  );
+  useClickOutside(() => handlers.close(), ['mousedown', 'touchstart'], [dropdown, target]);
 
   // We need this because the default Mantine popover closeOnEscape does not work
   useWindowEvent('keydown', (event) => {
@@ -80,9 +71,7 @@ function EmojiPicker({
     const tryFocus = (attempts: number) => {
       if (cancelled) return;
       const pickerEl = dropdown.querySelector('em-emoji-picker');
-      const input = pickerEl?.shadowRoot?.querySelector<HTMLInputElement>(
-        'input[type="search"]'
-      );
+      const input = pickerEl?.shadowRoot?.querySelector<HTMLInputElement>('input[type="search"]');
       if (input) {
         input.focus({ preventScroll: true });
         return;

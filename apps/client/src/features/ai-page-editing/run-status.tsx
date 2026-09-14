@@ -18,33 +18,18 @@ function useElapsedSeconds(): number {
   const [seconds, setSeconds] = useState(0);
   useEffect(() => {
     const startedAt = Date.now();
-    const id = setInterval(
-      () => setSeconds(Math.floor((Date.now() - startedAt) / 1000)),
-      1000
-    );
+    const id = setInterval(() => setSeconds(Math.floor((Date.now() - startedAt) / 1000)), 1000);
     return () => clearInterval(id);
   }, []);
   return seconds;
 }
 
-export function RunStatus({
-  phase,
-  tokenEstimate
-}: {
-  phase: RunPhase;
-  tokenEstimate: number;
-}) {
+export function RunStatus({ phase, tokenEstimate }: { phase: RunPhase; tokenEstimate: number }) {
   const dots = useAnimatedEllipsis();
   const seconds = useElapsedSeconds();
   const verb = `${phaseVerb(phase).replace(/…+$/, '')}${dots}`;
   return (
-    <Group
-      gap="xs"
-      wrap="nowrap"
-      className={classes.runStatus}
-      role="status"
-      aria-live="polite"
-    >
+    <Group gap="xs" wrap="nowrap" className={classes.runStatus} role="status" aria-live="polite">
       <Box component="span" className={classes.spinIcon} aria-hidden>
         <IconSparkles size={14} />
       </Box>

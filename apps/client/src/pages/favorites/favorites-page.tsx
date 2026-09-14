@@ -23,14 +23,8 @@ import rowClasses from '@/components/ui/clickable-table-row.module.css';
 
 export default function FavoritesPage() {
   const { t } = useTranslation();
-  const {
-    data,
-    isLoading,
-    isError,
-    hasNextPage,
-    fetchNextPage,
-    isFetchingNextPage
-  } = useFavoritesQuery('page');
+  const { data, isLoading, isError, hasNextPage, fetchNextPage, isFetchingNextPage } =
+    useFavoritesQuery('page');
   const favorites = data?.pages.flatMap((p) => p.items) ?? [];
 
   if (isLoading) {
@@ -72,19 +66,11 @@ export default function FavoritesPage() {
                         <UnstyledButton
                           className={rowClasses.link}
                           component={Link}
-                          to={buildPageUrl(
-                            fav.space?.slug,
-                            fav.page.slugId,
-                            fav.page.title
-                          )}
+                          to={buildPageUrl(fav.space?.slug, fav.page.slugId, fav.page.title)}
                         >
                           <Group wrap="nowrap">
                             {fav.page.icon || (
-                              <ThemeIcon
-                                variant="transparent"
-                                color="gray"
-                                size={18}
-                              >
+                              <ThemeIcon variant="transparent" color="gray" size={18}>
                                 <IconFileDescription size={18} />
                               </ThemeIcon>
                             )}
@@ -108,12 +94,7 @@ export default function FavoritesPage() {
                         )}
                       </Table.Td>
                       <Table.Td>
-                        <Text
-                          c="dimmed"
-                          style={{ whiteSpace: 'nowrap' }}
-                          size="xs"
-                          fw={500}
-                        >
+                        <Text c="dimmed" style={{ whiteSpace: 'nowrap' }} size="xs" fw={500}>
                           {formattedDate(new Date(fav.createdAt))}
                         </Text>
                       </Table.Td>

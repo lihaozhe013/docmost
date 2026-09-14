@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  Logger,
-  ServiceUnavailableException
-} from '@nestjs/common';
+import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
 import { EnvironmentService } from '../environment/environment.service';
 import {
   createOpenAiResponsesClient,

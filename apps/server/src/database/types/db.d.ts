@@ -10,11 +10,7 @@ export type Generated<T> =
     ? ColumnType<S, I | undefined, U>
     : ColumnType<T, T | undefined, T>;
 
-export type Int8 = ColumnType<
-  string,
-  bigint | number | string,
-  bigint | number | string
->;
+export type Int8 = ColumnType<string, bigint | number | string, bigint | number | string>;
 
 export type Json = JsonValue;
 

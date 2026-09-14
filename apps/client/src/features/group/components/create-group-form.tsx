@@ -33,10 +33,7 @@ export function CreateGroupForm() {
     setUserIds(value);
   };
 
-  const handleSubmit = async (data: {
-    name?: string;
-    description?: string;
-  }) => {
+  const handleSubmit = async (data: { name?: string; description?: string }) => {
     const groupData = {
       name: data.name,
       description: data.description,
@@ -73,10 +70,7 @@ export function CreateGroupForm() {
               {...form.getInputProps('description')}
             />
 
-            <MultiUserSelect
-              label={t('Add group members')}
-              onChange={handleMultiSelectChange}
-            />
+            <MultiUserSelect label={t('Add group members')} onChange={handleMultiSelectChange} />
           </Stack>
 
           <Group justify="flex-end" mt="md">

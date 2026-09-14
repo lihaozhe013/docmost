@@ -104,12 +104,7 @@ export function AudioMenu({ editor }: EditorMenuProps) {
         </Tooltip>
 
         <Tooltip position="top" label={t('Delete')} withinPortal={false}>
-          <ActionIcon
-            onClick={handleDelete}
-            size="lg"
-            aria-label={t('Delete')}
-            variant="subtle"
-          >
+          <ActionIcon onClick={handleDelete} size="lg" aria-label={t('Delete')} variant="subtle">
             <IconTrash size={18} />
           </ActionIcon>
         </Tooltip>

@@ -18,6 +18,4 @@ type PagePermissionGroupMember = {
   createdAt: Date;
 };
 
-export type PagePermissionMember =
-  | PagePermissionUserMember
-  | PagePermissionGroupMember;
+export type PagePermissionMember = PagePermissionUserMember | PagePermissionGroupMember;

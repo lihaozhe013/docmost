@@ -2,30 +2,25 @@
 
 Status: implementation specification and current implementation reference.
 
-Scope: conversational editing of the currently open page in this private,
-self-hosted Docmost fork.
+Scope: conversational editing of the currently open page in this private, self-hosted Docmost fork.
 
-This document defines the architecture, behavioral contracts, delivery sequence,
-and acceptance criteria for AI page editing. It is the reference for subsequent
-implementation decisions. Changes to these contracts must update this document
-together with the affected implementation.
+This document defines the architecture, behavioral contracts, delivery sequence, and acceptance
+criteria for AI page editing. It is the reference for subsequent implementation decisions. Changes
+to these contracts must update this document together with the affected implementation.
 
 ## 1. Objective
 
-Provide a conversational editing experience in which an agent reads a page,
-invokes focused editing tools, observes their results, and continues until the
-requested changes are complete or execution stops. Users see changes in the page
-and can continue the conversation to refine them.
+Provide a conversational editing experience in which an agent reads a page, invokes focused editing
+tools, observes their results, and continues until the requested changes are complete or execution
+stops. Users see changes in the page and can continue the conversation to refine them.
 
-The agent runtime must remain independent of Docmost's document model and
-application services. Docmost supplies the tools that read and modify its
-documents. The runtime orchestrates model calls and tool execution without
-accessing the editor, collaboration service, or database directly.
+The agent runtime must remain independent of Docmost's document model and application services.
+Docmost supplies the tools that read and modify its documents. The runtime orchestrates model calls
+and tool execution without accessing the editor, collaboration service, or database directly.
 
-The interaction follows the useful parts of a coding agent: inspect current
-content, make targeted changes, handle tool errors, inspect results, and report
-the outcome. A filesystem, shell, terminal, code execution sandbox, and
-repository discovery are unnecessary for this scope.
+The interaction follows the useful parts of a coding agent: inspect current content, make targeted
+changes, handle tool errors, inspect results, and report the outcome. A filesystem, shell, terminal,
+code execution sandbox, and repository discovery are unnecessary for this scope.
 
 ## 2. Scope and Product Behavior
 
@@ -38,24 +33,21 @@ The initial release supports:
 - Replacing text within supported blocks.
 - Generating and editing fenced code blocks, including Mermaid diagrams.
 - Generating and editing block LaTeX formulas and inline LaTeX formulas.
-- Inserting supported blocks at explicit locations, including into an empty
-  page.
+- Inserting supported blocks at explicit locations, including into an empty page.
 - Deleting supported blocks through an explicit operation.
 - Multiple tool calls within one user request.
 - Streaming assistant messages and displaying completed tool changes.
 - Stopping an active run and showing its actual outcome.
-- Explicitly undoing supported AI changes without restoring a whole-page
-  snapshot.
+- Explicitly undoing supported AI changes without restoring a whole-page snapshot.
 - Bounded conversation history for the lifetime of the open page session.
 
-Successful edit calls modify the live document immediately. The chat panel
-displays a concise change summary and can navigate to the affected block.
-Starting a run authorizes its supported edits; there is no mandatory approval
-prompt for every tool call.
+Successful edit calls modify the live document immediately. The chat panel displays a concise change
+summary and can navigate to the affected block. Starting a run authorizes its supported edits; there
+is no mandatory approval prompt for every tool call.
 
-The page must remain open and the collaboration connection must remain usable.
-Navigation, editor destruction, loss of edit access, or disconnection stops the
-run. Applied changes remain applied when a run stops.
+The page must remain open and the collaboration connection must remain usable. Navigation, editor
+destruction, loss of edit access, or disconnection stops the run. Applied changes remain applied
+when a run stops.
 
 ### 2.2 Deferred capabilities
 
@@ -63,25 +55,21 @@ The following are outside the initial release:
 
 - Editing other pages or searching the workspace.
 - Background execution after the page closes.
-- Filesystem, shell, browser automation, arbitrary network, or code execution
-  tools.
+- Filesystem, shell, browser automation, arbitrary network, or code execution tools.
 - Multi-agent orchestration, skills, plugin marketplaces, and MCP exposure.
 - Retrieval pipelines, embeddings, and workspace knowledge chat.
-- Creating attachments or editing non-Mermaid diagrams, databases, and embedded
-  content.
+- Creating attachments or editing non-Mermaid diagrams, databases, and embedded content.
 - Editing page titles, permissions, comments, or other page metadata.
-- Durable chat history, automatic run recovery, and resuming interrupted tool
-  execution.
+- Durable chat history, automatic run recovery, and resuming interrupted tool execution.
 - A separate draft document with an accept/reject merge workflow.
 - Billing, model tiers, or commercial administration features.
 
-These capabilities require their own scope decisions. The initial architecture
-must not implement speculative infrastructure for them.
+These capabilities require their own scope decisions. The initial architecture must not implement
+speculative infrastructure for them.
 
 ## 3. Repository Baseline
 
-The following paths describe the integration points inspected for this
-specification:
+The following paths describe the integration points inspected for this specification:
 
 | Area                      | Existing implementation                                                                                  | Implication                                                                                                                                                 |
 | ------------------------- | -------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -95,15 +83,14 @@ specification:
 | Markdown conversion       | [`markdown/index.ts`](../packages/editor-ext/src/lib/markdown/index.ts)                                  | Existing import/export helpers are reusable only where their supported conversion behavior matches the tool contract.                                       |
 | Model dependencies        | [`apps/server/package.json`](../apps/server/package.json)                                                | Page editing uses a small native HTTP client for the OpenAI Responses protocol.                                                                             |
 
-No reusable AI implementation is kept under `apps/server/src/ee`. The current
-feature lives under `apps/server/src/integrations/ai-page-editing` so the
-runtime, session host, and Responses client remain separate from enterprise
-feature modules. Dependency declarations and client routes alone do not
-establish a working server-side agent feature.
+No reusable AI implementation is kept under `apps/server/src/ee`. The current feature lives under
+`apps/server/src/integrations/ai-page-editing` so the runtime, session host, and Responses client
+remain separate from enterprise feature modules. Dependency declarations and client routes alone do
+not establish a working server-side agent feature.
 
-The implementation must preserve the existing collaboration and persistence
-lifecycle. Updating page JSON or text directly in the database would bypass the
-active document and is prohibited for agent edits.
+The implementation must preserve the existing collaboration and persistence lifecycle. Updating page
+JSON or text directly in the database would bypass the active document and is prohibited for agent
+edits.
 
 ## 4. Architecture and Dependency Boundaries
 
@@ -131,31 +118,27 @@ The runtime owns:
 - Per-run cancellation, timeouts, and step limits.
 - Context assembly from supplied messages and tool results.
 
-It must not import React, Tiptap, Yjs, NestJS application services, page
-repositories, or Docmost permission logic. It receives tool definitions, a
-dispatcher, model configuration, messages, and cancellation signals through its
-public interface.
+It must not import React, Tiptap, Yjs, NestJS application services, page repositories, or Docmost
+permission logic. It receives tool definitions, a dispatcher, model configuration, messages, and
+cancellation signals through its public interface.
 
-Runtime dependency types must not become the application's chat storage or wire
-protocol. An adapter translates library messages and events into
-application-owned contracts.
+Runtime dependency types must not become the application's chat storage or wire protocol. An adapter
+translates library messages and events into application-owned contracts.
 
 ### 4.2 Session host
 
-The server session host owns authentication, page scope, run lifecycle, API
-credentials, and the connection to the owning browser session. It instantiates
-the runtime and injects tools bound to that session.
+The server session host owns authentication, page scope, run lifecycle, API credentials, and the
+connection to the owning browser session. It instantiates the runtime and injects tools bound to
+that session.
 
-The host validates access before starting a run and before dispatching
-mutations. Existing collaboration authorization must also remain enforced.
-Browser checks improve correctness and feedback but do not replace server
-authorization.
+The host validates access before starting a run and before dispatching mutations. Existing
+collaboration authorization must also remain enforced. Browser checks improve correctness and
+feedback but do not replace server authorization.
 
-Each session is bound to one user, workspace, page, and editor instance. Model
-arguments cannot change those bindings. Only one run may execute within a
-session at a time. A new user message during execution is rejected with a clear
-busy state in the initial release; the user can stop the run before submitting
-another request.
+Each session is bound to one user, workspace, page, and editor instance. Model arguments cannot
+change those bindings. Only one run may execute within a session at a time. A new user message
+during execution is rejected with a clear busy state in the initial release; the user can stop the
+run before submitting another request.
 
 ### 4.3 Document adapter
 
@@ -168,15 +151,14 @@ The browser document adapter owns:
 - Applying localized editor transactions.
 - Tracking changes for UI presentation and supported undo operations.
 
-The adapter is an application editing capability with no dependency on an agent
-library. It must be testable through direct calls without a model.
+The adapter is an application editing capability with no dependency on an agent library. It must be
+testable through direct calls without a model.
 
 ### 4.4 Deployment boundary
 
-The initial runtime runs in the server process behind an independent package
-boundary. Logical independence does not imply process fault isolation. A
-separate worker or service may be introduced if runtime fault isolation becomes
-a concrete requirement; it is not required for the first release.
+The initial runtime runs in the server process behind an independent package boundary. Logical
+independence does not imply process fault isolation. A separate worker or service may be introduced
+if runtime fault isolation becomes a concrete requirement; it is not required for the first release.
 
 The separation is successful when:
 
@@ -186,26 +168,23 @@ The separation is successful when:
 
 ## 5. Runtime Selection
 
-The first runtime uses a small native HTTP client for the OpenAI Responses API.
-Keeping the protocol client local makes the request and stream behavior
-explicit, avoids provider SDK coupling, and keeps the runtime independent from
-the page editor. The runtime owns the bounded tool loop and does not expose the
-provider's wire types to the application.
+The first runtime uses a small native HTTP client for the OpenAI Responses API. Keeping the protocol
+client local makes the request and stream behavior explicit, avoids provider SDK coupling, and keeps
+the runtime independent from the page editor. The runtime owns the bounded tool loop and does not
+expose the provider's wire types to the application.
 
-Pi agent core is the preferred alternative when a concrete requirement benefits
-from its agent lifecycle and event model. Pi's file edit implementation also
-provides a useful reference for exact matching and replaceable I/O operations.
-The initial implementation must not ship two runtime backends merely to
-demonstrate interchangeability.
+Pi agent core is the preferred alternative when a concrete requirement benefits from its agent
+lifecycle and event model. Pi's file edit implementation also provides a useful reference for exact
+matching and replaceable I/O operations. The initial implementation must not ship two runtime
+backends merely to demonstrate interchangeability.
 
-OpenCode's edit implementation is a reference for tool behavior and error
-handling. Importing its full application runtime would introduce unrelated
-filesystem, formatting, snapshot, and language-server concerns.
+OpenCode's edit implementation is a reference for tool behavior and error handling. Importing its
+full application runtime would introduce unrelated filesystem, formatting, snapshot, and
+language-server concerns.
 
-Before adopting a new dependency or copying source, review the selected version,
-package surface, and applicable license. External main-branch links are
-informative references, not frozen behavioral specifications. This document
-defines the behavior required by Docmost.
+Before adopting a new dependency or copying source, review the selected version, package surface,
+and applicable license. External main-branch links are informative references, not frozen behavioral
+specifications. This document defines the behavior required by Docmost.
 
 ### 5.1 Responses API configuration
 
@@ -217,17 +196,15 @@ Page editing is configured with three server-only environment variables:
 | `AI_API_KEY` | Bearer credential sent only by the server.                                             |
 | `AI_MODEL`   | Model identifier accepted by the configured endpoint.                                  |
 
-All three values must be set to enable page editing. The URL is used exactly as
-configured when it already ends in `/responses`; otherwise the server resolves
-the Responses endpoint before sending a request. The official OpenAI host gets
-`/v1/responses` from a root URL, a URL ending in `/v1` gets `/v1/responses`, and
-other provider roots get `/responses`. A URL ending in `/chat/completions` is
-rewritten to the corresponding `/responses` path. The resolver does not send
-probe requests or retry a 404. Requests use `stream: true`, `store: false`, and
-include encrypted reasoning content so the stateless tool loop can replay
-reasoning items on the next request. The configured service must support
-standard Responses streaming and function calling. Chat Completions-only
-services are outside the supported contract.
+All three values must be set to enable page editing. The URL is used exactly as configured when it
+already ends in `/responses`; otherwise the server resolves the Responses endpoint before sending a
+request. The official OpenAI host gets `/v1/responses` from a root URL, a URL ending in `/v1` gets
+`/v1/responses`, and other provider roots get `/responses`. A URL ending in `/chat/completions` is
+rewritten to the corresponding `/responses` path. The resolver does not send probe requests or retry
+a 404. Requests use `stream: true`, `store: false`, and include encrypted reasoning content so the
+stateless tool loop can replay reasoning items on the next request. The configured service must
+support standard Responses streaming and function calling. Chat Completions-only services are
+outside the supported contract.
 
 For example, these configurations resolve to the provider endpoints shown:
 
@@ -238,39 +215,36 @@ For example, these configurations resolve to the provider endpoints shown:
 AI_API_URL=https://api.deepseek.com
 ```
 
-An unavailable or incomplete configuration fails the run with a structured
-error. Credentials, authorization headers, and request bodies are never sent to
-the browser or written to logs.
+An unavailable or incomplete configuration fails the run with a structured error. Credentials,
+authorization headers, and request bodies are never sent to the browser or written to logs.
 
-Deployments using the previous provider-specific settings must remove
-`AI_DRIVER`, `AI_COMPLETION_MODEL`, `AI_CHAT_MODEL`, and provider-specific key
-or URL variables, then set `AI_API_URL`, `AI_API_KEY`, and `AI_MODEL` above. The
-page-editing integration does not fall back to the removed settings.
+Deployments using the previous provider-specific settings must remove `AI_DRIVER`,
+`AI_COMPLETION_MODEL`, `AI_CHAT_MODEL`, and provider-specific key or URL variables, then set
+`AI_API_URL`, `AI_API_KEY`, and `AI_MODEL` above. The page-editing integration does not fall back to
+the removed settings.
 
 ## 6. Document Buffer Model
 
 ### 6.1 Authority and representation
 
-The authoritative editing state is the current Tiptap document synchronized
-through Yjs. A buffer is a session-scoped projection of that document, not an
-independent persisted Markdown copy.
+The authoritative editing state is the current Tiptap document synchronized through Yjs. A buffer is
+a session-scoped projection of that document, not an independent persisted Markdown copy.
 
 Maintain three related representations:
 
 1. The original rich document in the editor.
 2. A model-readable projection with explicit block handles and capabilities.
-3. A private mapping from handles and projected offsets to current document
-   structure.
+3. A private mapping from handles and projected offsets to current document structure.
 
-Do not serialize the whole page to Markdown, modify the string, and replace the
-whole page. Import/export conversion is not an established lossless round trip
-for IDs, marks, comments, embeds, and application-specific attributes.
+Do not serialize the whole page to Markdown, modify the string, and replace the whole page.
+Import/export conversion is not an established lossless round trip for IDs, marks, comments, embeds,
+and application-specific attributes.
 
 ### 6.2 Read output
 
-Read results contain a buffer revision and ordered block records. Each record
-identifies its handle, node type, capabilities, and supported content. Display
-labels and handles are metadata, not editable text.
+Read results contain a buffer revision and ordered block records. Each record identifies its handle,
+node type, capabilities, and supported content. Display labels and handles are metadata, not
+editable text.
 
 Example conceptual output:
 
@@ -287,41 +261,37 @@ Run the application using Docker Compose.
 Architecture diagram
 ```
 
-Typed tool results must distinguish plain text from Markdown and structural
-metadata. For text replacement, `oldText` refers to the block's plain-text
-content, not heading syntax or metadata labels.
+Typed tool results must distinguish plain text from Markdown and structural metadata. For text
+replacement, `oldText` refers to the block's plain-text content, not heading syntax or metadata
+labels.
 
-Code blocks include their `language` and complete source in `text`. Formula
-blocks expose their LaTeX source in `text` without delimiters. Paragraphs and
-headings may include `segments`; each segment has the editor child `index`, a
-`type` of `text` or `mathInline`, and its source text. Use segment indexes for
-inline formula operations instead of guessing offsets from the rendered `$...$`
-notation. A block marked `truncated` must be read again before attempting a
-source replacement.
+Code blocks include their `language` and complete source in `text`. Formula blocks expose their
+LaTeX source in `text` without delimiters. Paragraphs and headings may include `segments`; each
+segment has the editor child `index`, a `type` of `text` or `mathInline`, and its source text. Use
+segment indexes for inline formula operations instead of guessing offsets from the rendered `$...$`
+notation. A block marked `truncated` must be read again before attempting a source replacement.
 
-Protected blocks expose their type and available local description only. The
-adapter must not fetch linked pages, embedded resources, or referenced document
-contents to enrich this projection.
+Protected blocks expose their type and available local description only. The adapter must not fetch
+linked pages, embedded resources, or referenced document contents to enrich this projection.
 
 ### 6.3 Handles and revisions
 
-Reuse existing node IDs when suitable, but treat externally exposed handles as
-opaque session identifiers. For nodes without IDs, maintain an adapter-owned
-mapping. Handles must never silently resolve to a different block after deletion
-or structural change.
+Reuse existing node IDs when suitable, but treat externally exposed handles as opaque session
+identifiers. For nodes without IDs, maintain an adapter-owned mapping. Handles must never silently
+resolve to a different block after deletion or structural change.
 
-Use an adapter-local, monotonic document revision. Advance it whenever document
-content changes, including remote changes and mark or attribute changes.
-Selection-only transactions do not advance it. Include an editor-instance epoch
-in the revision identity or invalidate the session when the editor is recreated.
+Use an adapter-local, monotonic document revision. Advance it whenever document content changes,
+including remote changes and mark or attribute changes. Selection-only transactions do not advance
+it. Include an editor-instance epoch in the revision identity or invalidate the session when the
+editor is recreated.
 
-Do not use the page's database `updatedAt` value as this revision. Do not equate
-a Yjs state vector with a complete application revision check.
+Do not use the page's database `updatedAt` value as this revision. Do not equate a Yjs state vector
+with a complete application revision check.
 
-The initial release uses a conservative whole-buffer revision precondition. Any
-intervening document change makes a mutation stale, even if it occurred in
-another block. This favors predictable behavior over automatic rebasing.
-Target-scoped checks may be introduced later with dedicated consistency tests.
+The initial release uses a conservative whole-buffer revision precondition. Any intervening document
+change makes a mutation stale, even if it occurred in another block. This favors predictable
+behavior over automatic rebasing. Target-scoped checks may be introduced later with dedicated
+consistency tests.
 
 ### 6.4 Initial content support
 
@@ -337,64 +307,56 @@ Target-scoped checks may be introduced later with dedicated consistency tests.
 | Block and inline LaTeX formulas                                       | Formula source and inline segment metadata     | Replace complete source after KaTeX validation                                                |
 | Columns, transclusions, attachments, non-Mermaid diagrams, and embeds | Structural or protected representation         | Preserve existing nodes; do not edit their descendants                                        |
 
-An otherwise ordinary paragraph inside a protected container remains protected.
-Capability checks must inspect ancestry, not just the leaf node type.
+An otherwise ordinary paragraph inside a protected container remains protected. Capability checks
+must inspect ancestry, not just the leaf node type.
 
-New content supports paragraphs, headings, simple bullet or ordered lists, task
-lists (`- [ ]`, `- [x] `), quotes (`> `), callouts
-(`:::info|success|warning|danger` with a body closed by `:::`), GitHub pipe
-tables, horizontal rules (`---`), fenced code blocks, Mermaid code blocks, block
-formulas, and inline formulas, with a documented subset of basic inline
-formatting. Unsupported Markdown constructs must produce an explicit error
-rather than silently disappear or degrade. Raw HTML, image insertion, and media,
-attachment, transclusion, column, or details nodes are outside this insertion
-grammar. HTML-looking text inside a code fence or formula is treated as source
-text.
+New content supports paragraphs, headings, simple bullet or ordered lists, task lists (`- [ ]`,
+`- [x] `), quotes (`> `), callouts (`:::info|success|warning|danger` with a body closed by `:::`),
+GitHub pipe tables, horizontal rules (`---`), fenced code blocks, Mermaid code blocks, block
+formulas, and inline formulas, with a documented subset of basic inline formatting. Unsupported
+Markdown constructs must produce an explicit error rather than silently disappear or degrade. Raw
+HTML, image insertion, and media, attachment, transclusion, column, or details nodes are outside
+this insertion grammar. HTML-looking text inside a code fence or formula is treated as source text.
 
 ## 7. Tool Contract
 
-Expose a small tool set: `read_buffer`, `edit_buffer`, and `insert_blocks`. No
-tool accepts a filesystem path or a model-selected user or workspace identity.
-The host binds the buffer to the active page.
+Expose a small tool set: `read_buffer`, `edit_buffer`, and `insert_blocks`. No tool accepts a
+filesystem path or a model-selected user or workspace identity. The host binds the buffer to the
+active page.
 
-The schemas below describe the required semantics. The implementation must
-provide concrete runtime schemas and generated or shared TypeScript types for
-its wire messages.
+The schemas below describe the required semantics. The implementation must provide concrete runtime
+schemas and generated or shared TypeScript types for its wire messages.
 
 ### 7.1 `read_buffer`
 
-Inputs select the whole page or explicit block handles, with optional bounded
-pagination for long documents. `offset` is zero-based and `limit` is bounded to
-100 blocks per call. The result includes:
+Inputs select the whole page or explicit block handles, with optional bounded pagination for long
+documents. `offset` is zero-based and `limit` is bounded to 100 blocks per call. The result
+includes:
 
 - Buffer revision and whether the requested view is complete.
 - Ordered block records and supported operations.
-- Selection context captured when the user submitted the message, if still
-  resolvable.
-- An explicit `complete` flag and `nextOffset` continuation value when content
-  is truncated.
+- Selection context captured when the user submitted the message, if still resolvable.
+- An explicit `complete` flag and `nextOffset` continuation value when content is truncated.
 
-For small pages, inject an initial read result when the run starts. Retain the
-read tool for verification, recovery, and large pages. Initial context injection
-does not remove the need to read again after conflicts.
+For small pages, inject an initial read result when the run starts. Retain the read tool for
+verification, recovery, and large pages. Initial context injection does not remove the need to read
+again after conflicts.
 
-Selection context guides the task; subsequent cursor movement must not retarget
-an edit. If a captured selection becomes invalid, report that state explicitly.
+Selection context guides the task; subsequent cursor movement must not retarget an edit. If a
+captured selection becomes invalid, report that state explicitly.
 
 ### 7.2 `edit_buffer`
 
-Inputs contain `expectedRevision` and one or more operations. The supported
-operation set is:
+Inputs contain `expectedRevision` and one or more operations. The supported operation set is:
 
-- `replace_text`: `blockId`, `oldText`, `newText`, and optional `segmentIndex`
-  for a text segment in a paragraph containing inline formulas.
-- `replace_code`: complete code source in `oldText`, replacement source in
-  `newText`, and an optional `language`. Use this for Mermaid as well.
+- `replace_text`: `blockId`, `oldText`, `newText`, and optional `segmentIndex` for a text segment in
+  a paragraph containing inline formulas.
+- `replace_code`: complete code source in `oldText`, replacement source in `newText`, and an
+  optional `language`. Use this for Mermaid as well.
 - `replace_math`: complete block-formula source replacement.
-- `replace_inline_math`: replace the complete LaTeX source of an inline formula
-  identified by `segmentIndex`.
-- `replace_text_with_math`: replace a unique range in a text segment with a new
-  inline formula.
+- `replace_inline_math`: replace the complete LaTeX source of an inline formula identified by
+  `segmentIndex`.
+- `replace_text_with_math`: replace a unique range in a text segment with a new inline formula.
 - `delete_block`: `blockId`, restricted to deletable supported blocks.
 
 Example:
@@ -416,46 +378,38 @@ Example:
 Replacement rules:
 
 1. `oldText` is nonempty and matches exactly once in the addressed block.
-2. Matching is literal. No fuzzy matching, trimming, case folding, or Unicode
-   normalization is performed silently.
-3. Empty `newText` deletes the matched text. Removing a whole block requires
-   `delete_block`.
+2. Matching is literal. No fuzzy matching, trimming, case folding, or Unicode normalization is
+   performed silently.
+3. Empty `newText` deletes the matched text. Removing a whole block requires `delete_block`.
 4. Every operation is resolved against the same pre-edit document revision.
-5. Overlapping edits, ancestor/descendant deletions, and conflicting operations
-   are rejected.
+5. Overlapping edits, ancestor/descendant deletions, and conflicting operations are rejected.
 6. All operations are validated before any mutation occurs.
-7. One successful call applies one local editor transaction and returns its
-   resulting revision.
+7. One successful call applies one local editor transaction and returns its resulting revision.
 
-Text replacement is confined to a supported text range within one text block.
-For a paragraph containing inline formulas, use the returned segment index and
-keep the range within its text segment. Multi-paragraph insertion belongs to
-`insert_blocks`.
+Text replacement is confined to a supported text range within one text block. For a paragraph
+containing inline formulas, use the returned segment index and keep the range within its text
+segment. Multi-paragraph insertion belongs to `insert_blocks`.
 
-Code replacement compares the complete source, preserves the code block node and
-its attributes, and may contain line breaks. Setting `language` changes the
-language class; the exact value `language: "mermaid"` enables Mermaid rendering
-and requires valid Mermaid syntax. Formula replacement compares the complete
-source and validates the new source with KaTeX before changing the node. Inline
-formula source excludes its `$` delimiters and cannot contain line breaks.
+Code replacement compares the complete source, preserves the code block node and its attributes, and
+may contain line breaks. Setting `language` changes the language class; the exact value
+`language: "mermaid"` enables Mermaid rendering and requires valid Mermaid syntax. Formula
+replacement compares the complete source and validates the new source with KaTeX before changing the
+node. Inline formula source excludes its `$` delimiters and cannot contain line breaks.
 
-Use localized ProseMirror operations so unaffected nodes, attributes, and marks
-remain intact. Replacement text inherits marks only when the matched range has a
-uniform supported mark set. Mixed mark boundaries, comment ranges, and
-unsupported inline atoms produce `UNSUPPORTED_RANGE`. Inline formula segments
-are handled only by their dedicated operations. The agent may read again and
-choose a smaller valid edit; the tool must never silently remove formatting to
-succeed.
+Use localized ProseMirror operations so unaffected nodes, attributes, and marks remain intact.
+Replacement text inherits marks only when the matched range has a uniform supported mark set. Mixed
+mark boundaries, comment ranges, and unsupported inline atoms produce `UNSUPPORTED_RANGE`. Inline
+formula segments are handled only by their dedicated operations. The agent may read again and choose
+a smaller valid edit; the tool must never silently remove formatting to succeed.
 
-Block deletion must validate the resulting structure. Unsupported or ambiguous
-container cleanup is rejected rather than inferred. Preserve a valid empty
-document according to the editor schema when deleting its final supported
-content.
+Block deletion must validate the resulting structure. Unsupported or ambiguous container cleanup is
+rejected rather than inferred. Preserve a valid empty document according to the editor schema when
+deleting its final supported content.
 
 ### 7.3 `insert_blocks`
 
-Inputs contain `expectedRevision`, a structured insertion target, and Markdown
-in the supported insertion grammar.
+Inputs contain `expectedRevision`, a structured insertion target, and Markdown in the supported
+insertion grammar.
 
 The target is always an object. Use one of these forms:
 
@@ -476,16 +430,14 @@ Complete insertion input:
 }
 ```
 
-The Markdown insertion grammar also accepts fenced code blocks. The language
-after the opening fence is stored on the code block; use `mermaid` exactly to
-render a diagram. Quotes use `> ` lines, task items start with `- [ ] ` or
-`- [x] `, callouts use `:::type` followed by a body and a closing `:::`, GitHub
-pipe syntax inserts real tables, and a `---` line separated by blank lines is a
-horizontal rule. Text blocks nested inside these containers are indexed with
-their container as `parentBlockId` and can be replaced with `replace_text`, but
-nested blocks cannot be deleted or used as insertion targets. A block formula is
-written as `$$` on separate lines, and an inline formula uses `$...$`. Formula
-and Mermaid sources are preserved as raw source and are validated before the
+The Markdown insertion grammar also accepts fenced code blocks. The language after the opening fence
+is stored on the code block; use `mermaid` exactly to render a diagram. Quotes use `> ` lines, task
+items start with `- [ ] ` or `- [x] `, callouts use `:::type` followed by a body and a closing
+`:::`, GitHub pipe syntax inserts real tables, and a `---` line separated by blank lines is a
+horizontal rule. Text blocks nested inside these containers are indexed with their container as
+`parentBlockId` and can be replaced with `replace_text`, but nested blocks cannot be deleted or used
+as insertion targets. A block formula is written as `$$` on separate lines, and an inline formula
+uses `$...$`. Formula and Mermaid sources are preserved as raw source and are validated before the
 transaction is dispatched. For example:
 
 ````markdown
@@ -501,30 +453,27 @@ flowchart TD
 ```
 ````
 
-The agent runtime also normalizes the unambiguous legacy forms
-`target: "document_start"`, `target: "document_end"`, and a
-`target: "before_block"` or `target: "after_block"` paired with a top-level
-`blockId`. Some providers return the object target as a JSON-encoded string; the
-runtime decodes one such layer before schema validation. A bare block ID or an
-insertion direction without its required block ID remains invalid.
+The agent runtime also normalizes the unambiguous legacy forms `target: "document_start"`,
+`target: "document_end"`, and a `target: "before_block"` or `target: "after_block"` paired with a
+top-level `blockId`. Some providers return the object target as a JSON-encoded string; the runtime
+decodes one such layer before schema validation. A bare block ID or an insertion direction without
+its required block ID remains invalid.
 
-Insertion targets are `document_start`, `document_end`, `before_block`, or
-`after_block`. The latter two require a block handle. Initial insertion is
-limited to valid top-level boundaries. An anchor within a nested container is
-rejected.
+Insertion targets are `document_start`, `document_end`, `before_block`, or `after_block`. The latter
+two require a block handle. Initial insertion is limited to valid top-level boundaries. An anchor
+within a nested container is rejected.
 
-Parse and validate the entire fragment before inserting it. Apply it in one
-transaction using the current schema. New nodes receive IDs through the
-application's established ID behavior; returned handles must resolve
-immediately. Protected existing nodes remain unchanged. A trailing empty
-paragraph may still be supplied by the editor's trailing-node extension and is
-not part of the requested content.
+Parse and validate the entire fragment before inserting it. Apply it in one transaction using the
+current schema. New nodes receive IDs through the application's established ID behavior; returned
+handles must resolve immediately. Protected existing nodes remain unchanged. A trailing empty
+paragraph may still be supplied by the editor's trailing-node extension and is not part of the
+requested content.
 
 ### 7.4 Tool results and errors
 
-Successful mutations return the new revision, a change identifier, affected
-block handles, a compact before/after summary, and an application status. The
-runtime must receive the actual result before generating the next model step.
+Successful mutations return the new revision, a change identifier, affected block handles, a compact
+before/after summary, and an application status. The runtime must receive the actual result before
+generating the next model step.
 
 Use structured error codes:
 
@@ -541,77 +490,71 @@ Use structured error codes:
 | `CANCELLED`           | Execution stopped before application                 | Do not retry automatically                         |
 | `RESULT_UNKNOWN`      | A dispatched operation has no confirmed outcome      | Stop and reconcile; do not replay blindly          |
 
-Error details may include bounded relevant context, but must not return
-unrelated document content. Every failed validation leaves the document
-unchanged. Schema validation failures include bounded `details.issues` entries
-with the failing field path, validation code, and correction message. The
-runtime accepts one JSON-encoded object layer for `insert_blocks.target` because
-some providers serialize nested tool arguments as strings.
+Error details may include bounded relevant context, but must not return unrelated document content.
+Every failed validation leaves the document unchanged. Schema validation failures include bounded
+`details.issues` entries with the failing field path, validation code, and correction message. The
+runtime accepts one JSON-encoded object layer for `insert_blocks.target` because some providers
+serialize nested tool arguments as strings.
 
-The runtime sends a failed tool result back to the model so it can make one
-corrective attempt. If the same tool and arguments fail twice, the run stops
-with `TOOL_RETRY_LIMIT`; successful changes from earlier calls remain applied
-and are reported to the user. The normal eight-step run limit remains in force
-and reports `STEP_LIMIT` when reached.
+The runtime sends a failed tool result back to the model so it can make one corrective attempt. If
+the same tool and arguments fail twice, the run stops with `TOOL_RETRY_LIMIT`; successful changes
+from earlier calls remain applied and are reported to the user. The normal eight-step run limit
+remains in force and reports `STEP_LIMIT` when reached.
 
 ## 8. Consistency, Undo, and Persistence
 
 ### 8.1 Atomicity and concurrency
 
-Serialize mutation calls for each buffer. Read, validate, construct, and
-dispatch the transaction against the latest editor state without asynchronous
-work between the final revision check and local dispatch.
+Serialize mutation calls for each buffer. Read, validate, construct, and dispatch the transaction
+against the latest editor state without asynchronous work between the final revision check and local
+dispatch.
 
-Parse or perform asynchronous preparation before that final check. Remote
-changes received before dispatch must invalidate a stale request. Later remote
-updates follow the existing collaboration behavior.
+Parse or perform asynchronous preparation before that final check. Remote changes received before
+dispatch must invalidate a stale request. Later remote updates follow the existing collaboration
+behavior.
 
-Yjs convergence does not establish semantic freshness. Revision checks protect
-against applying instructions derived from obsolete content; Yjs handles
-synchronization after the local transaction.
+Yjs convergence does not establish semantic freshness. Revision checks protect against applying
+instructions derived from obsolete content; Yjs handles synchronization after the local transaction.
 
-Atomicity applies to one tool call, not the entire agent run. If the third call
-fails after two successful calls, the first two remain applied. The UI and final
-assistant response must represent that partial outcome.
+Atomicity applies to one tool call, not the entire agent run. If the third call fails after two
+successful calls, the first two remain applied. The UI and final assistant response must represent
+that partial outcome.
 
 ### 8.2 Undo
 
-The session host associates each browser request with its session, run, and
-tool-call identifiers. The document adapter records a change identifier for each
-applied transaction and returns it with the affected handles. Provide undo for
-the most recent eligible AI change, and allow repeated undo where it remains
-safe.
+The session host associates each browser request with its session, run, and tool-call identifiers.
+The document adapter records a change identifier for each applied transaction and returns it with
+the affected handles. Provide undo for the most recent eligible AI change, and allow repeated undo
+where it remains safe.
 
-Undo must revert only the recorded AI operation and preserve subsequent
-unrelated local or remote edits. Implement this with collaboration-aware history
-or mapped inverse operations, and verify its interaction with the existing
-editor history. Transaction metadata alone does not establish a correct
-selective undo implementation.
+Undo must revert only the recorded AI operation and preserve subsequent unrelated local or remote
+edits. Implement this with collaboration-aware history or mapped inverse operations, and verify its
+interaction with the existing editor history. Transaction metadata alone does not establish a
+correct selective undo implementation.
 
-If intervening changes overlap the affected range or invalidate the inverse
-operation, report a conflict and leave the document unchanged. The initial
-release does not promise an unconditional one-click rollback of a whole run.
+If intervening changes overlap the affected range or invalidate the inverse operation, report a
+conflict and leave the document unchanged. The initial release does not promise an unconditional
+one-click rollback of a whole run.
 
-Undo is an explicit UI action, not a model tool in the initial release. Stop and
-undo are separate actions.
+Undo is an explicit UI action, not a model tool in the initial release. Stop and undo are separate
+actions.
 
 ### 8.3 Application versus saving
 
-A tool succeeds when its validated transaction has been applied to the active
-document. This does not mean that database persistence has completed.
+A tool succeeds when its validated transaction has been applied to the active document. This does
+not mean that database persistence has completed.
 
-The UI must distinguish applied changes from collaboration connectivity or save
-status. Do not invent a durable-save acknowledgement if the existing protocol
-does not provide one. Reuse the application's persistence path and preserve its
-history, contributor, notification, and reference-update behavior.
+The UI must distinguish applied changes from collaboration connectivity or save status. Do not
+invent a durable-save acknowledgement if the existing protocol does not provide one. Reuse the
+application's persistence path and preserve its history, contributor, notification, and
+reference-update behavior.
 
 ## 9. Session Transport and Execution Lifecycle
 
-Use an authenticated bidirectional session channel because the server runtime
-must wait for browser-executed tool results. Prefer an existing suitable
-transport after checking its authentication and lifecycle behavior. Do not route
-agent RPC through undocumented collaboration messages or introduce an external
-protocol solely for this feature.
+Use an authenticated bidirectional session channel because the server runtime must wait for
+browser-executed tool results. Prefer an existing suitable transport after checking its
+authentication and lifecycle behavior. Do not route agent RPC through undocumented collaboration
+messages or introduce an external protocol solely for this feature.
 
 Define application-owned messages for:
 
@@ -620,19 +563,17 @@ Define application-owned messages for:
 - Tool requests and tool results.
 - Run completion, failure, and stopping.
 
-Every run-scoped outbound event and tool request carries the owning Socket.IO
-session ID and page ID; run events carry a run ID and tool requests carry a
-tool-call ID. The host adds a monotonic sequence number to outbound messages
-within a run for ordered UI processing. Sequence numbers do not imply durable
-event replay. Incoming tool results are bound to the authenticated socket and
-the outstanding call rather than trusting a client-supplied identity. The
-browser accepts a request only when its page ID matches the active editor
-instance.
+Every run-scoped outbound event and tool request carries the owning Socket.IO session ID and page
+ID; run events carry a run ID and tool requests carry a tool-call ID. The host adds a monotonic
+sequence number to outbound messages within a run for ordered UI processing. Sequence numbers do not
+imply durable event replay. Incoming tool results are bound to the authenticated socket and the
+outstanding call rather than trusting a client-supplied identity. The browser accepts a request only
+when its page ID matches the active editor instance.
 
-A tool result is accepted only from the bound browser connection for an
-outstanding call, after schema validation. The browser stores a bounded result
-record for completed calls during the session. Repeated delivery of the same
-call ID returns its recorded result; it must not apply the edit again.
+A tool result is accepted only from the bound browser connection for an outstanding call, after
+schema validation. The browser stores a bounded result record for completed calls during the
+session. Repeated delivery of the same call ID returns its recorded result; it must not apply the
+edit again.
 
 Recommended run states:
 
@@ -642,9 +583,8 @@ idle -> running -> completed
                -> stopping -> stopped
 ```
 
-Tool requests separately track pending, applied, rejected, cancelled, or unknown
-outcomes. Cancellation and timeout must not relabel an already applied edit as
-unapplied.
+Tool requests separately track pending, applied, rejected, cancelled, or unknown outcomes.
+Cancellation and timeout must not relabel an already applied edit as unapplied.
 
 On cancellation:
 
@@ -654,33 +594,29 @@ On cancellation:
 4. Settle or explicitly mark the outcome of any in-flight operation.
 5. Display the confirmed changes and any unresolved result.
 
-An editor transaction already dispatched cannot be cancelled. If its
-acknowledgement is lost, mark its result unknown. The initial release stops the
-run and requires a fresh document read before further work; it does not
-automatically resend the mutation after reconnecting.
+An editor transaction already dispatched cannot be cancelled. If its acknowledgement is lost, mark
+its result unknown. The initial release stops the run and requires a fresh document read before
+further work; it does not automatically resend the mutation after reconnecting.
 
 ### 9.1 Image attachments
 
-A start message may reference up to four images with `attachmentIds`. The
-browser uploads images through the existing `POST /api/files/upload` endpoint
-before sending the start message; raw image bytes never travel over Socket.IO
-because its default payload limit is about 1 MB.
+A start message may reference up to four images with `attachmentIds`. The browser uploads images
+through the existing `POST /api/files/upload` endpoint before sending the start message; raw image
+bytes never travel over Socket.IO because its default payload limit is about 1 MB.
 
-The server re-validates every referenced attachment before the run: it must
-exist, belong to the requesting user and workspace, be attached to the same page
-as the run, not be deleted, carry an image extension in `png/jpg/jpeg/webp/gif`,
-and be no larger than 10 MB. Valid attachments are read from storage and sent to
-the provider as `input_image` content parts on the current run's user message
-only. Images are intentionally not replayed in later runs, so the model does not
-retain them across turns. Failures end the run with `run.failed` and codes
-`INVALID_ATTACHMENT`, `UNSUPPORTED_IMAGE_TYPE`, or `ATTACHMENT_TOO_LARGE`. This
-requires a vision-capable `AI_MODEL`.
+The server re-validates every referenced attachment before the run: it must exist, belong to the
+requesting user and workspace, be attached to the same page as the run, not be deleted, carry an
+image extension in `png/jpg/jpeg/webp/gif`, and be no larger than 10 MB. Valid attachments are read
+from storage and sent to the provider as `input_image` content parts on the current run's user
+message only. Images are intentionally not replayed in later runs, so the model does not retain them
+across turns. Failures end the run with `run.failed` and codes `INVALID_ATTACHMENT`,
+`UNSUPPORTED_IMAGE_TYPE`, or `ATTACHMENT_TOO_LARGE`. This requires a vision-capable `AI_MODEL`.
 
 ## 10. Context, Limits, and Model Instructions
 
-The run context contains the user request, bounded prior conversation, current
-page projection, selection context, and tools. Page contents are task data and
-cannot grant new capabilities or override the tool contract.
+The run context contains the user request, bounded prior conversation, current page projection,
+selection context, and tools. Page contents are task data and cannot grant new capabilities or
+override the tool contract.
 
 The system instructions must explain:
 
@@ -688,112 +624,99 @@ The system instructions must explain:
 - Reading before editing and rereading after stale or missing matches.
 - Exact matching and supported block capabilities.
 - Using tool results as the source of truth for what changed.
-- Avoiding claims that edits were saved or completed without corresponding
-  evidence.
+- Avoiding claims that edits were saved or completed without corresponding evidence.
 - Explaining unsupported edits without repeatedly guessing tool arguments.
 
-Set explicit configuration for model steps, total run duration, individual tool
-timeouts, context size, insertion size, and recovery attempts. Use a small
-bounded recovery budget for repeated edit errors; do not allow unbounded
-guess-and-retry loops.
+Set explicit configuration for model steps, total run duration, individual tool timeouts, context
+size, insertion size, and recovery attempts. Use a small bounded recovery budget for repeated edit
+errors; do not allow unbounded guess-and-retry loops.
 
-The current implementation uses eight model steps per run, 24 browser tool
-requests including the initial read, a 45-second browser result timeout, a
-five-minute run timeout, a 20-message history window with an 80,000-character
-aggregate history budget, 20,000-character prompt and block-text limits, a
-40,000-character Markdown insertion limit, 100 blocks per read page, an
-80,000-character read-result budget, and a 60,000-character initial buffer
-context. Image attachments allow at most four per message, each no larger than
-10 MB, and only for the current run. These limits are implementation defaults
-and must be changed together with this document and the corresponding schemas.
+The current implementation uses eight model steps per run, 24 browser tool requests including the
+initial read, a 45-second browser result timeout, a five-minute run timeout, a 20-message history
+window with an 80,000-character aggregate history budget, 20,000-character prompt and block-text
+limits, a 40,000-character Markdown insertion limit, 100 blocks per read page, an 80,000-character
+read-result budget, and a 60,000-character initial buffer context. Image attachments allow at most
+four per message, each no larger than 10 MB, and only for the current run. These limits are
+implementation defaults and must be changed together with this document and the corresponding
+schemas.
 
-Writes execute sequentially regardless of the chosen library's default tool
-concurrency. A model-generated batch of dependent writes must either be
-represented as one atomic tool call or obtain fresh revision information between
-calls.
+Writes execute sequentially regardless of the chosen library's default tool concurrency. A
+model-generated batch of dependent writes must either be represented as one atomic tool call or
+obtain fresh revision information between calls.
 
-When trimming history, retain valid assistant/tool-result pairs and never
-discard the result of an outstanding tool call. Use fresh reads instead of
-repeatedly retaining obsolete whole-page snapshots. Automatic long-term memory
-and background summarization are unnecessary for the initial scope.
+When trimming history, retain valid assistant/tool-result pairs and never discard the result of an
+outstanding tool call. Use fresh reads instead of repeatedly retaining obsolete whole-page
+snapshots. Automatic long-term memory and background summarization are unnecessary for the initial
+scope.
 
 ## 11. User Interface
 
-The page chat panel presents assistant text, tool progress, compact change
-summaries, and run controls. It distinguishes ordinary discussion from executed
-changes.
+The page chat panel presents assistant text, tool progress, compact change summaries, and run
+controls. It distinguishes ordinary discussion from executed changes.
 
 Required behavior:
 
 - Capture the page and selection when submitting a message.
-- Allow attaching images through a file picker or paste, show upload state and
-  thumbnails, and keep the message enabled for text-only use.
+- Allow attaching images through a file picker or paste, show upload state and thumbnails, and keep
+  the message enabled for text-only use.
 - Show read/edit activity without exposing raw protocol payloads by default.
-- Apply only complete, validated tool calls; never stream incomplete edits into
-  the document.
+- Apply only complete, validated tool calls; never stream incomplete edits into the document.
 - Keep the user's editor focus and selection stable where possible.
-- Navigate to affected blocks on request rather than stealing focus after every
-  edit.
-- Show partial completion, conflict, cancellation, and unknown outcomes
-  explicitly.
+- Navigate to affected blocks on request rather than stealing focus after every edit.
+- Show partial completion, conflict, cancellation, and unknown outcomes explicitly.
 - Provide stop and eligible-change undo actions.
 - Explain that changing pages or losing the connection ends the active run.
 
-The UI consumes application-owned events rather than importing runtime-specific
-event types. Existing AI menu components may supply reusable presentation
-pieces, but the conversational workflow has its own session state.
+The UI consumes application-owned events rather than importing runtime-specific event types.
+Existing AI menu components may supply reusable presentation pieces, but the conversational workflow
+has its own session state.
 
 ## 12. Authorization and Data Handling
 
-Provider credentials remain on the server. The browser receives only the session
-data and events needed to operate the feature.
+Provider credentials remain on the server. The browser receives only the session data and events
+needed to operate the feature.
 
-The host enforces current-page scope and access for tool dispatch. Existing
-collaboration authorization remains authoritative for synchronization. If
-inspection reveals an actual access-revocation gap in the supported
-collaboration flow, resolve it before enabling agent writes rather than relying
-on a frontend `editable` flag.
+The host enforces current-page scope and access for tool dispatch. Existing collaboration
+authorization remains authoritative for synchronization. If inspection reveals an actual
+access-revocation gap in the supported collaboration flow, resolve it before enabling agent writes
+rather than relying on a frontend `editable` flag.
 
-Validate model arguments, browser result envelopes, inserted content, and
-document schema constraints. Unsupported links, HTML, or node construction must
-not bypass the application's existing sanitization rules.
+Validate model arguments, browser result envelopes, inserted content, and document schema
+constraints. Unsupported links, HTML, or node construction must not bypass the application's
+existing sanitization rules.
 
-Do not include secrets, authentication tokens, provider request bodies, or full
-document contents in operational logs. Document text is sent only as required by
-the configured model invocation and explicit tool results. Attached images are
-read from storage and sent to the provider for the current run only; they are
-uploaded as ordinary page attachments and inherit that lifecycle.
+Do not include secrets, authentication tokens, provider request bodies, or full document contents in
+operational logs. Document text is sent only as required by the configured model invocation and
+explicit tool results. Attached images are read from storage and sent to the provider for the
+current run only; they are uploaded as ordinary page attachments and inherit that lifecycle.
 
 ## 13. Observability
 
-Use the feature prefix `[ai_page_editing]` for relevant runtime, host, bridge,
-and adapter diagnostic entries. Include identifiers, tool names, timings,
-revisions, result codes, and operation counts where useful. Do not log raw
-prompts, replacement text, or credentials.
+Use the feature prefix `[ai_page_editing]` for relevant runtime, host, bridge, and adapter
+diagnostic entries. Include identifiers, tool names, timings, revisions, result codes, and operation
+counts where useful. Do not log raw prompts, replacement text, or credentials.
 
-Provide integration scenarios under the server's AI page-editing test area. The
-session test uses a deterministic Responses client substitute, while the HTTP
-client test feeds chunked SSE events. Together they exercise the runtime
-wrapper, session host, browser tool bridge, request shape, streaming parser,
-reasoning-item preservation, read, edit, result feedback, and completion.
+Provide integration scenarios under the server's AI page-editing test area. The session test uses a
+deterministic Responses client substitute, while the HTTP client test feeds chunked SSE events.
+Together they exercise the runtime wrapper, session host, browser tool bridge, request shape,
+streaming parser, reasoning-item preservation, read, edit, result feedback, and completion.
 
-Once that scenario exists, the following command executes the feature flow and
-writes focused diagnostics:
+Once that scenario exists, the following command executes the feature flow and writes focused
+diagnostics:
 
 ```bash
 pnpm --filter server exec jest --runInBand --testPathPatterns=integrations/ai-page-editing 2>&1 | rg --line-buffered '\[ai_page_editing\]' > ai-page-editing.debug.log
 ```
 
-The scenario emits meaningful prefixed diagnostics. For pass/fail verification,
-also run the test directly: the log-filtering pipeline is intended for diagnosis
-and does not reliably report the test runner's exit status in every shell.
+The scenario emits meaningful prefixed diagnostics. For pass/fail verification, also run the test
+directly: the log-filtering pipeline is intended for diagnosis and does not reliably report the test
+runner's exit status in every shell.
 
 ## 14. Code Organization
 
-The following paths describe the responsibility boundaries. The current first
-release implementation occupies the server integration and client feature paths
-shown below; future extraction into a standalone package may preserve the same
-contracts:
+The following paths describe the responsibility boundaries. The current first release implementation
+occupies the server integration and client feature paths shown below; future extraction into a
+standalone package may preserve the same contracts:
 
 ```text
 apps/server/src/integrations/ai-page-editing/
@@ -816,69 +739,61 @@ apps/client/src/features/ai-page-editing/
   document-buffer.test.ts
 ```
 
-`agent-runtime.ts` must not depend on page repositories, editors, collaboration
-services, or application authorization. The host supplies document tools through
-generic runtime interfaces. The protocol types are transport-neutral and the
-client imports no server runtime code.
+`agent-runtime.ts` must not depend on page repositories, editors, collaboration services, or
+application authorization. The host supplies document tools through generic runtime interfaces. The
+protocol types are transport-neutral and the client imports no server runtime code.
 
-Keep parsing, position mapping, mutation validation, and history
-responsibilities separable. Follow repository formatting and file-size rules.
-Create only the modules needed for the current delivery stage.
+Keep parsing, position mapping, mutation validation, and history responsibilities separable. Follow
+repository formatting and file-size rules. Create only the modules needed for the current delivery
+stage.
 
-The automated coverage currently exercises the deterministic buffer, the
-Responses HTTP/SSE client, and a server-side read/edit loop with a deterministic
-client. Collaborative persistence, endpoint smoke checks, and multi-browser
-behavior remain release verification work because they require a running
-application and external services.
+The automated coverage currently exercises the deterministic buffer, the Responses HTTP/SSE client,
+and a server-side read/edit loop with a deterministic client. Collaborative persistence, endpoint
+smoke checks, and multi-browser behavior remain release verification work because they require a
+running application and external services.
 
 ## 15. Implementation Sequence
 
 ### Stage 1: Deterministic document adapter
 
-Implement projection, handles, revisions, supported-node detection, read,
-replacement, insertion, deletion, and safe undo behavior. Invoke these
-capabilities without an LLM.
+Implement projection, handles, revisions, supported-node detection, read, replacement, insertion,
+deletion, and safe undo behavior. Invoke these capabilities without an LLM.
 
-Exit criteria: rich-document preservation, revision rejection, atomic
-validation, and undo-conflict tests pass. No model integration is needed to
-prove these properties.
+Exit criteria: rich-document preservation, revision rejection, atomic validation, and undo-conflict
+tests pass. No model integration is needed to prove these properties.
 
 ### Stage 2: Runtime and session contracts
 
-Implement the provider-independent Responses runtime, native HTTP/SSE client,
-application events, scoped session host, authenticated tool bridge, call
-deduplication, cancellation, and limits. Use a deterministic client substitute
-to exercise the full loop.
+Implement the provider-independent Responses runtime, native HTTP/SSE client, application events,
+scoped session host, authenticated tool bridge, call deduplication, cancellation, and limits. Use a
+deterministic client substitute to exercise the full loop.
 
-Exit criteria: successful multi-step execution, error recovery, cancellation
-races, and connection-loss behavior are verified without external model
-credentials.
+Exit criteria: successful multi-step execution, error recovery, cancellation races, and
+connection-loss behavior are verified without external model credentials.
 
 ### Stage 3: Current-page chat
 
-Connect the runtime to the browser adapter and add the page chat UI, selection
-capture, tool summaries, stop control, and undo actions. Add the configured
-Responses endpoint integration with server-held credentials.
+Connect the runtime to the browser adapter and add the page chat UI, selection capture, tool
+summaries, stop control, and undo actions. Add the configured Responses endpoint integration with
+server-held credentials.
 
-Exit criteria: the supported user scenarios work in a real collaborative page,
-including a second browser editing concurrently.
+Exit criteria: the supported user scenarios work in a real collaborative page, including a second
+browser editing concurrently.
 
 ### Stage 4: Release verification
 
-Verify schema preservation, access boundaries, content limits, cleanup,
-diagnostics, and persistence through the existing collaboration path. Document
-the exact supported insertion grammar and operational configuration alongside
-the implementation.
+Verify schema preservation, access boundaries, content limits, cleanup, diagnostics, and persistence
+through the existing collaboration path. Document the exact supported insertion grammar and
+operational configuration alongside the implementation.
 
-Exit criteria: all release acceptance criteria below pass. Do not expand into
-background agents or workspace tools before these requirements are met.
+Exit criteria: all release acceptance criteria below pass. Do not expand into background agents or
+workspace tools before these requirements are met.
 
 ## 16. Validation and Acceptance Criteria
 
-Tests must exercise observable behavior and data preservation rather than
-reproduce implementation details. Use existing client and server test runners.
-Real-model tests are optional smoke checks and must not be the only correctness
-evidence.
+Tests must exercise observable behavior and data preservation rather than reproduce implementation
+details. Use existing client and server test runners. Real-model tests are optional smoke checks and
+must not be the only correctness evidence.
 
 | Scenario                                                          | Required outcome                                                                                  |
 | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
@@ -912,30 +827,26 @@ evidence.
 | Runtime replacement test                                          | A fake generic runtime can use the same document tool dispatcher                                  |
 | Runtime independence test                                         | The runtime completes a read/edit loop against an in-memory text tool                             |
 
-Before release, manually verify a page containing headings, lists, links,
-comments, images, tables, diagrams, and references. Change only ordinary
-supported text and compare the untouched rich-document subtrees. Also verify
-that ordinary keyboard undo behavior remains usable after AI edits.
+Before release, manually verify a page containing headings, lists, links, comments, images, tables,
+diagrams, and references. Change only ordinary supported text and compare the untouched
+rich-document subtrees. Also verify that ordinary keyboard undo behavior remains usable after AI
+edits.
 
 ## 17. Future Extensions
 
-A server-side document adapter can later support background editing through the
-collaboration service. It must provide equivalent tool semantics, authorization,
-revisions, localized mutations, and result handling; invoking the current
-whole-document replacement handler is insufficient.
+A server-side document adapter can later support background editing through the collaboration
+service. It must provide equivalent tool semantics, authorization, revisions, localized mutations,
+and result handling; invoking the current whole-document replacement handler is insufficient.
 
-A draft workflow can later separate proposed edits from live edits. Applying a
-draft requires validating its base and committing localized changes to the
-current document. A draft generated from an old snapshot must never overwrite a
-newer whole page.
+A draft workflow can later separate proposed edits from live edits. Applying a draft requires
+validating its base and committing localized changes to the current document. A draft generated from
+an old snapshot must never overwrite a newer whole page.
 
-Workspace search and multi-page editing require explicit tools with
-independently enforced scope. They do not require giving the runtime direct
-database access.
+Workspace search and multi-page editing require explicit tools with independently enforced scope.
+They do not require giving the runtime direct database access.
 
-Target-scoped revision checks, richer formatting edits, table operations, and
-persistent sessions should be added only with corresponding tool contracts,
-consistency rules, and acceptance tests.
+Target-scoped revision checks, richer formatting edits, table operations, and persistent sessions
+should be added only with corresponding tool contracts, consistency rules, and acceptance tests.
 
 ## 18. References
 
@@ -945,10 +856,9 @@ consistency rules, and acceptance tests.
   streamed text and function-call event handling.
 - [Responses API migration guide](https://developers.openai.com/api/docs/guides/migrate-to-responses):
   replaying output and encrypted reasoning items with `store: false`.
-- [Pi agent core](https://github.com/earendil-works/pi/tree/main/packages/agent):
-  independent agent execution and event streaming.
+- [Pi agent core](https://github.com/earendil-works/pi/tree/main/packages/agent): independent agent
+  execution and event streaming.
 - [Pi edit tool](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/src/core/tools/edit.ts):
   targeted replacements and injectable editing operations.
 - [OpenCode edit tool](https://github.com/anomalyco/opencode/blob/dev/packages/opencode/src/tool/edit.ts):
-  reference implementation of text replacement and surrounding coding-tool
-  integration.
+  reference implementation of text replacement and surrounding coding-tool integration.

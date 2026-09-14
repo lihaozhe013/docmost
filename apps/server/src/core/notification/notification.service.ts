@@ -37,30 +37,19 @@ export class NotificationService {
     return notification;
   }
 
-  async findByUserId(
-    userId: string,
-    pagination: PaginationOptions,
-    type: NotificationTab = 'all'
-  ) {
-    const result = await this.notificationRepo.findByUserId(
-      userId,
-      pagination,
-      type
-    );
+  async findByUserId(userId: string, pagination: PaginationOptions, type: NotificationTab = 'all') {
+    const result = await this.notificationRepo.findByUserId(userId, pagination, type);
 
     const pageIds = result.items.map((n: any) => n.pageId).filter(Boolean);
 
     if (pageIds.length > 0) {
-      const accessiblePageIds =
-        await this.pagePermissionRepo.filterAccessiblePageIds({
-          pageIds,
-          userId
-        });
+      const accessiblePageIds = await this.pagePermissionRepo.filterAccessiblePageIds({
+        pageIds,
+        userId
+      });
       const accessibleSet = new Set(accessiblePageIds);
 
-      result.items = result.items.filter(
-        (n: any) => !n.pageId || accessibleSet.has(n.pageId)
-      );
+      result.items = result.items.filter((n: any) => !n.pageId || accessibleSet.has(n.pageId));
     }
 
     return result;

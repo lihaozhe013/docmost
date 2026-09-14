@@ -1,11 +1,4 @@
-import {
-  Divider,
-  Group,
-  Skeleton,
-  Stack,
-  Text,
-  UnstyledButton
-} from '@mantine/core';
+import { Divider, Group, Skeleton, Stack, Text, UnstyledButton } from '@mantine/core';
 import { IconChevronRight } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { useAtomValue } from 'jotai';
@@ -27,25 +20,18 @@ export function PageDetailsAside() {
     pageId: extractPageSlugId(pageSlug)
   });
   const pageEditor = useAtomValue(pageEditorAtom);
-  const { data: counts, isLoading: countsLoading } = useBacklinksCountQuery(
-    page?.id
-  );
-  const [modalOpened, { open: openModal, close: closeModal }] =
-    useDisclosure(false);
+  const { data: counts, isLoading: countsLoading } = useBacklinksCountQuery(page?.id);
+  const [modalOpened, { open: openModal, close: closeModal }] = useDisclosure(false);
 
   if (!page) return null;
 
   const wordCount: number = pageEditor?.storage?.characterCount?.words?.() ?? 0;
-  const characterCount: number =
-    pageEditor?.storage?.characterCount?.characters?.() ?? 0;
+  const characterCount: number = pageEditor?.storage?.characterCount?.characters?.() ?? 0;
 
   return (
     <>
       <Stack gap="md">
-        <PeopleSection
-          creator={page.creator}
-          lastUpdatedBy={page.lastUpdatedBy}
-        />
+        <PeopleSection creator={page.creator} lastUpdatedBy={page.lastUpdatedBy} />
 
         <Divider />
 
@@ -65,17 +51,10 @@ export function PageDetailsAside() {
           onClick={openModal}
         />
 
-        <LabelsSection
-          pageId={page.id}
-          canEdit={page.permissions?.canEdit ?? false}
-        />
+        <LabelsSection pageId={page.id} canEdit={page.permissions?.canEdit ?? false} />
       </Stack>
 
-      <BacklinksModal
-        pageId={page.id}
-        opened={modalOpened}
-        onClose={closeModal}
-      />
+      <BacklinksModal pageId={page.id} opened={modalOpened} onClose={closeModal} />
     </>
   );
 }
@@ -110,12 +89,7 @@ function PersonRow({
       </Text>
       {person ? (
         <Group gap={6} wrap="nowrap">
-          <CustomAvatar
-            avatarUrl={person.avatarUrl}
-            name={person.name}
-            size={20}
-            radius="xl"
-          />
+          <CustomAvatar avatarUrl={person.avatarUrl} name={person.name} size={20} radius="xl" />
           <Text size="sm" lineClamp={1}>
             {person.name}
           </Text>
@@ -149,10 +123,7 @@ function StatsSection({
       </Text>
       <StatRow label={t('Word count')} value={String(wordCount)} />
       <StatRow label={t('Characters')} value={String(characterCount)} />
-      <StatRow
-        label={t('Created')}
-        value={formattedDate(new Date(createdAt))}
-      />
+      <StatRow label={t('Created')} value={formattedDate(new Date(createdAt))} />
       <StatRow label={t('Last updated')} value={lastUpdated} />
     </Stack>
   );
@@ -226,16 +197,8 @@ function BacklinksRow({
           {label}
         </Text>
         <Group gap={6} wrap="nowrap">
-          {isLoading ? (
-            <Skeleton height={18} width={20} />
-          ) : (
-            <Text size="sm">{count}</Text>
-          )}
-          <IconChevronRight
-            size={16}
-            stroke={2}
-            color="var(--mantine-color-dimmed)"
-          />
+          {isLoading ? <Skeleton height={18} width={20} /> : <Text size="sm">{count}</Text>}
+          <IconChevronRight size={16} stroke={2} color="var(--mantine-color-dimmed)" />
         </Group>
       </Group>
     </UnstyledButton>

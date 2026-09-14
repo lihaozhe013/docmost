@@ -6,11 +6,7 @@ export default function ErrorPlaceholder() {
   const { t } = useTranslation();
   return (
     <div className={classes.placeholder}>
-      <IconAlertTriangle
-        size={18}
-        stroke={1.6}
-        className={classes.placeholderIcon}
-      />
+      <IconAlertTriangle size={18} stroke={1.6} className={classes.placeholderIcon} />
       <span>{t('Failed to load this synced block')}</span>
     </div>
   );

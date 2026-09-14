@@ -41,19 +41,12 @@ export class VerificationNotificationService {
     spaceId: string
   ): Promise<string[]> {
     if (userIds.length === 0) return [];
-    const inSpace = await this.spaceMemberRepo.getUserIdsWithSpaceAccess(
-      userIds,
-      spaceId
-    );
+    const inSpace = await this.spaceMemberRepo.getUserIdsWithSpaceAccess(userIds, spaceId);
     if (inSpace.size === 0) return [];
-    return this.pagePermissionRepo.getUserIdsWithPageAccess(pageId, [
-      ...inSpace
-    ]);
+    return this.pagePermissionRepo.getUserIdsWithPageAccess(pageId, [...inSpace]);
   }
 
-  async processVerificationExpiring(
-    data: IVerificationExpiringNotificationJob
-  ) {
+  async processVerificationExpiring(data: IVerificationExpiringNotificationJob) {
     const verification = await this.db
       .selectFrom('pageVerifications')
       .selectAll()
@@ -85,9 +78,7 @@ export class VerificationNotificationService {
       verification.id,
       NotificationType.PAGE_VERIFICATION_EXPIRING
     );
-    const recipients = accessibleVerifierIds.filter(
-      (id) => !alreadyNotified.has(id)
-    );
+    const recipients = accessibleVerifierIds.filter((id) => !alreadyNotified.has(id));
     if (recipients.length === 0) return;
 
     const expiresAtIso = new Date(verification.expiresAt).toISOString();
@@ -136,9 +127,7 @@ export class VerificationNotificationService {
       verification.id,
       NotificationType.PAGE_VERIFICATION_EXPIRED
     );
-    const recipients = accessibleVerifierIds.filter(
-      (id) => !alreadyNotified.has(id)
-    );
+    const recipients = accessibleVerifierIds.filter((id) => !alreadyNotified.has(id));
     if (recipients.length === 0) return;
 
     for (const userId of recipients) {
@@ -202,11 +191,7 @@ export class VerificationNotificationService {
   async processApprovalRejected(data: IApprovalRejectedNotificationJob) {
     const { pageId, spaceId, workspaceId, actorId, requestedById } = data;
 
-    const recipients = await this.filterAccessibleRecipients(
-      [requestedById],
-      pageId,
-      spaceId
-    );
+    const recipients = await this.filterAccessibleRecipients([requestedById], pageId, spaceId);
     if (recipients.length === 0) return;
 
     await this.notificationService.create({

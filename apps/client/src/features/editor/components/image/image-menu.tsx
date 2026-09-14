@@ -85,27 +85,15 @@ export function ImageMenu({ editor }: EditorMenuProps) {
   }, [editor]);
 
   const alignImageLeft = useCallback(() => {
-    editor
-      .chain()
-      .focus(undefined, { scrollIntoView: false })
-      .setImageAlign('left')
-      .run();
+    editor.chain().focus(undefined, { scrollIntoView: false }).setImageAlign('left').run();
   }, [editor]);
 
   const alignImageCenter = useCallback(() => {
-    editor
-      .chain()
-      .focus(undefined, { scrollIntoView: false })
-      .setImageAlign('center')
-      .run();
+    editor.chain().focus(undefined, { scrollIntoView: false }).setImageAlign('center').run();
   }, [editor]);
 
   const alignImageRight = useCallback(() => {
-    editor
-      .chain()
-      .focus(undefined, { scrollIntoView: false })
-      .setImageAlign('right')
-      .run();
+    editor.chain().focus(undefined, { scrollIntoView: false }).setImageAlign('right').run();
   }, [editor]);
 
   const handleDownload = useCallback(() => {
@@ -181,11 +169,7 @@ export function ImageMenu({ editor }: EditorMenuProps) {
             </ActionIcon>
           </Tooltip>
 
-          <Tooltip
-            position="top"
-            label={t('Align center')}
-            withinPortal={false}
-          >
+          <Tooltip position="top" label={t('Align center')} withinPortal={false}>
             <ActionIcon
               onClick={alignImageCenter}
               size="lg"
@@ -243,11 +227,7 @@ export function ImageMenu({ editor }: EditorMenuProps) {
             </ActionIcon>
           </Tooltip>
 
-          <Tooltip
-            position="top"
-            label={t('Replace image')}
-            withinPortal={false}
-          >
+          <Tooltip position="top" label={t('Replace image')} withinPortal={false}>
             <ActionIcon
               onClick={handleReplace}
               size="lg"
@@ -259,12 +239,7 @@ export function ImageMenu({ editor }: EditorMenuProps) {
           </Tooltip>
 
           <Tooltip position="top" label={t('Delete')} withinPortal={false}>
-            <ActionIcon
-              onClick={handleDelete}
-              size="lg"
-              aria-label={t('Delete')}
-              variant="subtle"
-            >
+            <ActionIcon onClick={handleDelete} size="lg" aria-label={t('Delete')} variant="subtle">
               <IconTrash size={18} />
             </ActionIcon>
           </Tooltip>

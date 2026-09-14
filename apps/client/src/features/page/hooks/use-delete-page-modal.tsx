@@ -9,10 +9,7 @@ type UseDeleteModalProps = {
 
 export function useDeletePageModal() {
   const { t } = useTranslation();
-  const openDeleteModal = ({
-    onConfirm,
-    isPermanent = false
-  }: UseDeleteModalProps) => {
+  const openDeleteModal = ({ onConfirm, isPermanent = false }: UseDeleteModalProps) => {
     modals.openConfirmModal({
       title: isPermanent
         ? t('Are you sure you want to delete this page?')

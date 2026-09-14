@@ -3,11 +3,7 @@ import { IconBellOff } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useRef } from 'react';
 import { NotificationItem } from './notification-item';
-import {
-  INotification,
-  NotificationFilter,
-  NotificationTab
-} from '../types/notification.types';
+import { INotification, NotificationFilter, NotificationTab } from '../types/notification.types';
 import { groupNotificationsByTime } from '../notification.utils';
 import { useNotificationsQuery } from '../queries/notification-query';
 import classes from '../notification.module.css';
@@ -18,14 +14,11 @@ type NotificationListProps = {
   onNavigate: () => void;
 };
 
-export function NotificationList({
-  tab,
-  filter,
-  onNavigate
-}: NotificationListProps) {
+export function NotificationList({ tab, filter, onNavigate }: NotificationListProps) {
   const { t } = useTranslation();
-  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
-    useNotificationsQuery(tab as string);
+  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } = useNotificationsQuery(
+    tab as string
+  );
 
   const sentinelRef = useRef<HTMLDivElement>(null);
 
@@ -57,23 +50,15 @@ export function NotificationList({
   const allNotifications = data?.pages.flatMap((page) => page.items) ?? [];
 
   const filtered =
-    filter === 'unread'
-      ? allNotifications.filter((n) => !n.readAt)
-      : allNotifications;
+    filter === 'unread' ? allNotifications.filter((n) => !n.readAt) : allNotifications;
 
   if (filtered.length === 0) {
     return (
       <Center py="xl">
         <Stack align="center" gap="xs">
-          <IconBellOff
-            size={32}
-            stroke={1.5}
-            color="var(--mantine-color-dimmed)"
-          />
+          <IconBellOff size={32} stroke={1.5} color="var(--mantine-color-dimmed)" />
           <Text size="sm" c="dimmed">
-            {filter === 'unread'
-              ? t('No unread notifications')
-              : t('No notifications')}
+            {filter === 'unread' ? t('No unread notifications') : t('No notifications')}
           </Text>
         </Stack>
       </Center>

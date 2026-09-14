@@ -1,11 +1,4 @@
-import {
-  ActionIcon,
-  Group,
-  Menu,
-  Text,
-  ThemeIcon,
-  Tooltip
-} from '@mantine/core';
+import { ActionIcon, Group, Menu, Text, ThemeIcon, Tooltip } from '@mantine/core';
 import {
   IconArrowRight,
   IconArrowsHorizontal,
@@ -43,10 +36,7 @@ import { PageWidthToggle } from '@/features/user/components/page-width-pref.tsx'
 import { Trans, useTranslation } from 'react-i18next';
 import ExportModal from '@/components/common/export-modal';
 import { htmlToMarkdown } from '@docmost/editor-ext';
-import {
-  pageEditorAtom,
-  yjsConnectionStatusAtom
-} from '@/features/editor/atoms/editor-atoms.ts';
+import { pageEditorAtom, yjsConnectionStatusAtom } from '@/features/editor/atoms/editor-atoms.ts';
 import { formattedDate } from '@/lib/time.ts';
 import { PageEditModeToggle } from '@/features/user/components/page-state-pref.tsx';
 import MovePageModal from '@/features/page/components/move-page-modal.tsx';
@@ -152,16 +142,11 @@ function PageActionMenu({ readOnly }: PageActionMenuProps) {
   });
   const { openDeleteModal } = useDeletePageModal();
   const { handleDelete } = useTreeMutation(page?.spaceId ?? '');
-  const [exportOpened, { open: openExportModal, close: closeExportModal }] =
+  const [exportOpened, { open: openExportModal, close: closeExportModal }] = useDisclosure(false);
+  const [movePageModalOpened, { open: openMovePageModal, close: closeMoveSpaceModal }] =
     useDisclosure(false);
-  const [
-    movePageModalOpened,
-    { open: openMovePageModal, close: closeMoveSpaceModal }
-  ] = useDisclosure(false);
-  const [
-    attachmentsOpened,
-    { open: openAttachmentsModal, close: closeAttachmentsModal }
-  ] = useDisclosure(false);
+  const [attachmentsOpened, { open: openAttachmentsModal, close: closeAttachmentsModal }] =
+    useDisclosure(false);
   const [pageEditor] = useAtom(pageEditorAtom);
   const pageUpdatedAt = useTimeAgo(page?.updatedAt);
   const favoriteIds = useFavoriteIds('page', page?.spaceId);
@@ -173,8 +158,7 @@ function PageActionMenu({ readOnly }: PageActionMenuProps) {
   const unwatchPage = useUnwatchPageMutation();
 
   const handleCopyLink = () => {
-    const pageUrl =
-      getAppUrl() + buildPageUrl(spaceSlug, page.slugId, page.title);
+    const pageUrl = getAppUrl() + buildPageUrl(spaceSlug, page.slugId, page.title);
 
     clipboard.copy(pageUrl);
     notifications.show({ message: t('Link copied') });
@@ -224,28 +208,18 @@ function PageActionMenu({ readOnly }: PageActionMenuProps) {
         arrowPosition="center"
       >
         <Menu.Target>
-          <ActionIcon
-            variant="subtle"
-            color="dark"
-            aria-label={t('Page actions')}
-          >
+          <ActionIcon variant="subtle" color="dark" aria-label={t('Page actions')}>
             <IconDots size={20} />
           </ActionIcon>
         </Menu.Target>
 
         <Menu.Dropdown>
-          <Menu.Item
-            leftSection={<IconLink size={16} />}
-            onClick={handleCopyLink}
-          >
+          <Menu.Item leftSection={<IconLink size={16} />} onClick={handleCopyLink}>
             {t('Copy link')}
           </Menu.Item>
 
           {!page?.isBase && (
-            <Menu.Item
-              leftSection={<IconMarkdown size={16} />}
-              onClick={handleCopyAsMarkdown}
-            >
+            <Menu.Item leftSection={<IconMarkdown size={16} />} onClick={handleCopyAsMarkdown}>
               {t('Copy as Markdown')}
             </Menu.Item>
           )}
@@ -253,10 +227,7 @@ function PageActionMenu({ readOnly }: PageActionMenuProps) {
           <Menu.Item
             leftSection={
               isFavorited ? (
-                <IconStarFilled
-                  size={16}
-                  color="var(--mantine-color-yellow-5)"
-                />
+                <IconStarFilled size={16} color="var(--mantine-color-yellow-5)" />
               ) : (
                 <IconStar size={16} />
               )
@@ -293,19 +264,13 @@ function PageActionMenu({ readOnly }: PageActionMenuProps) {
           )}
 
           {!page?.isBase && (
-            <Menu.Item
-              leftSection={<IconHistory size={16} />}
-              onClick={openHistoryModal}
-            >
+            <Menu.Item leftSection={<IconHistory size={16} />} onClick={openHistoryModal}>
               {t('Page history')}
             </Menu.Item>
           )}
 
           {!page?.isBase && (
-            <Menu.Item
-              leftSection={<IconPaperclip size={16} />}
-              onClick={openAttachmentsModal}
-            >
+            <Menu.Item leftSection={<IconPaperclip size={16} />} onClick={openAttachmentsModal}>
               {t('Attachments')}
             </Menu.Item>
           )}
@@ -313,25 +278,16 @@ function PageActionMenu({ readOnly }: PageActionMenuProps) {
           <Menu.Divider />
 
           {!readOnly && (
-            <Menu.Item
-              leftSection={<IconArrowRight size={16} />}
-              onClick={openMovePageModal}
-            >
+            <Menu.Item leftSection={<IconArrowRight size={16} />} onClick={openMovePageModal}>
               {t('Move')}
             </Menu.Item>
           )}
 
-          <Menu.Item
-            leftSection={<IconFileExport size={16} />}
-            onClick={openExportModal}
-          >
+          <Menu.Item leftSection={<IconFileExport size={16} />} onClick={openExportModal}>
             {t('Export')}
           </Menu.Item>
 
-          <Menu.Item
-            leftSection={<IconPrinter size={16} />}
-            onClick={handlePrint}
-          >
+          <Menu.Item leftSection={<IconPrinter size={16} />} onClick={handlePrint}>
             {t('Print PDF')}
           </Menu.Item>
 
@@ -385,12 +341,7 @@ function PageActionMenu({ readOnly }: PageActionMenuProps) {
         </Menu.Dropdown>
       </Menu>
 
-      <ExportModal
-        type="page"
-        id={page.id}
-        open={exportOpened}
-        onClose={closeExportModal}
-      />
+      <ExportModal type="page" id={page.id} open={exportOpened} onClose={closeExportModal} />
 
       <MovePageModal
         pageId={page.id}
@@ -416,9 +367,7 @@ function ConnectionWarning() {
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    const isDisconnected = ['disconnected', 'connecting'].includes(
-      yjsConnectionStatus
-    );
+    const isDisconnected = ['disconnected', 'connecting'].includes(yjsConnectionStatus);
 
     if (isDisconnected) {
       if (!timeoutRef.current) {
@@ -445,11 +394,7 @@ function ConnectionWarning() {
   if (!showWarning) return null;
 
   return (
-    <Tooltip
-      label={t('Real-time editor connection lost. Retrying...')}
-      openDelay={250}
-      withArrow
-    >
+    <Tooltip label={t('Real-time editor connection lost. Retrying...')} openDelay={250} withArrow>
       <ThemeIcon
         variant="default"
         c="red"

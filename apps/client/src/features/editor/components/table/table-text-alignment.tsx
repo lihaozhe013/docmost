@@ -1,17 +1,6 @@
 import React, { FC } from 'react';
-import {
-  IconAlignCenter,
-  IconAlignLeft,
-  IconAlignRight,
-  IconCheck
-} from '@tabler/icons-react';
-import {
-  ActionIcon,
-  Button,
-  Popover,
-  ScrollArea,
-  Tooltip
-} from '@mantine/core';
+import { IconAlignCenter, IconAlignLeft, IconAlignRight, IconCheck } from '@tabler/icons-react';
+import { ActionIcon, Button, Popover, ScrollArea, Tooltip } from '@mantine/core';
 import type { Editor } from '@tiptap/react';
 import { useEditorState } from '@tiptap/react';
 import { useTranslation } from 'react-i18next';

@@ -8,12 +8,7 @@ type CommentActionsProps = {
   isCommentEditor?: boolean;
 };
 
-function CommentActions({
-  onSave,
-  isLoading,
-  onCancel,
-  isCommentEditor
-}: CommentActionsProps) {
+function CommentActions({ onSave, isLoading, onCancel, isCommentEditor }: CommentActionsProps) {
   const { t } = useTranslation();
 
   return (

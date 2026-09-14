@@ -1,11 +1,4 @@
-import {
-  IsEnum,
-  IsIn,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  IsUUID
-} from 'class-validator';
+import { IsEnum, IsIn, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 import { AttachmentType } from '../attachment.constants';
 
 export class AttachmentInfoDto {
@@ -22,11 +15,7 @@ export class PageIdDto {
 
 export class RemoveIconDto {
   @IsEnum(AttachmentType)
-  @IsIn([
-    AttachmentType.Avatar,
-    AttachmentType.SpaceIcon,
-    AttachmentType.WorkspaceIcon
-  ])
+  @IsIn([AttachmentType.Avatar, AttachmentType.SpaceIcon, AttachmentType.WorkspaceIcon])
   @IsNotEmpty()
   type: AttachmentType;
 

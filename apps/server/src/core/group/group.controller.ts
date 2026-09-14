@@ -71,9 +71,7 @@ export class GroupController {
     @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
-    if (
-      ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Group)
-    ) {
+    if (ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Group)) {
       throw new ForbiddenException();
     }
     return this.groupService.createGroup(user, workspace.id, createGroupDto);
@@ -87,9 +85,7 @@ export class GroupController {
     @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
-    if (
-      ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Group)
-    ) {
+    if (ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Group)) {
       throw new ForbiddenException();
     }
 
@@ -109,11 +105,7 @@ export class GroupController {
       throw new ForbiddenException();
     }
 
-    return this.groupUserService.getGroupUsers(
-      groupIdDto.groupId,
-      workspace.id,
-      pagination
-    );
+    return this.groupUserService.getGroupUsers(groupIdDto.groupId, workspace.id, pagination);
   }
 
   @HttpCode(HttpStatus.OK)
@@ -124,9 +116,7 @@ export class GroupController {
     @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
-    if (
-      ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Group)
-    ) {
+    if (ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Group)) {
       throw new ForbiddenException();
     }
 
@@ -145,9 +135,7 @@ export class GroupController {
     @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
-    if (
-      ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Group)
-    ) {
+    if (ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Group)) {
       throw new ForbiddenException();
     }
 
@@ -166,9 +154,7 @@ export class GroupController {
     @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
-    if (
-      ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Group)
-    ) {
+    if (ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Group)) {
       throw new ForbiddenException();
     }
     return this.groupService.deleteGroup(groupIdDto.groupId, workspace.id);

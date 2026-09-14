@@ -28,11 +28,7 @@ import { usePageQuery } from '@/features/page/queries/page-query.ts';
 import { useSharePageQuery } from '@/features/share/queries/share-query.ts';
 import { buildSharedPageUrl } from '@/features/page/page.utils.ts';
 import { extractPageSlugId } from '@/lib';
-import {
-  sanitizeUrl,
-  copyToClipboard,
-  isEditorReady
-} from '@docmost/editor-ext';
+import { sanitizeUrl, copyToClipboard, isEditorReady } from '@docmost/editor-ext';
 import { normalizeUrl } from '@/lib/utils';
 
 const parseInternalLink = (
@@ -68,9 +64,7 @@ export default function LinkView(props: MarkViewProps) {
   const { t } = useTranslation();
   const isShareRoute = location.pathname.startsWith('/share');
 
-  const [popoverState, setPopoverState] = useState<
-    'closed' | 'preview' | 'edit'
-  >('closed');
+  const [popoverState, setPopoverState] = useState<'closed' | 'preview' | 'edit'>('closed');
   const [linkTitle, setLinkTitle] = useState('');
   const [linkUrl, setLinkUrl] = useState('');
   const [showSearch, setShowSearch] = useState(false);
@@ -78,11 +72,7 @@ export default function LinkView(props: MarkViewProps) {
   const wrapperRef = useRef<HTMLSpanElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const isEditable = editor.isEditable;
-  const {
-    isInternal,
-    slugId,
-    label: linkLabel
-  } = parseInternalLink(href, mark.attrs.internal);
+  const { isInternal, slugId, label: linkLabel } = parseInternalLink(href, mark.attrs.internal);
 
   const isPopoverVisible = popoverState !== 'closed';
   const activeView = isPopoverVisible ? popoverState : lastOpenState.current;
@@ -95,9 +85,7 @@ export default function LinkView(props: MarkViewProps) {
     pageId: isPopoverVisible && slugId && isShareRoute ? slugId : null
   });
 
-  const pageTitle = isShareRoute
-    ? sharedPageData?.page?.title
-    : linkedPage?.title;
+  const pageTitle = isShareRoute ? sharedPageData?.page?.title : linkedPage?.title;
 
   const pendingTitleRef = useRef<string | null>(null);
   const titleInputRef = useRef<HTMLInputElement>(null);
@@ -123,9 +111,7 @@ export default function LinkView(props: MarkViewProps) {
       const node = resolved.nodeAfter;
       if (!node?.isText) return;
 
-      const linkMark = node.marks.find(
-        (m) => m.type.name === 'link' && m.attrs.href === href
-      );
+      const linkMark = node.marks.find((m) => m.type.name === 'link' && m.attrs.href === href);
       if (!linkMark || node.text === newTitle) return;
 
       const from = pos;
@@ -156,19 +142,13 @@ export default function LinkView(props: MarkViewProps) {
         return;
       }
 
-      const linkMark = node.marks.find(
-        (m) => m.type.name === 'link' && m.attrs.href === href
-      );
+      const linkMark = node.marks.find((m) => m.type.name === 'link' && m.attrs.href === href);
       if (linkMark) {
         const from = pos;
         const to = pos + node.nodeSize;
         const { tr } = state;
         tr.removeMark(from, to, linkMark.type);
-        tr.addMark(
-          from,
-          to,
-          linkMark.type.create({ href: normalizedUrl, internal: !!internal })
-        );
+        tr.addMark(from, to, linkMark.type.create({ href: normalizedUrl, internal: !!internal }));
         editor.view.dispatch(tr);
       }
 
@@ -204,10 +184,7 @@ export default function LinkView(props: MarkViewProps) {
     if (!isPopoverVisible) return;
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as Node;
-      if (
-        wrapperRef.current?.contains(target) ||
-        dropdownRef.current?.contains(target)
-      ) {
+      if (wrapperRef.current?.contains(target) || dropdownRef.current?.contains(target)) {
         return;
       }
       setPopoverState('closed');
@@ -268,11 +245,7 @@ export default function LinkView(props: MarkViewProps) {
         navigate(anchor ? `${targetPath}#${anchor}` : targetPath);
       }
     } else {
-      window.open(
-        sanitizeUrl(normalizeUrl(href)),
-        '_blank',
-        'noopener,noreferrer'
-      );
+      window.open(sanitizeUrl(normalizeUrl(href)), '_blank', 'noopener,noreferrer');
     }
   }, [
     href,
@@ -304,9 +277,7 @@ export default function LinkView(props: MarkViewProps) {
       e.preventDefault();
       e.stopPropagation();
 
-      const fullUrl = sanitizeUrl(
-        isInternal ? `${window.location.origin}${href}` : href
-      );
+      const fullUrl = sanitizeUrl(isInternal ? `${window.location.origin}${href}` : href);
       copyToClipboard(fullUrl);
       notifications.show({
         message: t('Link copied')
@@ -346,10 +317,7 @@ export default function LinkView(props: MarkViewProps) {
           pendingTitleRef.current = val;
           const anchor = wrapperRef.current?.querySelector('a');
           if (anchor && val) {
-            const walker = document.createTreeWalker(
-              anchor,
-              NodeFilter.SHOW_TEXT
-            );
+            const walker = document.createTreeWalker(anchor, NodeFilter.SHOW_TEXT);
             const textNode = walker.nextNode();
             if (textNode && isEditorReady(editor)) {
               const view = editor.view as any;
@@ -389,11 +357,7 @@ export default function LinkView(props: MarkViewProps) {
       closeOnClickOutside={false}
     >
       <Popover.Target>
-        <span
-          ref={wrapperRef}
-          className={classes.linkWrapper}
-          onClick={handleClick}
-        >
+        <span ref={wrapperRef} className={classes.linkWrapper} onClick={handleClick}>
           <a
             href={displayHref}
             spellCheck={false}
@@ -420,10 +384,7 @@ export default function LinkView(props: MarkViewProps) {
             {isInternal ? (
               !showSearch ? (
                 <>
-                  <UnstyledButton
-                    className={classes.linkChip}
-                    onClick={() => setShowSearch(true)}
-                  >
+                  <UnstyledButton className={classes.linkChip} onClick={() => setShowSearch(true)}>
                     <IconFileDescription
                       size={16}
                       stroke={1.5}
@@ -439,10 +400,7 @@ export default function LinkView(props: MarkViewProps) {
 
                   <Divider my="xs" />
 
-                  <UnstyledButton
-                    onClick={handleRemoveLink}
-                    className={classes.removeLink}
-                  >
+                  <UnstyledButton onClick={handleRemoveLink} className={classes.removeLink}>
                     <Group gap={8}>
                       <IconLinkOff size={16} stroke={1.5} />
                       <Text size="sm">{t('Remove link')}</Text>
@@ -450,20 +408,13 @@ export default function LinkView(props: MarkViewProps) {
                   </UnstyledButton>
                 </>
               ) : (
-                <LinkEditorPanel
-                  onSetLink={handleEditLink}
-                  onUnsetLink={handleRemoveLink}
-                />
+                <LinkEditorPanel onSetLink={handleEditLink} onUnsetLink={handleRemoveLink} />
               )
             ) : (
               <>
                 <TextInput
                   leftSection={
-                    <IconWorld
-                      size={16}
-                      stroke={1.5}
-                      color="var(--mantine-color-dimmed)"
-                    />
+                    <IconWorld size={16} stroke={1.5} color="var(--mantine-color-dimmed)" />
                   }
                   classNames={{ input: classes.linkInput }}
                   value={linkUrl}
@@ -488,10 +439,7 @@ export default function LinkView(props: MarkViewProps) {
 
                 <Divider my="xs" />
 
-                <UnstyledButton
-                  onClick={handleRemoveLink}
-                  className={classes.removeLink}
-                >
+                <UnstyledButton onClick={handleRemoveLink} className={classes.removeLink}>
                   <Group gap={8}>
                     <IconLinkOff size={16} stroke={1.5} />
                     <Text size="sm">{t('Remove link')}</Text>

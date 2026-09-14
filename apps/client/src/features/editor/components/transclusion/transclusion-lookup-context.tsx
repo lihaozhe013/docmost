@@ -170,10 +170,7 @@ export function TransclusionLookupProvider({
     []
   );
 
-  const value = useMemo<ContextValue>(
-    () => ({ subscribe, refresh }),
-    [subscribe, refresh]
-  );
+  const value = useMemo<ContextValue>(() => ({ subscribe, refresh }), [subscribe, refresh]);
 
   return (
     <TransclusionLookupContext.Provider value={value}>

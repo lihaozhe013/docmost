@@ -49,10 +49,7 @@ export default function LabelPage() {
     isFetchingNextPage
   } = useLabelPagesQuery(labelName, debouncedSearch, activeSpaceId);
 
-  const pages = useMemo(
-    () => pagesData?.pages.flatMap((p) => p.items) ?? [],
-    [pagesData]
-  );
+  const pages = useMemo(() => pagesData?.pages.flatMap((p) => p.items) ?? [], [pagesData]);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -96,10 +93,7 @@ export default function LabelPage() {
                 className={classes.headerChip}
                 style={{ background: c.bg, color: c.fg }}
               >
-                <span
-                  className={classes.headerDot}
-                  style={{ background: c.dot }}
-                />
+                <span className={classes.headerDot} style={{ background: c.dot }} />
                 <span>{labelName}</span>
               </Link>
             </Group>
@@ -115,11 +109,7 @@ export default function LabelPage() {
               style={{ flex: 1 }}
             />
             <SpaceFilterMenu value={spaceId} onChange={setSpaceId}>
-              <Button
-                variant="default"
-                size="sm"
-                rightSection={<IconChevronDown size={14} />}
-              >
+              <Button variant="default" size="sm" rightSection={<IconChevronDown size={14} />}>
                 {selectedSpaceName}
               </Button>
             </SpaceFilterMenu>
@@ -136,11 +126,7 @@ export default function LabelPage() {
           ) : pages.length > 0 ? (
             <div>
               {pages.map((page) => (
-                <LabelPageRow
-                  key={page.id}
-                  page={page}
-                  currentLabelName={labelName}
-                />
+                <LabelPageRow key={page.id} page={page} currentLabelName={labelName} />
               ))}
               <div ref={sentinelRef} />
               {isFetchingNextPage && (
@@ -152,11 +138,7 @@ export default function LabelPage() {
           ) : (
             <EmptyState
               icon={IconLabel}
-              title={
-                debouncedSearch
-                  ? t('No matches')
-                  : t('No pages with this label')
-              }
+              title={debouncedSearch ? t('No matches') : t('No pages with this label')}
               description={
                 debouncedSearch
                   ? t('No pages match your search.')

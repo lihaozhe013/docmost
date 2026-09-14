@@ -1,17 +1,6 @@
-import {
-  Text,
-  SimpleGrid,
-  Card,
-  rem,
-  Group,
-  Button,
-  Title
-} from '@mantine/core';
+import { Text, SimpleGrid, Card, rem, Group, Button, Title } from '@mantine/core';
 import React from 'react';
-import {
-  prefetchSpace,
-  useGetSpacesQuery
-} from '@/features/space/queries/space-query.ts';
+import { prefetchSpace, useGetSpacesQuery } from '@/features/space/queries/space-query.ts';
 import { getSpaceUrl } from '@/lib/config.ts';
 import { Link } from 'react-router-dom';
 import classes from './space-grid.module.css';
@@ -40,16 +29,8 @@ export default function SpaceGrid() {
       withBorder
     >
       <Card.Section className={classes.cardSection} h={40}>
-        <div
-          className={classes.starButton}
-          data-favorited={spaceFavoriteIds.has(space.id)}
-        >
-          <StarButton
-            type="space"
-            spaceId={space.id}
-            name={space.name}
-            size={16}
-          />
+        <div className={classes.starButton} data-favorited={spaceFavoriteIds.has(space.id)}>
+          <StarButton type="space" spaceId={space.id} name={space.name} size={16} />
         </div>
       </Card.Section>
       <CustomAvatar

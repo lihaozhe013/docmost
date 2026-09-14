@@ -28,10 +28,7 @@ function parsePixelWidth(el: Cheerio<any>): number | null {
  * Returns an array of length = number of columns, with null entries
  * for columns whose width couldn't be determined.
  */
-function deriveColumnWidths(
-  $: CheerioAPI,
-  table: Cheerio<any>
-): (number | null)[] | null {
+function deriveColumnWidths($: CheerioAPI, table: Cheerio<any>): (number | null)[] | null {
   const cols = table.find('> colgroup > col');
   if (cols.length > 0) {
     const widths: (number | null)[] = [];
@@ -66,10 +63,7 @@ function deriveColumnWidths(
  * This lives upstream of tiptap's generateJSON: tiptap reads
  * `colwidth="N[,N...]"` on <td>/<th> to build the runtime <colgroup>.
  */
-export function normalizeTableColumnWidths(
-  $: CheerioAPI,
-  $root: Cheerio<any>
-): void {
+export function normalizeTableColumnWidths($: CheerioAPI, $root: Cheerio<any>): void {
   $root.find('table').each(function () {
     const table = $(this);
     const firstRow = table.find('> tbody > tr, > thead > tr, > tr').first();

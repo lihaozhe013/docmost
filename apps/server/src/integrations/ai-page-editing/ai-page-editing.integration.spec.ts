@@ -1,9 +1,6 @@
 import { AgentRuntime } from './agent-runtime';
 import { AiPageEditingImageService } from './ai-page-editing-image.service';
-import {
-  AiPageEditingService,
-  normalizeInsertBlocksInput
-} from './ai-page-editing.service';
+import { AiPageEditingService, normalizeInsertBlocksInput } from './ai-page-editing.service';
 import { ResponsesApiClient, ResponsesStreamOptions } from './responses-client';
 
 const allowAllImages = {
@@ -95,9 +92,7 @@ describe('AI page editing session', () => {
                 arguments: '{}'
               }
             ],
-            functionCalls: [
-              { callId: 'read-1', name: 'read_buffer', arguments: '{}' }
-            ],
+            functionCalls: [{ callId: 'read-1', name: 'read_buffer', arguments: '{}' }],
             usage: { inputTokens: 1, outputTokens: 1, totalTokens: 2 }
           };
         }
@@ -227,16 +222,12 @@ describe('AI page editing session', () => {
     await completed;
 
     expect(emitted.some((event) => event.event === 'run.started')).toBe(true);
-    expect(
-      emitted.find((event) => event.event === 'run.started')
-    ).toMatchObject({
+    expect(emitted.find((event) => event.event === 'run.started')).toMatchObject({
       sessionId: socket.id,
       sequence: 1
     });
     expect(emitted.some((event) => event.event === 'tool.started')).toBe(true);
-    expect(emitted.some((event) => event.event === 'tool.completed')).toBe(
-      true
-    );
+    expect(emitted.some((event) => event.event === 'tool.completed')).toBe(true);
     expect(emitted.some((event) => event.event === 'text.delta')).toBe(true);
     expect(emitted.some((event) => event.event === 'run.completed')).toBe(true);
     expect(modelCall).toBe(3);
@@ -247,20 +238,14 @@ describe('AI page editing session', () => {
     ]);
     expect(requests[0]?.tools[0]?.strict).toBe(false);
     expect(requests[0]?.tools[0]?.parameters).not.toHaveProperty('$schema');
-    expect(requests[0]?.tools[2]?.description).toContain(
-      'target must be an object'
-    );
+    expect(requests[0]?.tools[2]?.description).toContain('target must be an object');
     expect(requests[0]?.tools[2]?.parameters).toMatchObject({
       properties: {
         target: expect.any(Object)
       }
     });
-    expect(JSON.stringify(requests[0]?.tools[1]?.parameters)).toContain(
-      'replace_code'
-    );
-    expect(JSON.stringify(requests[0]?.tools[1]?.parameters)).toContain(
-      'replace_inline_math'
-    );
+    expect(JSON.stringify(requests[0]?.tools[1]?.parameters)).toContain('replace_code');
+    expect(JSON.stringify(requests[0]?.tools[1]?.parameters)).toContain('replace_inline_math');
     expect(requests[0]?.instructions).toContain('capabilities: replace_text');
     expect(requests[0]?.instructions).toContain('Mermaid');
     expect(requests[0]?.instructions).toContain('LaTeX');
@@ -368,9 +353,9 @@ describe('AI page editing session', () => {
     expect(failedToolEvents[0]?.error).toMatchObject({
       code: 'UNSUPPORTED_RANGE'
     });
-    expect(
-      emitted.find((event) => event.event === 'run.failed')?.error
-    ).toMatchObject({ code: 'TOOL_RETRY_LIMIT' });
+    expect(emitted.find((event) => event.event === 'run.failed')?.error).toMatchObject({
+      code: 'TOOL_RETRY_LIMIT'
+    });
   });
 
   it('sends current-run images as input parts to the model', async () => {
@@ -528,9 +513,9 @@ describe('AI page editing session', () => {
     });
     await completed;
 
-    expect(
-      emitted.find((event) => event.event === 'run.failed')?.error
-    ).toMatchObject({ code: 'INVALID_ATTACHMENT' });
+    expect(emitted.find((event) => event.event === 'run.failed')?.error).toMatchObject({
+      code: 'INVALID_ATTACHMENT'
+    });
     expect(requests).toHaveLength(0);
   });
 });

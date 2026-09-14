@@ -32,22 +32,16 @@ export async function processBacklinks(
         .where('slugId', 'in', internalLinkSlugIds)
         .where('workspaceId', '=', workspaceId)
         .execute();
-      resolvedLinkPageIds = resolvedPages
-        .map((p) => p.id)
-        .filter((id) => id !== pageId);
+      resolvedLinkPageIds = resolvedPages.map((p) => p.id).filter((id) => id !== pageId);
     }
 
-    const allTargetPageIds = [
-      ...new Set([...mentionTargetPageIds, ...resolvedLinkPageIds])
-    ];
+    const allTargetPageIds = [...new Set([...mentionTargetPageIds, ...resolvedLinkPageIds])];
 
     if (existingBacklinks.length === 0 && allTargetPageIds.length === 0) {
       return;
     }
 
-    const existingTargetPageIds = existingBacklinks.map(
-      (backlink) => backlink.targetPageId
-    );
+    const existingTargetPageIds = existingBacklinks.map((backlink) => backlink.targetPageId);
 
     let validTargetPages = [];
     if (allTargetPageIds.length > 0) {
@@ -61,9 +55,7 @@ export async function processBacklinks(
 
     const validTargetPageIds = validTargetPages.map((page) => page.id);
 
-    const backlinksToAdd = validTargetPageIds.filter(
-      (id) => !existingTargetPageIds.includes(id)
-    );
+    const backlinksToAdd = validTargetPageIds.filter((id) => !existingTargetPageIds.includes(id));
 
     const backlinksToRemove = existingTargetPageIds.filter(
       (existingId) => !validTargetPageIds.includes(existingId)
@@ -87,9 +79,7 @@ export async function processBacklinks(
         .where('targetPageId', 'in', backlinksToRemove)
         .execute();
 
-      logger.debug(
-        `Removed ${backlinksToRemove.length} outdated backlinks from ${pageId}.`
-      );
+      logger.debug(`Removed ${backlinksToRemove.length} outdated backlinks from ${pageId}.`);
     }
   });
 }

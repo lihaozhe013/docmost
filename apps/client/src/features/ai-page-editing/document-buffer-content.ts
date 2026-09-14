@@ -13,9 +13,7 @@ export function replaceInlineSegmentText(
       if (index === childIndex && child.type.name === 'text') {
         const text = child.text ?? '';
         const start = text.indexOf(oldText);
-        return (
-          text.slice(0, start) + newText + text.slice(start + oldText.length)
-        );
+        return text.slice(0, start) + newText + text.slice(start + oldText.length);
       }
       if (child.type.name === 'mathInline') {
         return `$${String(child.attrs?.text ?? '')}$`;
@@ -36,11 +34,7 @@ export function replaceInlineSegmentWithMath(
       if (index === childIndex && child.type.name === 'text') {
         const text = child.text ?? '';
         const start = text.indexOf(oldText);
-        return (
-          text.slice(0, start) +
-          `$${newText}$` +
-          text.slice(start + oldText.length)
-        );
+        return text.slice(0, start) + `$${newText}$` + text.slice(start + oldText.length);
       }
       if (child.type.name === 'mathInline') {
         return `$${String(child.attrs?.text ?? '')}$`;
@@ -50,11 +44,7 @@ export function replaceInlineSegmentWithMath(
     .join('');
 }
 
-export function validateLatex(
-  source: string,
-  displayMode: boolean,
-  blockId: string
-): void {
+export function validateLatex(source: string, displayMode: boolean, blockId: string): void {
   try {
     katex.renderToString(source, {
       displayMode,
@@ -108,24 +98,17 @@ export async function validateMermaidContent(content: Fragment): Promise<void> {
   }
 }
 
-export async function validateMermaidSource(
-  source: string,
-  blockId: string
-): Promise<void> {
+export async function validateMermaidSource(source: string, blockId: string): Promise<void> {
   if (!source.trim()) {
-    throw new BufferError(
-      'INVALID_CONTENT',
-      'Mermaid diagrams cannot be empty',
-      {
-        issues: [
-          {
-            path: blockId,
-            code: 'empty_mermaid',
-            message: 'The Mermaid source is empty'
-          }
-        ]
-      }
-    );
+    throw new BufferError('INVALID_CONTENT', 'Mermaid diagrams cannot be empty', {
+      issues: [
+        {
+          path: blockId,
+          code: 'empty_mermaid',
+          message: 'The Mermaid source is empty'
+        }
+      ]
+    });
   }
   try {
     const { default: mermaid } = await import('mermaid');
@@ -149,10 +132,7 @@ function collectMermaidSource(node: ProseMirrorNode, diagrams: string[]): void {
     diagrams.push(node.textContent);
   }
   node.descendants((child) => {
-    if (
-      child.type.name === 'codeBlock' &&
-      child.attrs?.language === 'mermaid'
-    ) {
+    if (child.type.name === 'codeBlock' && child.attrs?.language === 'mermaid') {
       diagrams.push(child.textContent);
     }
   });

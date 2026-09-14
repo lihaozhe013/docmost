@@ -49,10 +49,7 @@ export const theme = createTheme({
     // Size badges to their content; fit-content collapses inside table cells.
     Badge: Badge.extend({
       styles: (_theme, props) => ({
-        root:
-          props.fullWidth || props.circle
-            ? {}
-            : { width: 'max-content', maxWidth: '100%' }
+        root: props.fullWidth || props.circle ? {} : { width: 'max-content', maxWidth: '100%' }
       })
     }),
     Tabs: Tabs.extend({

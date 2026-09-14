@@ -1,15 +1,6 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 import { IconCheck, IconChevronDown } from '@tabler/icons-react';
-import {
-  Button,
-  Popover,
-  rem,
-  Text,
-  Tooltip,
-  SimpleGrid,
-  Box,
-  Stack
-} from '@mantine/core';
+import { Button, Popover, rem, Text, Tooltip, SimpleGrid, Box, Stack } from '@mantine/core';
 import type { Editor } from '@tiptap/react';
 import { useEditorState } from '@tiptap/react';
 import { useTranslation } from 'react-i18next';
@@ -150,9 +141,7 @@ function handleColorKeyNav(
     } else if (grid === 'text') {
       focusSwatch('highlight', Math.min(col, HIGHLIGHT_COLORS.length - 1));
     } else if (grid === 'highlight') {
-      document
-        .querySelector<HTMLElement>('[data-color-grid="remove"]')
-        ?.focus();
+      document.querySelector<HTMLElement>('[data-color-grid="remove"]')?.focus();
     }
     return;
   }
@@ -169,11 +158,7 @@ function handleColorKeyNav(
   }
 }
 
-export const ColorSelector: FC<ColorSelectorProps> = ({
-  editor,
-  isOpen,
-  setIsOpen
-}) => {
+export const ColorSelector: FC<ColorSelectorProps> = ({ editor, isOpen, setIsOpen }) => {
   const { t } = useTranslation();
 
   const editorState = useEditorState({
@@ -203,22 +188,14 @@ export const ColorSelector: FC<ColorSelectorProps> = ({
     return null;
   }
 
-  const activeColorItem = TEXT_COLORS.find(
-    ({ color }) => editorState[`text_${color}`]
-  );
+  const activeColorItem = TEXT_COLORS.find(({ color }) => editorState[`text_${color}`]);
 
   const activeHighlightItem = HIGHLIGHT_COLORS.find(
     ({ color }) => editorState[`highlight_${color}`]
   );
 
   return (
-    <Popover
-      width={220}
-      opened={isOpen}
-      onChange={setIsOpen}
-      trapFocus
-      withArrow
-    >
+    <Popover width={220} opened={isOpen} onChange={setIsOpen} trapFocus withArrow>
       <Popover.Target>
         <Tooltip label={t('Text color')} withArrow withinPortal={false}>
           <Button
@@ -367,10 +344,7 @@ export const ColorSelector: FC<ColorSelectorProps> = ({
                       }}
                     >
                       {editorState[`highlight_${color}`] ? (
-                        <IconCheck
-                          size={16}
-                          color="var(--mantine-color-green-7)"
-                        />
+                        <IconCheck size={16} color="var(--mantine-color-green-7)" />
                       ) : (
                         'A'
                       )}
@@ -397,8 +371,7 @@ export const ColorSelector: FC<ColorSelectorProps> = ({
               if (e.key === 'ArrowUp') {
                 e.preventDefault();
                 const lastRowStart =
-                  Math.floor((HIGHLIGHT_COLORS.length - 1) / COLOR_GRID_COLS) *
-                  COLOR_GRID_COLS;
+                  Math.floor((HIGHLIGHT_COLORS.length - 1) / COLOR_GRID_COLS) * COLOR_GRID_COLS;
                 focusSwatch('highlight', lastRowStart);
               }
             }}

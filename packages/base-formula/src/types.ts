@@ -1,11 +1,6 @@
 import type { FormulaAST } from './ast';
 
-export type FormulaResultType =
-  | 'number'
-  | 'string'
-  | 'boolean'
-  | 'date'
-  | 'null';
+export type FormulaResultType = 'number' | 'string' | 'boolean' | 'date' | 'null';
 
 export type FormulaTypeOptions = {
   source: string;

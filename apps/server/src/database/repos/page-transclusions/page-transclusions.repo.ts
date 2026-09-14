@@ -12,10 +12,7 @@ import {
 export class PageTransclusionsRepo {
   constructor(@InjectKysely() private readonly db: KyselyDB) {}
 
-  async findByPageId(
-    pageId: string,
-    trx?: KyselyTransaction
-  ): Promise<PageTransclusion[]> {
+  async findByPageId(pageId: string, trx?: KyselyTransaction): Promise<PageTransclusion[]> {
     return dbOrTx(this.db, trx)
       .selectFrom('pageTransclusions')
       .selectAll()
@@ -50,10 +47,7 @@ export class PageTransclusionsRepo {
       .where((eb) =>
         eb.or(
           keys.map((k) =>
-            eb.and([
-              eb('pageId', '=', k.pageId),
-              eb('transclusionId', '=', k.transclusionId)
-            ])
+            eb.and([eb('pageId', '=', k.pageId), eb('transclusionId', '=', k.transclusionId)])
           )
         )
       )
@@ -71,15 +65,9 @@ export class PageTransclusionsRepo {
       .executeTakeFirstOrThrow();
   }
 
-  async insertMany(
-    data: InsertablePageTransclusion[],
-    trx?: KyselyTransaction
-  ): Promise<void> {
+  async insertMany(data: InsertablePageTransclusion[], trx?: KyselyTransaction): Promise<void> {
     if (data.length === 0) return;
-    await dbOrTx(this.db, trx)
-      .insertInto('pageTransclusions')
-      .values(data)
-      .execute();
+    await dbOrTx(this.db, trx).insertInto('pageTransclusions').values(data).execute();
   }
 
   async update(

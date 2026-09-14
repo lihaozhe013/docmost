@@ -1,7 +1,4 @@
-import {
-  AiPageEditingImageService,
-  MAX_AI_IMAGE_BYTES
-} from './ai-page-editing-image.service';
+import { AiPageEditingImageService, MAX_AI_IMAGE_BYTES } from './ai-page-editing-image.service';
 
 const scope = { userId: 'user-1', workspaceId: 'ws-1', pageId: 'page-1' };
 
@@ -19,10 +16,7 @@ function attachmentBase() {
   };
 }
 
-function serviceFor(
-  attachments: Record<string, any>,
-  content = Buffer.from('img')
-) {
+function serviceFor(attachments: Record<string, any>, content = Buffer.from('img')) {
   const attachmentRepo = {
     findById: async (id: string) => attachments[id] ?? null
   } as any;
@@ -44,9 +38,7 @@ describe('AiPageEditingImageService', () => {
   it('deduplicates repeated attachment ids', async () => {
     const service = serviceFor({ 'att-1': attachmentBase() });
 
-    await expect(
-      service.resolveImages(['att-1', 'att-1'], scope)
-    ).resolves.toHaveLength(1);
+    await expect(service.resolveImages(['att-1', 'att-1'], scope)).resolves.toHaveLength(1);
   });
 
   it('returns no images for an empty request', async () => {
@@ -58,9 +50,9 @@ describe('AiPageEditingImageService', () => {
   it('rejects a missing attachment', async () => {
     const service = serviceFor({});
 
-    await expect(service.resolveImages(['att-x'], scope)).rejects.toMatchObject(
-      { code: 'INVALID_ATTACHMENT' }
-    );
+    await expect(service.resolveImages(['att-x'], scope)).rejects.toMatchObject({
+      code: 'INVALID_ATTACHMENT'
+    });
   });
 
   it('rejects an attachment uploaded by another user', async () => {
@@ -68,9 +60,9 @@ describe('AiPageEditingImageService', () => {
       'att-1': { ...attachmentBase(), creatorId: 'user-2' }
     });
 
-    await expect(service.resolveImages(['att-1'], scope)).rejects.toMatchObject(
-      { code: 'INVALID_ATTACHMENT' }
-    );
+    await expect(service.resolveImages(['att-1'], scope)).rejects.toMatchObject({
+      code: 'INVALID_ATTACHMENT'
+    });
   });
 
   it('rejects an attachment belonging to another page', async () => {
@@ -78,9 +70,9 @@ describe('AiPageEditingImageService', () => {
       'att-1': { ...attachmentBase(), pageId: 'page-2' }
     });
 
-    await expect(service.resolveImages(['att-1'], scope)).rejects.toMatchObject(
-      { code: 'INVALID_ATTACHMENT' }
-    );
+    await expect(service.resolveImages(['att-1'], scope)).rejects.toMatchObject({
+      code: 'INVALID_ATTACHMENT'
+    });
   });
 
   it('rejects a soft-deleted attachment', async () => {
@@ -88,9 +80,9 @@ describe('AiPageEditingImageService', () => {
       'att-1': { ...attachmentBase(), deletedAt: new Date() }
     });
 
-    await expect(service.resolveImages(['att-1'], scope)).rejects.toMatchObject(
-      { code: 'INVALID_ATTACHMENT' }
-    );
+    await expect(service.resolveImages(['att-1'], scope)).rejects.toMatchObject({
+      code: 'INVALID_ATTACHMENT'
+    });
   });
 
   it('rejects a non-image extension', async () => {
@@ -98,9 +90,9 @@ describe('AiPageEditingImageService', () => {
       'att-1': { ...attachmentBase(), fileExt: '.pdf' }
     });
 
-    await expect(service.resolveImages(['att-1'], scope)).rejects.toMatchObject(
-      { code: 'UNSUPPORTED_IMAGE_TYPE' }
-    );
+    await expect(service.resolveImages(['att-1'], scope)).rejects.toMatchObject({
+      code: 'UNSUPPORTED_IMAGE_TYPE'
+    });
   });
 
   it('rejects an oversized image', async () => {
@@ -111,9 +103,9 @@ describe('AiPageEditingImageService', () => {
       }
     });
 
-    await expect(service.resolveImages(['att-1'], scope)).rejects.toMatchObject(
-      { code: 'ATTACHMENT_TOO_LARGE' }
-    );
+    await expect(service.resolveImages(['att-1'], scope)).rejects.toMatchObject({
+      code: 'ATTACHMENT_TOO_LARGE'
+    });
   });
 
   it('rejects more images than the per-message limit', async () => {
@@ -134,13 +126,10 @@ describe('AiPageEditingImageService', () => {
         throw new Error('disk gone');
       }
     } as any;
-    const service = new AiPageEditingImageService(
-      attachmentRepo,
-      storageService
-    );
+    const service = new AiPageEditingImageService(attachmentRepo, storageService);
 
-    await expect(service.resolveImages(['att-1'], scope)).rejects.toMatchObject(
-      { code: 'INVALID_ATTACHMENT' }
-    );
+    await expect(service.resolveImages(['att-1'], scope)).rejects.toMatchObject({
+      code: 'INVALID_ATTACHMENT'
+    });
   });
 });

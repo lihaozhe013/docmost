@@ -30,10 +30,7 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import { validateSsoEnforcement } from './auth.util';
 import { ModuleRef } from '@nestjs/core';
 import { AuditEvent, AuditResource } from '../../common/events/audit-events';
-import {
-  AUDIT_SERVICE,
-  IAuditService
-} from '../../integrations/audit/audit.service';
+import { AUDIT_SERVICE, IAuditService } from '../../integrations/audit/audit.service';
 
 @SkipThrottle({ ...ALL_NAMED_THROTTLERS_SKIPPED, [AUTH_THROTTLER]: false })
 @UseGuards(ThrottlerGuard)
@@ -65,9 +62,7 @@ export class AuthController {
       MfaModule = require('./../../ee/mfa/services/mfa.service');
       isMfaModuleReady = true;
     } catch (err) {
-      this.logger.debug(
-        'MFA module requested but EE module not bundled in this build'
-      );
+      this.logger.debug('MFA module requested but EE module not bundled in this build');
       isMfaModuleReady = false;
     }
     if (isMfaModuleReady) {
@@ -75,11 +70,7 @@ export class AuthController {
         strict: false
       });
 
-      const mfaResult = await mfaService.checkMfaRequirements(
-        loginInput,
-        workspace,
-        res
-      );
+      const mfaResult = await mfaService.checkMfaRequirements(loginInput, workspace, res);
 
       if (mfaResult) {
         // If user has MFA enabled OR workspace enforces MFA, require MFA verification
@@ -108,8 +99,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: FastifyReply,
     @Body() createAdminUserDto: CreateAdminUserDto
   ) {
-    const { workspace, authToken } =
-      await this.authService.setup(createAdminUserDto);
+    const { workspace, authToken } = await this.authService.setup(createAdminUserDto);
 
     this.setAuthCookie(res, authToken);
     return workspace;
@@ -126,22 +116,14 @@ export class AuthController {
     @Req() req: FastifyRequest
   ) {
     const currentSessionId = (req.raw as any).sessionId;
-    return this.authService.changePassword(
-      dto,
-      user.id,
-      workspace.id,
-      currentSessionId
-    );
+    return this.authService.changePassword(dto, user.id, workspace.id, currentSessionId);
   }
 
   @SkipThrottle({ [AUTH_THROTTLER]: true })
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @Post('collab-token')
-  async collabToken(
-    @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace
-  ) {
+  async collabToken(@AuthUser() user: User, @AuthWorkspace() workspace: Workspace) {
     return this.authService.getCollabToken(user, workspace.id);
   }
 
@@ -156,11 +138,7 @@ export class AuthController {
   ) {
     const sessionId = (req.raw as any).sessionId;
     if (sessionId) {
-      await this.sessionService.revokeSession(
-        sessionId,
-        user.id,
-        user.workspaceId
-      );
+      await this.sessionService.revokeSession(sessionId, user.id, user.workspaceId);
     }
 
     res.clearCookie('authToken');

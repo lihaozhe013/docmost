@@ -15,10 +15,7 @@ import SpaceAbilityFactory from '../../core/casl/abilities/space-ability.factory
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { AuthUser } from '../../common/decorators/auth-user.decorator';
 import { User, Workspace } from '@docmost/db/types/entity.types';
-import {
-  SpaceCaslAction,
-  SpaceCaslSubject
-} from '../../core/casl/interfaces/space-ability.type';
+import { SpaceCaslAction, SpaceCaslSubject } from '../../core/casl/interfaces/space-ability.type';
 import { FileInterceptor } from '../../common/interceptors/file.interceptor';
 import bytes from 'bytes';
 import * as path from 'path';
@@ -26,10 +23,7 @@ import { ImportService } from './services/import.service';
 import { AuthWorkspace } from '../../common/decorators/auth-workspace.decorator';
 import { EnvironmentService } from '../environment/environment.service';
 import { AuditEvent, AuditResource } from '../../common/events/audit-events';
-import {
-  AUDIT_SERVICE,
-  IAuditService
-} from '../../integrations/audit/audit.service';
+import { AUDIT_SERVICE, IAuditService } from '../../integrations/audit/audit.service';
 
 @Controller()
 export class ImportController {
@@ -46,11 +40,7 @@ export class ImportController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @Post('pages/import')
-  async importPage(
-    @Req() req: any,
-    @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace
-  ) {
+  async importPage(@Req() req: any, @AuthUser() user: User, @AuthWorkspace() workspace: Workspace) {
     const validFileExtensions = ['.md', '.html', '.docx', '.pdf'];
 
     const maxFileSize = bytes('30mb');
@@ -63,9 +53,7 @@ export class ImportController {
     } catch (err: any) {
       this.logger.error(err.message);
       if (err?.statusCode === 413) {
-        throw new BadRequestException(
-          `File too large. Exceeds the 10mb import limit`
-        );
+        throw new BadRequestException(`File too large. Exceeds the 10mb import limit`);
       }
     }
 
@@ -73,9 +61,7 @@ export class ImportController {
       throw new BadRequestException('Failed to upload file');
     }
 
-    if (
-      !validFileExtensions.includes(path.extname(file.filename).toLowerCase())
-    ) {
+    if (!validFileExtensions.includes(path.extname(file.filename).toLowerCase())) {
       throw new BadRequestException('Invalid import file type.');
     }
 
@@ -90,12 +76,7 @@ export class ImportController {
       throw new ForbiddenException();
     }
 
-    const createdPage = await this.importService.importPage(
-      file,
-      user.id,
-      spaceId,
-      workspace.id
-    );
+    const createdPage = await this.importService.importPage(file, user.id, spaceId, workspace.id);
 
     const ext = path.extname(file.filename).toLowerCase();
     const sourceMap: Record<string, string> = {
@@ -125,11 +106,7 @@ export class ImportController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @Post('pages/import-zip')
-  async importZip(
-    @Req() req: any,
-    @AuthUser() user: User,
-    @AuthWorkspace() workspace: Workspace
-  ) {
+  async importZip(@Req() req: any, @AuthUser() user: User, @AuthWorkspace() workspace: Workspace) {
     const validFileExtensions = ['.zip'];
 
     const maxFileSize = bytes(this.environmentService.getFileImportSizeLimit());
@@ -152,9 +129,7 @@ export class ImportController {
       throw new BadRequestException('Failed to upload file');
     }
 
-    if (
-      !validFileExtensions.includes(path.extname(file.filename).toLowerCase())
-    ) {
+    if (!validFileExtensions.includes(path.extname(file.filename).toLowerCase())) {
       throw new BadRequestException('Invalid import file extension.');
     }
 
@@ -189,12 +164,6 @@ export class ImportController {
       }
     });
 
-    return this.importService.importZip(
-      file,
-      source,
-      user.id,
-      spaceId,
-      workspace.id
-    );
+    return this.importService.importZip(file, source, user.id, spaceId, workspace.id);
   }
 }

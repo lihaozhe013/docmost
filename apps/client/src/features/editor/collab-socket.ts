@@ -1,7 +1,4 @@
-import {
-  HocuspocusProviderWebsocket,
-  WebSocketStatus
-} from '@hocuspocus/provider';
+import { HocuspocusProviderWebsocket, WebSocketStatus } from '@hocuspocus/provider';
 import { getCollaborationUrl } from '@/lib/config.ts';
 
 const RELEASE_GRACE_MS = 5000;

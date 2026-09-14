@@ -63,9 +63,7 @@ export default function StarButton(props: StarButtonProps) {
       addMutation.mutate(params, {
         onSuccess: () => {
           notifications.show({
-            message: name
-              ? t('Added {{name}} to favorites', { name })
-              : t('Added to favorites')
+            message: name ? t('Added {{name}} to favorites', { name }) : t('Added to favorites')
           });
         }
       });
@@ -74,9 +72,7 @@ export default function StarButton(props: StarButtonProps) {
 
   // Tooltip label stays short. Accessible name expands to include the item
   // so screen reader users can distinguish stars on different rows.
-  const tooltipLabel = isFavorited
-    ? t('Remove from favorites')
-    : t('Add to favorites');
+  const tooltipLabel = isFavorited ? t('Remove from favorites') : t('Add to favorites');
 
   const ariaLabel = name
     ? isFavorited
@@ -94,11 +90,7 @@ export default function StarButton(props: StarButtonProps) {
         onClick={handleToggle}
         loading={isPending}
       >
-        {isFavorited ? (
-          <IconStarFilled size={size} />
-        ) : (
-          <IconStar size={size} stroke={2} />
-        )}
+        {isFavorited ? <IconStarFilled size={size} /> : <IconStar size={size} stroke={2} />}
       </ActionIcon>
     </Tooltip>
   );

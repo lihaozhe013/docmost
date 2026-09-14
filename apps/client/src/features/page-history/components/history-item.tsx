@@ -85,11 +85,7 @@ const HistoryItem = memo(function HistoryItem({
         />
       )}
 
-      <UnstyledButton
-        p="xs"
-        onClick={handleClick}
-        className={classes.historyButton}
-      >
+      <UnstyledButton p="xs" onClick={handleClick} className={classes.historyButton}>
         <Text size="sm">{date}</Text>
 
         <Group gap={6} wrap="nowrap" mt={4}>
@@ -97,29 +93,21 @@ const HistoryItem = memo(function HistoryItem({
             <>
               <Tooltip.Group openDelay={300} closeDelay={100}>
                 <Avatar.Group spacing={8}>
-                  {contributors
-                    .slice(0, MAX_VISIBLE_AVATARS)
-                    .map((contributor) => (
-                      <Tooltip
-                        key={contributor.id}
-                        label={contributor.name}
-                        withArrow
-                      >
-                        <CustomAvatar
-                          size="sm"
-                          avatarUrl={contributor.avatarUrl}
-                          name={contributor.name}
-                        />
-                      </Tooltip>
-                    ))}
+                  {contributors.slice(0, MAX_VISIBLE_AVATARS).map((contributor) => (
+                    <Tooltip key={contributor.id} label={contributor.name} withArrow>
+                      <CustomAvatar
+                        size="sm"
+                        avatarUrl={contributor.avatarUrl}
+                        name={contributor.name}
+                      />
+                    </Tooltip>
+                  ))}
                   {contributors.length > MAX_VISIBLE_AVATARS && (
                     <Tooltip
                       withArrow
-                      label={contributors
-                        .slice(MAX_VISIBLE_AVATARS)
-                        .map((c) => (
-                          <div key={c.id}>{c.name}</div>
-                        ))}
+                      label={contributors.slice(MAX_VISIBLE_AVATARS).map((c) => (
+                        <div key={c.id}>{c.name}</div>
+                      ))}
                     >
                       <Avatar size="sm" color="gray">
                         +{contributors.length - MAX_VISIBLE_AVATARS}
@@ -163,16 +151,11 @@ const HistoryItem = memo(function HistoryItem({
             </ActionIcon>
           </Menu.Target>
           <Menu.Dropdown>
-            <Menu.Item
-              disabled={!canCompare}
-              onClick={() => onStartCompare(historyItem.id)}
-            >
+            <Menu.Item disabled={!canCompare} onClick={() => onStartCompare(historyItem.id)}>
               {t('Compare')}
             </Menu.Item>
             {onRestore && (
-              <Menu.Item onClick={() => onRestore(historyItem.id, index)}>
-                {t('Restore')}
-              </Menu.Item>
+              <Menu.Item onClick={() => onRestore(historyItem.id, index)}>{t('Restore')}</Menu.Item>
             )}
           </Menu.Dropdown>
         </Menu>

@@ -3,11 +3,7 @@ import RedisClient from 'ioredis';
 import { CollabProxySocket } from './collab-proxy-socket';
 import { type Hocuspocus, type WebSocketLike } from '@hocuspocus/server';
 
-export type SecondParam<T> = T extends (
-  arg1: any,
-  arg2: infer A,
-  ...args: any[]
-) => any
+export type SecondParam<T> = T extends (arg1: any, arg2: infer A, ...args: any[]) => any
   ? A
   : never;
 
@@ -113,9 +109,7 @@ export interface Configuration<TCE> {
   // Derive the hocuspocus context once per socket instead of re-deriving it in a
   // per-document hook like onConnect/onAuthenticate. Runs on the origin server when
   // the socket opens and on the doc owner when the first proxied message arrives.
-  deriveContext?: (
-    serializedHTTPRequest: SerializedHTTPRequest
-  ) => Record<string, any>;
+  deriveContext?: (serializedHTTPRequest: SerializedHTTPRequest) => Record<string, any>;
 }
 
 // Hocuspocus expects a web-standard Request, so rehydrate one from what crossed the wire

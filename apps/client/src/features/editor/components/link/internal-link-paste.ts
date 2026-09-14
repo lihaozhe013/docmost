@@ -49,11 +49,7 @@ export const handleInternalLink =
         const { schema } = view.state;
 
         const transaction = view.state.tr.insertText(url, pos);
-        transaction.addMark(
-          pos,
-          pos + url.length,
-          schema.marks.link.create({ href: url })
-        );
+        transaction.addMark(pos, pos + url.length, schema.marks.link.create({ href: url }));
 
         view.dispatch(transaction);
       }

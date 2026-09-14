@@ -28,11 +28,7 @@ export function rewriteAttachmentsForUnsync(
   const visit = (node: any): void => {
     if (!node || typeof node !== 'object') return;
 
-    if (
-      typeof node.type === 'string' &&
-      isAttachmentNode(node.type) &&
-      node.attrs
-    ) {
+    if (typeof node.type === 'string' && isAttachmentNode(node.type) && node.attrs) {
       const oldId = node.attrs.attachmentId;
       if (typeof oldId === 'string' && oldId.length > 0) {
         let newId = idMap.get(oldId);
@@ -41,10 +37,7 @@ export function rewriteAttachmentsForUnsync(
           idMap.set(oldId, newId);
         }
         node.attrs.attachmentId = newId;
-        if (
-          typeof node.attrs.src === 'string' &&
-          node.attrs.src.includes(oldId)
-        ) {
+        if (typeof node.attrs.src === 'string' && node.attrs.src.includes(oldId)) {
           node.attrs.src = node.attrs.src.split(oldId).join(newId);
         }
       }

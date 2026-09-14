@@ -27,12 +27,7 @@ interface CommentListItemProps {
   userSpaceRole?: string;
 }
 
-function CommentListItem({
-  comment,
-  pageId,
-  canComment,
-  userSpaceRole
-}: CommentListItemProps) {
+function CommentListItem({ comment, pageId, canComment, userSpaceRole }: CommentListItemProps) {
   const { t } = useTranslation();
   const { hovered, ref } = useHover();
   const [isEditing, setIsEditing] = useState(false);
@@ -100,9 +95,7 @@ function CommentListItem({
   }
 
   function handleCommentClick(comment: IComment) {
-    const el = document.querySelector(
-      `.comment-mark[data-comment-id="${comment.id}"]`
-    );
+    const el = document.querySelector(`.comment-mark[data-comment-id="${comment.id}"]`);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
       el.classList.add('comment-highlight');
@@ -123,11 +116,7 @@ function CommentListItem({
   return (
     <Box ref={ref} pb="xs">
       <Group>
-        <CustomAvatar
-          size="sm"
-          avatarUrl={comment.creator.avatarUrl}
-          name={comment.creator.name}
-        />
+        <CustomAvatar size="sm" avatarUrl={comment.creator.avatarUrl} name={comment.creator.name} />
 
         <div style={{ flex: 1 }}>
           <Group justify="space-between" wrap="nowrap">
@@ -145,8 +134,7 @@ function CommentListItem({
                 />
               )}
 
-              {(currentUser?.user?.id === comment.creatorId ||
-                userSpaceRole === 'admin') && (
+              {(currentUser?.user?.id === comment.creatorId || userSpaceRole === 'admin') && (
                 <CommentMenu
                   onEditComment={handleEditToggle}
                   onDeleteComment={handleDeleteComment}

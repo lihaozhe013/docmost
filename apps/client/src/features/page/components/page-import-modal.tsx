@@ -1,12 +1,4 @@
-import {
-  Modal,
-  Button,
-  SimpleGrid,
-  FileButton,
-  Group,
-  Text,
-  Tooltip
-} from '@mantine/core';
+import { Modal, Button, SimpleGrid, FileButton, Group, Text, Tooltip } from '@mantine/core';
 import {
   IconBrandNotion,
   IconCheck,
@@ -17,10 +9,7 @@ import {
   IconMarkdown,
   IconX
 } from '@tabler/icons-react';
-import {
-  importPage,
-  importZip
-} from '@/features/page/services/page-service.ts';
+import { importPage, importZip } from '@/features/page/services/page-service.ts';
 import { notifications } from '@mantine/notifications';
 import { treeDataAtom } from '@/features/page/tree/atoms/tree-data-atom.ts';
 import { useAtom } from 'jotai';
@@ -45,11 +34,7 @@ interface PageImportModalProps {
   onClose: () => void;
 }
 
-export default function PageImportModal({
-  spaceId,
-  open,
-  onClose
-}: PageImportModalProps) {
+export default function PageImportModal({ spaceId, open, onClose }: PageImportModalProps) {
   const { t } = useTranslation();
   return (
     <>
@@ -133,9 +118,7 @@ function ImportFormatSelection({ spaceId, onClose }: ImportFormatSelection) {
       notifications.update({
         id: 'import',
         title: t('Importing pages'),
-        message: t(
-          'Page import is in progress. You can check back later if this takes longer.'
-        ),
+        message: t('Page import is in progress. You can check back later if this takes longer.'),
         loading: true,
         withCloseButton: true,
         autoClose: false
@@ -209,12 +192,9 @@ function ImportFormatSelection({ spaceId, onClose }: ImportFormatSelection) {
             id: 'import',
             color: 'red',
             title: t('Page import failed'),
-            message: t(
-              'Something went wrong while importing pages: {{reason}}.',
-              {
-                reason: fileTask.errorMessage
-              }
-            ),
+            message: t('Something went wrong while importing pages: {{reason}}.', {
+              reason: fileTask.errorMessage
+            }),
             icon: <IconX size={18} />,
             loading: false,
             withCloseButton: true,
@@ -229,12 +209,9 @@ function ImportFormatSelection({ spaceId, onClose }: ImportFormatSelection) {
           id: 'import',
           color: 'red',
           title: t('Import failed'),
-          message: t(
-            'Something went wrong while importing pages: {{reason}}.',
-            {
-              reason: err.response?.data.message
-            }
-          ),
+          message: t('Something went wrong while importing pages: {{reason}}.', {
+            reason: err.response?.data.message
+          }),
           icon: <IconX size={18} />,
           loading: false,
           withCloseButton: true,
@@ -254,9 +231,7 @@ function ImportFormatSelection({ spaceId, onClose }: ImportFormatSelection) {
       return;
     }
 
-    const oversizedFiles = selectedFiles.filter(
-      (f) => f.size > maxSingleFileSize
-    );
+    const oversizedFiles = selectedFiles.filter((f) => f.size > maxSingleFileSize);
     if (oversizedFiles.length > 0) {
       notifications.show({
         color: 'red',
@@ -303,8 +278,7 @@ function ImportFormatSelection({ spaceId, onClose }: ImportFormatSelection) {
       if (docxFileRef.current) docxFileRef.current();
       if (pdfFileRef.current) pdfFileRef.current();
 
-      const pageCountText =
-        pageCount === 1 ? `1 ${t('page')}` : `${pageCount} ${t('pages')}`;
+      const pageCountText = pageCount === 1 ? `1 ${t('page')}` : `${pageCount} ${t('pages')}`;
 
       notifications.update({
         id: alert,
@@ -471,12 +445,9 @@ function ImportFormatSelection({ spaceId, onClose }: ImportFormatSelection) {
             Import zip file
           </Text>
           <Text ta="center" size="sm" c="dimmed" inline py="sm">
-            {t(
-              `Upload zip file containing Markdown and HTML files. Max: {{sizeLimit}}`,
-              {
-                sizeLimit: formatBytes(getFileImportSizeLimit())
-              }
-            )}
+            {t(`Upload zip file containing Markdown and HTML files. Max: {{sizeLimit}}`, {
+              sizeLimit: formatBytes(getFileImportSizeLimit())
+            })}
           </Text>
           <FileButton
             onChange={(file) => handleZipUpload(file, 'generic')}
@@ -488,11 +459,7 @@ function ImportFormatSelection({ spaceId, onClose }: ImportFormatSelection) {
           >
             {(props) => (
               <Group justify="center">
-                <Button
-                  justify="center"
-                  leftSection={<IconFileTypeZip size={18} />}
-                  {...props}
-                >
+                <Button justify="center" leftSection={<IconFileTypeZip size={18} />} {...props}>
                   {t('Upload file')}
                 </Button>
               </Group>

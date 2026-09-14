@@ -8,8 +8,7 @@
     width: 100%;
 
     &:hover {
-      border: 1px solid
-        light-dark(var(--mantine-color-gray-3), var(--mantine-color-gray-7));
+      border: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-gray-7));
 
       [data-type='detailsSummary'] {
       }
@@ -37,14 +36,8 @@
 
         &:hover,
         &.active {
-          color: light-dark(
-            var(--mantine-color-gray-8),
-            var(--mantine-color-gray-0)
-          );
-          background: light-dark(
-            var(--mantine-color-gray-1),
-            var(--mantine-color-gray-8)
-          );
+          color: light-dark(var(--mantine-color-gray-8), var(--mantine-color-gray-0));
+          background: light-dark(var(--mantine-color-gray-1), var(--mantine-color-gray-8));
         }
       }
     }
@@ -57,15 +50,11 @@
     }
   }
 
-  [data-type='details']
-    > [data-type='detailsContainer']
-    > [data-type='detailsContent'] {
+  [data-type='details'] > [data-type='detailsContainer'] > [data-type='detailsContent'] {
     display: none;
   }
 
-  [data-type='details'][open]
-    > [data-type='detailsContainer']
-    > [data-type='detailsContent'] {
+  [data-type='details'][open] > [data-type='detailsContainer'] > [data-type='detailsContent'] {
     display: block;
   }
 
@@ -83,9 +72,7 @@
     display: block;
   }
 
-  [data-type='details']:has(.search-result)
-    > [data-type='detailsButton']
-    .ProseMirror-icon {
+  [data-type='details']:has(.search-result) > [data-type='detailsButton'] .ProseMirror-icon {
     transform: rotateZ(90deg);
   }
 }

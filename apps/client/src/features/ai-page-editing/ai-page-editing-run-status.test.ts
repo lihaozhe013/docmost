@@ -106,9 +106,7 @@ describe('formatRunMeta', () => {
         usage: { inputTokens: 100, outputTokens: 50, totalTokens: 1500 }
       })
     ).toBe('1.5k tokens');
-    expect(
-      formatRunMeta({ usage: { inputTokens: 1200, outputTokens: 300 } })
-    ).toBe('1.5k tokens');
+    expect(formatRunMeta({ usage: { inputTokens: 1200, outputTokens: 300 } })).toBe('1.5k tokens');
   });
 
   it('joins usage and elapsed time with a separator', () => {

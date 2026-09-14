@@ -21,10 +21,7 @@ import { executeTx } from '@docmost/db/utils';
 import { InjectKysely } from 'nestjs-kysely';
 import { AuditEvent, AuditResource } from '../../../common/events/audit-events';
 import { diffAuditTrackedFields } from '../../../common/helpers';
-import {
-  AUDIT_SERVICE,
-  IAuditService
-} from '../../../integrations/audit/audit.service';
+import { AUDIT_SERVICE, IAuditService } from '../../../integrations/audit/audit.service';
 
 @Injectable()
 export class GroupService {
@@ -58,10 +55,7 @@ export class GroupService {
     createGroupDto: CreateGroupDto,
     trx?: KyselyTransaction
   ): Promise<Group> {
-    const groupExists = await this.groupRepo.findByName(
-      createGroupDto.name,
-      workspaceId
-    );
+    const groupExists = await this.groupRepo.findByName(createGroupDto.name, workspaceId);
     if (groupExists) {
       throw new BadRequestException('Group name already exists');
     }
@@ -98,15 +92,10 @@ export class GroupService {
     return createdGroup;
   }
 
-  async updateGroup(
-    workspaceId: string,
-    updateGroupDto: UpdateGroupDto
-  ): Promise<Group> {
-    const group = await this.groupRepo.findById(
-      updateGroupDto.groupId,
-      workspaceId,
-      { includeMemberCount: true }
-    );
+  async updateGroup(workspaceId: string, updateGroupDto: UpdateGroupDto): Promise<Group> {
+    const group = await this.groupRepo.findById(updateGroupDto.groupId, workspaceId, {
+      includeMemberCount: true
+    });
 
     if (!group) {
       throw new NotFoundException('Group not found');
@@ -119,10 +108,7 @@ export class GroupService {
     const groupBefore = { name: group.name, description: group.description };
 
     if (updateGroupDto.name) {
-      const existingGroup = await this.groupRepo.findByName(
-        updateGroupDto.name,
-        workspaceId
-      );
+      const existingGroup = await this.groupRepo.findByName(updateGroupDto.name, workspaceId);
 
       if (existingGroup && group.name !== existingGroup.name) {
         throw new BadRequestException('Group name already exists');
@@ -186,17 +172,9 @@ export class GroupService {
       await this.groupRepo.delete(groupId, workspaceId, { trx });
 
       for (const spaceId of spaceIds) {
-        await this.watcherRepo.deleteByUsersWithoutSpaceAccess(
-          userIds,
-          spaceId,
-          { trx }
-        );
+        await this.watcherRepo.deleteByUsersWithoutSpaceAccess(userIds, spaceId, { trx });
 
-        await this.favoriteRepo.deleteByUsersWithoutSpaceAccess(
-          userIds,
-          spaceId,
-          { trx }
-        );
+        await this.favoriteRepo.deleteByUsersWithoutSpaceAccess(userIds, spaceId, { trx });
       }
     });
 

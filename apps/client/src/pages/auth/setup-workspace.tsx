@@ -8,12 +8,7 @@ import { DocumentTitle } from '@/components/ui/document-title.tsx';
 
 export default function SetupWorkspace() {
   const { t } = useTranslation();
-  const {
-    data: workspace,
-    isLoading,
-    isError,
-    error
-  } = useWorkspacePublicDataQuery();
+  const { data: workspace, isLoading, isError, error } = useWorkspacePublicDataQuery();
 
   const navigate = useNavigate();
 

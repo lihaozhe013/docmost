@@ -53,9 +53,7 @@ export class PageTransclusionReferencesRepo {
       .insertInto('pageTransclusionReferences')
       .values(rows)
       .onConflict((oc) =>
-        oc
-          .columns(['referencePageId', 'sourcePageId', 'transclusionId'])
-          .doNothing()
+        oc.columns(['referencePageId', 'sourcePageId', 'transclusionId']).doNothing()
       )
       .execute();
   }

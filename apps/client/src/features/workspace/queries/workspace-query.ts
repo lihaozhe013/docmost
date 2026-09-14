@@ -35,10 +35,7 @@ export function useWorkspaceQuery(): UseQueryResult<IWorkspace, Error> {
   });
 }
 
-export function useWorkspacePublicDataQuery(): UseQueryResult<
-  IPublicWorkspace,
-  Error
-> {
+export function useWorkspacePublicDataQuery(): UseQueryResult<IPublicWorkspace, Error> {
   return useQuery({
     queryKey: ['workspace-public'],
     queryFn: () => getWorkspacePublicData()
@@ -146,11 +143,7 @@ export function useChangeMemberRoleMutation() {
 export function useCreateWorkspaceMemberMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation<
-    { user: IUser; password: string },
-    Error,
-    ICreateWorkspaceUser
-  >({
+  return useMutation<{ user: IUser; password: string }, Error, ICreateWorkspaceUser>({
     mutationFn: (data) => createWorkspaceMember(data),
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -186,9 +179,7 @@ export function useResetWorkspaceMemberPasswordMutation() {
   });
 }
 
-export function useAppVersion(
-  isEnabled: boolean
-): UseQueryResult<IVersion, Error> {
+export function useAppVersion(isEnabled: boolean): UseQueryResult<IVersion, Error> {
   return useQuery({
     queryKey: ['version'],
     queryFn: () => getAppVersion(),

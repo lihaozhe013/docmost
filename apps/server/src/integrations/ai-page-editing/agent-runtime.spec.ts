@@ -199,9 +199,7 @@ describe('AgentRuntime', () => {
     });
 
     expect(modelCall).toBe(2);
-    expect(events.filter((event) => event.type === 'tool-error')).toHaveLength(
-      2
-    );
+    expect(events.filter((event) => event.type === 'tool-error')).toHaveLength(2);
     expect(events[events.length - 1]?.type).toBe('error');
   });
 

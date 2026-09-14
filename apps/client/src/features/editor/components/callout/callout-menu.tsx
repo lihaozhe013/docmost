@@ -16,11 +16,7 @@ import {
   IconMoodSmile,
   IconNotes
 } from '@tabler/icons-react';
-import {
-  CalloutType,
-  isEditorReady,
-  isTextSelected
-} from '@docmost/editor-ext';
+import { CalloutType, isEditorReady, isTextSelected } from '@docmost/editor-ext';
 import { useTranslation } from 'react-i18next';
 import EmojiPicker from '@/components/ui/emoji-picker.tsx';
 import classes from '../common/toolbar-menu.module.css';
@@ -94,21 +90,13 @@ export function CalloutMenu({ editor }: EditorMenuProps) {
   const setCalloutIcon = useCallback(
     (emoji: any) => {
       const emojiChar = emoji?.native || emoji?.emoji || emoji;
-      editor
-        .chain()
-        .focus(undefined, { scrollIntoView: false })
-        .updateCalloutIcon(emojiChar)
-        .run();
+      editor.chain().focus(undefined, { scrollIntoView: false }).updateCalloutIcon(emojiChar).run();
     },
     [editor]
   );
 
   const removeCalloutIcon = useCallback(() => {
-    editor
-      .chain()
-      .focus(undefined, { scrollIntoView: false })
-      .updateCalloutIcon('')
-      .run();
+    editor.chain().focus(undefined, { scrollIntoView: false }).updateCalloutIcon('').run();
   }, [editor]);
 
   const getCurrentIcon = () => {
@@ -144,10 +132,7 @@ export function CalloutMenu({ editor }: EditorMenuProps) {
             variant="subtle"
             className={clsx({ [classes.active]: editorState?.isInfo })}
           >
-            <IconInfoCircleFilled
-              size={18}
-              color="var(--mantine-color-blue-5)"
-            />
+            <IconInfoCircleFilled size={18} color="var(--mantine-color-blue-5)" />
           </ActionIcon>
         </Tooltip>
 
@@ -171,10 +156,7 @@ export function CalloutMenu({ editor }: EditorMenuProps) {
             variant="subtle"
             className={clsx({ [classes.active]: editorState?.isSuccess })}
           >
-            <IconCircleCheckFilled
-              size={18}
-              color="var(--mantine-color-green-5)"
-            />
+            <IconCircleCheckFilled size={18} color="var(--mantine-color-green-5)" />
           </ActionIcon>
         </Tooltip>
 
@@ -186,10 +168,7 @@ export function CalloutMenu({ editor }: EditorMenuProps) {
             variant="subtle"
             className={clsx({ [classes.active]: editorState?.isWarning })}
           >
-            <IconAlertTriangleFilled
-              size={18}
-              color="var(--mantine-color-orange-5)"
-            />
+            <IconAlertTriangleFilled size={18} color="var(--mantine-color-orange-5)" />
           </ActionIcon>
         </Tooltip>
 

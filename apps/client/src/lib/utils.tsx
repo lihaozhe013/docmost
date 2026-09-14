@@ -52,10 +52,7 @@ export const formatBytes = (bytes: number): string => {
   return `${adjustedSize.toFixed(precision)} ${units[adjustedUnitIndex]}`;
 };
 
-export async function svgStringToFile(
-  svgString: string,
-  fileName: string
-): Promise<File> {
+export async function svgStringToFile(svgString: string, fileName: string): Promise<File> {
   const blob = new Blob([svgString], { type: 'image/svg+xml' });
   return new File([blob], fileName, { type: 'image/svg+xml' });
 }
@@ -86,11 +83,7 @@ export function capitalizeFirstChar(string: string) {
 export function getPageIcon(icon: string, size = 18): string | ReactNode {
   return (
     icon || (
-      <IconFileDescription
-        size={size}
-        color="var(--mantine-color-gray-6)"
-        aria-hidden="true"
-      />
+      <IconFileDescription size={size} color="var(--mantine-color-gray-6)" aria-hidden="true" />
     )
   );
 }

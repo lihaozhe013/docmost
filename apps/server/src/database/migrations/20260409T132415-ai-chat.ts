@@ -4,22 +4,14 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable('ai_chats')
     .ifNotExists()
-    .addColumn('id', 'uuid', (col) =>
-      col.primaryKey().defaultTo(sql`gen_uuid_v7()`)
-    )
+    .addColumn('id', 'uuid', (col) => col.primaryKey().defaultTo(sql`gen_uuid_v7()`))
     .addColumn('workspace_id', 'uuid', (col) =>
       col.references('workspaces.id').onDelete('cascade').notNull()
     )
-    .addColumn('creator_id', 'uuid', (col) =>
-      col.references('users.id').notNull()
-    )
+    .addColumn('creator_id', 'uuid', (col) => col.references('users.id').notNull())
     .addColumn('title', 'varchar', (col) => col)
-    .addColumn('created_at', 'timestamptz', (col) =>
-      col.notNull().defaultTo(sql`now()`)
-    )
-    .addColumn('updated_at', 'timestamptz', (col) =>
-      col.notNull().defaultTo(sql`now()`)
-    )
+    .addColumn('created_at', 'timestamptz', (col) => col.notNull().defaultTo(sql`now()`))
+    .addColumn('updated_at', 'timestamptz', (col) => col.notNull().defaultTo(sql`now()`))
     .addColumn('deleted_at', 'timestamptz', (col) => col)
     .execute();
 
@@ -33,29 +25,21 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable('ai_chat_messages')
     .ifNotExists()
-    .addColumn('id', 'uuid', (col) =>
-      col.primaryKey().defaultTo(sql`gen_uuid_v7()`)
-    )
+    .addColumn('id', 'uuid', (col) => col.primaryKey().defaultTo(sql`gen_uuid_v7()`))
     .addColumn('chat_id', 'uuid', (col) =>
       col.references('ai_chats.id').onDelete('cascade').notNull()
     )
     .addColumn('workspace_id', 'uuid', (col) =>
       col.references('workspaces.id').onDelete('cascade').notNull()
     )
-    .addColumn('user_id', 'uuid', (col) =>
-      col.references('users.id').onDelete('set null')
-    )
+    .addColumn('user_id', 'uuid', (col) => col.references('users.id').onDelete('set null'))
     .addColumn('role', 'varchar', (col) => col.notNull())
     .addColumn('content', 'text', (col) => col)
     .addColumn('tool_calls', 'jsonb', (col) => col)
     .addColumn('metadata', 'jsonb', (col) => col)
     .addColumn('tsv', sql`tsvector`, (col) => col)
-    .addColumn('created_at', 'timestamptz', (col) =>
-      col.notNull().defaultTo(sql`now()`)
-    )
-    .addColumn('updated_at', 'timestamptz', (col) =>
-      col.notNull().defaultTo(sql`now()`)
-    )
+    .addColumn('created_at', 'timestamptz', (col) => col.notNull().defaultTo(sql`now()`))
+    .addColumn('updated_at', 'timestamptz', (col) => col.notNull().defaultTo(sql`now()`))
     .addColumn('deleted_at', 'timestamptz', (col) => col)
     .execute();
 
@@ -110,9 +94,7 @@ export async function down(db: Kysely<any>): Promise<void> {
   await sql`DROP TRIGGER IF EXISTS ai_chat_messages_tsvector_update ON ai_chat_messages`.execute(
     db
   );
-  await sql`DROP FUNCTION IF EXISTS ai_chat_messages_tsvector_trigger`.execute(
-    db
-  );
+  await sql`DROP FUNCTION IF EXISTS ai_chat_messages_tsvector_trigger`.execute(db);
   await db.schema.dropTable('ai_chat_messages').execute();
   await db.schema.dropTable('ai_chats').execute();
 }

@@ -13,20 +13,13 @@ import {
   getWorkspaceLabels,
   removeLabelFromPage
 } from '@/features/label/services/label-service.ts';
-import {
-  IAddLabels,
-  ILabel,
-  IRemoveLabel
-} from '@/features/label/types/label.types.ts';
+import { IAddLabels, ILabel, IRemoveLabel } from '@/features/label/types/label.types.ts';
 import { IPagination } from '@/lib/types.ts';
 import { notifications } from '@mantine/notifications';
 import { useTranslation } from 'react-i18next';
 
 const PAGE_LABELS_KEY = (pageId: string) => ['page-labels', pageId];
-const WORKSPACE_LABELS_KEY = (query?: string) => [
-  'workspace-labels',
-  query ?? ''
-];
+const WORKSPACE_LABELS_KEY = (query?: string) => ['workspace-labels', query ?? ''];
 
 export function usePageLabelsQuery(pageId: string | undefined) {
   return useQuery({
@@ -53,16 +46,13 @@ export function useAddLabelsMutation(pageId: string | undefined) {
   return useMutation<ILabel[], Error, IAddLabels>({
     mutationFn: (data) => addLabelsToPage(data),
     onSuccess: (added) => {
-      queryClient.setQueryData<IPagination<ILabel>>(
-        PAGE_LABELS_KEY(pageId ?? ''),
-        (cache) => {
-          if (!cache) return cache;
-          const existing = new Set(cache.items.map((l) => l.id));
-          const additions = added.filter((l) => !existing.has(l.id));
-          if (additions.length === 0) return cache;
-          return { ...cache, items: [...cache.items, ...additions] };
-        }
-      );
+      queryClient.setQueryData<IPagination<ILabel>>(PAGE_LABELS_KEY(pageId ?? ''), (cache) => {
+        if (!cache) return cache;
+        const existing = new Set(cache.items.map((l) => l.id));
+        const additions = added.filter((l) => !existing.has(l.id));
+        if (additions.length === 0) return cache;
+        return { ...cache, items: [...cache.items, ...additions] };
+      });
 
       queryClient.setQueriesData<IPagination<ILabel>>(
         { queryKey: ['workspace-labels'] },
@@ -73,9 +63,7 @@ export function useAddLabelsMutation(pageId: string | undefined) {
           if (additions.length === 0) return cache;
           return {
             ...cache,
-            items: [...cache.items, ...additions].sort((a, b) =>
-              a.name.localeCompare(b.name)
-            )
+            items: [...cache.items, ...additions].sort((a, b) => a.name.localeCompare(b.name))
           };
         }
       );
@@ -99,17 +87,12 @@ export function useRemoveLabelMutation(pageId: string | undefined) {
   return useMutation<void, Error, IRemoveLabel>({
     mutationFn: (data) => removeLabelFromPage(data),
     onSuccess: (_data, variables) => {
-      const cache = queryClient.getQueryData<IPagination<ILabel>>(
-        PAGE_LABELS_KEY(pageId ?? '')
-      );
+      const cache = queryClient.getQueryData<IPagination<ILabel>>(PAGE_LABELS_KEY(pageId ?? ''));
       if (cache) {
-        queryClient.setQueryData<IPagination<ILabel>>(
-          PAGE_LABELS_KEY(pageId ?? ''),
-          {
-            ...cache,
-            items: cache.items.filter((l) => l.id !== variables.labelId)
-          }
-        );
+        queryClient.setQueryData<IPagination<ILabel>>(PAGE_LABELS_KEY(pageId ?? ''), {
+          ...cache,
+          items: cache.items.filter((l) => l.id !== variables.labelId)
+        });
       }
       queryClient.invalidateQueries({ queryKey: ['workspace-labels'] });
       queryClient.invalidateQueries({ queryKey: ['label-pages'] });
@@ -135,11 +118,7 @@ export function useLabelInfoQuery(name: string, spaceId?: string) {
 
 const LABEL_PAGES_LIMIT = 25;
 
-export function useLabelPagesQuery(
-  name: string,
-  query: string,
-  spaceId?: string
-) {
+export function useLabelPagesQuery(name: string, query: string, spaceId?: string) {
   return useInfiniteQuery({
     queryKey: ['label-pages', name, query, spaceId ?? ''],
     queryFn: ({ pageParam }) =>
@@ -153,9 +132,7 @@ export function useLabelPagesQuery(
     enabled: !!name,
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) =>
-      lastPage.meta.hasNextPage
-        ? (lastPage.meta.nextCursor ?? undefined)
-        : undefined,
+      lastPage.meta.hasNextPage ? (lastPage.meta.nextCursor ?? undefined) : undefined,
     placeholderData: keepPreviousData
   });
 }

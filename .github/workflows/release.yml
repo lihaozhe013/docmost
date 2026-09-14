@@ -37,8 +37,7 @@ jobs:
           context: .
           platforms: linux/amd64
           outputs:
-            type=image,name=${{ env.IMAGE_NAME
-            }},push-by-digest=true,name-canonical=true,push=true
+            type=image,name=${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
           provenance: false
           cache-from: type=gha,scope=amd64
           cache-to: type=gha,scope=amd64,mode=max

@@ -54,9 +54,7 @@ export class CommentService {
     const commentContent = JSON.parse(createCommentDto.content);
 
     if (createCommentDto.parentCommentId) {
-      const parentComment = await this.commentRepo.findById(
-        createCommentDto.parentCommentId
-      );
+      const parentComment = await this.commentRepo.findById(createCommentDto.parentCommentId);
 
       if (!parentComment || parentComment.pageId !== page.id) {
         throw new BadRequestException('Parent comment not found');
@@ -79,9 +77,7 @@ export class CommentService {
     });
 
     if (createCommentDto.yjsSelection) {
-      const parsed = yjsSelectionSchema.safeParse(
-        createCommentDto.yjsSelection
-      );
+      const parsed = yjsSelectionSchema.safeParse(createCommentDto.yjsSelection);
       if (!parsed.success) {
         this.logger.warn(
           `Invalid yjsSelection for comment ${inserted.id}: ${parsed.error.message}`
@@ -89,16 +85,12 @@ export class CommentService {
       } else {
         const documentName = `page.${page.id}`;
         try {
-          await this.collaborationGateway.handleYjsEvent(
-            'setCommentMark',
-            documentName,
-            {
-              yjsSelection: parsed.data,
-              commentId: inserted.id,
-              resolved: false,
-              user
-            }
-          );
+          await this.collaborationGateway.handleYjsEvent('setCommentMark', documentName, {
+            yjsSelection: parsed.data,
+            commentId: inserted.id,
+            resolved: false,
+            user
+          });
         } catch (error) {
           this.logger.warn(
             `Failed to apply comment mark for comment ${inserted.id}, comment saved without inline highlight`,
@@ -120,9 +112,7 @@ export class CommentService {
         spaceId: page.spaceId,
         workspaceId
       })
-      .catch((err) =>
-        this.logger.warn(`Failed to queue add-page-watchers: ${err.message}`)
-      );
+      .catch((err) => this.logger.warn(`Failed to queue add-page-watchers: ${err.message}`));
 
     const isReply = !!createCommentDto.parentCommentId;
 
@@ -224,8 +214,7 @@ export class CommentService {
       (id) => id !== actorId && !oldMentionIds.includes(id)
     );
 
-    if (newMentionIds.length === 0 && !notifyWatchers && !parentCommentId)
-      return;
+    if (newMentionIds.length === 0 && !notifyWatchers && !parentCommentId) return;
 
     const jobData: ICommentNotificationJob = {
       commentId,

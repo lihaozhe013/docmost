@@ -6,10 +6,7 @@ export type ResolveResult = {
   dependencies: string[];
 };
 
-export function resolve(
-  raw: RawFormulaAST,
-  nameToId: ReadonlyMap<string, string>
-): ResolveResult {
+export function resolve(raw: RawFormulaAST, nameToId: ReadonlyMap<string, string>): ResolveResult {
   const deps = new Set<string>();
   const ast = walk(raw, nameToId, deps);
   return { ast, dependencies: Array.from(deps).sort() };
@@ -44,9 +41,7 @@ function walk(
       return {
         t: 'op',
         op: (node as any).op,
-        args: (node as any).args.map((a: RawFormulaAST) =>
-          walk(a, nameToId, deps)
-        )
+        args: (node as any).args.map((a: RawFormulaAST) => walk(a, nameToId, deps))
       };
     case 'if':
       return {
@@ -58,24 +53,18 @@ function walk(
     case 'and':
       return {
         t: 'and',
-        args: (node as any).args.map((a: RawFormulaAST) =>
-          walk(a, nameToId, deps)
-        )
+        args: (node as any).args.map((a: RawFormulaAST) => walk(a, nameToId, deps))
       };
     case 'or':
       return {
         t: 'or',
-        args: (node as any).args.map((a: RawFormulaAST) =>
-          walk(a, nameToId, deps)
-        )
+        args: (node as any).args.map((a: RawFormulaAST) => walk(a, nameToId, deps))
       };
     case 'call':
       return {
         t: 'call',
         fn: (node as any).fn,
-        args: (node as any).args.map((a: RawFormulaAST) =>
-          walk(a, nameToId, deps)
-        )
+        args: (node as any).args.map((a: RawFormulaAST) => walk(a, nameToId, deps))
       };
   }
 }

@@ -1,12 +1,4 @@
-import {
-  Alert,
-  Button,
-  Modal,
-  Select,
-  Stack,
-  Text,
-  TextInput
-} from '@mantine/core';
+import { Alert, Button, Modal, Select, Stack, Text, TextInput } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { zodResolver } from 'mantine-form-zod-resolver';
 import { useForm } from '@mantine/form';
@@ -31,9 +23,7 @@ type FormValues = z.infer<typeof formSchema>;
 export default function CreateMemberModal({ opened, onClose }: Props) {
   const { t } = useTranslation();
   const createMemberMutation = useCreateWorkspaceMemberMutation();
-  const [generatedPassword, setGeneratedPassword] = useState<string | null>(
-    null
-  );
+  const [generatedPassword, setGeneratedPassword] = useState<string | null>(null);
 
   const form = useForm<FormValues>({
     validate: zodResolver(formSchema),
@@ -66,12 +56,7 @@ export default function CreateMemberModal({ opened, onClose }: Props) {
   };
 
   return (
-    <Modal
-      opened={opened}
-      onClose={handleClose}
-      title={t('Create member')}
-      centered
-    >
+    <Modal opened={opened} onClose={handleClose} title={t('Create member')} centered>
       <Stack>
         <Text size="sm" c="dimmed">
           {t(
@@ -96,9 +81,7 @@ export default function CreateMemberModal({ opened, onClose }: Props) {
             data-1p-ignore
             data-lpignore="true"
             data-bwignore
-            description={t(
-              'The email is used as the sign-in name. Any working email is fine.'
-            )}
+            description={t('The email is used as the sign-in name. Any working email is fine.')}
             {...form.getInputProps('email')}
           />
           <Select
@@ -113,12 +96,7 @@ export default function CreateMemberModal({ opened, onClose }: Props) {
             checkIconPosition="right"
             {...form.getInputProps('role')}
           />
-          <Button
-            type="submit"
-            fullWidth
-            mt="md"
-            loading={createMemberMutation.isPending}
-          >
+          <Button type="submit" fullWidth mt="md" loading={createMemberMutation.isPending}>
             {t('Create member')}
           </Button>
         </form>
@@ -126,9 +104,7 @@ export default function CreateMemberModal({ opened, onClose }: Props) {
         {generatedPassword && (
           <Alert color="yellow" title={t('One-time password')}>
             <Text size="sm">
-              {t(
-                'Share this password with the user. It will not be shown again.'
-              )}
+              {t('Share this password with the user. It will not be shown again.')}
             </Text>
             <Text size="sm" fw={700} ta="center" my="sm">
               {generatedPassword}

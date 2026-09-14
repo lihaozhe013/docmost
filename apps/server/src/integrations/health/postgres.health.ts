@@ -1,8 +1,5 @@
 import { InjectKysely } from 'nestjs-kysely';
-import {
-  HealthIndicatorResult,
-  HealthIndicatorService
-} from '@nestjs/terminus';
+import { HealthIndicatorResult, HealthIndicatorService } from '@nestjs/terminus';
 import { Injectable, Logger } from '@nestjs/common';
 import { sql } from 'kysely';
 import { KyselyDB } from '@docmost/db/types/kysely.types';

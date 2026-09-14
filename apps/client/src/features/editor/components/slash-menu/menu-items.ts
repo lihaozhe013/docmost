@@ -68,12 +68,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
       searchTerms: ['p', 'paragraph'],
       icon: IconTypography,
       command: ({ editor, range }: CommandProps) => {
-        editor
-          .chain()
-          .focus()
-          .deleteRange(range)
-          .toggleNode('paragraph', 'paragraph')
-          .run();
+        editor.chain().focus().deleteRange(range).toggleNode('paragraph', 'paragraph').run();
       }
     },
     {
@@ -91,12 +86,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
       searchTerms: ['title', 'big', 'large'],
       icon: IconH1,
       command: ({ editor, range }: CommandProps) => {
-        editor
-          .chain()
-          .focus()
-          .deleteRange(range)
-          .setNode('heading', { level: 1 })
-          .run();
+        editor.chain().focus().deleteRange(range).setNode('heading', { level: 1 }).run();
       }
     },
     {
@@ -105,12 +95,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
       searchTerms: ['subtitle', 'medium'],
       icon: IconH2,
       command: ({ editor, range }: CommandProps) => {
-        editor
-          .chain()
-          .focus()
-          .deleteRange(range)
-          .setNode('heading', { level: 2 })
-          .run();
+        editor.chain().focus().deleteRange(range).setNode('heading', { level: 2 }).run();
       }
     },
     {
@@ -119,12 +104,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
       searchTerms: ['subtitle', 'small'],
       icon: IconH3,
       command: ({ editor, range }: CommandProps) => {
-        editor
-          .chain()
-          .focus()
-          .deleteRange(range)
-          .setNode('heading', { level: 3 })
-          .run();
+        editor.chain().focus().deleteRange(range).setNode('heading', { level: 3 }).run();
       }
     },
     {
@@ -256,15 +236,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
     {
       title: 'Audio',
       description: 'Upload any audio from your device.',
-      searchTerms: [
-        'audio',
-        'music',
-        'sound',
-        'mp3',
-        'media',
-        'file',
-        'attachment'
-      ],
+      searchTerms: ['audio', 'music', 'sound', 'mp3', 'media', 'file', 'attachment'],
       icon: IconMusic,
       command: ({ editor, range }) => {
         editor.chain().focus().deleteRange(range).run();
@@ -382,16 +354,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
     {
       title: 'Callout',
       description: 'Insert callout notice.',
-      searchTerms: [
-        'callout',
-        'notice',
-        'panel',
-        'info',
-        'warning',
-        'success',
-        'error',
-        'danger'
-      ],
+      searchTerms: ['callout', 'notice', 'panel', 'info', 'warning', 'success', 'error', 'danger'],
       icon: IconInfoCircle,
       command: ({ editor, range }: CommandProps) =>
         editor.chain().focus().deleteRange(range).toggleCallout().run()
@@ -412,13 +375,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
       ],
       icon: IconMathFunction,
       command: ({ editor, range }: CommandProps) =>
-        editor
-          .chain()
-          .focus()
-          .deleteRange(range)
-          .setMathInline()
-          .setNodeSelection(range.from)
-          .run()
+        editor.chain().focus().deleteRange(range).setMathInline().setNodeSelection(range.from).run()
     },
     {
       title: 'Math block',
@@ -479,12 +436,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
           day: 'numeric'
         });
 
-        editor
-          .chain()
-          .focus()
-          .deleteRange(range)
-          .insertContent(currentDate)
-          .run();
+        editor.chain().focus().deleteRange(range).insertContent(currentDate).run();
       }
     },
     {
@@ -498,12 +450,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
           minute: 'numeric'
         });
 
-        editor
-          .chain()
-          .focus()
-          .deleteRange(range)
-          .insertContent(currentTime)
-          .run();
+        editor.chain().focus().deleteRange(range).insertContent(currentTime).run();
       }
     },
     {
@@ -512,25 +459,13 @@ const CommandGroups: SlashMenuGroupedItemsType = {
       searchTerms: ['status', 'badge', 'label', 'lozenge'],
       icon: IconTag,
       command: ({ editor, range }: CommandProps) => {
-        editor
-          .chain()
-          .focus()
-          .deleteRange(range)
-          .setStatus({ text: '', color: 'gray' })
-          .run();
+        editor.chain().focus().deleteRange(range).setStatus({ text: '', color: 'gray' }).run();
       }
     },
     {
       title: 'Emoji',
       description: 'Insert emoji.',
-      searchTerms: [
-        'emoji',
-        'icon',
-        'smiley',
-        'emoticon',
-        'symbol',
-        'reaction'
-      ],
+      searchTerms: ['emoji', 'icon', 'smiley', 'emoticon', 'symbol', 'reaction'],
       icon: IconMoodSmile,
       command: ({ editor, range }: CommandProps) => {
         editor.chain().focus().deleteRange(range).insertContent(':').run();
@@ -539,14 +474,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
     {
       title: 'Subpages (Child pages)',
       description: 'List all subpages of the current page',
-      searchTerms: [
-        'subpages',
-        'child',
-        'children',
-        'nested',
-        'hierarchy',
-        'toc'
-      ],
+      searchTerms: ['subpages', 'child', 'children', 'nested', 'hierarchy', 'toc'],
       icon: IconSitemap,
       command: ({ editor, range }: CommandProps) => {
         editor.chain().focus().deleteRange(range).insertSubpages().run();
@@ -566,12 +494,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
       ],
       icon: IconRotate2,
       command: ({ editor, range }: CommandProps) => {
-        editor
-          .chain()
-          .focus()
-          .deleteRange(range)
-          .insertTransclusionSource()
-          .run();
+        editor.chain().focus().deleteRange(range).insertTransclusionSource().run();
       }
     },
     {
@@ -580,12 +503,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
       searchTerms: ['columns', 'layout', 'split', 'side'],
       icon: IconColumns2,
       command: ({ editor, range }: CommandProps) =>
-        editor
-          .chain()
-          .focus()
-          .deleteRange(range)
-          .insertColumns({ layout: 'two_equal' })
-          .run()
+        editor.chain().focus().deleteRange(range).insertColumns({ layout: 'two_equal' }).run()
     },
     {
       title: '3 Columns',
@@ -593,12 +511,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
       searchTerms: ['columns', 'layout', 'split', 'triple'],
       icon: IconColumns3,
       command: ({ editor, range }: CommandProps) =>
-        editor
-          .chain()
-          .focus()
-          .deleteRange(range)
-          .insertColumns({ layout: 'three_equal' })
-          .run()
+        editor.chain().focus().deleteRange(range).insertColumns({ layout: 'three_equal' }).run()
     },
     {
       title: '4 Columns',
@@ -606,12 +519,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
       searchTerms: ['columns', 'layout', 'split'],
       icon: IconColumns4,
       command: ({ editor, range }: CommandProps) =>
-        editor
-          .chain()
-          .focus()
-          .deleteRange(range)
-          .insertColumns({ layout: 'four_equal' })
-          .run()
+        editor.chain().focus().deleteRange(range).insertColumns({ layout: 'four_equal' }).run()
     },
     {
       title: '5 Columns',
@@ -619,12 +527,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
       searchTerms: ['columns', 'layout', 'split'],
       icon: IconColumns5,
       command: ({ editor, range }: CommandProps) =>
-        editor
-          .chain()
-          .focus()
-          .deleteRange(range)
-          .insertColumns({ layout: 'five_equal' })
-          .run()
+        editor.chain().focus().deleteRange(range).insertColumns({ layout: 'five_equal' }).run()
     },
     {
       title: 'Iframe embed',
@@ -632,12 +535,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
       searchTerms: ['iframe'],
       icon: IconAppWindow,
       command: ({ editor, range }: CommandProps) => {
-        editor
-          .chain()
-          .focus()
-          .deleteRange(range)
-          .setEmbed({ provider: 'iframe' })
-          .run();
+        editor.chain().focus().deleteRange(range).setEmbed({ provider: 'iframe' }).run();
       }
     },
     {
@@ -646,12 +544,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
       searchTerms: ['airtable'],
       icon: AirtableIcon,
       command: ({ editor, range }: CommandProps) => {
-        editor
-          .chain()
-          .focus()
-          .deleteRange(range)
-          .setEmbed({ provider: 'airtable' })
-          .run();
+        editor.chain().focus().deleteRange(range).setEmbed({ provider: 'airtable' }).run();
       }
     },
     {
@@ -660,12 +553,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
       searchTerms: ['loom'],
       icon: LoomIcon,
       command: ({ editor, range }: CommandProps) => {
-        editor
-          .chain()
-          .focus()
-          .deleteRange(range)
-          .setEmbed({ provider: 'loom' })
-          .run();
+        editor.chain().focus().deleteRange(range).setEmbed({ provider: 'loom' }).run();
       }
     },
     {
@@ -674,12 +562,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
       searchTerms: ['figma'],
       icon: FigmaIcon,
       command: ({ editor, range }: CommandProps) => {
-        editor
-          .chain()
-          .focus()
-          .deleteRange(range)
-          .setEmbed({ provider: 'figma' })
-          .run();
+        editor.chain().focus().deleteRange(range).setEmbed({ provider: 'figma' }).run();
       }
     },
     {
@@ -688,12 +571,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
       searchTerms: ['typeform'],
       icon: TypeformIcon,
       command: ({ editor, range }: CommandProps) => {
-        editor
-          .chain()
-          .focus()
-          .deleteRange(range)
-          .setEmbed({ provider: 'typeform' })
-          .run();
+        editor.chain().focus().deleteRange(range).setEmbed({ provider: 'typeform' }).run();
       }
     },
     {
@@ -702,12 +580,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
       searchTerms: ['miro'],
       icon: MiroIcon,
       command: ({ editor, range }: CommandProps) => {
-        editor
-          .chain()
-          .focus()
-          .deleteRange(range)
-          .setEmbed({ provider: 'miro' })
-          .run();
+        editor.chain().focus().deleteRange(range).setEmbed({ provider: 'miro' }).run();
       }
     },
     {
@@ -716,12 +589,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
       searchTerms: ['youtube', 'yt', 'media', 'video'],
       icon: YoutubeIcon,
       command: ({ editor, range }: CommandProps) => {
-        editor
-          .chain()
-          .focus()
-          .deleteRange(range)
-          .setEmbed({ provider: 'youtube' })
-          .run();
+        editor.chain().focus().deleteRange(range).setEmbed({ provider: 'youtube' }).run();
       }
     },
     {
@@ -730,12 +598,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
       searchTerms: ['vimeo'],
       icon: VimeoIcon,
       command: ({ editor, range }: CommandProps) => {
-        editor
-          .chain()
-          .focus()
-          .deleteRange(range)
-          .setEmbed({ provider: 'vimeo' })
-          .run();
+        editor.chain().focus().deleteRange(range).setEmbed({ provider: 'vimeo' }).run();
       }
     },
     {
@@ -744,12 +607,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
       searchTerms: ['framer'],
       icon: FramerIcon,
       command: ({ editor, range }: CommandProps) => {
-        editor
-          .chain()
-          .focus()
-          .deleteRange(range)
-          .setEmbed({ provider: 'framer' })
-          .run();
+        editor.chain().focus().deleteRange(range).setEmbed({ provider: 'framer' }).run();
       }
     },
     {
@@ -758,12 +616,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
       searchTerms: ['google drive', 'gdrive'],
       icon: GoogleDriveIcon,
       command: ({ editor, range }: CommandProps) => {
-        editor
-          .chain()
-          .focus()
-          .deleteRange(range)
-          .setEmbed({ provider: 'gdrive' })
-          .run();
+        editor.chain().focus().deleteRange(range).setEmbed({ provider: 'gdrive' }).run();
       }
     },
     {
@@ -772,12 +625,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
       searchTerms: ['google sheets', 'gsheets'],
       icon: GoogleSheetsIcon,
       command: ({ editor, range }: CommandProps) => {
-        editor
-          .chain()
-          .focus()
-          .deleteRange(range)
-          .setEmbed({ provider: 'gsheets' })
-          .run();
+        editor.chain().focus().deleteRange(range).setEmbed({ provider: 'gsheets' }).run();
       }
     }
   ]
@@ -815,9 +663,7 @@ export const getSuggestionItems = ({
         translatedDescription.toLowerCase().includes(search) ||
         (item.searchTerms &&
           item.searchTerms.some(
-            (term: string) =>
-              term.includes(search) ||
-              i18n.t(term).toLowerCase().includes(search)
+            (term: string) => term.includes(search) || i18n.t(term).toLowerCase().includes(search)
           ))
       );
     });
@@ -825,13 +671,11 @@ export const getSuggestionItems = ({
     if (filteredItems.length) {
       filteredGroups[group] = filteredItems.sort((a, b) => {
         const aTitle =
-          a.title.toLowerCase().includes(search) ||
-          i18n.t(a.title).toLowerCase().includes(search)
+          a.title.toLowerCase().includes(search) || i18n.t(a.title).toLowerCase().includes(search)
             ? 0
             : 1;
         const bTitle =
-          b.title.toLowerCase().includes(search) ||
-          i18n.t(b.title).toLowerCase().includes(search)
+          b.title.toLowerCase().includes(search) || i18n.t(b.title).toLowerCase().includes(search)
             ? 0
             : 1;
         return aTitle - bTitle;

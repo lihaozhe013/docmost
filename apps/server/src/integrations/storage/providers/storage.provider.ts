@@ -1,7 +1,4 @@
-import {
-  STORAGE_CONFIG_TOKEN,
-  STORAGE_DRIVER_TOKEN
-} from '../constants/storage.constants';
+import { STORAGE_CONFIG_TOKEN, STORAGE_DRIVER_TOKEN } from '../constants/storage.constants';
 import { EnvironmentService } from '../../environment/environment.service';
 import {
   AzureStorageConfig,

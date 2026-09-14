@@ -23,10 +23,7 @@ import { PageNotificationService } from './services/page.notification';
 import { VerificationNotificationService } from './services/verification.notification';
 
 @Processor(QueueName.NOTIFICATION_QUEUE)
-export class NotificationProcessor
-  extends WorkerHost
-  implements OnModuleDestroy
-{
+export class NotificationProcessor extends WorkerHost implements OnModuleDestroy {
   private readonly logger = new Logger(NotificationProcessor.name);
 
   constructor(
@@ -65,9 +62,7 @@ export class NotificationProcessor
 
       switch (job.name) {
         case QueueJob.COMMENT_NOTIFICATION: {
-          await this.commentNotificationService.processComment(
-            job.data as ICommentNotificationJob
-          );
+          await this.commentNotificationService.processComment(job.data as ICommentNotificationJob);
           break;
         }
 
@@ -166,22 +161,17 @@ export class NotificationProcessor
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       eeModule = require('../../ee/page-verification/page-verification-scheduler.service');
     } catch {
-      this.logger.debug(
-        'VERIFICATION_RECONCILE fired but EE scheduler not bundled in this build'
-      );
+      this.logger.debug('VERIFICATION_RECONCILE fired but EE scheduler not bundled in this build');
       return;
     }
 
     const schedulerClass = eeModule.PageVerificationSchedulerService as
-      | (new (...args: unknown[]) => { reconcile(): Promise<void> })
-      | undefined;
+      (new (...args: unknown[]) => { reconcile(): Promise<void> }) | undefined;
     if (!schedulerClass) return;
 
     const scheduler = this.moduleRef.get(schedulerClass, { strict: false });
     if (!scheduler) {
-      this.logger.warn(
-        'VERIFICATION_RECONCILE fired but scheduler service not resolvable'
-      );
+      this.logger.warn('VERIFICATION_RECONCILE fired but scheduler service not resolvable');
       return;
     }
     await scheduler.reconcile();
@@ -189,9 +179,7 @@ export class NotificationProcessor
 
   @OnWorkerEvent('failed')
   onError(job: Job) {
-    this.logger.error(
-      `Error processing ${job.name} job. Reason: ${job.failedReason}`
-    );
+    this.logger.error(`Error processing ${job.name} job. Reason: ${job.failedReason}`);
   }
 
   async onModuleDestroy(): Promise<void> {

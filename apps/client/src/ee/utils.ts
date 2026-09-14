@@ -8,9 +8,6 @@ export function getHostnameUrl(hostname: string): string {
   return `${protocol}://${hostname}.${getSubdomainHost()}`;
 }
 
-export function exchangeTokenRedirectUrl(
-  hostname: string,
-  exchangeToken: string
-) {
+export function exchangeTokenRedirectUrl(hostname: string, exchangeToken: string) {
   return getHostnameUrl(hostname) + '/api/auth/exchange?token=' + exchangeToken;
 }

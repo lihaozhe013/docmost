@@ -36,14 +36,8 @@ export function DeletedPageBanner({ slugId }: DeletedPageBannerProps) {
 
   if (!page?.deletedAt) return null;
 
-  const canRestore = spaceAbility.can(
-    SpaceCaslAction.Edit,
-    SpaceCaslSubject.Page
-  );
-  const canPermanentlyDelete = spaceAbility.can(
-    SpaceCaslAction.Manage,
-    SpaceCaslSubject.Settings
-  );
+  const canRestore = spaceAbility.can(SpaceCaslAction.Edit, SpaceCaslSubject.Page);
+  const canPermanentlyDelete = spaceAbility.can(SpaceCaslAction.Manage, SpaceCaslSubject.Settings);
   const actorName = page.deletedBy?.name ?? t('Someone');
 
   const handleRestore = () => {

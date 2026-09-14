@@ -1,10 +1,4 @@
-import {
-  IsString,
-  IsOptional,
-  MinLength,
-  MaxLength,
-  IsNotEmpty
-} from 'class-validator';
+import { IsString, IsOptional, MinLength, MaxLength, IsNotEmpty } from 'class-validator';
 
 export class MovePageDto {
   @IsString()

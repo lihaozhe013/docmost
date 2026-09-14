@@ -1,11 +1,4 @@
-import {
-  Text,
-  Group,
-  UnstyledButton,
-  Badge,
-  Table,
-  Button
-} from '@mantine/core';
+import { Text, Group, UnstyledButton, Badge, Table, Button } from '@mantine/core';
 import { Link } from 'react-router-dom';
 import PageListSkeleton from '@/components/ui/page-list-skeleton';
 import { buildPageUrl, getPageTitle } from '@/features/page/page.utils';
@@ -25,14 +18,8 @@ interface Props {
 
 export default function FavoritesPages({ spaceId }: Props) {
   const { t } = useTranslation();
-  const {
-    data,
-    isLoading,
-    isError,
-    hasNextPage,
-    fetchNextPage,
-    isFetchingNextPage
-  } = useFavoritesQuery('page', spaceId);
+  const { data, isLoading, isError, hasNextPage, fetchNextPage, isFetchingNextPage } =
+    useFavoritesQuery('page', spaceId);
 
   const favorites = data?.pages.flatMap((p) => p.items) ?? [];
 
@@ -56,17 +43,10 @@ export default function FavoritesPages({ spaceId }: Props) {
                     <UnstyledButton
                       className={rowClasses.link}
                       component={Link}
-                      to={buildPageUrl(
-                        fav.space?.slug,
-                        fav.page.slugId,
-                        fav.page.title
-                      )}
+                      to={buildPageUrl(fav.space?.slug, fav.page.slugId, fav.page.title)}
                     >
                       <Group wrap="nowrap">
-                        <PageListIcon
-                          icon={fav.page.icon}
-                          isBase={fav.page.isBase}
-                        />
+                        <PageListIcon icon={fav.page.icon} isBase={fav.page.isBase} />
                         <Text fw={500} size="md" lineClamp={1}>
                           {getPageTitle(fav.page.title, fav.page.isBase, t)}
                         </Text>
@@ -89,12 +69,7 @@ export default function FavoritesPages({ spaceId }: Props) {
                     </Table.Td>
                   )}
                   <Table.Td>
-                    <Text
-                      c="dimmed"
-                      style={{ whiteSpace: 'nowrap' }}
-                      size="xs"
-                      fw={500}
-                    >
+                    <Text c="dimmed" style={{ whiteSpace: 'nowrap' }} size="xs" fw={500}>
                       {formattedDate(new Date(fav.createdAt))}
                     </Text>
                   </Table.Td>

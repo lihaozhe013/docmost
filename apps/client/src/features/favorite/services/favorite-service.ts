@@ -13,9 +13,7 @@ export async function addFavorite(params: ToggleFavoriteParams): Promise<void> {
   await api.post('/favorites/add', params);
 }
 
-export async function removeFavorite(
-  params: ToggleFavoriteParams
-): Promise<void> {
+export async function removeFavorite(params: ToggleFavoriteParams): Promise<void> {
   await api.post('/favorites/remove', params);
 }
 

@@ -9,28 +9,18 @@ const SetupWorkspace = lazy(() => import('@/pages/auth/setup-workspace.tsx'));
 const LoginPage = lazy(() => import('@/pages/auth/login'));
 const Home = lazy(() => import('@/pages/dashboard/home'));
 const Page = lazy(() => import('@/pages/page/page'));
-const AccountSettings = lazy(
-  () => import('@/pages/settings/account/account-settings')
-);
-const WorkspaceMembers = lazy(
-  () => import('@/pages/settings/workspace/workspace-members')
-);
-const WorkspaceSettings = lazy(
-  () => import('@/pages/settings/workspace/workspace-settings')
-);
+const AccountSettings = lazy(() => import('@/pages/settings/account/account-settings'));
+const WorkspaceMembers = lazy(() => import('@/pages/settings/workspace/workspace-members'));
+const WorkspaceSettings = lazy(() => import('@/pages/settings/workspace/workspace-settings'));
 const Groups = lazy(() => import('@/pages/settings/group/groups'));
 const GroupInfo = lazy(() => import('./pages/settings/group/group-info'));
 const Spaces = lazy(() => import('@/pages/settings/space/spaces.tsx'));
-const AccountPreferences = lazy(
-  () => import('@/pages/settings/account/account-preferences.tsx')
-);
+const AccountPreferences = lazy(() => import('@/pages/settings/account/account-preferences.tsx'));
 const SpaceHome = lazy(() => import('@/pages/space/space-home.tsx'));
 const PageRedirect = lazy(() => import('@/pages/page/page-redirect.tsx'));
 const SharedPage = lazy(() => import('@/pages/share/shared-page.tsx'));
 const Shares = lazy(() => import('@/pages/settings/shares/shares.tsx'));
-const ShareLayout = lazy(
-  () => import('@/features/share/components/share-layout.tsx')
-);
+const ShareLayout = lazy(() => import('@/features/share/components/share-layout.tsx'));
 const ShareRedirect = lazy(() => import('@/pages/share/share-redirect.tsx'));
 const SpacesPage = lazy(() => import('@/pages/spaces/spaces.tsx'));
 const SpaceTrash = lazy(() => import('@/pages/space/space-trash.tsx'));
@@ -55,10 +45,7 @@ export default function App() {
         <Route path={'/setup/register'} element={<SetupWorkspace />} />
 
         <Route element={<ShareLayout />}>
-          <Route
-            path={'/share/:shareId/p/:pageSlug'}
-            element={<SharedPage />}
-          />
+          <Route path={'/share/:shareId/p/:pageSlug'} element={<SharedPage />} />
           <Route path={'/share/p/:pageSlug'} element={<SharedPage />} />
         </Route>
 
@@ -76,10 +63,7 @@ export default function App() {
 
           <Route path={'/settings'}>
             <Route path={'account/profile'} element={<AccountSettings />} />
-            <Route
-              path={'account/preferences'}
-              element={<AccountPreferences />}
-            />
+            <Route path={'account/preferences'} element={<AccountPreferences />} />
             <Route path={'workspace'} element={<WorkspaceSettings />} />
             <Route path={'members'} element={<WorkspaceMembers />} />
             <Route path={'groups'} element={<Groups />} />

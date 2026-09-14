@@ -3,10 +3,7 @@ import {
   getBacklinks,
   getBacklinksCount
 } from '@/features/page-details/services/backlinks-service.ts';
-import {
-  BacklinkDirection,
-  IBacklinkCount
-} from '@/features/page-details/types/backlink.types.ts';
+import { BacklinkDirection, IBacklinkCount } from '@/features/page-details/types/backlink.types.ts';
 
 const BACKLINKS_STALE_TIME = 30 * 1000;
 const BACKLINKS_PAGE_LIMIT = 100;
@@ -37,9 +34,7 @@ export function useBacklinksQuery(
     enabled: enabled && !!pageId,
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) =>
-      lastPage.meta.hasNextPage
-        ? (lastPage.meta.nextCursor ?? undefined)
-        : undefined,
+      lastPage.meta.hasNextPage ? (lastPage.meta.nextCursor ?? undefined) : undefined,
     staleTime: BACKLINKS_STALE_TIME
   });
 }

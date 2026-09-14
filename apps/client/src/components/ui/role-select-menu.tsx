@@ -31,12 +31,7 @@ interface RoleMenuProps {
   disabled?: boolean;
 }
 
-export default function RoleSelectMenu({
-  roles,
-  roleName,
-  onChange,
-  disabled
-}: RoleMenuProps) {
+export default function RoleSelectMenu({ roles, roleName, onChange, disabled }: RoleMenuProps) {
   const { t } = useTranslation();
 
   return (
@@ -47,10 +42,7 @@ export default function RoleSelectMenu({
 
       <Menu.Dropdown>
         {roles?.map((item) => (
-          <Menu.Item
-            onClick={() => onChange && onChange(item.value)}
-            key={item.value}
-          >
+          <Menu.Item onClick={() => onChange && onChange(item.value)} key={item.value}>
             <Group flex="1" gap="xs">
               <div>
                 <Text size="sm">{t(item.label)}</Text>

@@ -1,11 +1,6 @@
 import { useState } from 'react';
 import { Loader, Popover } from '@mantine/core';
-import {
-  IconChevronDown,
-  IconCornerDownLeft,
-  IconFile,
-  IconInfoCircle
-} from '@tabler/icons-react';
+import { IconChevronDown, IconCornerDownLeft, IconFile, IconInfoCircle } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
 import { useReferencesQuery } from '@/features/transclusion/queries/transclusion-query';
@@ -46,11 +41,7 @@ export default function SyncBlockReferencesDropdown({
   // before the dropdown is opened. The cache is keyed on (sourcePageId,
   // transclusionId), so two views (source + reference) share one fetch.
   const enabled = !!sourcePageId && !!transclusionId;
-  const { data, isLoading } = useReferencesQuery(
-    sourcePageId,
-    transclusionId,
-    enabled
-  );
+  const { data, isLoading } = useReferencesQuery(sourcePageId, transclusionId, enabled);
 
   const allPages: Array<{ page: ReferencingPage; isOriginal: boolean }> = [];
   if (data?.source) {
@@ -147,11 +138,7 @@ export default function SyncBlockReferencesDropdown({
                 const title = page.title?.length ? page.title : t('Untitled');
                 return (
                   <li key={page.id}>
-                    <Link
-                      to={href}
-                      className={classes.row}
-                      onClick={() => handleOpenChange(false)}
-                    >
+                    <Link to={href} className={classes.row} onClick={() => handleOpenChange(false)}>
                       {page.icon ? (
                         <span className={classes.rowEmoji}>{page.icon}</span>
                       ) : (
@@ -163,9 +150,7 @@ export default function SyncBlockReferencesDropdown({
                         {title}
                       </span>
                       {isCurrent ? (
-                        <span
-                          className={`${classes.badge} ${classes.badgeAccent}`}
-                        >
+                        <span className={`${classes.badge} ${classes.badgeAccent}`}>
                           {t('THIS PAGE')}
                         </span>
                       ) : isOriginal ? (

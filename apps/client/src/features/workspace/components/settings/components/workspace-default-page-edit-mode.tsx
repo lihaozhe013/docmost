@@ -30,8 +30,7 @@ export default function WorkspaceDefaultPageEditMode() {
 function DefaultPageEditModeControl() {
   const { t } = useTranslation();
   const [workspace, setWorkspace] = useAtom(workspaceAtom);
-  const defaultPageEditMode =
-    workspace?.settings?.defaultPageEditMode ?? PageEditMode.Edit;
+  const defaultPageEditMode = workspace?.settings?.defaultPageEditMode ?? PageEditMode.Edit;
   const [value, setValue] = useState<string>(defaultPageEditMode);
 
   const handleChange = async (newValue: string) => {

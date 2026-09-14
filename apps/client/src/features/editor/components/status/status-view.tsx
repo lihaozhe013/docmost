@@ -86,11 +86,7 @@ export default function StatusView(props: NodeViewProps) {
       >
         <Popover.Target>
           <span
-            className={clsx(
-              'status-badge',
-              classes.status,
-              colorClassMap[color]
-            )}
+            className={clsx('status-badge', classes.status, colorClassMap[color])}
             onClick={() => isEditable && setOpened(true)}
             onKeyDown={(e) => {
               if (isEditable && (e.key === 'Enter' || e.key === ' ')) {
@@ -112,9 +108,7 @@ export default function StatusView(props: NodeViewProps) {
           <TextInput
             ref={inputRef}
             value={inputValue}
-            onChange={(e) =>
-              handleTextChange(e.currentTarget.value.toUpperCase())
-            }
+            onChange={(e) => handleTextChange(e.currentTarget.value.toUpperCase())}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 setOpened(false);
@@ -130,10 +124,7 @@ export default function StatusView(props: NodeViewProps) {
             {STATUS_COLORS.map(({ name, bg }) => (
               <Box
                 key={name}
-                className={clsx(
-                  classes.swatch,
-                  color === name && classes.swatchActive
-                )}
+                className={clsx(classes.swatch, color === name && classes.swatchActive)}
                 style={{ backgroundColor: bg }}
                 onClick={() => handleColorChange(name)}
                 onKeyDown={(e) => {

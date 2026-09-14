@@ -56,9 +56,7 @@ export function SpaceSelect({
 
   useEffect(() => {
     if (spaces) {
-      spaces.items.forEach((space: ISpace) =>
-        fetchedSpaces.current.set(space.slug, space)
-      );
+      spaces.items.forEach((space: ISpace) => fetchedSpaces.current.set(space.slug, space));
       const spaceData = spaces?.items
         .filter((space: ISpace) => space.slug !== value)
         .map((space: ISpace) => {
@@ -70,8 +68,7 @@ export function SpaceSelect({
         });
 
       const filteredSpaceData = spaceData.filter(
-        (space) =>
-          !data.find((existingSpace) => existingSpace.value === space.value)
+        (space) => !data.find((existingSpace) => existingSpace.value === space.value)
       );
       setData((prevData) => [...prevData, ...filteredSpaceData]);
     }

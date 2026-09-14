@@ -51,23 +51,17 @@ export class HistoryProcessor extends WorkerHost implements OnModuleDestroy {
         return;
       }
 
-      const lastHistory = await this.pageHistoryRepo.findPageLastHistory(
-        pageId,
-        { includeContent: true }
-      );
+      const lastHistory = await this.pageHistoryRepo.findPageLastHistory(pageId, {
+        includeContent: true
+      });
 
       if (!lastHistory && isEmptyParagraphDoc(page.content as any)) {
-        this.logger.debug(
-          `Skipping first history for page ${pageId}: empty content`
-        );
+        this.logger.debug(`Skipping first history for page ${pageId}: empty content`);
         await this.collabHistory.clearContributors(pageId);
         return;
       }
 
-      if (
-        !lastHistory ||
-        !isDeepStrictEqual(lastHistory.content, page.content)
-      ) {
+      if (!lastHistory || !isDeepStrictEqual(lastHistory.content, page.content)) {
         const contributorIds = await this.collabHistory.popContributors(pageId);
 
         try {
@@ -97,9 +91,7 @@ export class HistoryProcessor extends WorkerHost implements OnModuleDestroy {
             internalLinkSlugIds
           } as IPageBacklinkJob)
           .catch((err) => {
-            this.logger.error(
-              `Failed to queue backlinks for ${pageId}: ${err.message}`
-            );
+            this.logger.error(`Failed to queue backlinks for ${pageId}: ${err.message}`);
           });
 
         if (contributorIds.length > 0 && lastHistory?.content) {

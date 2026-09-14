@@ -1,18 +1,5 @@
-import {
-  Modal,
-  Button,
-  Group,
-  Text,
-  Select,
-  Switch,
-  Divider,
-  Tooltip,
-  Badge
-} from '@mantine/core';
-import {
-  exportPage,
-  exportPageToDocx
-} from '@/features/page/services/page-service.ts';
+import { Modal, Button, Group, Text, Select, Switch, Divider, Tooltip, Badge } from '@mantine/core';
+import { exportPage, exportPageToDocx } from '@/features/page/services/page-service.ts';
 import { useState } from 'react';
 import { ExportFormat } from '@/features/page/types/page.types.ts';
 import { notifications } from '@mantine/notifications';
@@ -29,12 +16,7 @@ interface ExportModalProps {
   onClose: () => void;
 }
 
-export default function ExportModal({
-  id,
-  type,
-  open,
-  onClose
-}: ExportModalProps) {
+export default function ExportModal({ id, type, open, onClose }: ExportModalProps) {
   const [format, setFormat] = useState<ExportFormat>(ExportFormat.Markdown);
   const [includeChildren, setIncludeChildren] = useState<boolean>(false);
   const [includeAttachments, setIncludeAttachments] = useState<boolean>(false);
@@ -121,9 +103,7 @@ export default function ExportModal({
                   <Text size="md">{t('Include subpages')}</Text>
                 </div>
                 <Switch
-                  onChange={(event) =>
-                    setIncludeChildren(event.currentTarget.checked)
-                  }
+                  onChange={(event) => setIncludeChildren(event.currentTarget.checked)}
                   checked={includeChildren}
                 />
               </Group>
@@ -133,9 +113,7 @@ export default function ExportModal({
                   <Text size="md">{t('Include attachments')}</Text>
                 </div>
                 <Switch
-                  onChange={(event) =>
-                    setIncludeAttachments(event.currentTarget.checked)
-                  }
+                  onChange={(event) => setIncludeAttachments(event.currentTarget.checked)}
                   checked={includeAttachments}
                 />
               </Group>
@@ -151,9 +129,7 @@ export default function ExportModal({
                   <Text size="md">{t('Include attachments')}</Text>
                 </div>
                 <Switch
-                  onChange={(event) =>
-                    setIncludeAttachments(event.currentTarget.checked)
-                  }
+                  onChange={(event) => setIncludeAttachments(event.currentTarget.checked)}
                   checked={includeAttachments}
                 />
               </Group>
@@ -164,11 +140,7 @@ export default function ExportModal({
             <Button onClick={onClose} variant="default">
               {t('Cancel')}
             </Button>
-            <Tooltip
-              label={upgradeLabel}
-              disabled={!blockedByLicense}
-              withArrow
-            >
+            <Tooltip label={upgradeLabel} disabled={!blockedByLicense} withArrow>
               <Button
                 onClick={handleExport}
                 loading={isExporting}
@@ -202,9 +174,7 @@ function ExportFormatSelection({
   const data = [
     { value: 'markdown', label: 'Markdown' },
     { value: 'html', label: 'HTML' },
-    ...(includeDocx
-      ? [{ value: 'docx', label: 'Word (.docx)', disabled: !docxEntitled }]
-      : [])
+    ...(includeDocx ? [{ value: 'docx', label: 'Word (.docx)', disabled: !docxEntitled }] : [])
   ];
 
   return (

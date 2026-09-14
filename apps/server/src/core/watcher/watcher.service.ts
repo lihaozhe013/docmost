@@ -1,8 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-  WatcherRepo,
-  WatcherType
-} from '@docmost/db/repos/watcher/watcher.repo';
+import { WatcherRepo, WatcherType } from '@docmost/db/repos/watcher/watcher.repo';
 import { PaginationOptions } from '@docmost/db/pagination/pagination-options';
 import { KyselyTransaction } from '@docmost/db/types/kysely.types';
 import { InsertableWatcher } from '@docmost/db/types/entity.types';
@@ -54,12 +51,7 @@ export class WatcherService {
     return this.watcherRepo.insertMany(watchers, trx);
   }
 
-  async unwatchPage(
-    userId: string,
-    pageId: string,
-    spaceId: string,
-    workspaceId: string
-  ) {
+  async unwatchPage(userId: string, pageId: string, spaceId: string, workspaceId: string) {
     return this.watcherRepo.mute(userId, pageId, spaceId, workspaceId);
   }
 
@@ -67,12 +59,7 @@ export class WatcherService {
     return this.watcherRepo.isWatching(userId, pageId);
   }
 
-  async watchSpace(
-    userId: string,
-    spaceId: string,
-    workspaceId: string,
-    trx?: KyselyTransaction
-  ) {
+  async watchSpace(userId: string, spaceId: string, workspaceId: string, trx?: KyselyTransaction) {
     const watcher: InsertableWatcher = {
       userId,
       pageId: null,
@@ -89,10 +76,7 @@ export class WatcherService {
   }
 
   async getWatchedSpaceIds(userId: string, workspaceId: string) {
-    const result = await this.watcherRepo.getWatchedSpaceIds(
-      userId,
-      workspaceId
-    );
+    const result = await this.watcherRepo.getWatchedSpaceIds(userId, workspaceId);
 
     const spaceIds = result.items.map((r) => r.spaceId);
 
@@ -117,10 +101,7 @@ export class WatcherService {
     return this.watcherRepo.findPageWatchers(pageId, pagination);
   }
 
-  async getPageWatcherIds(
-    pageId: string,
-    trx?: KyselyTransaction
-  ): Promise<string[]> {
+  async getPageWatcherIds(pageId: string, trx?: KyselyTransaction): Promise<string[]> {
     return this.watcherRepo.getPageWatcherIds(pageId, trx);
   }
 
@@ -145,10 +126,6 @@ export class WatcherService {
     opts?: { trx?: KyselyTransaction }
   ): Promise<void> {
     await this.watcherRepo.updateSpaceIdByPageIds(spaceId, pageIds, opts);
-    await this.watcherRepo.deleteByPageIdsWithoutSpaceAccess(
-      pageIds,
-      spaceId,
-      opts
-    );
+    await this.watcherRepo.deleteByPageIdsWithoutSpaceAccess(pageIds, spaceId, opts);
   }
 }

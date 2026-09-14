@@ -1,16 +1,5 @@
-import {
-  ActionIcon,
-  Group,
-  Text,
-  Tooltip,
-  UnstyledButton
-} from '@mantine/core';
-import {
-  IconBell,
-  IconCheck,
-  IconFileDescription,
-  IconPointFilled
-} from '@tabler/icons-react';
+import { ActionIcon, Group, Text, Tooltip, UnstyledButton } from '@mantine/core';
+import { IconBell, IconCheck, IconFileDescription, IconPointFilled } from '@tabler/icons-react';
 import { Avatar } from '@mantine/core';
 import { CustomAvatar } from '@/components/ui/custom-avatar';
 import { INotification } from '../types/notification.types';
@@ -27,10 +16,7 @@ type NotificationItemProps = {
   onNavigate: () => void;
 };
 
-export function NotificationItem({
-  notification,
-  onNavigate
-}: NotificationItemProps) {
+export function NotificationItem({ notification, onNavigate }: NotificationItemProps) {
   const { t } = useTranslation();
   const markRead = useMarkReadMutation();
   const [hovered, setHovered] = useState(false);
@@ -76,18 +62,12 @@ export function NotificationItem({
 
   const pageUrl =
     notification.page && notification.space
-      ? buildPageUrl(
-          notification.space.slug,
-          notification.page.slugId,
-          notification.page.title
-        )
+      ? buildPageUrl(notification.space.slug, notification.page.slugId, notification.page.title)
       : undefined;
 
   const isSiemDestination = notification.type.startsWith('siem_destination.');
   const destinationName =
-    typeof notification.data?.destinationName === 'string'
-      ? notification.data.destinationName
-      : '';
+    typeof notification.data?.destinationName === 'string' ? notification.data.destinationName : '';
   const lastError =
     (notification.type === 'siem_destination.failing' ||
       notification.type === 'siem_destination.disabled') &&
@@ -144,9 +124,7 @@ export function NotificationItem({
             <Trans
               i18nKey={getNotificationMessageKey()}
               values={{
-                name: isSiemDestination
-                  ? destinationName
-                  : notification.actor?.name
+                name: isSiemDestination ? destinationName : notification.actor?.name
               }}
               components={{ bold: <Text span fw={600} /> }}
             />

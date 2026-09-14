@@ -3,9 +3,7 @@ import { IGroup } from '@/features/group/types/group.types';
 import { IPagination, QueryParams } from '@/lib/types.ts';
 import { IUser } from '@/features/user/types/user.types.ts';
 
-export async function getGroups(
-  params?: QueryParams
-): Promise<IPagination<IGroup>> {
+export async function getGroups(params?: QueryParams): Promise<IPagination<IGroup>> {
   const req = await api.post('/groups', params);
   return req.data;
 }
@@ -37,16 +35,10 @@ export async function getGroupMembers(
   return req.data;
 }
 
-export async function addGroupMember(data: {
-  groupId: string;
-  userIds: string[];
-}): Promise<void> {
+export async function addGroupMember(data: { groupId: string; userIds: string[] }): Promise<void> {
   await api.post('/groups/members/add', data);
 }
 
-export async function removeGroupMember(data: {
-  groupId: string;
-  userId: string;
-}): Promise<void> {
+export async function removeGroupMember(data: { groupId: string; userId: string }): Promise<void> {
   await api.post('/groups/members/remove', data);
 }

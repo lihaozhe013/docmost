@@ -1,8 +1,5 @@
 import { ISharedPageTree } from '@/features/share/types/share.types.ts';
-import {
-  buildSharedPageTree,
-  SharedPageTreeNode
-} from '@/features/share/utils.ts';
+import { buildSharedPageTree, SharedPageTreeNode } from '@/features/share/utils.ts';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useAtom } from 'jotai';
@@ -73,14 +70,10 @@ export default function SharedTree({ sharedPageTree }: SharedTreeProps) {
   // Stable callbacks so memo(DocTreeRow) actually saves work — see I2 in the
   // post-implementation code review.
   const handleToggle = useCallback(
-    (id: string, isOpen: boolean) =>
-      setOpenTreeNodes((prev) => ({ ...prev, [id]: isOpen })),
+    (id: string, isOpen: boolean) => setOpenTreeNodes((prev) => ({ ...prev, [id]: isOpen })),
     [setOpenTreeNodes]
   );
-  const getDragLabel = useCallback(
-    (n: SharedPageTreeNode) => n.name || 'untitled',
-    []
-  );
+  const getDragLabel = useCallback((n: SharedPageTreeNode) => n.name || 'untitled', []);
 
   if (!sharedPageTree || !sharedPageTree?.pageTree) {
     return null;
@@ -140,11 +133,7 @@ function SharedTreeRow({
         setMobileSidebarState(false);
       }}
     >
-      <SharedPageArrow
-        isOpen={isOpen}
-        hasChildren={hasChildren}
-        onToggle={toggleOpen}
-      />
+      <SharedPageArrow isOpen={isOpen} hasChildren={hasChildren} onToggle={toggleOpen} />
       <div style={{ marginRight: '4px' }}>
         <EmojiPicker
           onEmojiSelect={() => {}}
@@ -165,11 +154,7 @@ interface SharedPageArrowProps {
   onToggle: () => void;
 }
 
-function SharedPageArrow({
-  isOpen,
-  hasChildren,
-  onToggle
-}: SharedPageArrowProps) {
+function SharedPageArrow({ isOpen, hasChildren, onToggle }: SharedPageArrowProps) {
   if (!hasChildren) {
     return (
       <span

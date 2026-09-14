@@ -5,16 +5,9 @@ import { AuthenticationExtension } from './extensions/authentication.extension';
 import { PersistenceExtension } from './extensions/persistence.extension';
 import { Injectable } from '@nestjs/common';
 import { EnvironmentService } from '../integrations/environment/environment.service';
-import {
-  createRetryStrategy,
-  parseRedisUrl,
-  RedisConfig
-} from '../common/helpers';
+import { createRetryStrategy, parseRedisUrl, RedisConfig } from '../common/helpers';
 import { LoggerExtension } from './extensions/logger.extension';
-import {
-  RedisSyncExtension,
-  SerializedHTTPRequest
-} from './extensions/redis-sync';
+import { RedisSyncExtension, SerializedHTTPRequest } from './extensions/redis-sync';
 import { toWebRequest } from './extensions/redis-sync/redis-sync.types';
 import { WsSocketWrapper } from './extensions/redis-sync/ws-socket-wrapper';
 import RedisClient from 'ioredis';
@@ -22,18 +15,14 @@ import { pack, unpack } from 'msgpackr';
 import { nanoid } from 'nanoid';
 import * as os from 'node:os';
 import { CollabWsAdapter } from './adapter/collab-ws.adapter';
-import {
-  CollaborationHandler,
-  CollabEventHandlers
-} from './collaboration.handler';
+import { CollaborationHandler, CollabEventHandlers } from './collaboration.handler';
 
 @Injectable()
 export class CollaborationGateway {
   private readonly hocuspocus: Hocuspocus;
   private redisConfig: RedisConfig;
   // @ts-ignore
-  private readonly redisSync: RedisSyncExtension<CollabEventHandlers> | null =
-    null;
+  private readonly redisSync: RedisSyncExtension<CollabEventHandlers> | null = null;
   private readonly withRedis: boolean;
 
   constructor(
@@ -50,11 +39,7 @@ export class CollaborationGateway {
       debounce: 10000,
       maxDebounce: 45000,
       unloadImmediately: false,
-      extensions: [
-        this.authenticationExtension,
-        this.persistenceExtension,
-        this.loggerExtension
-      ]
+      extensions: [this.authenticationExtension, this.persistenceExtension, this.loggerExtension]
     });
 
     if (this.withRedis) {
@@ -89,8 +74,7 @@ export class CollaborationGateway {
       url: request.url ?? '/',
       headers: {
         'sec-websocket-key': request.headers['sec-websocket-key'] ?? '',
-        'sec-websocket-protocol':
-          request.headers['sec-websocket-protocol'] ?? ''
+        'sec-websocket-protocol': request.headers['sec-websocket-protocol'] ?? ''
       },
       socket: { remoteAddress: request.socket?.remoteAddress ?? '' }
     };
@@ -111,11 +95,7 @@ export class CollaborationGateway {
       });
 
       client.on('close', (code: number, reason: Buffer) => {
-        this.redisSync!.onSocketClose(
-          socketId,
-          code,
-          new Uint8Array(reason).buffer
-        );
+        this.redisSync!.onSocketClose(socketId, code, new Uint8Array(reason).buffer);
       });
     } else {
       // Fallback to direct Hocuspocus connection

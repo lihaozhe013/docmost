@@ -36,10 +36,7 @@ export default function AppVersion() {
           style={{ cursor: 'pointer' }}
           disabled={!hasUpdate}
           onClick={() => {
-            window.open(
-              'https://github.com/docmost/docmost/releases',
-              '_blank'
-            );
+            window.open('https://github.com/docmost/docmost/releases', '_blank');
           }}
         >
           <Text

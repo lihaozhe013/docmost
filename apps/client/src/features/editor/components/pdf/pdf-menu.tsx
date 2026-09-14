@@ -113,11 +113,7 @@ export function PdfMenu({ editor }: EditorMenuProps) {
       shouldShow={shouldShow}
     >
       <div className={classes.toolbar}>
-        <Tooltip
-          position="top"
-          label={t('Convert to attachment')}
-          withinPortal={false}
-        >
+        <Tooltip position="top" label={t('Convert to attachment')} withinPortal={false}>
           <ActionIcon
             onClick={handleConvertToAttachment}
             size="lg"
@@ -129,12 +125,7 @@ export function PdfMenu({ editor }: EditorMenuProps) {
         </Tooltip>
 
         <Tooltip position="top" label={t('Delete')} withinPortal={false}>
-          <ActionIcon
-            onClick={handleDelete}
-            size="lg"
-            aria-label={t('Delete')}
-            variant="subtle"
-          >
+          <ActionIcon onClick={handleDelete} size="lg" aria-label={t('Delete')} variant="subtle">
             <IconTrash size={18} />
           </ActionIcon>
         </Tooltip>

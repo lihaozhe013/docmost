@@ -2,11 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectKysely } from 'nestjs-kysely';
 import { KyselyDB, KyselyTransaction } from '../../types/kysely.types';
 import { dbOrTx, executeTx } from '../../utils';
-import {
-  InsertablePage,
-  Page,
-  UpdatablePage
-} from '@docmost/db/types/entity.types';
+import { InsertablePage, Page, UpdatablePage } from '@docmost/db/types/entity.types';
 import { PaginationOptions } from '@docmost/db/pagination/pagination-options';
 import { executeWithCursorPagination } from '@docmost/db/pagination/cursor-pagination';
 import { validate as isValidUUID } from 'uuid';
@@ -69,9 +65,7 @@ export class PageRepo {
       .$if(opts?.includeContent, (qb) => qb.select('content'))
       .$if(opts?.includeYdoc, (qb) => qb.select('ydoc'))
       .$if(opts?.includeTextContent, (qb) => qb.select('textContent'))
-      .$if(opts?.includeHasChildren, (qb) =>
-        qb.select((eb) => this.withHasChildren(eb))
-      );
+      .$if(opts?.includeHasChildren, (qb) => qb.select((eb) => this.withHasChildren(eb)));
 
     if (opts?.includeCreator) {
       query = query.select((eb) => this.withCreator(eb));
@@ -116,41 +110,24 @@ export class PageRepo {
     if (pageIds.length === 0) return [];
     const db = dbOrTx(this.db, opts?.trx);
 
-    let query = db
-      .selectFrom('pages')
-      .select(this.baseFields)
-      .where('id', 'in', pageIds);
+    let query = db.selectFrom('pages').select(this.baseFields).where('id', 'in', pageIds);
 
     if (opts?.workspaceId) {
-      query = query
-        .where('workspaceId', '=', opts.workspaceId)
-        .where('deletedAt', 'is', null);
+      query = query.where('workspaceId', '=', opts.workspaceId).where('deletedAt', 'is', null);
     }
 
     return query.execute();
   }
 
-  async updatePage(
-    updatablePage: UpdatablePage,
-    pageId: string,
-    trx?: KyselyTransaction
-  ) {
+  async updatePage(updatablePage: UpdatablePage, pageId: string, trx?: KyselyTransaction) {
     return this.updatePages(updatablePage, [pageId], trx);
   }
 
-  async updatePages(
-    updatePageData: UpdatablePage,
-    pageIds: string[],
-    trx?: KyselyTransaction
-  ) {
+  async updatePages(updatePageData: UpdatablePage, pageIds: string[], trx?: KyselyTransaction) {
     const result = await dbOrTx(this.db, trx)
       .updateTable('pages')
       .set({ ...updatePageData, updatedAt: new Date() })
-      .where(
-        pageIds.some((pageId) => !isValidUUID(pageId)) ? 'slugId' : 'id',
-        'in',
-        pageIds
-      )
+      .where(pageIds.some((pageId) => !isValidUUID(pageId)) ? 'slugId' : 'id', 'in', pageIds)
       .executeTakeFirst();
 
     this.eventEmitter.emit(EventName.PAGE_UPDATED, {
@@ -161,10 +138,7 @@ export class PageRepo {
     return result;
   }
 
-  async insertPage(
-    insertablePage: InsertablePage,
-    trx?: KyselyTransaction
-  ): Promise<Page> {
+  async insertPage(insertablePage: InsertablePage, trx?: KyselyTransaction): Promise<Page> {
     const db = dbOrTx(this.db, trx);
     const result = await db
       .insertInto('pages')
@@ -192,11 +166,7 @@ export class PageRepo {
     await query.execute();
   }
 
-  async removePage(
-    pageId: string,
-    deletedById: string,
-    workspaceId: string
-  ): Promise<void> {
+  async removePage(pageId: string, deletedById: string, workspaceId: string): Promise<void> {
     const currentDate = new Date();
 
     const descendants = await this.db
@@ -482,13 +452,7 @@ export class PageRepo {
     return eb
       .selectFrom('pages as child')
       .select((eb) =>
-        eb
-          .case()
-          .when(eb.fn.countAll(), '>', 0)
-          .then(true)
-          .else(false)
-          .end()
-          .as('count')
+        eb.case().when(eb.fn.countAll(), '>', 0).then(true).else(false).end().as('count')
       )
       .whereRef('child.parentPageId', '=', 'pages.id')
       .where('child.deletedAt', 'is', null)
@@ -496,10 +460,7 @@ export class PageRepo {
       .as('hasChildren');
   }
 
-  async getPageAndDescendants(
-    parentPageId: string,
-    opts: { includeContent: boolean }
-  ) {
+  async getPageAndDescendants(parentPageId: string, opts: { includeContent: boolean }) {
     return this.db
       .withRecursive('page_hierarchy', (db) =>
         db

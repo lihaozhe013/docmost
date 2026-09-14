@@ -1,10 +1,5 @@
 export type CalloutType =
-  | 'default'
-  | 'info'
-  | 'note'
-  | 'success'
-  | 'warning'
-  | 'danger';
+  'default' | 'info' | 'note' | 'success' | 'warning' | 'danger';
 const validCalloutTypes = [
   'default',
   'info',

@@ -10,9 +10,7 @@ import {
 import { IPagination, QueryParams } from '@/lib/types.ts';
 import { saveAs } from 'file-saver';
 
-export async function getSpaces(
-  params?: QueryParams
-): Promise<IPagination<ISpace>> {
+export async function getSpaces(params?: QueryParams): Promise<IPagination<ISpace>> {
   const req = await api.post('/spaces', params);
   return req.data;
 }
@@ -48,15 +46,11 @@ export async function addSpaceMember(data: IAddSpaceMember): Promise<void> {
   await api.post('/spaces/members/add', data);
 }
 
-export async function removeSpaceMember(
-  data: IRemoveSpaceMember
-): Promise<void> {
+export async function removeSpaceMember(data: IRemoveSpaceMember): Promise<void> {
   await api.post('/spaces/members/remove', data);
 }
 
-export async function changeMemberRole(
-  data: IChangeSpaceMemberRole
-): Promise<void> {
+export async function changeMemberRole(data: IChangeSpaceMemberRole): Promise<void> {
   await api.post('/spaces/members/change-role', data);
 }
 
@@ -65,9 +59,7 @@ export async function exportSpace(data: IExportSpaceParams): Promise<void> {
     responseType: 'blob'
   });
 
-  const fileName = req?.headers['content-disposition']
-    .split('filename=')[1]
-    .replace(/"/g, '');
+  const fileName = req?.headers['content-disposition'].split('filename=')[1].replace(/"/g, '');
 
   let decodedFileName = fileName;
   try {

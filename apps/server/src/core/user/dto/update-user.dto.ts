@@ -10,9 +10,7 @@ import {
 } from 'class-validator';
 import { CreateUserDto } from '../../auth/dto/create-user.dto';
 
-export class UpdateUserDto extends PartialType(
-  OmitType(CreateUserDto, ['password'] as const)
-) {
+export class UpdateUserDto extends PartialType(OmitType(CreateUserDto, ['password'] as const)) {
   @IsOptional()
   @IsBoolean()
   fullPageWidth: boolean;

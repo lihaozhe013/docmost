@@ -1,7 +1,4 @@
-import {
-  InsertableUserSession,
-  UserSession
-} from '@docmost/db/types/entity.types';
+import { InsertableUserSession, UserSession } from '@docmost/db/types/entity.types';
 import { KyselyDB, KyselyTransaction } from '@docmost/db/types/kysely.types';
 import { dbOrTx } from '@docmost/db/utils';
 import { Injectable } from '@nestjs/common';
@@ -17,11 +14,7 @@ export class UserSessionRepo {
     trx?: KyselyTransaction
   ): Promise<UserSession> {
     const db = dbOrTx(this.db, trx);
-    return db
-      .insertInto('userSessions')
-      .values(session)
-      .returningAll()
-      .executeTakeFirstOrThrow();
+    return db.insertInto('userSessions').values(session).returningAll().executeTakeFirstOrThrow();
   }
 
   async findActiveById(id: string): Promise<UserSession | undefined> {
@@ -34,10 +27,7 @@ export class UserSessionRepo {
       .executeTakeFirst();
   }
 
-  async findActiveByUser(
-    userId: string,
-    workspaceId: string
-  ): Promise<UserSession[]> {
+  async findActiveByUser(userId: string, workspaceId: string): Promise<UserSession[]> {
     return this.db
       .selectFrom('userSessions')
       .selectAll()
@@ -57,11 +47,7 @@ export class UserSessionRepo {
       .execute();
   }
 
-  async revokeById(
-    id: string,
-    userId: string,
-    workspaceId: string
-  ): Promise<void> {
+  async revokeById(id: string, userId: string, workspaceId: string): Promise<void> {
     await this.db
       .updateTable('userSessions')
       .set({ revokedAt: new Date() })
@@ -127,9 +113,7 @@ export class UserSessionRepo {
     const cutoff = new Date(Date.now() - retentionDays * 24 * 60 * 60 * 1000);
     await this.db
       .deleteFrom('userSessions')
-      .where((eb) =>
-        eb.or([eb('revokedAt', '<', cutoff), eb('expiresAt', '<', cutoff)])
-      )
+      .where((eb) => eb.or([eb('revokedAt', '<', cutoff), eb('expiresAt', '<', cutoff)]))
       .execute();
   }
 

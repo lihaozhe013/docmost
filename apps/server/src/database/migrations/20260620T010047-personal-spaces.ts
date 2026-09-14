@@ -3,9 +3,7 @@ import { Kysely, sql } from 'kysely';
 export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .alterTable('spaces')
-    .addColumn('is_personal', 'boolean', (col) =>
-      col.notNull().defaultTo(false)
-    )
+    .addColumn('is_personal', 'boolean', (col) => col.notNull().defaultTo(false))
     .execute();
 
   await sql`
@@ -16,9 +14,6 @@ export async function up(db: Kysely<any>): Promise<void> {
 }
 
 export async function down(db: Kysely<any>): Promise<void> {
-  await db.schema
-    .dropIndex('spaces_personal_creator_unique')
-    .ifExists()
-    .execute();
+  await db.schema.dropIndex('spaces_personal_creator_unique').ifExists().execute();
   await db.schema.alterTable('spaces').dropColumn('is_personal').execute();
 }

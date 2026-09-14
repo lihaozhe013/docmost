@@ -1,8 +1,5 @@
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
-import {
-  searchPage,
-  searchAttachments
-} from '@/features/search/services/search-service';
+import { searchPage, searchAttachments } from '@/features/search/services/search-service';
 import {
   IAttachmentSearch,
   IPageSearch,
@@ -23,8 +20,7 @@ export function useUnifiedSearch(
 ): UseQueryResult<UnifiedSearchResult[], Error> {
   const hasAttachmentIndexing = useHasFeature(Feature.ATTACHMENT_INDEXING);
 
-  const isAttachmentSearch =
-    params.contentType === 'attachment' && hasAttachmentIndexing;
+  const isAttachmentSearch = params.contentType === 'attachment' && hasAttachmentIndexing;
   const searchType = isAttachmentSearch ? 'attachment' : 'page';
 
   return useQuery({
@@ -40,15 +36,11 @@ export function useUnifiedSearch(
       }
     },
     enabled:
-      (!!params.query ||
-        (params.labelIds?.length ?? 0) > 0 ||
-        !!params.creatorId) &&
-      enabled,
+      (!!params.query || (params.labelIds?.length ?? 0) > 0 || !!params.creatorId) && enabled,
     // keep previous results only within the same search type; page results
     // rendered as attachments (or vice versa) crash on missing fields
     placeholderData: (previousData, previousQuery) => {
-      if (!params.query && !params.labelIds?.length && !params.creatorId)
-        return undefined;
+      if (!params.query && !params.labelIds?.length && !params.creatorId) return undefined;
       if (previousQuery && previousQuery.queryKey[1] !== searchType) {
         return undefined;
       }

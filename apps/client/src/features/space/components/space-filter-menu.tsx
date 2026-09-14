@@ -20,13 +20,7 @@ type SpaceFilterMenuProps = {
   onChange: (spaceId: string | null) => void;
   children: ReactNode;
   width?: number;
-  position?:
-    | 'bottom-start'
-    | 'bottom-end'
-    | 'bottom'
-    | 'top-start'
-    | 'top-end'
-    | 'top';
+  position?: 'bottom-start' | 'bottom-end' | 'bottom' | 'top-start' | 'top-end' | 'top';
   zIndex?: number;
 };
 
@@ -75,18 +69,9 @@ export function SpaceFilterMenu({
         />
 
         <ScrollArea.Autosize mah={280}>
-          <Menu.Item
-            component={RadioMenuItem}
-            aria-checked={!value}
-            onClick={() => onChange(null)}
-          >
+          <Menu.Item component={RadioMenuItem} aria-checked={!value} onClick={() => onChange(null)}>
             <Group flex="1" gap="xs">
-              <Avatar
-                color="initials"
-                variant="filled"
-                name={t('All spaces')}
-                size={20}
-              />
+              <Avatar color="initials" variant="filled" name={t('All spaces')} size={20} />
               <div style={{ flex: 1 }}>
                 <Text size="sm" fw={500}>
                   {t('All spaces')}
@@ -109,12 +94,7 @@ export function SpaceFilterMenu({
               onClick={() => onChange(space.id)}
             >
               <Group flex="1" gap="xs">
-                <Avatar
-                  color="initials"
-                  variant="filled"
-                  name={space.name}
-                  size={20}
-                />
+                <Avatar color="initials" variant="filled" name={space.name} size={20} />
                 <Text size="sm" fw={500} style={{ flex: 1 }} truncate>
                   {space.name}
                 </Text>

@@ -25,10 +25,7 @@ export const localStorageLibraryAdapter: LibraryPersistenceAdapter = {
         return JSON.parse(data);
       }
     } catch (e) {
-      console.error(
-        'Error downloading Excalidraw library from localStorage',
-        e
-      );
+      console.error('Error downloading Excalidraw library from localStorage', e);
     }
     return null;
   },
@@ -36,10 +33,7 @@ export const localStorageLibraryAdapter: LibraryPersistenceAdapter = {
     try {
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(libraryData));
     } catch (e) {
-      console.error(
-        'Error while saving library from Excalidraw to localStorage',
-        e
-      );
+      console.error('Error while saving library from Excalidraw to localStorage', e);
     }
   }
 };

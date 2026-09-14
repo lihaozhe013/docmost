@@ -21,14 +21,7 @@ export class InternalLogFilter extends ConsoleLogger {
     if (isProduction && !isDebugMode) {
       this.allowedLogLevels = ['info', 'error', 'fatal'];
     } else {
-      this.allowedLogLevels = [
-        'info',
-        'debug',
-        'verbose',
-        'warn',
-        'error',
-        'fatal'
-      ];
+      this.allowedLogLevels = ['info', 'debug', 'verbose', 'warn', 'error', 'fatal'];
     }
   }
 
@@ -37,10 +30,7 @@ export class InternalLogFilter extends ConsoleLogger {
   }
 
   log(_: any, context?: string): void {
-    if (
-      this.isLogLevelAllowed('info') &&
-      !InternalLogFilter.contextsToIgnore.includes(context)
-    ) {
+    if (this.isLogLevelAllowed('info') && !InternalLogFilter.contextsToIgnore.includes(context)) {
       super.log.apply(this, arguments);
     }
   }

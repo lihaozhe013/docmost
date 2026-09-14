@@ -34,10 +34,7 @@
     content: '';
     position: absolute;
     border-radius: 1px;
-    background-color: light-dark(
-      var(--mantine-color-blue-4),
-      var(--mantine-color-blue-5)
-    );
+    background-color: light-dark(var(--mantine-color-blue-4), var(--mantine-color-blue-5));
     transition: background-color 0.15s ease;
   }
 
@@ -53,10 +50,7 @@
 
   &:hover::before,
   &:hover::after {
-    background-color: light-dark(
-      var(--mantine-color-blue-6),
-      var(--mantine-color-blue-4)
-    );
+    background-color: light-dark(var(--mantine-color-blue-6), var(--mantine-color-blue-4));
   }
 }
 
@@ -147,17 +141,11 @@
   height: 3px;
   border-radius: 2px;
   transition: background-color 0.15s ease;
-  background-color: light-dark(
-    var(--mantine-color-blue-4),
-    var(--mantine-color-blue-5)
-  );
+  background-color: light-dark(var(--mantine-color-blue-4), var(--mantine-color-blue-5));
 }
 
 .resizeHandleBottom:hover .resizeBar {
-  background-color: light-dark(
-    var(--mantine-color-blue-6),
-    var(--mantine-color-blue-4)
-  );
+  background-color: light-dark(var(--mantine-color-blue-6), var(--mantine-color-blue-4));
 }
 
 .wrapper:hover .cornerHandle,
@@ -171,17 +159,11 @@
 
 .resizing .cornerHandle::before,
 .resizing .cornerHandle::after {
-  background-color: light-dark(
-    var(--mantine-color-blue-6),
-    var(--mantine-color-blue-4)
-  );
+  background-color: light-dark(var(--mantine-color-blue-6), var(--mantine-color-blue-4));
 }
 
 .resizing .resizeBar {
-  background-color: light-dark(
-    var(--mantine-color-blue-6),
-    var(--mantine-color-blue-4)
-  );
+  background-color: light-dark(var(--mantine-color-blue-6), var(--mantine-color-blue-4));
 }
 
 @media print {

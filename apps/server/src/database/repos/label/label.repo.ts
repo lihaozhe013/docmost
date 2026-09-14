@@ -23,16 +23,9 @@ export class LabelRepo {
     private readonly spaceMemberRepo: SpaceMemberRepo
   ) {}
 
-  async findById(
-    labelId: string,
-    trx?: KyselyTransaction
-  ): Promise<Label | undefined> {
+  async findById(labelId: string, trx?: KyselyTransaction): Promise<Label | undefined> {
     const db = dbOrTx(this.db, trx);
-    return db
-      .selectFrom('labels')
-      .selectAll()
-      .where('id', '=', labelId)
-      .executeTakeFirst();
+    return db.selectFrom('labels').selectAll().where('id', '=', labelId).executeTakeFirst();
   }
 
   async findByNameAndWorkspace(
@@ -67,9 +60,7 @@ export class LabelRepo {
       .insertInto('labels')
       .values({ name: normalizedName, type, workspaceId })
       .onConflict((oc) =>
-        oc
-          .columns(['name', 'type', 'workspaceId'])
-          .doUpdateSet({ name: normalizedName })
+        oc.columns(['name', 'type', 'workspaceId']).doUpdateSet({ name: normalizedName })
       )
       .returningAll()
       .executeTakeFirstOrThrow();
@@ -95,9 +86,7 @@ export class LabelRepo {
       perPage: pagination.limit,
       cursor: pagination.cursor,
       beforeCursor: pagination.beforeCursor,
-      fields: [
-        { expression: 'pageLabels.id', direction: 'asc', key: 'joinId' }
-      ],
+      fields: [{ expression: 'pageLabels.id', direction: 'asc', key: 'joinId' }],
       parseCursor: (cursor) => ({
         joinId: cursor.joinId
       })
@@ -133,19 +122,11 @@ export class LabelRepo {
           .innerJoin('pages', 'pages.id', 'pageLabels.pageId')
           .select('pageLabels.labelId')
           .where('pages.deletedAt', 'is', null)
-          .where(
-            'pages.spaceId',
-            'in',
-            this.spaceMemberRepo.getUserSpaceIdsQuery(userId)
-          )
+          .where('pages.spaceId', 'in', this.spaceMemberRepo.getUserSpaceIdsQuery(userId))
       );
 
     if (pagination.query) {
-      query = query.where(
-        'name',
-        'like',
-        `%${pagination.query.toLowerCase()}%`
-      );
+      query = query.where('name', 'like', `%${pagination.query.toLowerCase()}%`);
     }
 
     return executeWithCursorPagination(query, {
@@ -163,11 +144,7 @@ export class LabelRepo {
     });
   }
 
-  async addLabelToPage(
-    pageId: string,
-    labelId: string,
-    trx?: KyselyTransaction
-  ): Promise<void> {
+  async addLabelToPage(pageId: string, labelId: string, trx?: KyselyTransaction): Promise<void> {
     const db = dbOrTx(this.db, trx);
     await db
       .insertInto('pageLabels')
@@ -199,10 +176,7 @@ export class LabelRepo {
       .execute();
   }
 
-  async getPageLabelCount(
-    pageId: string,
-    trx?: KyselyTransaction
-  ): Promise<number> {
+  async getPageLabelCount(pageId: string, trx?: KyselyTransaction): Promise<number> {
     const db = dbOrTx(this.db, trx);
     const result = await db
       .selectFrom('pageLabels')
@@ -230,11 +204,7 @@ export class LabelRepo {
     return Number(result?.count ?? 0);
   }
 
-  async deleteLabel(
-    labelId: string,
-    workspaceId: string,
-    trx?: KyselyTransaction
-  ): Promise<void> {
+  async deleteLabel(labelId: string, workspaceId: string, trx?: KyselyTransaction): Promise<void> {
     const db = dbOrTx(this.db, trx);
     await db
       .deleteFrom('labels')
@@ -291,11 +261,7 @@ export class LabelRepo {
     if (opts.spaceId) {
       query = query.where('pages.spaceId', '=', opts.spaceId);
     } else {
-      query = query.where(
-        'pages.spaceId',
-        'in',
-        this.spaceMemberRepo.getUserSpaceIdsQuery(userId)
-      );
+      query = query.where('pages.spaceId', 'in', this.spaceMemberRepo.getUserSpaceIdsQuery(userId));
     }
 
     if (opts.query) {
@@ -332,11 +298,7 @@ export class LabelRepo {
     if (spaceId) {
       query = query.where('pages.spaceId', '=', spaceId);
     } else {
-      query = query.where(
-        'pages.spaceId',
-        'in',
-        this.spaceMemberRepo.getUserSpaceIdsQuery(userId)
-      );
+      query = query.where('pages.spaceId', 'in', this.spaceMemberRepo.getUserSpaceIdsQuery(userId));
     }
 
     const result = await query.executeTakeFirst();

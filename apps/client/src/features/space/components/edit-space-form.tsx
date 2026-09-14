@@ -38,11 +38,7 @@ export function EditSpaceForm({ space, readOnly }: EditSpaceFormProps) {
     }
   });
 
-  const handleSubmit = async (values: {
-    name?: string;
-    description?: string;
-    slug?: string;
-  }) => {
+  const handleSubmit = async (values: { name?: string; description?: string; slug?: string }) => {
     const spaceData: Partial<ISpace> = {
       spaceId: space.id
     };

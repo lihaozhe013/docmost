@@ -11,10 +11,7 @@ import {
   pageEditorAtom,
   titleEditorAtom
 } from '@/features/editor/atoms/editor-atoms';
-import {
-  updatePageData,
-  useUpdateTitlePageMutation
-} from '@/features/page/queries/page-query';
+import { updatePageData, useUpdateTitlePageMutation } from '@/features/page/queries/page-query';
 import { useDebouncedCallback, getHotkeyHandler } from '@mantine/hooks';
 import { useAtom } from 'jotai';
 import { useQueryEmit } from '@/features/websocket/use-query-emit.ts';
@@ -47,8 +44,7 @@ export function TitleEditor({
   isBase
 }: TitleEditorProps) {
   const { t } = useTranslation();
-  const { mutateAsync: updateTitlePageMutationAsync } =
-    useUpdateTitlePageMutation();
+  const { mutateAsync: updateTitlePageMutationAsync } = useUpdateTitlePageMutation();
   const pageEditor = useAtomValue(pageEditorAtom);
   const [, setTitleEditor] = useAtom(titleEditorAtom);
   const emit = useQueryEmit();
@@ -125,10 +121,7 @@ export function TitleEditor({
   const saveTitle = useCallback(() => {
     if (!titleEditor || activePageId !== pageId) return;
 
-    if (
-      titleEditor.getText() === title ||
-      (titleEditor.getText() === '' && title === null)
-    ) {
+    if (titleEditor.getText() === title || (titleEditor.getText() === '' && title === null)) {
       return;
     }
 
@@ -161,11 +154,7 @@ export function TitleEditor({
   const debounceUpdate = useDebouncedCallback(saveTitle, 500);
 
   useEffect(() => {
-    if (
-      titleEditor &&
-      !titleEditor.isDestroyed &&
-      title !== titleEditor.getText()
-    ) {
+    if (titleEditor && !titleEditor.isDestroyed && title !== titleEditor.getText()) {
       titleEditor.commands.setContent(title);
     }
   }, [pageId, title, titleEditor]);
@@ -187,9 +176,7 @@ export function TitleEditor({
 
   useEffect(() => {
     if (!titleEditor) return;
-    titleEditor.setEditable(
-      editable && currentPageEditMode === PageEditMode.Edit
-    );
+    titleEditor.setEditable(editable && currentPageEditMode === PageEditMode.Edit);
   }, [currentPageEditMode, titleEditor, editable]);
 
   const openSearchDialog = () => {
@@ -202,8 +189,7 @@ export function TitleEditor({
 
     // Prevent focus shift when IME composition is active
     // `keyCode === 229` is added to support Safari where `isComposing` may not be reliable
-    if (event.nativeEvent.isComposing || event.nativeEvent.keyCode === 229)
-      return;
+    if (event.nativeEvent.isComposing || event.nativeEvent.keyCode === 229) return;
 
     const { key } = event;
     const { $head } = titleEditor.state.selection;
@@ -234,17 +220,14 @@ export function TitleEditor({
         })
         .insertContentAt(0, {
           type: 'paragraph',
-          content: textAfterCursor
-            ? [{ type: 'text', text: textAfterCursor }]
-            : undefined
+          content: textAfterCursor ? [{ type: 'text', text: textAfterCursor }] : undefined
         })
         .focus('start')
         .run();
       return;
     }
 
-    const shouldFocusEditor =
-      key === 'ArrowDown' || (key === 'ArrowRight' && !$head.nodeAfter);
+    const shouldFocusEditor = key === 'ArrowDown' || (key === 'ArrowRight' && !$head.nodeAfter);
 
     if (shouldFocusEditor) {
       pageEditor.commands.focus('start');

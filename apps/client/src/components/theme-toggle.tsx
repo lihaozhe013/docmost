@@ -1,9 +1,4 @@
-import {
-  ActionIcon,
-  Tooltip,
-  useComputedColorScheme,
-  useMantineColorScheme
-} from '@mantine/core';
+import { ActionIcon, Tooltip, useComputedColorScheme, useMantineColorScheme } from '@mantine/core';
 import { IconMoon, IconSun } from '@tabler/icons-react';
 import classes from './theme-toggle.module.css';
 

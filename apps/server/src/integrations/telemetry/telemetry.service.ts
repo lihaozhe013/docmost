@@ -36,10 +36,7 @@ export class TelemetryService {
         return;
       }
 
-      const anonymizedHash = createHmac(
-        'sha256',
-        this.environmentService.getAppSecret()
-      )
+      const anonymizedHash = createHmac('sha256', this.environmentService.getAppSecret())
         .update(workspace.id)
         .digest('hex');
 

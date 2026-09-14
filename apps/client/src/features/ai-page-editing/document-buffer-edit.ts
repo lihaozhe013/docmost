@@ -6,11 +6,7 @@ import {
   replaceInlineSegmentWithMath,
   validateLatex
 } from './document-buffer-content';
-import {
-  getNodeText,
-  isDirectTextBlock,
-  isSingleTextNodeRange
-} from './document-buffer-utils';
+import { getNodeText, isDirectTextBlock, isSingleTextNodeRange } from './document-buffer-utils';
 import { getInlineChildLocation } from './document-buffer-locations';
 import type { BlockLocation } from './document-buffer-locations';
 
@@ -48,10 +44,7 @@ export function prepareEditOperations(
     seen.add(operation.blockId);
     const location = byId.get(operation.blockId);
     if (!location) {
-      throw new BufferError(
-        'BLOCK_NOT_FOUND',
-        `Block ${operation.blockId} was not found`
-      );
+      throw new BufferError('BLOCK_NOT_FOUND', `Block ${operation.blockId} was not found`);
     }
     if (!location.editable) {
       throw new BufferError(
@@ -132,14 +125,8 @@ export function prepareEditOperations(
       continue;
     }
 
-    if (
-      operation.type === 'replace_inline_math' ||
-      operation.type === 'replace_text_with_math'
-    ) {
-      if (
-        location.node.type.name !== 'paragraph' &&
-        location.node.type.name !== 'heading'
-      ) {
+    if (operation.type === 'replace_inline_math' || operation.type === 'replace_text_with_math') {
+      if (location.node.type.name !== 'paragraph' && location.node.type.name !== 'heading') {
         throw new BufferError(
           'UNSUPPORTED_RANGE',
           `Block ${operation.blockId} does not contain inline formula segments`
@@ -156,23 +143,14 @@ export function prepareEditOperations(
           `Segment ${operation.segmentIndex} was not found in block ${operation.blockId}`
         );
       }
-      if (
-        operation.type === 'replace_inline_math' &&
-        segment.node.type.name !== 'mathInline'
-      ) {
+      if (operation.type === 'replace_inline_math' && segment.node.type.name !== 'mathInline') {
         throw new BufferError(
           'UNSUPPORTED_RANGE',
           `Segment ${operation.segmentIndex} is not an inline formula`
         );
       }
-      if (
-        operation.type === 'replace_text_with_math' &&
-        segment.node.type.name !== 'text'
-      ) {
-        throw new BufferError(
-          'UNSUPPORTED_RANGE',
-          `Segment ${operation.segmentIndex} is not text`
-        );
+      if (operation.type === 'replace_text_with_math' && segment.node.type.name !== 'text') {
+        throw new BufferError('UNSUPPORTED_RANGE', `Segment ${operation.segmentIndex} is not text`);
       }
       const segmentText =
         segment.node.type.name === 'mathInline'
@@ -203,24 +181,15 @@ export function prepareEditOperations(
         }
         before = getNodeText(location.node);
       }
-      if (
-        operation.newText.includes('\n') ||
-        operation.newText.includes('\r')
-      ) {
-        throw new BufferError(
-          'UNSUPPORTED_RANGE',
-          'Inline formulas cannot contain line breaks'
-        );
+      if (operation.newText.includes('\n') || operation.newText.includes('\r')) {
+        throw new BufferError('UNSUPPORTED_RANGE', 'Inline formulas cannot contain line breaks');
       }
       validateLatex(operation.newText, false, operation.blockId);
       const attrs = { text: operation.newText };
       prepared.push({
         operation,
         location,
-        kind:
-          operation.type === 'replace_inline_math'
-            ? 'inline-node'
-            : 'text-to-inline-math',
+        kind: operation.type === 'replace_inline_math' ? 'inline-node' : 'text-to-inline-math',
         from: segment.position + matchOffset,
         to:
           segment.position +
@@ -242,10 +211,7 @@ export function prepareEditOperations(
       continue;
     }
 
-    if (
-      location.node.type.name !== 'paragraph' &&
-      location.node.type.name !== 'heading'
-    ) {
+    if (location.node.type.name !== 'paragraph' && location.node.type.name !== 'heading') {
       throw new BufferError(
         'UNSUPPORTED_RANGE',
         `Block ${operation.blockId} does not contain editable text`
@@ -309,9 +275,7 @@ export function prepareEditOperations(
           `The exact text occurs more than once in block ${operation.blockId}`
         );
       }
-      if (
-        !isSingleTextNodeRange(location.node, first, operation.oldText.length)
-      ) {
+      if (!isSingleTextNodeRange(location.node, first, operation.oldText.length)) {
         throw new BufferError(
           'UNSUPPORTED_RANGE',
           `The replacement in block ${operation.blockId} crosses formatting boundaries`
@@ -357,15 +321,11 @@ export function applyPreparedOperations(
   const topLevelLocations = locations.filter((location) => location.topLevel);
   const deletedBlockIds = new Set(
     prepared
-      .filter(
-        (item) =>
-          item.operation.type === 'delete_block' && item.location.topLevel
-      )
+      .filter((item) => item.operation.type === 'delete_block' && item.location.topLevel)
       .map((item) => item.operation.blockId)
   );
   const preservedFinalBlockId =
-    deletedBlockIds.size === topLevelLocations.length &&
-    deletedBlockIds.size > 0
+    deletedBlockIds.size === topLevelLocations.length && deletedBlockIds.size > 0
       ? topLevelLocations[0].blockId
       : undefined;
   for (const item of [...prepared].sort((a, b) => b.from - a.from)) {
@@ -389,10 +349,7 @@ export function applyPreparedOperations(
           item.location.node.type.name === 'paragraph' ||
           item.location.node.type.name === 'heading';
         if (isEmptyTextBlock) {
-          throw new BufferError(
-            'UNSUPPORTED_RANGE',
-            'The final empty block cannot be deleted'
-          );
+          throw new BufferError('UNSUPPORTED_RANGE', 'The final empty block cannot be deleted');
         }
       }
       transaction.delete(
@@ -405,11 +362,7 @@ export function applyPreparedOperations(
         | Extract<BufferEditOperation, { type: 'replace_code' }>;
       transaction.insertText(operation.newText, item.from, item.to);
       if (item.kind === 'code' && item.attrs) {
-        transaction.setNodeMarkup(
-          item.location.position,
-          undefined,
-          item.attrs
-        );
+        transaction.setNodeMarkup(item.location.position, undefined, item.attrs);
       }
     } else if (item.kind === 'node') {
       transaction.setNodeMarkup(item.location.position, undefined, item.attrs);
@@ -427,11 +380,7 @@ export function applyPreparedOperations(
           'Inline formulas are not supported by this editor'
         );
       }
-      transaction.replaceWith(
-        item.from,
-        item.to,
-        mathInline.create({ text: operation.newText })
-      );
+      transaction.replaceWith(item.from, item.to, mathInline.create({ text: operation.newText }));
     }
     changes.push({
       blockId: item.operation.blockId,

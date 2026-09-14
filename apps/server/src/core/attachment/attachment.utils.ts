@@ -49,19 +49,13 @@ export async function prepareFile(
   }
 }
 
-export function validateFileType(
-  fileExtension: string,
-  allowedTypes: string[]
-) {
+export function validateFileType(fileExtension: string, allowedTypes: string[]) {
   if (!allowedTypes.includes(fileExtension)) {
     throw new Error('Invalid file type');
   }
 }
 
-export function getAttachmentFolderPath(
-  type: AttachmentType,
-  workspaceId: string
-): string {
+export function getAttachmentFolderPath(type: AttachmentType, workspaceId: string): string {
   switch (type) {
     case AttachmentType.Avatar:
       return `${workspaceId}/avatars`;

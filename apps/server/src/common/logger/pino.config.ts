@@ -41,10 +41,7 @@ export function createPinoConfig(): Params {
             for (const arg of inputArgs) {
               if (typeof arg === 'object' && arg !== null && 'context' in arg) {
                 const context = (arg as Record<string, unknown>)['context'];
-                if (
-                  typeof context === 'string' &&
-                  CONTEXTS_TO_IGNORE.includes(context)
-                ) {
+                if (typeof context === 'string' && CONTEXTS_TO_IGNORE.includes(context)) {
                   return;
                 }
               }
@@ -71,8 +68,7 @@ export function createPinoConfig(): Params {
       },
       autoLogging: logHttp
         ? {
-            ignore: (req) =>
-              req.url === '/api/health' || req.url === '/api/health/live'
+            ignore: (req) => req.url === '/api/health' || req.url === '/api/health/live'
           }
         : false
     }

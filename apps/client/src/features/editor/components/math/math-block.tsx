@@ -21,10 +21,7 @@ export default function MathBlockView(props: NodeViewProps) {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [debouncedPreview] = useDebouncedValue(preview, 500);
 
-  const renderMath = (
-    katexString: string,
-    container: HTMLDivElement | null
-  ) => {
+  const renderMath = (katexString: string, container: HTMLDivElement | null) => {
     try {
       katex.render(katexString, container!, {
         displayMode: true,
@@ -58,8 +55,7 @@ export default function MathBlockView(props: NodeViewProps) {
   useEffect(() => {
     const pos = getPos();
     const { from, to } = editor.state.selection;
-    const nodeSelected =
-      props.selected && from === pos && to === pos + node.nodeSize;
+    const nodeSelected = props.selected && from === pos && to === pos + node.nodeSize;
     setIsEditing(nodeSelected);
     if (nodeSelected) setPreview(node.attrs.text);
   }, [props.selected]);
@@ -82,8 +78,7 @@ export default function MathBlockView(props: NodeViewProps) {
             classes.mathBlock,
             props.selected ? classes.selected : '',
             error ? classes.error : '',
-            (isEditing && !preview?.trim().length) ||
-            (!isEditing && !node.attrs.text.trim().length)
+            (isEditing && !preview?.trim().length) || (!isEditing && !node.attrs.text.trim().length)
               ? classes.empty
               : ''
           ].join(' ')}
@@ -94,14 +89,9 @@ export default function MathBlockView(props: NodeViewProps) {
             }}
             ref={mathPreviewContainer}
           ></div>
-          <div
-            style={{ display: isEditing ? 'none' : undefined }}
-            ref={mathResultContainer}
-          ></div>
+          <div style={{ display: isEditing ? 'none' : undefined }} ref={mathResultContainer}></div>
           {((isEditing && !preview?.trim().length) ||
-            (!isEditing && !node.attrs.text.trim().length)) && (
-            <div>{t('Empty equation')}</div>
-          )}
+            (!isEditing && !node.attrs.text.trim().length)) && <div>{t('Empty equation')}</div>}
           {error && <div>{t('Invalid equation')}</div>}
         </NodeViewWrapper>
       </Popover.Target>

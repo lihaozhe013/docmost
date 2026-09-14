@@ -17,8 +17,7 @@ export default function ImageView(props: NodeViewProps) {
     return 'alignCenter';
   }, [align]);
   const previewSrc = useMemo(() => {
-    editor.storage.shared.imagePreviews =
-      editor.storage.shared.imagePreviews || {};
+    editor.storage.shared.imagePreviews = editor.storage.shared.imagePreviews || {};
 
     if (placeholder?.id) {
       return editor.storage.shared.imagePreviews[placeholder.id];
@@ -41,17 +40,10 @@ export default function ImageView(props: NodeViewProps) {
           width
         }}
       >
-        {src && (
-          <Image radius="md" fit="contain" src={getFileUrl(src)} alt={alt} />
-        )}
+        {src && <Image radius="md" fit="contain" src={getFileUrl(src)} alt={alt} />}
         {!src && previewSrc && (
           <Group pos="relative" h="100%" w="100%">
-            <Image
-              radius="md"
-              fit="contain"
-              src={previewSrc}
-              alt={placeholder?.name}
-            />
+            <Image radius="md" fit="contain" src={previewSrc} alt={placeholder?.name} />
             <Loader size={20} pos="absolute" bottom={6} right={6} />
           </Group>
         )}

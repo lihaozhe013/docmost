@@ -27,20 +27,10 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { OAuthScope } from '../../common/decorators/oauth-scope.decorator';
 import { Attachment, User, Workspace } from '@docmost/db/types/entity.types';
 import { StorageService } from '../../integrations/storage/storage.service';
-import {
-  getAttachmentFolderPath,
-  validAttachmentTypes
-} from './attachment.utils';
+import { getAttachmentFolderPath, validAttachmentTypes } from './attachment.utils';
 import { getMimeType } from '../../common/helpers';
-import {
-  AttachmentType,
-  inlineFileExtensions,
-  MAX_AVATAR_SIZE
-} from './attachment.constants';
-import {
-  SpaceCaslAction,
-  SpaceCaslSubject
-} from '../casl/interfaces/space-ability.type';
+import { AttachmentType, inlineFileExtensions, MAX_AVATAR_SIZE } from './attachment.constants';
+import { SpaceCaslAction, SpaceCaslSubject } from '../casl/interfaces/space-ability.type';
 import SpaceAbilityFactory from '../casl/abilities/space-ability.factory';
 import {
   WorkspaceCaslAction,
@@ -54,19 +44,12 @@ import { EnvironmentService } from '../../integrations/environment/environment.s
 import { TokenService } from '../auth/services/token.service';
 import { JwtAttachmentPayload, JwtType } from '../auth/dto/jwt-payload';
 import * as path from 'path';
-import {
-  AttachmentInfoDto,
-  PageIdDto,
-  RemoveIconDto
-} from './dto/attachment.dto';
+import { AttachmentInfoDto, PageIdDto, RemoveIconDto } from './dto/attachment.dto';
 import { PaginationOptions } from '@docmost/db/pagination/pagination-options';
 import { PageAccessService } from '../page/page-access/page-access.service';
 import { DomainService } from '../../integrations/environment/domain.service';
 import { AuditEvent, AuditResource } from '../../common/events/audit-events';
-import {
-  AUDIT_SERVICE,
-  IAuditService
-} from '../../integrations/audit/audit.service';
+import { AUDIT_SERVICE, IAuditService } from '../../integrations/audit/audit.service';
 
 @Controller()
 export class AttachmentController {
@@ -224,14 +207,9 @@ export class AttachmentController {
   ) {
     let jwtPayload: JwtAttachmentPayload;
     try {
-      jwtPayload = await this.tokenService.verifyJwt(
-        jwtToken,
-        JwtType.ATTACHMENT
-      );
+      jwtPayload = await this.tokenService.verifyJwt(jwtToken, JwtType.ATTACHMENT);
     } catch (err) {
-      throw new BadRequestException(
-        'Expired or invalid attachment access token'
-      );
+      throw new BadRequestException('Expired or invalid attachment access token');
     }
 
     if (
@@ -280,9 +258,7 @@ export class AttachmentController {
       });
     } catch (err: any) {
       if (err?.statusCode === 413) {
-        throw new BadRequestException(
-          `File too large. Exceeds the ${MAX_AVATAR_SIZE} limit`
-        );
+        throw new BadRequestException(`File too large. Exceeds the ${MAX_AVATAR_SIZE} limit`);
       }
     }
 
@@ -297,21 +273,13 @@ export class AttachmentController {
       throw new BadRequestException('attachment type is required');
     }
 
-    if (
-      !validAttachmentTypes.includes(attachmentType) ||
-      attachmentType === AttachmentType.File
-    ) {
+    if (!validAttachmentTypes.includes(attachmentType) || attachmentType === AttachmentType.File) {
       throw new BadRequestException('Invalid image attachment type');
     }
 
     if (attachmentType === AttachmentType.WorkspaceIcon) {
       const ability = this.workspaceAbility.createForUser(user, workspace);
-      if (
-        ability.cannot(
-          WorkspaceCaslAction.Manage,
-          WorkspaceCaslSubject.Settings
-        )
-      ) {
+      if (ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Settings)) {
         throw new ForbiddenException();
       }
     }
@@ -322,9 +290,7 @@ export class AttachmentController {
       }
 
       const spaceAbility = await this.spaceAbility.createForUser(user, spaceId);
-      if (
-        spaceAbility.cannot(SpaceCaslAction.Manage, SpaceCaslSubject.Settings)
-      ) {
+      if (spaceAbility.cannot(SpaceCaslAction.Manage, SpaceCaslSubject.Settings)) {
         throw new ForbiddenException();
       }
     }
@@ -352,10 +318,7 @@ export class AttachmentController {
     @Param('attachmentType') attachmentType: AttachmentType,
     @Param('fileName') fileName?: string
   ) {
-    if (
-      !validAttachmentTypes.includes(attachmentType) ||
-      attachmentType === AttachmentType.File
-    ) {
+    if (!validAttachmentTypes.includes(attachmentType) || attachmentType === AttachmentType.File) {
       throw new BadRequestException('Invalid image attachment type');
     }
 
@@ -366,11 +329,7 @@ export class AttachmentController {
     const ext = path.extname(fileName);
     const filenameWithoutExt = path.basename(fileName, ext);
 
-    if (
-      !ext ||
-      !isValidUUID(filenameWithoutExt) ||
-      `${filenameWithoutExt}${ext}` !== fileName
-    ) {
+    if (!ext || !isValidUUID(filenameWithoutExt) || `${filenameWithoutExt}${ext}` !== fileName) {
       throw new BadRequestException('Invalid file name');
     }
 
@@ -434,10 +393,7 @@ export class AttachmentController {
 
     await this.pageAccessService.validateCanView(page, user);
 
-    const result = await this.attachmentRepo.findPageAttachments(
-      page.id,
-      pagination
-    );
+    const result = await this.attachmentRepo.findPageAttachments(page.id, pagination);
 
     return {
       ...result,
@@ -467,15 +423,11 @@ export class AttachmentController {
     // remove space icon
     if (type === AttachmentType.SpaceIcon) {
       if (!spaceId) {
-        throw new BadRequestException(
-          'spaceId is required to change space icons'
-        );
+        throw new BadRequestException('spaceId is required to change space icons');
       }
 
       const spaceAbility = await this.spaceAbility.createForUser(user, spaceId);
-      if (
-        spaceAbility.cannot(SpaceCaslAction.Manage, SpaceCaslSubject.Settings)
-      ) {
+      if (spaceAbility.cannot(SpaceCaslAction.Manage, SpaceCaslSubject.Settings)) {
         throw new ForbiddenException();
       }
 
@@ -486,12 +438,7 @@ export class AttachmentController {
     // remove workspace icon
     if (type === AttachmentType.WorkspaceIcon) {
       const ability = this.workspaceAbility.createForUser(user, workspace);
-      if (
-        ability.cannot(
-          WorkspaceCaslAction.Manage,
-          WorkspaceCaslSubject.Settings
-        )
-      ) {
+      if (ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Settings)) {
         throw new ForbiddenException();
       }
       await this.attachmentService.removeWorkspaceIcon(workspace);
@@ -529,9 +476,7 @@ export class AttachmentController {
       const match = rangeHeader.match(/bytes=(\d+)-(\d*)/);
       if (match) {
         const start = parseInt(match[1], 10);
-        const end = match[2]
-          ? Math.min(parseInt(match[2], 10), fileSize - 1)
-          : fileSize - 1;
+        const end = match[2] ? Math.min(parseInt(match[2], 10), fileSize - 1) : fileSize - 1;
 
         if (start >= fileSize || start > end) {
           res.status(416);
@@ -539,10 +484,10 @@ export class AttachmentController {
           return res.send();
         }
 
-        const fileStream = await this.storageService.readRangeStream(
-          attachment.filePath,
-          { start, end }
-        );
+        const fileStream = await this.storageService.readRangeStream(attachment.filePath, {
+          start,
+          end
+        });
 
         res.status(206);
         res.headers({
@@ -556,9 +501,7 @@ export class AttachmentController {
       }
     }
 
-    const fileStream = await this.storageService.readStream(
-      attachment.filePath
-    );
+    const fileStream = await this.storageService.readStream(attachment.filePath);
 
     res.headers({
       'Content-Type': attachment.mimeType,

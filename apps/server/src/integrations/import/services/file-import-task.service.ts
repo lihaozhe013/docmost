@@ -3,11 +3,7 @@ import * as path from 'path';
 import { jsonToText } from '../../../collaboration/collaboration.util';
 import { InjectKysely } from 'nestjs-kysely';
 import { KyselyDB } from '@docmost/db/types/kysely.types';
-import {
-  extractZip,
-  FileImportSource,
-  FileTaskStatus
-} from '../utils/file.utils';
+import { extractZip, FileImportSource, FileTaskStatus } from '../utils/file.utils';
 import { StorageService } from '../../storage/storage.service';
 import * as tmp from 'tmp-promise';
 import { pipeline } from 'node:stream/promises';
@@ -38,10 +34,7 @@ import { ImportPageNode } from '../dto/file-task-dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EventName } from '../../../common/events/event.contants';
 import { AuditEvent, AuditResource } from '../../../common/events/audit-events';
-import {
-  AUDIT_SERVICE,
-  IAuditService
-} from '../../../integrations/audit/audit.service';
+import { AUDIT_SERVICE, IAuditService } from '../../../integrations/audit/audit.service';
 
 @Injectable()
 export class FileImportTaskService {
@@ -92,9 +85,7 @@ export class FileImportTaskService {
     });
 
     try {
-      const fileStream = await this.storageService.readStream(
-        fileTask.filePath
-      );
+      const fileStream = await this.storageService.readStream(fileTask.filePath);
       await pipeline(fileStream, createWriteStream(tmpZipPath));
       await extractZip(tmpZipPath, tmpExtractDir);
     } catch (err) {
@@ -121,9 +112,7 @@ export class FileImportTaskService {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           ConfluenceModule = require('./../../../ee/confluence-import/confluence-import.service');
         } catch (err) {
-          this.logger.error(
-            'Confluence import requested but EE module not bundled in this build'
-          );
+          this.logger.error('Confluence import requested but EE module not bundled in this build');
           return;
         }
         const confluenceImportService = this.moduleRef.get(
@@ -143,10 +132,7 @@ export class FileImportTaskService {
         // delete stored file on success
         await this.storageService.delete(fileTask.filePath);
       } catch (err) {
-        this.logger.error(
-          `Failed to delete import file from storage. Task ID: ${fileTaskId}`,
-          err
-        );
+        this.logger.error(`Failed to delete import file from storage. Task ID: ${fileTaskId}`, err);
       }
     } catch (err) {
       await cleanupTmpFile();
@@ -156,10 +142,7 @@ export class FileImportTaskService {
     }
   }
 
-  async processGenericImport(opts: {
-    extractDir: string;
-    fileTask: FileTask;
-  }): Promise<void> {
+  async processGenericImport(opts: { extractDir: string; fileTask: FileTask }): Promise<void> {
     const { extractDir, fileTask } = opts;
     const isNotion = fileTask.source === FileImportSource.Notion;
     const allFiles = await collectMarkdownAndHtmlFiles(extractDir);
@@ -175,10 +158,7 @@ export class FileImportTaskService {
     const pagesMap = new Map<string, ImportPageNode>();
 
     for (const absPath of allFiles) {
-      const relPath = path
-        .relative(extractDir, absPath)
-        .split(path.sep)
-        .join('/'); // normalize to forward-slashes
+      const relPath = path.relative(extractDir, absPath).split(path.sep).join('/'); // normalize to forward-slashes
       const ext = path.extname(relPath).toLowerCase();
 
       const encodedPath = encodeFilePath(relPath);
@@ -223,9 +203,7 @@ export class FileImportTaskService {
     if (rootLevelItems.size === 1) {
       const onlyRootItem = Array.from(rootLevelItems)[0];
       // Check if this is a folder (not a file at root)
-      const hasRootFiles = Array.from(pagesMap.keys()).some(
-        (filePath) => !filePath.includes('/')
-      );
+      const hasRootFiles = Array.from(pagesMap.keys()).some((filePath) => !filePath.includes('/'));
       if (!hasRootFiles) {
         skipRootFolder = onlyRootItem;
       }
@@ -243,10 +221,7 @@ export class FileImportTaskService {
       : [...foldersWithContent];
 
     sortedFolders.forEach((folderPath) => {
-      if (
-        skipRootFolder &&
-        folderPath?.toLowerCase() === skipRootFolder?.toLowerCase()
-      ) {
+      if (skipRootFolder && folderPath?.toLowerCase() === skipRootFolder?.toLowerCase()) {
         return;
       }
 
@@ -264,8 +239,7 @@ export class FileImportTaskService {
           const partialId = extractNotionPartialId(folderName);
           const strippedFolderName = stripNotionID(folderName);
           const isSameDir = (fileDir: string) =>
-            fileDir === parentDir ||
-            (parentDir === '.' && !fileDir.includes('/'));
+            fileDir === parentDir || (parentDir === '.' && !fileDir.includes('/'));
 
           for (const [filePath, page] of pagesMap.entries()) {
             if (!isSameDir(path.dirname(filePath))) continue;
@@ -277,10 +251,7 @@ export class FileImportTaskService {
               const fullIdMatch = fileBase.match(/[a-f0-9]{32}$/i);
               if (!fullIdMatch) continue;
               const fullId = fullIdMatch[0].toLowerCase();
-              if (
-                !fullId.startsWith(partialId.prefix) ||
-                !fullId.endsWith(partialId.suffix)
-              ) {
+              if (!fullId.startsWith(partialId.prefix) || !fullId.endsWith(partialId.suffix)) {
                 continue;
               }
             }
@@ -351,10 +322,8 @@ export class FileImportTaskService {
     const sortSiblings = (siblings: ImportPageNode[]) => {
       if (docmostMetadata) {
         siblings.sort((a, b) => {
-          const posA =
-            docmostMetadata.pages[encodedPathsMap.get(a.filePath)]?.position;
-          const posB =
-            docmostMetadata.pages[encodedPathsMap.get(b.filePath)]?.position;
+          const posA = docmostMetadata.pages[encodedPathsMap.get(a.filePath)]?.position;
+          const posB = docmostMetadata.pages[encodedPathsMap.get(b.filePath)]?.position;
           if (posA && posB) {
             // Use direct comparison to match PostgreSQL collation 'C' (byte order)
             if (posA < posB) return -1;
@@ -375,9 +344,7 @@ export class FileImportTaskService {
       sortSiblings(rootSibs);
 
       // get first position key from the server
-      const nextPosition = await this.pageService.nextPagePosition(
-        fileTask.spaceId
-      );
+      const nextPosition = await this.pageService.nextPagePosition(fileTask.spaceId);
 
       let prevPos: string | null = null;
       rootSibs.forEach((page, idx) => {
@@ -404,10 +371,7 @@ export class FileImportTaskService {
     });
 
     // internal page links
-    const filePathToPageMetaMap = new Map<
-      string,
-      { id: string; title: string; slugId: string }
-    >();
+    const filePathToPageMetaMap = new Map<string, { id: string; title: string; slugId: string }>();
     pagesMap.forEach((page) => {
       filePathToPageMetaMap.set(page.filePath, {
         id: page.id,
@@ -439,10 +403,7 @@ export class FileImportTaskService {
 
         // Find children of current page
         for (const [childFilePath, childPage] of pagesMap.entries()) {
-          if (
-            childPage.parentPageId === currentPage.id &&
-            !pageLevel.has(childFilePath)
-          ) {
+          if (childPage.parentPageId === currentPage.id && !pageLevel.has(childFilePath)) {
             pageLevel.set(childFilePath, level + 1);
             queue.push({ filePath: childFilePath, level: level + 1 });
           }
@@ -499,15 +460,14 @@ export class FileImportTaskService {
               }
             }
 
-            const htmlContent =
-              await this.importAttachmentService.processAttachments({
-                html: content,
-                pageRelativePath: page.filePath,
-                extractDir,
-                pageId: page.id,
-                fileTask,
-                attachmentCandidates
-              });
+            const htmlContent = await this.importAttachmentService.processAttachments({
+              html: content,
+              pageRelativePath: page.filePath,
+              extractDir,
+              pageId: page.id,
+              fileTask,
+              attachmentCandidates
+            });
 
             const { html, backlinks, pageIcon } = await formatImportHtml({
               html: htmlContent,
@@ -519,9 +479,7 @@ export class FileImportTaskService {
               spaceSlug: space?.slug
             });
 
-            const pmState = getProsemirrorContent(
-              await this.importService.processHTML(html)
-            );
+            const pmState = getProsemirrorContent(await this.importService.processHTML(html));
 
             const { title, prosemirrorJson } =
               this.importService.extractTitleAndRemoveHeading(pmState);
@@ -565,11 +523,7 @@ export class FileImportTaskService {
         // Insert backlinks in batches
         if (filteredBacklinks.length > 0) {
           const BACKLINK_BATCH_SIZE = 100;
-          for (
-            let i = 0;
-            i < filteredBacklinks.length;
-            i += BACKLINK_BATCH_SIZE
-          ) {
+          for (let i = 0; i < filteredBacklinks.length; i += BACKLINK_BATCH_SIZE) {
             const backlinkChunk = filteredBacklinks.slice(
               i,
               Math.min(i + BACKLINK_BATCH_SIZE, filteredBacklinks.length)
@@ -625,11 +579,7 @@ export class FileImportTaskService {
       .executeTakeFirst();
   }
 
-  async updateTaskStatus(
-    fileTaskId: string,
-    status: FileTaskStatus,
-    errorMessage?: string
-  ) {
+  async updateTaskStatus(fileTaskId: string, status: FileTaskStatus, errorMessage?: string) {
     try {
       await this.db
         .updateTable('fileTasks')

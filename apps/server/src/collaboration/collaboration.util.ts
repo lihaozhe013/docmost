@@ -50,12 +50,7 @@ import {
   Footnote,
   FootnoteReference
 } from '@docmost/editor-ext';
-import {
-  extensions as coreExtensions,
-  generateText,
-  getSchema,
-  JSONContent
-} from '@tiptap/core';
+import { extensions as coreExtensions, generateText, getSchema, JSONContent } from '@tiptap/core';
 import { generateHTML, generateJSON } from '../common/helpers/prosemirror/html';
 import { collapseBlankLines } from '../common/helpers';
 // @tiptap/html library works best for generating prosemirror json state but not HTML
@@ -155,10 +150,7 @@ export function jsonToNode(tiptapJson: JSONContent) {
   try {
     return Node.fromJSON(schema, tiptapJson);
   } catch (error) {
-    if (
-      error instanceof RangeError &&
-      error.message.includes('Unknown node type')
-    ) {
+    if (error instanceof RangeError && error.message.includes('Unknown node type')) {
       Logger.warn('Stripping unknown node types from document:', error.message);
       const cleanedJson = stripUnknownNodes(tiptapJson, schema);
       return Node.fromJSON(schema, cleanedJson);
@@ -177,16 +169,10 @@ export function isEmptyParagraphDoc(tiptapJson: JSONContent): boolean {
   if (!Array.isArray(content) || content.length !== 1) return false;
   const child = content[0];
   if (!child || child.type !== 'paragraph') return false;
-  return (
-    !child.content ||
-    (Array.isArray(child.content) && child.content.length === 0)
-  );
+  return !child.content || (Array.isArray(child.content) && child.content.length === 0);
 }
 
-function stripUnknownNodes(
-  json: JSONContent,
-  schema: Schema
-): JSONContent | null {
+function stripUnknownNodes(json: JSONContent, schema: Schema): JSONContent | null {
   if (!json || typeof json !== 'object') return json;
 
   // Recursively clean children first, flattening any unwrapped content
@@ -206,9 +192,7 @@ function stripUnknownNodes(
   // Check if this node is unknown AFTER processing children
   if (json.type && !schema.nodes[json.type]) {
     // Unwrap: return cleaned children directly instead of wrapping
-    return (
-      json.content && json.content.length > 0 ? json.content : null
-    ) as any;
+    return (json.content && json.content.length > 0 ? json.content : null) as any;
   }
 
   return json;

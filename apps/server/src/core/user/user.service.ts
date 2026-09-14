@@ -8,17 +8,11 @@ import {
 } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { NotificationSettingKey } from '../notification/notification.constants';
-import {
-  comparePasswordHash,
-  diffAuditTrackedFields
-} from '../../common/helpers/utils';
+import { comparePasswordHash, diffAuditTrackedFields } from '../../common/helpers/utils';
 import { Workspace } from '@docmost/db/types/entity.types';
 import { validateSsoEnforcement } from '../auth/auth.util';
 import { AuditEvent, AuditResource } from '../../common/events/audit-events';
-import {
-  AUDIT_SERVICE,
-  IAuditService
-} from '../../integrations/audit/audit.service';
+import { AUDIT_SERVICE, IAuditService } from '../../integrations/audit/audit.service';
 
 @Injectable()
 export class UserService {
@@ -31,13 +25,8 @@ export class UserService {
     return this.userRepo.findById(userId, workspaceId);
   }
 
-  async update(
-    updateUserDto: UpdateUserDto,
-    userId: string,
-    workspace: Workspace
-  ) {
-    const includePassword =
-      updateUserDto.email != null && updateUserDto.confirmPassword != null;
+  async update(updateUserDto: UpdateUserDto, userId: string, workspace: Workspace) {
+    const includePassword = updateUserDto.email != null && updateUserDto.confirmPassword != null;
 
     const user = await this.userRepo.findById(userId, workspace.id, {
       includePassword
@@ -49,11 +38,7 @@ export class UserService {
 
     // preference update
     if (typeof updateUserDto.fullPageWidth !== 'undefined') {
-      return this.userRepo.updatePreference(
-        userId,
-        'fullPageWidth',
-        updateUserDto.fullPageWidth
-      );
+      return this.userRepo.updatePreference(userId, 'fullPageWidth', updateUserDto.fullPageWidth);
     }
 
     if (typeof updateUserDto.pageEditMode !== 'undefined') {
@@ -65,11 +50,7 @@ export class UserService {
     }
 
     if (typeof updateUserDto.editorToolbar !== 'undefined') {
-      return this.userRepo.updatePreference(
-        userId,
-        'editorToolbar',
-        updateUserDto.editorToolbar
-      );
+      return this.userRepo.updatePreference(userId, 'editorToolbar', updateUserDto.editorToolbar);
     }
 
     const notificationSettings: Record<string, NotificationSettingKey> = {
@@ -82,11 +63,7 @@ export class UserService {
 
     for (const [dtoField, settingKey] of Object.entries(notificationSettings)) {
       if (typeof updateUserDto[dtoField] !== 'undefined') {
-        return this.userRepo.updateNotificationSetting(
-          userId,
-          settingKey,
-          updateUserDto[dtoField]
-        );
+        return this.userRepo.updateNotificationSetting(userId, settingKey, updateUserDto[dtoField]);
       }
     }
 
@@ -104,9 +81,7 @@ export class UserService {
       validateSsoEnforcement(workspace);
 
       if (!updateUserDto.confirmPassword) {
-        throw new BadRequestException(
-          'You must provide a password to change your email'
-        );
+        throw new BadRequestException('You must provide a password to change your email');
       }
 
       const isPasswordMatch = await comparePasswordHash(
@@ -115,9 +90,7 @@ export class UserService {
       );
 
       if (!isPasswordMatch) {
-        throw new BadRequestException(
-          'You must provide the correct password to change your email'
-        );
+        throw new BadRequestException('You must provide the correct password to change your email');
       }
 
       if (await this.userRepo.findByEmail(updateUserDto.email, workspace.id)) {
@@ -135,12 +108,7 @@ export class UserService {
 
     await this.userRepo.updateUser(updateUserDto, userId, workspace.id);
 
-    const changes = diffAuditTrackedFields(
-      ['name', 'email'],
-      updateUserDto,
-      userBefore,
-      user
-    );
+    const changes = diffAuditTrackedFields(['name', 'email'], updateUserDto, userBefore, user);
 
     if (changes) {
       this.auditService.log({

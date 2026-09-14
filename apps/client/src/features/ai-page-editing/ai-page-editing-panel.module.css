@@ -32,12 +32,8 @@
   max-width: 92%;
   padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
   border-radius: var(--mantine-radius-md);
-  background: light-dark(
-    var(--mantine-color-blue-0),
-    var(--mantine-color-dark-6)
-  );
-  border: 1px solid
-    light-dark(var(--mantine-color-blue-2), var(--mantine-color-dark-5));
+  background: light-dark(var(--mantine-color-blue-0), var(--mantine-color-dark-6));
+  border: 1px solid light-dark(var(--mantine-color-blue-2), var(--mantine-color-dark-5));
 }
 
 .userText {
@@ -62,10 +58,7 @@
   margin-top: 2px;
   border-radius: 50%;
   color: var(--mantine-color-blue-filled);
-  background: light-dark(
-    var(--mantine-color-blue-0),
-    var(--mantine-color-dark-6)
-  );
+  background: light-dark(var(--mantine-color-blue-0), var(--mantine-color-dark-6));
 }
 
 .assistantBody {
@@ -81,10 +74,7 @@
 .streamCaret::after {
   content: '▍';
   display: inline-block;
-  color: light-dark(
-    var(--mantine-color-blue-7),
-    var(--mantine-color-blue-4)
-  );
+  color: light-dark(var(--mantine-color-blue-7), var(--mantine-color-blue-4));
   animation: ai-blink 1s step-end infinite;
 }
 
@@ -98,8 +88,7 @@
   gap: 2px;
   margin-left: 3px;
   padding-left: 8px;
-  border-left: 1px solid
-    light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-5));
+  border-left: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-5));
 }
 
 .toolStep {
@@ -115,10 +104,7 @@
 }
 
 .toolStepCheck {
-  color: light-dark(
-    var(--mantine-color-teal-6),
-    var(--mantine-color-teal-5)
-  );
+  color: light-dark(var(--mantine-color-teal-6), var(--mantine-color-teal-5));
 }
 
 .toolStepError {
@@ -144,10 +130,7 @@
 
 .runStatusVerb {
   font-weight: 500;
-  color: light-dark(
-    var(--mantine-color-blue-8),
-    var(--mantine-color-blue-3)
-  );
+  color: light-dark(var(--mantine-color-blue-8), var(--mantine-color-blue-3));
 }
 
 .spinIcon {
@@ -189,8 +172,7 @@
   height: 72px;
   object-fit: cover;
   border-radius: var(--mantine-radius-sm);
-  border: 1px solid
-    light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  border: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
 }
 
 .imageChip {
@@ -209,8 +191,7 @@
   height: 56px;
   object-fit: cover;
   border-radius: var(--mantine-radius-sm);
-  border: 1px solid
-    light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  border: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
 }
 
 .imageChipOverlay {

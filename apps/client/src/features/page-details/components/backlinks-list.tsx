@@ -1,12 +1,4 @@
-import {
-  Button,
-  Center,
-  Group,
-  Loader,
-  Stack,
-  Text,
-  UnstyledButton
-} from '@mantine/core';
+import { Button, Center, Group, Loader, Stack, Text, UnstyledButton } from '@mantine/core';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useBacklinksQuery } from '@/features/page-details/queries/backlinks-query.ts';
@@ -24,15 +16,13 @@ interface BacklinksListProps {
   onItemClick: () => void;
 }
 
-export function BacklinksList({
-  pageId,
-  direction,
-  enabled,
-  onItemClick
-}: BacklinksListProps) {
+export function BacklinksList({ pageId, direction, enabled, onItemClick }: BacklinksListProps) {
   const { t } = useTranslation();
-  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useBacklinksQuery(pageId, direction, enabled);
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useBacklinksQuery(
+    pageId,
+    direction,
+    enabled
+  );
 
   if (!enabled) return null;
 
@@ -44,8 +34,7 @@ export function BacklinksList({
     );
   }
 
-  const items: IBacklinkPageItem[] =
-    data?.pages.flatMap((page) => page.items) ?? [];
+  const items: IBacklinkPageItem[] = data?.pages.flatMap((page) => page.items) ?? [];
 
   if (items.length === 0) {
     return (
@@ -72,11 +61,7 @@ export function BacklinksList({
           component={Link}
           to={
             item.space?.slug
-              ? buildPageUrl(
-                  item.space.slug,
-                  item.slugId,
-                  item.title ?? undefined
-                )
+              ? buildPageUrl(item.space.slug, item.slugId, item.title ?? undefined)
               : '#'
           }
           onClick={handleClick}

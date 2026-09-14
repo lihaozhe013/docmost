@@ -27,8 +27,7 @@ export function getBackendUrl(): string {
 
 export function getCollaborationUrl(): string {
   const baseUrl =
-    getConfigValue('COLLAB_URL') ||
-    (import.meta.env.DEV ? process.env.APP_URL : getAppUrl());
+    getConfigValue('COLLAB_URL') || (import.meta.env.DEV ? process.env.APP_URL : getAppUrl());
 
   const collabUrl = new URL('/collab', baseUrl);
   collabUrl.protocol = collabUrl.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -43,10 +42,7 @@ export function isCloud(): boolean {
   return castToBoolean(getConfigValue('CLOUD'));
 }
 
-export function getAvatarUrl(
-  avatarUrl: string,
-  type: AvatarIconType = AvatarIconType.AVATAR
-) {
+export function getAvatarUrl(avatarUrl: string, type: AvatarIconType = AvatarIconType.AVATAR) {
   if (!avatarUrl) return null;
   if (avatarUrl?.startsWith('http')) return avatarUrl;
 
@@ -101,8 +97,6 @@ export function getPostHogKey() {
 }
 
 function getConfigValue(key: string, defaultValue: string = undefined): string {
-  const rawValue = import.meta.env.DEV
-    ? process?.env?.[key]
-    : window?.CONFIG?.[key];
+  const rawValue = import.meta.env.DEV ? process?.env?.[key] : window?.CONFIG?.[key];
   return rawValue ?? defaultValue;
 }

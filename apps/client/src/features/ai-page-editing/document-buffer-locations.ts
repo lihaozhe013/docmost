@@ -1,11 +1,7 @@
 import type { Editor } from '@tiptap/core';
 import { Node as ProseMirrorNode } from '@tiptap/pm/model';
 import { BufferError } from './document-buffer-types';
-import type {
-  BufferBlock,
-  BufferCapability,
-  BufferReadResult
-} from './document-buffer-types';
+import type { BufferBlock, BufferCapability, BufferReadResult } from './document-buffer-types';
 import {
   getInlineSegments,
   getNodeText,
@@ -40,14 +36,7 @@ export function collectLocations(
   let nextCounter = startCounter;
   let position = 0;
   doc.forEach((node, _offset) => {
-    const block = resolveBlockId(
-      fallbackBindings,
-      node,
-      position,
-      true,
-      undefined,
-      nextCounter
-    );
+    const block = resolveBlockId(fallbackBindings, node, position, true, undefined, nextCounter);
     nextCounter = block.nextCounter;
     const blockId = block.blockId;
     if (seen.has(blockId)) {
@@ -137,10 +126,7 @@ export function toBufferBlock(location: BlockLocation): BufferBlock {
   const truncated = fullText.length > MAX_BLOCK_TEXT;
   const capabilities: BufferCapability[] = [];
   if (editable && !truncated) {
-    if (
-      location.node.type.name === 'paragraph' ||
-      location.node.type.name === 'heading'
-    ) {
+    if (location.node.type.name === 'paragraph' || location.node.type.name === 'heading') {
       capabilities.push('replace_text');
       const segments = getInlineSegments(location.node);
       if (segments.some((segment) => segment.type === 'mathInline')) {
@@ -165,14 +151,11 @@ export function toBufferBlock(location: BlockLocation): BufferBlock {
     blockId: location.blockId,
     type: location.node.type.name,
     depth: location.depth,
-    ...(location.parentBlockId
-      ? { parentBlockId: location.parentBlockId }
-      : {}),
+    ...(location.parentBlockId ? { parentBlockId: location.parentBlockId } : {}),
     text: fullText.slice(0, MAX_BLOCK_TEXT),
     editable,
     capabilities,
-    ...(location.node.type.name === 'codeBlock' &&
-    typeof location.node.attrs?.language === 'string'
+    ...(location.node.type.name === 'codeBlock' && typeof location.node.attrs?.language === 'string'
       ? { language: location.node.attrs.language }
       : {}),
     ...(segments.length
@@ -187,9 +170,7 @@ export function toBufferBlock(location: BlockLocation): BufferBlock {
   };
 }
 
-export function readEditorSelection(
-  editor: Editor
-): BufferReadResult['selection'] {
+export function readEditorSelection(editor: Editor): BufferReadResult['selection'] {
   const { from, to } = editor.state.selection;
   if (from === to) return undefined;
   return {

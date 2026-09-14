@@ -4,10 +4,7 @@ import { Text, TextProps, Tooltip } from '@mantine/core';
 type AutoTooltipTextProps = TextProps & {
   children: ReactNode;
   tooltipLabel?: string;
-  tooltipProps?: Omit<
-    React.ComponentProps<typeof Tooltip>,
-    'children' | 'label'
-  >;
+  tooltipProps?: Omit<React.ComponentProps<typeof Tooltip>, 'children' | 'label'>;
 };
 
 export function AutoTooltipText({
@@ -37,12 +34,7 @@ export function AutoTooltipText({
       withinPortal={false}
       {...tooltipProps}
     >
-      <Text
-        ref={textRef}
-        truncate
-        onMouseEnter={handleMouseEnter}
-        {...textProps}
-      >
+      <Text ref={textRef} truncate onMouseEnter={handleMouseEnter} {...textProps}>
         {children}
       </Text>
     </Tooltip>

@@ -30,8 +30,7 @@ export const useQuerySubscription = () => {
           break;
         case 'commentCreated': {
           const createCache = queryClient.getQueryData(RQ_KEY(data.pageId)) as
-            | InfiniteData<IPagination<IComment>>
-            | undefined;
+            InfiniteData<IPagination<IComment>> | undefined;
 
           if (createCache && createCache.pages.length > 0) {
             const alreadyExists = createCache.pages.some((page) =>
@@ -43,9 +42,7 @@ export const useQuerySubscription = () => {
             queryClient.setQueryData(RQ_KEY(data.pageId), {
               ...createCache,
               pages: createCache.pages.map((page, i) =>
-                i === lastIdx
-                  ? { ...page, items: [...page.items, data.comment] }
-                  : page
+                i === lastIdx ? { ...page, items: [...page.items, data.comment] } : page
               )
             });
           }
@@ -54,8 +51,7 @@ export const useQuerySubscription = () => {
         case 'commentUpdated':
         case 'commentResolved': {
           const updateCache = queryClient.getQueryData(RQ_KEY(data.pageId)) as
-            | InfiniteData<IPagination<IComment>>
-            | undefined;
+            InfiniteData<IPagination<IComment>> | undefined;
 
           if (updateCache) {
             queryClient.setQueryData(RQ_KEY(data.pageId), {
@@ -72,17 +68,14 @@ export const useQuerySubscription = () => {
         }
         case 'commentDeleted': {
           const deleteCache = queryClient.getQueryData(RQ_KEY(data.pageId)) as
-            | InfiniteData<IPagination<IComment>>
-            | undefined;
+            InfiniteData<IPagination<IComment>> | undefined;
 
           if (deleteCache) {
             queryClient.setQueryData(RQ_KEY(data.pageId), {
               ...deleteCache,
               pages: deleteCache.pages.map((page) => ({
                 ...page,
-                items: page.items.filter(
-                  (comment) => comment.id !== data.commentId
-                )
+                items: page.items.filter((comment) => comment.id !== data.commentId)
               }))
             });
           }
@@ -105,8 +98,7 @@ export const useQuerySubscription = () => {
           break;
         case 'updateOne': {
           const entity = data.entity[0];
-          const keyIds =
-            entity === 'pages' ? [data.payload.slugId, data.id] : [data.id];
+          const keyIds = entity === 'pages' ? [data.payload.slugId, data.id] : [data.id];
 
           for (const keyId of keyIds) {
             if (!keyId) continue;

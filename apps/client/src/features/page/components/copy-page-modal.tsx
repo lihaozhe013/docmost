@@ -36,16 +36,10 @@ export default function CopyPageModal({
       });
       queryClient.removeQueries({
         predicate: (item) =>
-          ['pages', 'sidebar-pages', 'root-sidebar-pages'].includes(
-            item.queryKey[0] as string
-          )
+          ['pages', 'sidebar-pages', 'root-sidebar-pages'].includes(item.queryKey[0] as string)
       });
 
-      const pageUrl = buildPageUrl(
-        copiedPage.space.slug,
-        copiedPage.slugId,
-        copiedPage.title
-      );
+      const pageUrl = buildPageUrl(copiedPage.space.slug, copiedPage.slugId, copiedPage.title);
       navigate(pageUrl);
       notifications.show({
         message: t('Page copied successfully')
@@ -87,11 +81,7 @@ export default function CopyPageModal({
             {t('Copy page to a different space.')}
           </Text>
 
-          <SpaceSelect
-            value={currentSpaceSlug}
-            clearable={false}
-            onChange={handleChange}
-          />
+          <SpaceSelect value={currentSpaceSlug} clearable={false} onChange={handleChange} />
           <Group justify="end" mt="md">
             <Button onClick={onClose} variant="default">
               {t('Cancel')}

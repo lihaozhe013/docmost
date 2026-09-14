@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  Logger,
-  NotFoundException
-} from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Readable } from 'stream';
 import { StorageService } from '../../../integrations/storage/storage.service';
 import { MultipartFile } from '@fastify/multipart';
@@ -60,13 +55,9 @@ export class AttachmentService {
     // passing attachmentId to allow for updating diagrams
     // instead of creating new files for each save
     if (opts?.attachmentId) {
-      const existingAttachment = await this.attachmentRepo.findById(
-        opts.attachmentId
-      );
+      const existingAttachment = await this.attachmentRepo.findById(opts.attachmentId);
       if (!existingAttachment) {
-        throw new NotFoundException(
-          'Existing attachment to overwrite not found'
-        );
+        throw new NotFoundException('Existing attachment to overwrite not found');
       }
 
       if (
@@ -84,9 +75,7 @@ export class AttachmentService {
 
     const filePath = `${getAttachmentFolderPath(AttachmentType.File, workspaceId)}/${attachmentId}/${preparedFile.fileName}`;
 
-    const { stream, getBytesRead } = createByteCountingStream(
-      preparedFile.multiPartFile.file
-    );
+    const { stream, getBytesRead } = createByteCountingStream(preparedFile.multiPartFile.file);
 
     await this.uploadToDrive(filePath, stream);
 
@@ -117,9 +106,7 @@ export class AttachmentService {
       }
 
       // Only index PDF, DOCX and TXT files
-      if (
-        ['.pdf', '.docx', '.txt'].includes(attachment.fileExt.toLowerCase())
-      ) {
+      if (['.pdf', '.docx', '.txt'].includes(attachment.fileExt.toLowerCase())) {
         await this.attachmentQueue.add(
           QueueJob.ATTACHMENT_INDEX_CONTENT,
           {
@@ -144,10 +131,7 @@ export class AttachmentService {
 
   async uploadImage(
     filePromise: Promise<MultipartFile>,
-    type:
-      | AttachmentType.Avatar
-      | AttachmentType.WorkspaceIcon
-      | AttachmentType.SpaceIcon,
+    type: AttachmentType.Avatar | AttachmentType.WorkspaceIcon | AttachmentType.SpaceIcon,
     userId: string,
     workspaceId: string,
     spaceId?: string
@@ -225,8 +209,7 @@ export class AttachmentService {
 
     if (oldFileName && !oldFileName.toLowerCase().startsWith('http')) {
       // delete old avatar or logo
-      const oldFilePath =
-        getAttachmentFolderPath(type, workspaceId) + '/' + oldFileName;
+      const oldFilePath = getAttachmentFolderPath(type, workspaceId) + '/' + oldFileName;
       await this.deleteRedundantFile(oldFilePath);
     }
 
@@ -316,9 +299,7 @@ export class AttachmentService {
       );
 
       if (failedDeletions.length === attachments.length) {
-        throw new Error(
-          `Failed to delete any attachments for spaceId: ${spaceId}`
-        );
+        throw new Error(`Failed to delete any attachments for spaceId: ${spaceId}`);
       }
     } catch (err) {
       throw err;
@@ -394,10 +375,7 @@ export class AttachmentService {
         );
       }
     } catch (err) {
-      this.logger.error(
-        `Error in handleDeletePageAttachments for page ${pageId}:`,
-        err
-      );
+      this.logger.error(`Error in handleDeletePageAttachments for page ${pageId}:`, err);
       throw err;
     }
   }
@@ -408,11 +386,7 @@ export class AttachmentService {
       await this.deleteRedundantFile(filePath);
     }
 
-    await this.userRepo.updateUser(
-      { avatarUrl: null },
-      user.id,
-      user.workspaceId
-    );
+    await this.userRepo.updateUser({ avatarUrl: null }, user.id, user.workspaceId);
   }
 
   async removeSpaceIcon(spaceId: string, workspaceId: string) {

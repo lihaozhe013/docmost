@@ -11,18 +11,12 @@
 
   &.empty {
     color: light-dark(var(--mantine-color-gray-6), var(--mantine-color-gray-4));
-    background-color: light-dark(
-      var(--mantine-color-gray-0),
-      var(--mantine-color-gray-8)
-    );
+    background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-gray-8));
   }
 
   &.error {
     color: light-dark(var(--mantine-color-red-8), var(--mantine-color-red-7));
-    background-color: light-dark(
-      var(--mantine-color-gray-0),
-      var(--mantine-color-gray-8)
-    );
+    background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-gray-8));
   }
 }
 
@@ -49,17 +43,11 @@
 
   &.empty {
     color: light-dark(var(--mantine-color-gray-6), var(--mantine-color-gray-4));
-    background-color: light-dark(
-      var(--mantine-color-gray-0),
-      var(--mantine-color-gray-8)
-    );
+    background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-gray-8));
   }
 
   &.error {
     color: light-dark(var(--mantine-color-red-8), var(--mantine-color-red-7));
-    background-color: light-dark(
-      var(--mantine-color-gray-0),
-      var(--mantine-color-gray-8)
-    );
+    background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-gray-8));
   }
 }

@@ -30,9 +30,7 @@ function CommentDialog({ editor, pageId, readOnly }: CommentDialogProps) {
   const [comment, setComment] = useState('');
   const [, setShowCommentPopup] = useAtom(showCommentPopupAtom);
   const [, setShowReadOnlyCommentPopup] = useAtom(showReadOnlyCommentPopupAtom);
-  const [readOnlyCommentData, setReadOnlyCommentData] = useAtom(
-    readOnlyCommentDataAtom
-  );
+  const [readOnlyCommentData, setReadOnlyCommentData] = useAtom(readOnlyCommentDataAtom);
   const [, setActiveCommentId] = useAtom(activeCommentIdAtom);
   const [draftCommentId, setDraftCommentId] = useAtom(draftCommentIdAtom);
   const [currentUser] = useAtom(currentUserAtom);
@@ -78,14 +76,9 @@ function CommentDialog({ editor, pageId, readOnly }: CommentDialogProps) {
         type: 'inline'
       };
 
-      const createdComment =
-        await createCommentMutation.mutateAsync(commentData);
+      const createdComment = await createCommentMutation.mutateAsync(commentData);
       if (isEditorReady(editor)) {
-        editor
-          .chain()
-          .setComment(createdComment.id)
-          .unsetCommentDecoration()
-          .run();
+        editor.chain().setComment(createdComment.id).unsetCommentDecoration().run();
         editor.commands.setTextSelection({
           from: editor.view.state.selection.from,
           to: editor.view.state.selection.from

@@ -51,10 +51,7 @@ export class FavoriteRepo {
       .execute();
   }
 
-  async deleteByUserAndTemplate(
-    userId: string,
-    templateId: string
-  ): Promise<void> {
+  async deleteByUserAndTemplate(userId: string, templateId: string): Promise<void> {
     await this.db
       .deleteFrom('favorites')
       .where('userId', '=', userId)
@@ -93,9 +90,7 @@ export class FavoriteRepo {
     });
 
     return {
-      items: result.items
-        .map((r) => (r as any).entityId as string)
-        .filter(Boolean),
+      items: result.items.map((r) => (r as any).entityId as string).filter(Boolean),
       meta: result.meta
     };
   }

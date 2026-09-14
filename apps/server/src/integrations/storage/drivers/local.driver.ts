@@ -1,8 +1,4 @@
-import {
-  StorageDriver,
-  LocalStorageConfig,
-  StorageOption
-} from '../interfaces';
+import { StorageDriver, LocalStorageConfig, StorageOption } from '../interfaces';
 import { dirname, resolve, sep } from 'path';
 import * as fs from 'fs-extra';
 import { Readable } from 'stream';
@@ -108,10 +104,7 @@ export class LocalDriver implements StorageDriver {
     try {
       return await fs.pathExists(this._fullPath(filePath));
     } catch (err) {
-      throw new Error(
-        `Failed to check file existence: ${(err as Error).message}`,
-        { cause: err }
-      );
+      throw new Error(`Failed to check file existence: ${(err as Error).message}`, { cause: err });
     }
   }
 

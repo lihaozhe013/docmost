@@ -65,12 +65,9 @@ describe('containsDomain', () => {
   });
 
   describe('case insensitive — should block', () => {
-    it.each(['EXAMPLE.COM', 'Example.Com', 'example.COM'])(
-      'blocks "%s"',
-      (value) => {
-        expect(containsDomain(value)).toBe(true);
-      }
-    );
+    it.each(['EXAMPLE.COM', 'Example.Com', 'example.COM'])('blocks "%s"', (value) => {
+      expect(containsDomain(value)).toBe(true);
+    });
   });
 
   describe('fake TLDs — should allow', () => {
@@ -125,20 +122,14 @@ describe('containsDomain', () => {
   });
 
   describe('IP addresses — should allow', () => {
-    it.each(['192.168.1.1', '10.0.0.1', '127.0.0.1'])(
-      'allows "%s"',
-      (value) => {
-        expect(containsDomain(value)).toBe(false);
-      }
-    );
+    it.each(['192.168.1.1', '10.0.0.1', '127.0.0.1'])('allows "%s"', (value) => {
+      expect(containsDomain(value)).toBe(false);
+    });
   });
 
   describe('edge cases — should allow', () => {
-    it.each(['', ' ', '.', '..', 'hello', '.com', 'a.b'])(
-      'allows "%s"',
-      (value) => {
-        expect(containsDomain(value)).toBe(false);
-      }
-    );
+    it.each(['', ' ', '.', '..', 'hello', '.com', 'a.b'])('allows "%s"', (value) => {
+      expect(containsDomain(value)).toBe(false);
+    });
   });
 });

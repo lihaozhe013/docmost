@@ -44,19 +44,15 @@ export class CommentNotificationService {
         ? await this.watcherRepo.getPageWatcherIds(pageId)
         : [];
 
-    const allCandidateIds = [
-      ...new Set([...mentionedUserIds, ...recipientIds])
-    ];
-    const usersWithSpaceAccess =
-      await this.spaceMemberRepo.getUserIdsWithSpaceAccess(
-        allCandidateIds,
-        spaceId
-      );
+    const allCandidateIds = [...new Set([...mentionedUserIds, ...recipientIds])];
+    const usersWithSpaceAccess = await this.spaceMemberRepo.getUserIdsWithSpaceAccess(
+      allCandidateIds,
+      spaceId
+    );
 
-    const usersWithPageAccess =
-      await this.pagePermissionRepo.getUserIdsWithPageAccess(pageId, [
-        ...usersWithSpaceAccess
-      ]);
+    const usersWithPageAccess = await this.pagePermissionRepo.getUserIdsWithPageAccess(pageId, [
+      ...usersWithSpaceAccess
+    ]);
     const usersWithAccess = new Set(usersWithPageAccess);
 
     for (const userId of mentionedUserIds) {
@@ -94,21 +90,11 @@ export class CommentNotificationService {
   }
 
   async processResolved(data: ICommentResolvedNotificationJob) {
-    const {
-      commentId,
-      commentCreatorId,
-      pageId,
-      spaceId,
-      workspaceId,
-      actorId
-    } = data;
+    const { commentId, commentCreatorId, pageId, spaceId, workspaceId, actorId } = data;
 
     if (commentCreatorId === actorId) return;
 
-    const roles = await this.spaceMemberRepo.getUserSpaceRoles(
-      commentCreatorId,
-      spaceId
-    );
+    const roles = await this.spaceMemberRepo.getUserSpaceRoles(commentCreatorId, spaceId);
 
     if (!roles) {
       this.logger.debug(
@@ -117,10 +103,9 @@ export class CommentNotificationService {
       return;
     }
 
-    const hasPageAccess =
-      await this.pagePermissionRepo.getUserIdsWithPageAccess(pageId, [
-        commentCreatorId
-      ]);
+    const hasPageAccess = await this.pagePermissionRepo.getUserIdsWithPageAccess(pageId, [
+      commentCreatorId
+    ]);
     if (hasPageAccess.length === 0) return;
 
     const notification = await this.notificationService.create({
@@ -135,17 +120,12 @@ export class CommentNotificationService {
     if (!notification) return;
   }
 
-  private async getThreadParticipantIds(
-    parentCommentId: string
-  ): Promise<string[]> {
+  private async getThreadParticipantIds(parentCommentId: string): Promise<string[]> {
     const participants = await this.db
       .selectFrom('comments')
       .select('creatorId')
       .where((eb) =>
-        eb.or([
-          eb('id', '=', parentCommentId),
-          eb('parentCommentId', '=', parentCommentId)
-        ])
+        eb.or([eb('id', '=', parentCommentId), eb('parentCommentId', '=', parentCommentId)])
       )
       .execute();
 

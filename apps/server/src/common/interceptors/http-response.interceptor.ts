@@ -1,9 +1,4 @@
-import {
-  CallHandler,
-  ExecutionContext,
-  Injectable,
-  NestInterceptor
-} from '@nestjs/common';
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { map, Observable } from 'rxjs';
 import { Reflector } from '@nestjs/core';
 import { SKIP_TRANSFORM_KEY } from '../decorators/skip-transform.decorator';
@@ -12,20 +7,11 @@ export interface Response<T> {
 }
 
 @Injectable()
-export class TransformHttpResponseInterceptor<T> implements NestInterceptor<
-  T,
-  Response<T>
-> {
+export class TransformHttpResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
   constructor(private reflector: Reflector) {}
 
-  intercept(
-    context: ExecutionContext,
-    next: CallHandler<T>
-  ): Observable<Response<T> | any> {
-    const skipTransform = this.reflector.get(
-      SKIP_TRANSFORM_KEY,
-      context.getHandler()
-    );
+  intercept(context: ExecutionContext, next: CallHandler<T>): Observable<Response<T> | any> {
+    const skipTransform = this.reflector.get(SKIP_TRANSFORM_KEY, context.getHandler());
 
     if (skipTransform) {
       return next.handle();

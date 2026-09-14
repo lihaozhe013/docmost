@@ -5,22 +5,13 @@ import { Text } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import { useParams } from 'react-router-dom';
-import {
-  activeHistoryIdAtom,
-  historyAtoms
-} from '@/features/page-history/atoms/history-atoms';
+import { activeHistoryIdAtom, historyAtoms } from '@/features/page-history/atoms/history-atoms';
 import { fetchPageHistory } from '@/features/page-history/queries/page-history-query';
 import { IPageHistory } from '@/features/page-history/types/page.types';
-import {
-  pageEditorAtom,
-  titleEditorAtom
-} from '@/features/editor/atoms/editor-atoms';
+import { pageEditorAtom, titleEditorAtom } from '@/features/editor/atoms/editor-atoms';
 import { useSpaceAbility } from '@/features/space/permissions/use-space-ability';
 import { useSpaceQuery } from '@/features/space/queries/space-query';
-import {
-  SpaceCaslAction,
-  SpaceCaslSubject
-} from '@/features/space/permissions/permissions.type';
+import { SpaceCaslAction, SpaceCaslSubject } from '@/features/space/permissions/permissions.type';
 
 export function useHistoryRestore() {
   const { t } = useTranslation();
@@ -34,10 +25,7 @@ export function useHistoryRestore() {
   const { data: space } = useSpaceQuery(spaceSlug);
   const spaceAbility = useSpaceAbility(space?.membership?.permissions);
 
-  const canRestore = spaceAbility.can(
-    SpaceCaslAction.Manage,
-    SpaceCaslSubject.Page
-  );
+  const canRestore = spaceAbility.can(SpaceCaslAction.Manage, SpaceCaslSubject.Page);
 
   const handleRestore = useCallback(
     async (historyId: string) => {

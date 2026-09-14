@@ -14,14 +14,7 @@ import {
 import { resolveComparePair } from '@/features/page-history/utils/resolve-compare-pair';
 import { useAtom, useSetAtom } from 'jotai';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import {
-  Button,
-  ScrollArea,
-  Group,
-  Divider,
-  Loader,
-  Center
-} from '@mantine/core';
+import { Button, ScrollArea, Group, Divider, Loader, Center } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { useHistoryRestore } from '@/features/page-history/hooks';
 
@@ -124,13 +117,7 @@ function HistoryList({ pageId }: Props) {
     setComparePair(pair);
     setCompareMode(false);
     setCompareSelection([]);
-  }, [
-    historyItems,
-    compareSelection,
-    setComparePair,
-    setCompareMode,
-    setCompareSelection
-  ]);
+  }, [historyItems, compareSelection, setComparePair, setCompareMode, setCompareSelection]);
 
   const handleRestoreItem = useCallback(
     (id: string, index: number) => {
@@ -145,12 +132,7 @@ function HistoryList({ pageId }: Props) {
       setActiveHistoryId(historyItems[0].id);
       setActiveHistoryPrevId(historyItems[1]?.id ?? '');
     }
-  }, [
-    historyItems,
-    activeHistoryId,
-    setActiveHistoryId,
-    setActiveHistoryPrevId
-  ]);
+  }, [historyItems, activeHistoryId, setActiveHistoryId, setActiveHistoryPrevId]);
 
   useEffect(() => {
     const sentinel = loadMoreRef.current;
@@ -196,8 +178,7 @@ function HistoryList({ pageId }: Props) {
             compareMode={compareMode}
             isChecked={compareSelection.includes(historyItem.id)}
             isCheckboxDisabled={
-              !compareSelection.includes(historyItem.id) &&
-              compareSelection.length >= 2
+              !compareSelection.includes(historyItem.id) && compareSelection.length >= 2
             }
             canCompare={historyItems.length >= 2}
             onToggleCompare={handleToggleCompare}
@@ -217,11 +198,7 @@ function HistoryList({ pageId }: Props) {
         <>
           <Divider />
           <Group p="xs" wrap="nowrap">
-            <Button
-              variant="default"
-              size="compact-md"
-              onClick={handleCancelCompare}
-            >
+            <Button variant="default" size="compact-md" onClick={handleCancelCompare}>
               {t('Cancel')}
             </Button>
             <Button

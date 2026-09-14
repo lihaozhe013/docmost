@@ -54,15 +54,12 @@ export function UserProvider({ children }: React.PropsWithChildren) {
   useEffect(() => {
     if (data && data.user && data.workspace) {
       setCurrentUser(data);
-      i18n.changeLanguage(
-        data.user.locale === 'en' ? 'en-US' : data.user.locale
-      );
+      i18n.changeLanguage(data.user.locale === 'en' ? 'en-US' : data.user.locale);
     }
   }, [data, isLoading]);
 
   useEffect(() => {
-    document.documentElement.lang =
-      i18n.resolvedLanguage || i18n.language || 'en-US';
+    document.documentElement.lang = i18n.resolvedLanguage || i18n.language || 'en-US';
   }, [i18n.language, i18n.resolvedLanguage]);
 
   useEffect(() => {

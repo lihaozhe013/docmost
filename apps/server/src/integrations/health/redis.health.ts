@@ -1,7 +1,4 @@
-import {
-  HealthIndicatorResult,
-  HealthIndicatorService
-} from '@nestjs/terminus';
+import { HealthIndicatorResult, HealthIndicatorService } from '@nestjs/terminus';
 import { Injectable, Logger } from '@nestjs/common';
 import { EnvironmentService } from '../environment/environment.service';
 import { Redis } from 'ioredis';

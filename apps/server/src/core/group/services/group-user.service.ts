@@ -16,10 +16,7 @@ import { executeTx } from '@docmost/db/utils';
 import { WatcherRepo } from '@docmost/db/repos/watcher/watcher.repo';
 import { FavoriteRepo } from '@docmost/db/repos/favorite/favorite.repo';
 import { AuditEvent, AuditResource } from '../../../common/events/audit-events';
-import {
-  AUDIT_SERVICE,
-  IAuditService
-} from '../../../integrations/audit/audit.service';
+import { AUDIT_SERVICE, IAuditService } from '../../../integrations/audit/audit.service';
 import { dbOrTx } from '@docmost/db/utils';
 
 @Injectable()
@@ -36,17 +33,10 @@ export class GroupUserService {
     @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService
   ) {}
 
-  async getGroupUsers(
-    groupId: string,
-    workspaceId: string,
-    pagination: PaginationOptions
-  ) {
+  async getGroupUsers(groupId: string, workspaceId: string, pagination: PaginationOptions) {
     await this.groupService.findAndValidateGroup(groupId, workspaceId);
 
-    const groupUsers = await this.groupUserRepo.getGroupUsersPaginated(
-      groupId,
-      pagination
-    );
+    const groupUsers = await this.groupUserRepo.getGroupUsersPaginated(groupId, pagination);
 
     return groupUsers;
   }
@@ -103,15 +93,8 @@ export class GroupUserService {
     }
   }
 
-  async removeUserFromGroup(
-    userId: string,
-    groupId: string,
-    workspaceId: string
-  ): Promise<void> {
-    const group = await this.groupService.findAndValidateGroup(
-      groupId,
-      workspaceId
-    );
+  async removeUserFromGroup(userId: string, groupId: string, workspaceId: string): Promise<void> {
+    const group = await this.groupService.findAndValidateGroup(groupId, workspaceId);
 
     const user = await this.userRepo.findById(userId, workspaceId);
 
@@ -120,15 +103,10 @@ export class GroupUserService {
     }
 
     if (group.isDefault) {
-      throw new BadRequestException(
-        'You cannot remove users from a default group'
-      );
+      throw new BadRequestException('You cannot remove users from a default group');
     }
 
-    const groupUser = await this.groupUserRepo.getGroupUserById(
-      userId,
-      groupId
-    );
+    const groupUser = await this.groupUserRepo.getGroupUserById(userId, groupId);
 
     if (!groupUser) {
       throw new BadRequestException('Group member not found');
@@ -141,17 +119,9 @@ export class GroupUserService {
       await this.groupUserRepo.delete(userId, groupId, { trx });
 
       for (const spaceId of spaceIds) {
-        await this.watcherRepo.deleteByUsersWithoutSpaceAccess(
-          [userId],
-          spaceId,
-          { trx }
-        );
+        await this.watcherRepo.deleteByUsersWithoutSpaceAccess([userId], spaceId, { trx });
 
-        await this.favoriteRepo.deleteByUsersWithoutSpaceAccess(
-          [userId],
-          spaceId,
-          { trx }
-        );
+        await this.favoriteRepo.deleteByUsersWithoutSpaceAccess([userId], spaceId, { trx });
       }
     });
 

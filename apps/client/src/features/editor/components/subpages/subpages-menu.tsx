@@ -18,66 +18,59 @@ interface ShouldShowProps {
   to?: number;
 }
 
-export const SubpagesMenu = React.memo(
-  ({ editor }: SubpagesMenuProps): JSX.Element => {
-    const { t } = useTranslation();
+export const SubpagesMenu = React.memo(({ editor }: SubpagesMenuProps): JSX.Element => {
+  const { t } = useTranslation();
 
-    const shouldShow = useCallback(
-      ({ state }: ShouldShowProps) => {
-        if (!state) {
-          return false;
-        }
-
-        return editor.isActive('subpages');
-      },
-      [editor]
-    );
-
-    const getReferenceClientRect = useCallback(() => {
-      if (!isEditorReady(editor)) return new DOMRect();
-      const { selection } = editor.state;
-      const predicate = (node: PMNode) => node.type.name === 'subpages';
-      const parent = findParentNode(predicate)(selection);
-
-      if (parent) {
-        const dom = editor.view.nodeDOM(parent?.pos) as HTMLElement;
-        return dom.getBoundingClientRect();
+  const shouldShow = useCallback(
+    ({ state }: ShouldShowProps) => {
+      if (!state) {
+        return false;
       }
 
-      return posToDOMRect(editor.view, selection.from, selection.to);
-    }, [editor]);
+      return editor.isActive('subpages');
+    },
+    [editor]
+  );
 
-    const deleteNode = useCallback(() => {
-      const { selection } = editor.state;
-      editor
-        .chain()
-        .focus()
-        .setNodeSelection(selection.from)
-        .deleteSelection()
-        .run();
-    }, [editor]);
+  const getReferenceClientRect = useCallback(() => {
+    if (!isEditorReady(editor)) return new DOMRect();
+    const { selection } = editor.state;
+    const predicate = (node: PMNode) => node.type.name === 'subpages';
+    const parent = findParentNode(predicate)(selection);
 
-    return (
-      <BaseBubbleMenu
-        editor={editor}
-        pluginKey={`subpages-menu`}
-        updateDelay={0}
-        shouldShow={shouldShow}
-      >
-        <Tooltip position="top" label={t('Delete')}>
-          <ActionIcon
-            onClick={deleteNode}
-            variant="default"
-            size="lg"
-            color="red"
-            aria-label={t('Delete')}
-          >
-            <IconTrash size={18} />
-          </ActionIcon>
-        </Tooltip>
-      </BaseBubbleMenu>
-    );
-  }
-);
+    if (parent) {
+      const dom = editor.view.nodeDOM(parent?.pos) as HTMLElement;
+      return dom.getBoundingClientRect();
+    }
+
+    return posToDOMRect(editor.view, selection.from, selection.to);
+  }, [editor]);
+
+  const deleteNode = useCallback(() => {
+    const { selection } = editor.state;
+    editor.chain().focus().setNodeSelection(selection.from).deleteSelection().run();
+  }, [editor]);
+
+  return (
+    <BaseBubbleMenu
+      editor={editor}
+      pluginKey={`subpages-menu`}
+      updateDelay={0}
+      shouldShow={shouldShow}
+    >
+      <Tooltip position="top" label={t('Delete')}>
+        <ActionIcon
+          onClick={deleteNode}
+          variant="default"
+          size="lg"
+          color="red"
+          aria-label={t('Delete')}
+        >
+          <IconTrash size={18} />
+        </ActionIcon>
+      </Tooltip>
+    </BaseBubbleMenu>
+  );
+});
 
 export default SubpagesMenu;

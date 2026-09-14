@@ -11,20 +11,11 @@ export type AuditLogContext = {
 
 export type IAuditService = {
   log(payload: AuditLogPayload): void | Promise<void>;
-  logWithContext(
-    payload: AuditLogPayload,
-    context: AuditLogContext
-  ): void | Promise<void>;
-  logBatchWithContext(
-    payloads: AuditLogPayload[],
-    context: AuditLogContext
-  ): void | Promise<void>;
+  logWithContext(payload: AuditLogPayload, context: AuditLogContext): void | Promise<void>;
+  logBatchWithContext(payloads: AuditLogPayload[], context: AuditLogContext): void | Promise<void>;
   setActorId(actorId: string): void;
   setActorType(actorType: ActorType): void;
-  updateRetention(
-    workspaceId: string,
-    retentionDays: number
-  ): void | Promise<void>;
+  updateRetention(workspaceId: string, retentionDays: number): void | Promise<void>;
 };
 
 export const AUDIT_SERVICE = Symbol('AUDIT_SERVICE');
@@ -39,10 +30,7 @@ export class NoopAuditService implements IAuditService {
     // No-op: swallow the log when EE module is not available
   }
 
-  logBatchWithContext(
-    _payloads: AuditLogPayload[],
-    _context: AuditLogContext
-  ): void {
+  logBatchWithContext(_payloads: AuditLogPayload[], _context: AuditLogContext): void {
     // No-op: swallow the log when EE module is not available
   }
 

@@ -24,10 +24,7 @@ const defaultColors: MantineColor[] = [
   'violet'
 ];
 
-export function getInitialsColor(
-  name: string,
-  colors: MantineColor[] = defaultColors
-) {
+export function getInitialsColor(name: string, colors: MantineColor[] = defaultColors) {
   const hash = hashCode(name);
   const index = Math.abs(hash) % colors.length;
   return colors[index];

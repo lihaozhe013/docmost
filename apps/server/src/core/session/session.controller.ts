@@ -47,15 +47,9 @@ export class SessionController {
   ) {
     const currentSessionId = (req.raw as any).sessionId;
     if (dto.sessionId === currentSessionId) {
-      throw new BadRequestException(
-        'Cannot revoke current session. Use logout instead.'
-      );
+      throw new BadRequestException('Cannot revoke current session. Use logout instead.');
     }
-    await this.sessionService.revokeSession(
-      dto.sessionId,
-      user.id,
-      workspace.id
-    );
+    await this.sessionService.revokeSession(dto.sessionId, user.id, workspace.id);
   }
 
   @HttpCode(HttpStatus.OK)
@@ -67,14 +61,8 @@ export class SessionController {
   ) {
     const currentSessionId = (req.raw as any).sessionId;
     if (!currentSessionId) {
-      throw new BadRequestException(
-        'Current session not found. Please log in again.'
-      );
+      throw new BadRequestException('Current session not found. Please log in again.');
     }
-    await this.sessionService.revokeAllOtherSessions(
-      currentSessionId,
-      user.id,
-      workspace.id
-    );
+    await this.sessionService.revokeAllOtherSessions(currentSessionId, user.id, workspace.id);
   }
 }

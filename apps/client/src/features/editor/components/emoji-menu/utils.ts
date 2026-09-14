@@ -1,8 +1,4 @@
-import {
-  CommandProps,
-  EmojiMartFrequentlyType,
-  EmojiMenuItemType
-} from './types';
+import { CommandProps, EmojiMartFrequentlyType, EmojiMenuItemType } from './types';
 
 export const LOCAL_STORAGE_FREQUENT_KEY = 'emoji-mart.frequently';
 
@@ -38,8 +34,7 @@ export const buildEmojiIndex = async (): Promise<EmojiIndexEntry[]> => {
 
 export const incrementEmojiUsage = (emojiId: string) => {
   const stored = JSON.parse(
-    localStorage.getItem(LOCAL_STORAGE_FREQUENT_KEY) ||
-      DEFAULT_FREQUENTLY_USED_EMOJI_MART
+    localStorage.getItem(LOCAL_STORAGE_FREQUENT_KEY) || DEFAULT_FREQUENTLY_USED_EMOJI_MART
   );
   stored[emojiId] = (stored[emojiId] ?? 0) + 1;
   localStorage.setItem(LOCAL_STORAGE_FREQUENT_KEY, JSON.stringify(stored));
@@ -73,8 +68,7 @@ export const sortFrequentlyUsedEmoji = async (
 
 export const getFrequentlyUsedEmoji = (): EmojiMartFrequentlyType => {
   return JSON.parse(
-    localStorage.getItem(LOCAL_STORAGE_FREQUENT_KEY) ||
-      DEFAULT_FREQUENTLY_USED_EMOJI_MART
+    localStorage.getItem(LOCAL_STORAGE_FREQUENT_KEY) || DEFAULT_FREQUENTLY_USED_EMOJI_MART
   );
 };
 
@@ -92,9 +86,7 @@ export const getEmojiCategories = async (): Promise<EmojiCategory[]> => {
   _cats = ((data as any).categories as { id: string; emojis: string[] }[])
     .map((cat) => ({
       id: cat.id,
-      emojis: cat.emojis
-        .map((id) => byId.get(id))
-        .filter((e): e is EmojiIndexEntry => !!e)
+      emojis: cat.emojis.map((id) => byId.get(id)).filter((e): e is EmojiIndexEntry => !!e)
     }))
     .filter((c) => c.emojis.length > 0);
   return _cats;

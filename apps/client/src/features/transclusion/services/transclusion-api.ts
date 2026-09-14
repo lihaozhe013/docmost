@@ -1,8 +1,5 @@
 import api from '@/lib/api-client';
-import type {
-  ReferencingPagesResponse,
-  TransclusionLookup
-} from '../types/transclusion.types';
+import type { ReferencingPagesResponse, TransclusionLookup } from '../types/transclusion.types';
 
 export async function lookupTransclusion(params: {
   references: Array<{ sourcePageId: string; transclusionId: string }>;

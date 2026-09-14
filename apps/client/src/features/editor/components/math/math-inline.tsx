@@ -18,10 +18,7 @@ export default function MathInlineView(props: NodeViewProps) {
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
   const [isEditing, setIsEditing] = useState<boolean>(false);
 
-  const renderMath = (
-    katexString: string,
-    container: HTMLDivElement | null
-  ) => {
+  const renderMath = (katexString: string, container: HTMLDivElement | null) => {
     try {
       katex.render(katexString, container);
       setError(null);
@@ -48,8 +45,7 @@ export default function MathInlineView(props: NodeViewProps) {
   useEffect(() => {
     const pos = getPos();
     const { from, to } = editor.state.selection;
-    const nodeSelected =
-      props.selected && from === pos && to === pos + node.nodeSize;
+    const nodeSelected = props.selected && from === pos && to === pos + node.nodeSize;
     setIsEditing(nodeSelected);
     if (nodeSelected) setPreview(node.attrs.text);
   }, [props.selected]);
@@ -89,9 +85,7 @@ export default function MathInlineView(props: NodeViewProps) {
               ref={mathResultContainer}
             ></div>
             {((isEditing && !preview?.trim().length) ||
-              (!isEditing && !node.attrs.text.trim().length)) && (
-              <div>{t('Empty equation')}</div>
-            )}
+              (!isEditing && !node.attrs.text.trim().length)) && <div>{t('Empty equation')}</div>}
             {error && <div>{t('Invalid equation')}</div>}
           </NodeViewWrapper>
         </Popover.Target>

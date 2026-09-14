@@ -103,19 +103,10 @@ function getPageMedia(editor: Editor): Slide[] {
   return media;
 }
 
-export default function LightboxView({
-  editor,
-  open,
-  src,
-  type,
-  onClose
-}: LightboxViewProps) {
+export default function LightboxView({ editor, open, src, type, onClose }: LightboxViewProps) {
   const { i18n: i18nInstance } = useTranslation();
 
-  const selectedSlide = useMemo(
-    () => getMedia(src, type),
-    [src, type, i18nInstance.language]
-  );
+  const selectedSlide = useMemo(() => getMedia(src, type), [src, type, i18nInstance.language]);
 
   const [pageSlides, setPageSlides] = useState<Slide[]>([]);
   const [loadedMediaKey, setLoadedMediaKey] = useState<string | null>(null);
@@ -140,8 +131,7 @@ export default function LightboxView({
     return () => cancelAnimationFrame(frame);
   }, [editor, open, type, src]);
 
-  const slides =
-    loadedMediaKey === `${type}:${src}` ? pageSlides : [selectedSlide];
+  const slides = loadedMediaKey === `${type}:${src}` ? pageSlides : [selectedSlide];
 
   const index = useMemo(() => {
     if (!(pageSlides.length > 0)) {

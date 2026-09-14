@@ -31,8 +31,7 @@ export class TrashCleanupService {
       let totalCleaned = 0;
 
       for (const workspace of workspaces) {
-        const retentionDays =
-          workspace.trashRetentionDays ?? DEFAULT_RETENTION_DAYS;
+        const retentionDays = workspace.trashRetentionDays ?? DEFAULT_RETENTION_DAYS;
 
         const retentionDate = new Date();
         retentionDate.setDate(retentionDate.getDate() - retentionDays);
@@ -91,9 +90,7 @@ export class TrashCleanupService {
 
     const pageIds = descendants.map((d) => d.id);
 
-    this.logger.debug(
-      `Cleaning up page ${pageId} with ${pageIds.length - 1} descendants`
-    );
+    this.logger.debug(`Cleaning up page ${pageId} with ${pageIds.length - 1} descendants`);
 
     // Queue attachment deletion for all pages with unique job IDs to prevent duplicates
     for (const id of pageIds) {

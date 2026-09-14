@@ -15,10 +15,7 @@ export async function getPageAttachments(
   return req.data;
 }
 
-async function compressAndResizeIcon(
-  file: File,
-  type: AvatarIconType
-): Promise<File> {
+async function compressAndResizeIcon(file: File, type: AvatarIconType): Promise<File> {
   const isPng = file.type === 'image/png';
 
   const { image: canvas } = await loadImage(file, {
@@ -79,10 +76,7 @@ export async function uploadUserAvatar(file: File): Promise<IAttachment> {
   return uploadIcon(file, AvatarIconType.AVATAR);
 }
 
-export async function uploadSpaceIcon(
-  file: File,
-  spaceId: string
-): Promise<IAttachment> {
+export async function uploadSpaceIcon(file: File, spaceId: string): Promise<IAttachment> {
   return uploadIcon(file, AvatarIconType.SPACE_ICON, spaceId);
 }
 
@@ -90,10 +84,7 @@ export async function uploadWorkspaceIcon(file: File): Promise<IAttachment> {
   return uploadIcon(file, AvatarIconType.WORKSPACE_ICON);
 }
 
-async function removeIcon(
-  type: AvatarIconType,
-  spaceId?: string
-): Promise<void> {
+async function removeIcon(type: AvatarIconType, spaceId?: string): Promise<void> {
   const payload: { spaceId?: string; type: string } = { type };
 
   if (spaceId) {

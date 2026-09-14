@@ -1,8 +1,4 @@
-import {
-  Backlink,
-  InsertableBacklink,
-  UpdatableBacklink
-} from '@docmost/db/types/entity.types';
+import { Backlink, InsertableBacklink, UpdatableBacklink } from '@docmost/db/types/entity.types';
 import { KyselyDB, KyselyTransaction } from '@docmost/db/types/kysely.types';
 import { dbOrTx } from '@docmost/db/utils';
 import { Injectable } from '@nestjs/common';
@@ -31,30 +27,18 @@ export class BacklinkRepo {
 
     return db
       .selectFrom('backlinks')
-      .select([
-        'id',
-        'sourcePageId',
-        'targetPageId',
-        'workspaceId',
-        'createdAt',
-        'updatedAt'
-      ])
+      .select(['id', 'sourcePageId', 'targetPageId', 'workspaceId', 'createdAt', 'updatedAt'])
       .where('id', '=', backlinkId)
       .where('workspaceId', '=', workspaceId)
       .executeTakeFirst();
   }
 
-  async insertBacklink(
-    insertableBacklink: InsertableBacklink,
-    trx?: KyselyTransaction
-  ) {
+  async insertBacklink(insertableBacklink: InsertableBacklink, trx?: KyselyTransaction) {
     const db = dbOrTx(this.db, trx);
     return db
       .insertInto('backlinks')
       .values(insertableBacklink)
-      .onConflict((oc) =>
-        oc.columns(['sourcePageId', 'targetPageId']).doNothing()
-      )
+      .onConflict((oc) => oc.columns(['sourcePageId', 'targetPageId']).doNothing())
       .returningAll()
       .executeTakeFirst();
   }
@@ -72,10 +56,7 @@ export class BacklinkRepo {
       .execute();
   }
 
-  async deleteBacklink(
-    backlinkId: string,
-    trx?: KyselyTransaction
-  ): Promise<void> {
+  async deleteBacklink(backlinkId: string, trx?: KyselyTransaction): Promise<void> {
     const db = dbOrTx(this.db, trx);
     await db.deleteFrom('backlinks').where('id', '=', backlinkId).execute();
   }
@@ -110,10 +91,7 @@ export class BacklinkRepo {
     return rows.map((r) => r.relatedId);
   }
 
-  async findPagesByIdsPaginated(
-    pageIds: string[],
-    pagination: PaginationOptions
-  ) {
+  async findPagesByIdsPaginated(pageIds: string[], pagination: PaginationOptions) {
     if (pageIds.length === 0) {
       return emptyCursorPaginationResult<{
         id: string;

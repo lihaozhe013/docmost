@@ -5,10 +5,7 @@ import { UserSessionRepo } from '@docmost/db/repos/session/user-session.repo';
 import { EnvironmentService } from '../../integrations/environment/environment.service';
 import { User } from '@docmost/db/types/entity.types';
 import { ClsService } from 'nestjs-cls';
-import {
-  AuditContext,
-  AUDIT_CONTEXT_KEY
-} from '../../common/middlewares/audit-context.middleware';
+import { AuditContext, AUDIT_CONTEXT_KEY } from '../../common/middlewares/audit-context.middleware';
 import * as Bowser from 'bowser';
 
 const MAX_SESSIONS_PER_USER = 25;
@@ -55,15 +52,8 @@ export class SessionService {
     return this.tokenService.generateAccessToken(user, session.id);
   }
 
-  async getActiveSessions(
-    userId: string,
-    workspaceId: string,
-    currentSessionId: string | null
-  ) {
-    const sessions = await this.userSessionRepo.findActiveByUser(
-      userId,
-      workspaceId
-    );
+  async getActiveSessions(userId: string, workspaceId: string, currentSessionId: string | null) {
+    const sessions = await this.userSessionRepo.findActiveByUser(userId, workspaceId);
 
     const mapped = sessions.map((s) => ({
       id: s.id,
@@ -81,11 +71,7 @@ export class SessionService {
     });
   }
 
-  async revokeSession(
-    sessionId: string,
-    userId: string,
-    workspaceId: string
-  ): Promise<void> {
+  async revokeSession(sessionId: string, userId: string, workspaceId: string): Promise<void> {
     await this.userSessionRepo.revokeById(sessionId, userId, workspaceId);
   }
 
@@ -94,11 +80,7 @@ export class SessionService {
     userId: string,
     workspaceId: string
   ): Promise<void> {
-    await this.userSessionRepo.revokeAllExceptCurrent(
-      currentSessionId,
-      userId,
-      workspaceId
-    );
+    await this.userSessionRepo.revokeAllExceptCurrent(currentSessionId, userId, workspaceId);
   }
 
   private parseDeviceName(userAgent: string | null): string | null {

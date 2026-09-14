@@ -60,12 +60,7 @@ export default function WorkspaceNameForm() {
       />
 
       {isAdmin && (
-        <Button
-          mt="sm"
-          type="submit"
-          disabled={isLoading || !form.isDirty()}
-          loading={isLoading}
-        >
+        <Button mt="sm" type="submit" disabled={isLoading || !form.isDirty()} loading={isLoading}>
           {t('Save')}
         </Button>
       )}

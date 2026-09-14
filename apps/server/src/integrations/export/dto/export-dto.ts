@@ -1,10 +1,4 @@
-import {
-  IsBoolean,
-  IsIn,
-  IsNotEmpty,
-  IsOptional,
-  IsString
-} from 'class-validator';
+import { IsBoolean, IsIn, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export enum ExportFormat {
   HTML = 'html',

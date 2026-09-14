@@ -30,13 +30,7 @@ export default function TransclusionContent({ content }: Props) {
   const stop = (e: React.SyntheticEvent) => e.stopPropagation();
 
   return (
-    <div
-      onMouseDown={stop}
-      onClick={stop}
-      onDragStart={stop}
-      onDragOver={stop}
-      onDrop={stop}
-    >
+    <div onMouseDown={stop} onClick={stop} onDragStart={stop} onDragOver={stop} onDrop={stop}>
       <EditorProvider
         editable={false}
         immediatelyRender={true}

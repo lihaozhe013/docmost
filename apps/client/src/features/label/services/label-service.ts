@@ -12,16 +12,12 @@ import {
   IRemoveLabel
 } from '@/features/label/types/label.types.ts';
 
-export async function getPageLabels(
-  params: IPageLabelsParams
-): Promise<IPagination<ILabel>> {
+export async function getPageLabels(params: IPageLabelsParams): Promise<IPagination<ILabel>> {
   const req = await api.post<IPagination<ILabel>>('/pages/labels', params);
   return req.data;
 }
 
-export async function getWorkspaceLabels(
-  params: IListLabelsParams
-): Promise<IPagination<ILabel>> {
+export async function getWorkspaceLabels(params: IListLabelsParams): Promise<IPagination<ILabel>> {
   const req = await api.post<IPagination<ILabel>>('/labels', params);
   return req.data;
 }
@@ -35,9 +31,7 @@ export async function removeLabelFromPage(data: IRemoveLabel): Promise<void> {
   await api.post('/pages/labels/remove', data);
 }
 
-export async function getLabelInfo(
-  params: ILabelInfoParams
-): Promise<ILabelInfo> {
+export async function getLabelInfo(params: ILabelInfoParams): Promise<ILabelInfo> {
   const req = await api.post<ILabelInfo>('/labels/info', params);
   return req.data;
 }
@@ -45,9 +39,6 @@ export async function getLabelInfo(
 export async function findPagesByLabel(
   params: IFindPagesByLabelParams
 ): Promise<IPagination<ILabelPageItem>> {
-  const req = await api.post<IPagination<ILabelPageItem>>(
-    '/labels/pages',
-    params
-  );
+  const req = await api.post<IPagination<ILabelPageItem>>('/labels/pages', params);
   return req.data;
 }

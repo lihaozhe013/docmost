@@ -4,11 +4,7 @@ import { KyselyDB, KyselyTransaction } from '@docmost/db/types/kysely.types';
 import { DB, Users } from '@docmost/db/types/db';
 import { hashPassword } from '../../../common/helpers';
 import { dbOrTx } from '@docmost/db/utils';
-import {
-  InsertableUser,
-  UpdatableUser,
-  User
-} from '@docmost/db/types/entity.types';
+import { InsertableUser, UpdatableUser, User } from '@docmost/db/types/entity.types';
 import { PaginationOptions } from '../../pagination/pagination-options';
 import { executeWithCursorPagination } from '@docmost/db/pagination/cursor-pagination';
 import { ExpressionBuilder, sql } from 'kysely';
@@ -115,8 +111,7 @@ export class UserRepo {
     opts?: { pageEditMode?: string }
   ): Promise<User> {
     const user: InsertableUser = {
-      name:
-        insertableUser.name || insertableUser.email.split('@')[0].toLowerCase(),
+      name: insertableUser.name || insertableUser.email.split('@')[0].toLowerCase(),
       email: insertableUser.email.toLowerCase(),
       password: await hashPassword(insertableUser.password),
       locale: 'en-US',
@@ -142,10 +137,7 @@ export class UserRepo {
       .executeTakeFirst();
   }
 
-  async roleCountByWorkspaceId(
-    role: string,
-    workspaceId: string
-  ): Promise<number> {
+  async roleCountByWorkspaceId(role: string, workspaceId: string): Promise<number> {
     const { count } = await this.db
       .selectFrom('users')
       .select((eb) => eb.fn.count('role').as('count'))
@@ -169,11 +161,7 @@ export class UserRepo {
           sql`f_unaccent(users.name)`,
           'ilike',
           sql`f_unaccent(${'%' + pagination.query + '%'})`
-        ).or(
-          sql`users.email`,
-          'ilike',
-          sql`f_unaccent(${'%' + pagination.query + '%'})`
-        )
+        ).or(sql`users.email`, 'ilike', sql`f_unaccent(${'%' + pagination.query + '%'})`)
       );
     }
 
@@ -189,11 +177,7 @@ export class UserRepo {
     });
   }
 
-  async updatePreference(
-    userId: string,
-    prefKey: string,
-    prefValue: string | boolean
-  ) {
+  async updatePreference(userId: string, prefKey: string, prefValue: string | boolean) {
     return await this.db
       .updateTable('users')
       .set({
@@ -229,12 +213,7 @@ export class UserRepo {
     return jsonObjectFrom(
       eb
         .selectFrom('userMfa')
-        .select([
-          'userMfa.id',
-          'userMfa.method',
-          'userMfa.isEnabled',
-          'userMfa.createdAt'
-        ])
+        .select(['userMfa.id', 'userMfa.method', 'userMfa.isEnabled', 'userMfa.createdAt'])
         .whereRef('userMfa.userId', '=', 'users.id')
     ).as('mfa');
   }

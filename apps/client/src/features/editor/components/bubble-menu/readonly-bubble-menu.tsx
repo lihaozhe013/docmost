@@ -53,10 +53,7 @@ export const ReadonlyBubbleMenu: FC<ReadonlyBubbleMenuProps> = ({ editor }) => {
     }
 
     const editorDom = editor.view.dom;
-    if (
-      !editorDom.contains(selection.anchorNode) ||
-      !editorDom.contains(selection.focusNode)
-    ) {
+    if (!editorDom.contains(selection.anchorNode) || !editorDom.contains(selection.focusNode)) {
       setVisible(false);
       return;
     }
@@ -69,9 +66,7 @@ export const ReadonlyBubbleMenu: FC<ReadonlyBubbleMenuProps> = ({ editor }) => {
       return;
     }
 
-    const editorRect = editorDom
-      .closest('.editor-container')
-      ?.getBoundingClientRect();
+    const editorRect = editorDom.closest('.editor-container')?.getBoundingClientRect();
     if (!editorRect) {
       setVisible(false);
       return;

@@ -30,8 +30,7 @@ export function SpaceRow({
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
 
-  const writable =
-    !!space.membership?.role && space.membership.role !== SpaceRole.READER;
+  const writable = !!space.membership?.role && space.membership.role !== SpaceRole.READER;
   const isSelected = space.id === selectedId;
 
   const rowClasses = [

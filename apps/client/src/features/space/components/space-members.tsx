@@ -1,13 +1,4 @@
-import {
-  Center,
-  Group,
-  Loader,
-  Table,
-  Text,
-  Menu,
-  ActionIcon,
-  ScrollArea
-} from '@mantine/core';
+import { Center, Group, Loader, Table, Text, Menu, ActionIcon, ScrollArea } from '@mantine/core';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { IconDots } from '@tabler/icons-react';
 import { modals } from '@mantine/modals';
@@ -20,10 +11,7 @@ import {
 import { IconGroupCircle } from '@/components/icons/icon-people-circle.tsx';
 import { IRemoveSpaceMember } from '@/features/space/types/space.types.ts';
 import RoleSelectMenu from '@/components/ui/role-select-menu.tsx';
-import {
-  getSpaceRoleLabel,
-  spaceRoleData
-} from '@/features/space/types/space-role-data.ts';
+import { getSpaceRoleLabel, spaceRoleData } from '@/features/space/types/space-role-data.ts';
 import { formatMemberCount } from '@/lib';
 import { useTranslation } from 'react-i18next';
 import { SearchInput } from '@/components/common/search-input.tsx';
@@ -36,10 +24,7 @@ interface SpaceMembersProps {
   readOnly?: boolean;
 }
 
-export default function SpaceMembersList({
-  spaceId,
-  readOnly
-}: SpaceMembersProps) {
+export default function SpaceMembersList({ spaceId, readOnly }: SpaceMembersProps) {
   const { t } = useTranslation();
   const [search, setSearch] = useState('');
   const handleSearch = useCallback((query: string) => setSearch(query), []);
@@ -153,10 +138,7 @@ export default function SpaceMembersList({
                   <Table.Td>
                     <Group gap="sm" wrap="nowrap">
                       {member.type === 'user' && (
-                        <CustomAvatar
-                          avatarUrl={member?.avatarUrl}
-                          name={member.name}
-                        />
+                        <CustomAvatar avatarUrl={member?.avatarUrl} name={member.name} />
                       )}
 
                       {member.type === 'group' && <IconGroupCircle />}
@@ -189,12 +171,7 @@ export default function SpaceMembersList({
                         roles={spaceRoleData}
                         roleName={getSpaceRoleLabel(member.role)}
                         onChange={(newRole) =>
-                          handleRoleChange(
-                            member.id,
-                            member.type,
-                            newRole,
-                            member.role
-                          )
+                          handleRoleChange(member.id, member.type, newRole, member.role)
                         }
                       />
                     )}
@@ -223,11 +200,7 @@ export default function SpaceMembersList({
                         </Menu.Target>
 
                         <Menu.Dropdown>
-                          <Menu.Item
-                            onClick={() =>
-                              openRemoveModal(member.id, member.type)
-                            }
-                          >
+                          <Menu.Item onClick={() => openRemoveModal(member.id, member.type)}>
                             {t('Remove space member')}
                           </Menu.Item>
                         </Menu.Dropdown>

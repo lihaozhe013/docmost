@@ -19,11 +19,7 @@ import GlobalSidebar from '@/components/layouts/global/global-sidebar.tsx';
 import { ASIDE_PANEL_ID } from '@/hooks/use-toggle-aside.tsx';
 import { MAIN_CONTENT_ID, SkipToMain } from '@/components/ui/skip-to-main.tsx';
 
-export default function GlobalAppShell({
-  children
-}: {
-  children: React.ReactNode;
-}) {
+export default function GlobalAppShell({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation();
   const [mobileOpened] = useAtom(mobileSidebarAtom);
   const toggleMobile = useToggleSidebar(mobileSidebarAtom);
@@ -45,9 +41,7 @@ export default function GlobalAppShell({
   const resize = React.useCallback(
     (mouseMoveEvent) => {
       if (isResizing) {
-        const newWidth =
-          mouseMoveEvent.clientX -
-          sidebarRef.current.getBoundingClientRect().left;
+        const newWidth = mouseMoveEvent.clientX - sidebarRef.current.getBoundingClientRect().left;
         if (newWidth < 220) {
           setSidebarWidth(220);
           return;
@@ -115,9 +109,7 @@ export default function GlobalAppShell({
                 : t('Main navigation')
           }
         >
-          {isSpaceRoute && (
-            <div className={classes.resizeHandle} onMouseDown={startResizing} />
-          )}
+          {isSpaceRoute && <div className={classes.resizeHandle} onMouseDown={startResizing} />}
           {isSpaceRoute && <SpaceSidebar />}
           {isSettingsRoute && <SettingsSidebar />}
           {showGlobalSidebar && <GlobalSidebar />}

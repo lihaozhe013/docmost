@@ -1,7 +1,4 @@
-import {
-  useDeleteGroupMutation,
-  useGroupQuery
-} from '@/features/group/queries/group-query';
+import { useDeleteGroupMutation, useGroupQuery } from '@/features/group/queries/group-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Menu, ActionIcon, Text } from '@mantine/core';
 import React from 'react';
@@ -20,9 +17,7 @@ export default function GroupActionMenu(props: GroupActionMenuProps = {}) {
   const { t } = useTranslation();
   const { groupId: routeGroupId } = useParams();
   const groupId = props.group?.id ?? routeGroupId;
-  const { data: queriedGroup } = useGroupQuery(
-    props.group ? undefined : groupId
-  );
+  const { data: queriedGroup } = useGroupQuery(props.group ? undefined : groupId);
   const group = props.group ?? queriedGroup;
   const deleteGroupMutation = useDeleteGroupMutation();
   const navigate = useNavigate();

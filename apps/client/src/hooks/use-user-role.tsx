@@ -6,8 +6,7 @@ export const useUserRole = () => {
   const [currentUser] = useAtom(currentUserAtom);
 
   const isAdmin =
-    currentUser?.user?.role === UserRole.ADMIN ||
-    currentUser?.user?.role === UserRole.OWNER;
+    currentUser?.user?.role === UserRole.ADMIN || currentUser?.user?.role === UserRole.OWNER;
 
   const isOwner = currentUser?.user?.role === UserRole.OWNER;
 

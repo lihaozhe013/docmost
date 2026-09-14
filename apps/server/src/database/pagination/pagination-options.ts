@@ -1,12 +1,4 @@
-import {
-  IsBoolean,
-  IsNumber,
-  IsOptional,
-  IsPositive,
-  IsString,
-  Max,
-  Min
-} from 'class-validator';
+import { IsBoolean, IsNumber, IsOptional, IsPositive, IsString, Max, Min } from 'class-validator';
 
 export class PaginationOptions {
   @IsOptional()

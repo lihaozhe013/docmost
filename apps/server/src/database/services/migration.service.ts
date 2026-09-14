@@ -30,9 +30,7 @@ export class MigrationService {
 
     results?.forEach((it) => {
       if (it.status === 'Success') {
-        this.logger.log(
-          `Migration "${it.migrationName}" executed successfully`
-        );
+        this.logger.log(`Migration "${it.migrationName}" executed successfully`);
       } else if (it.status === 'Error') {
         this.logger.error(`Failed to execute migration "${it.migrationName}"`);
       }

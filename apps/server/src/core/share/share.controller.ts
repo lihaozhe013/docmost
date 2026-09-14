@@ -31,10 +31,7 @@ import { ShareRepo } from '@docmost/db/repos/share/share.repo';
 import { PaginationOptions } from '@docmost/db/pagination/pagination-options';
 import { LicenseCheckService } from '../../integrations/environment/license-check.service';
 import { AuditEvent, AuditResource } from '../../common/events/audit-events';
-import {
-  AUDIT_SERVICE,
-  IAuditService
-} from '../../integrations/audit/audit.service';
+import { AUDIT_SERVICE, IAuditService } from '../../integrations/audit/audit.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('shares')
@@ -51,20 +48,14 @@ export class ShareController {
 
   @HttpCode(HttpStatus.OK)
   @Post('/')
-  async getShares(
-    @AuthUser() user: User,
-    @Body() pagination: PaginationOptions
-  ) {
+  async getShares(@AuthUser() user: User, @Body() pagination: PaginationOptions) {
     return this.shareRepo.getShares(user.id, pagination);
   }
 
   @Public()
   @HttpCode(HttpStatus.OK)
   @Post('/page-info')
-  async getSharedPageInfo(
-    @Body() dto: ShareInfoDto,
-    @AuthWorkspace() workspace: Workspace
-  ) {
+  async getSharedPageInfo(@Body() dto: ShareInfoDto, @AuthWorkspace() workspace: Workspace) {
     if (!dto.pageId && !dto.shareId) {
       throw new BadRequestException();
     }
@@ -81,10 +72,7 @@ export class ShareController {
 
     return {
       ...shareData,
-      features: this.licenseCheckService.resolveFeatures(
-        workspace.licenseKey,
-        workspace.plan
-      )
+      features: this.licenseCheckService.resolveFeatures(workspace.licenseKey, workspace.plan)
     };
   }
 
@@ -118,11 +106,7 @@ export class ShareController {
     @Body() dto: ShareTransclusionLookupDto,
     @AuthWorkspace() workspace: Workspace
   ) {
-    return this.shareService.lookupTransclusionForShare(
-      dto.shareId,
-      dto.references,
-      workspace.id
-    );
+    return this.shareService.lookupTransclusionForShare(dto.shareId, dto.references, workspace.id);
   }
 
   @HttpCode(HttpStatus.OK)
@@ -161,17 +145,12 @@ export class ShareController {
     await this.pageAccessService.validateCanEdit(page, user);
 
     // Prevent sharing restricted pages
-    const isRestricted = await this.pagePermissionRepo.hasRestrictedAncestor(
-      page.id
-    );
+    const isRestricted = await this.pagePermissionRepo.hasRestrictedAncestor(page.id);
     if (isRestricted) {
       throw new BadRequestException('Cannot share a restricted page');
     }
 
-    const sharingAllowed = await this.shareService.isSharingAllowed(
-      workspace.id,
-      page.spaceId
-    );
+    const sharingAllowed = await this.shareService.isSharingAllowed(workspace.id, page.spaceId);
     if (!sharingAllowed) {
       throw new ForbiddenException('Public sharing is disabled');
     }
@@ -253,14 +232,8 @@ export class ShareController {
   @Public()
   @HttpCode(HttpStatus.OK)
   @Post('/tree')
-  async getSharePageTree(
-    @Body() dto: ShareIdDto,
-    @AuthWorkspace() workspace: Workspace
-  ) {
-    const treeData = await this.shareService.getShareTree(
-      dto.shareId,
-      workspace.id
-    );
+  async getSharePageTree(@Body() dto: ShareIdDto, @AuthWorkspace() workspace: Workspace) {
+    const treeData = await this.shareService.getShareTree(dto.shareId, workspace.id);
 
     const sharingAllowed = await this.shareService.isSharingAllowed(
       workspace.id,
@@ -272,10 +245,7 @@ export class ShareController {
 
     return {
       ...treeData,
-      features: this.licenseCheckService.resolveFeatures(
-        workspace.licenseKey,
-        workspace.plan
-      )
+      features: this.licenseCheckService.resolveFeatures(workspace.licenseKey, workspace.plan)
     };
   }
 }

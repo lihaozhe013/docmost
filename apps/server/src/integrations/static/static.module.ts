@@ -16,14 +16,7 @@ export class StaticModule implements OnModuleInit {
     const httpAdapter = this.httpAdapterHost.httpAdapter;
     const app = httpAdapter.getInstance();
 
-    const clientDistPath = join(
-      __dirname,
-      '..',
-      '..',
-      '..',
-      '..',
-      'client/dist'
-    );
+    const clientDistPath = join(__dirname, '..', '..', '..', '..', 'client/dist');
 
     const indexFilePath = join(clientDistPath, 'index.html');
 
@@ -35,10 +28,8 @@ export class StaticModule implements OnModuleInit {
         ENV: this.environmentService.getNodeEnv(),
         APP_URL: this.environmentService.getAppUrl(),
         CLOUD: this.environmentService.isCloud(),
-        FILE_UPLOAD_SIZE_LIMIT:
-          this.environmentService.getFileUploadSizeLimit(),
-        FILE_IMPORT_SIZE_LIMIT:
-          this.environmentService.getFileImportSizeLimit(),
+        FILE_UPLOAD_SIZE_LIMIT: this.environmentService.getFileUploadSizeLimit(),
+        FILE_IMPORT_SIZE_LIMIT: this.environmentService.getFileImportSizeLimit(),
         DRAWIO_URL: this.environmentService.getDrawioUrl(),
         SUBDOMAIN_HOST: this.environmentService.isCloud()
           ? this.environmentService.getSubdomainHost()
@@ -67,10 +58,7 @@ export class StaticModule implements OnModuleInit {
         setHeaders: (reply: any, pathName: string) => {
           // Vite content-hashes everything under /assets, so they can be cached forever
           if (/[\\/]assets[\\/]/.test(pathName)) {
-            reply.header(
-              'Cache-Control',
-              'public, max-age=31536000, immutable'
-            );
+            reply.header('Cache-Control', 'public, max-age=31536000, immutable');
           }
         }
       });

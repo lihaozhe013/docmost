@@ -21,24 +21,21 @@ export type HeadingLink = {
 const recalculateLinks = (nodePos: NodePos[]) => {
   const nodes: HTMLElement[] = [];
 
-  const links: HeadingLink[] = Array.from(nodePos).reduce<HeadingLink[]>(
-    (acc, item) => {
-      const label = item.node.textContent;
-      const level = Number(item.node.attrs.level);
-      if (label.length && level <= 6) {
-        acc.push({
-          label,
-          level,
-          element: item.element,
-          //@ts-ignore
-          position: item.resolvedPos.pos
-        });
-        nodes.push(item.element);
-      }
-      return acc;
-    },
-    []
-  );
+  const links: HeadingLink[] = Array.from(nodePos).reduce<HeadingLink[]>((acc, item) => {
+    const label = item.node.textContent;
+    const level = Number(item.node.attrs.level);
+    if (label.length && level <= 6) {
+      acc.push({
+        label,
+        level,
+        element: item.element,
+        //@ts-ignore
+        position: item.resolvedPos.pos
+      });
+      nodes.push(item.element);
+    }
+    return acc;
+  }, []);
   return { links, nodes };
 };
 
@@ -59,8 +56,7 @@ export const TableOfContents: FC<TableOfContentsProps> = (props) => {
 
     const { node } = view.domAtPos(position);
     const element = node as HTMLElement;
-    const scrollPosition =
-      element.getBoundingClientRect().top + window.scrollY - headerOffset;
+    const scrollPosition = element.getBoundingClientRect().top + window.scrollY - headerOffset;
 
     window.scrollTo({
       top: scrollPosition,
@@ -113,9 +109,7 @@ export const TableOfContents: FC<TableOfContentsProps> = (props) => {
       let headerOffset = 0;
       if (headerPaddingRef.current) {
         headerOffset = parseInt(
-          window
-            .getComputedStyle(headerPaddingRef.current)
-            .getPropertyValue('top')
+          window.getComputedStyle(headerPaddingRef.current).getPropertyValue('top')
         );
       }
       const observerOptions: IntersectionObserverInit = {
@@ -123,10 +117,7 @@ export const TableOfContents: FC<TableOfContentsProps> = (props) => {
         threshold: 0,
         root: null
       };
-      const observer = new IntersectionObserver(
-        observeHandler,
-        observerOptions
-      );
+      const observer = new IntersectionObserver(observeHandler, observerOptions);
 
       headingDOMNodes.forEach((heading) => {
         observer.observe(heading);
@@ -145,9 +136,7 @@ export const TableOfContents: FC<TableOfContentsProps> = (props) => {
     return (
       <>
         {!props.isShare && (
-          <Text size="sm">
-            {t('Add headings (H1, H2, H3) to generate a table of contents.')}
-          </Text>
+          <Text size="sm">{t('Add headings (H1, H2, H3) to generate a table of contents.')}</Text>
         )}
 
         {props.isShare && (

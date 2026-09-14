@@ -1,11 +1,4 @@
-import {
-  Text,
-  Group,
-  UnstyledButton,
-  Badge,
-  Table,
-  Button
-} from '@mantine/core';
+import { Text, Group, UnstyledButton, Badge, Table, Button } from '@mantine/core';
 import { Link } from 'react-router-dom';
 import PageListSkeleton from '@/components/ui/page-list-skeleton.tsx';
 import { buildPageUrl, getPageTitle } from '@/features/page/page.utils.ts';
@@ -25,14 +18,8 @@ interface Props {
 
 export default function RecentChanges({ spaceId }: Props) {
   const { t } = useTranslation();
-  const {
-    data,
-    isLoading,
-    isError,
-    hasNextPage,
-    fetchNextPage,
-    isFetchingNextPage
-  } = useRecentChangesQuery(spaceId);
+  const { data, isLoading, isError, hasNextPage, fetchNextPage, isFetchingNextPage } =
+    useRecentChangesQuery(spaceId);
   const pages = data?.pages.flatMap((p) => p.items) ?? [];
 
   if (isLoading) {
@@ -79,12 +66,7 @@ export default function RecentChanges({ spaceId }: Props) {
                   </Table.Td>
                 )}
                 <Table.Td>
-                  <Text
-                    c="dimmed"
-                    style={{ whiteSpace: 'nowrap' }}
-                    size="xs"
-                    fw={500}
-                  >
+                  <Text c="dimmed" style={{ whiteSpace: 'nowrap' }} size="xs" fw={500}>
                     {formattedDate(page.updatedAt)}
                   </Text>
                 </Table.Td>

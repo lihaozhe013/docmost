@@ -19,11 +19,7 @@ export class LabelService {
     @InjectKysely() private readonly db: KyselyDB
   ) {}
 
-  async addLabelsToPage(
-    pageId: string,
-    names: string[],
-    workspaceId: string
-  ): Promise<Label[]> {
+  async addLabelsToPage(pageId: string, names: string[], workspaceId: string): Promise<Label[]> {
     const attached: Label[] = [];
     await executeTx(this.db, async (trx) => {
       for (const name of names) {
@@ -46,29 +42,16 @@ export class LabelService {
     return attached;
   }
 
-  async removeLabelFromPage(
-    pageId: string,
-    labelId: string,
-    workspaceId: string
-  ): Promise<void> {
+  async removeLabelFromPage(pageId: string, labelId: string, workspaceId: string): Promise<void> {
     await executeTx(this.db, async (trx) => {
       const label = await this.labelRepo.findById(labelId, trx);
       if (!label || label.workspaceId !== workspaceId) {
         throw new NotFoundException('Label not found');
       }
 
-      await this.labelRepo.removeLabelFromPage(
-        pageId,
-        labelId,
-        workspaceId,
-        trx
-      );
+      await this.labelRepo.removeLabelFromPage(pageId, labelId, workspaceId, trx);
 
-      const count = await this.labelRepo.getLabelPageCount(
-        labelId,
-        workspaceId,
-        trx
-      );
+      const count = await this.labelRepo.getLabelPageCount(labelId, workspaceId, trx);
       if (count === 0) {
         await this.labelRepo.deleteLabel(labelId, workspaceId, trx);
       }
@@ -102,20 +85,14 @@ export class LabelService {
       pagination: PaginationOptions;
     }
   ) {
-    const result = await this.labelRepo.findPagesByLabelId(
-      labelId,
-      userId,
-      opts
-    );
+    const result = await this.labelRepo.findPagesByLabelId(labelId, userId, opts);
     if (result.items.length === 0) return result;
 
-    const accessibleIds = await this.pagePermissionRepo.filterAccessiblePageIds(
-      {
-        pageIds: result.items.map((p) => p.id),
-        userId,
-        spaceId: opts.spaceId
-      }
-    );
+    const accessibleIds = await this.pagePermissionRepo.filterAccessiblePageIds({
+      pageIds: result.items.map((p) => p.id),
+      userId,
+      spaceId: opts.spaceId
+    });
     const accessible = new Set(accessibleIds);
     return {
       items: result.items.filter((p) => accessible.has(p.id)),
@@ -131,11 +108,7 @@ export class LabelService {
     spaceId?: string
   ) {
     const normalized = normalizeLabelName(name);
-    const label = await this.labelRepo.findByNameAndWorkspace(
-      normalized,
-      workspaceId,
-      type
-    );
+    const label = await this.labelRepo.findByNameAndWorkspace(normalized, workspaceId, type);
 
     // Uniform response shape.
     // We don't want to expose whether the label row exists

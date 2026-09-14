@@ -10,9 +10,7 @@ import { useTranslation } from 'react-i18next';
 interface AddSpaceMemberModalProps {
   spaceId: string;
 }
-export default function AddSpaceMembersModal({
-  spaceId
-}: AddSpaceMemberModalProps) {
+export default function AddSpaceMembersModal({ spaceId }: AddSpaceMemberModalProps) {
   const { t } = useTranslation();
   const titleId = useId();
   const [opened, { open, close }] = useDisclosure(false);

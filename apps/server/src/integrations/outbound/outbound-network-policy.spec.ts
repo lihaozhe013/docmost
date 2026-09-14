@@ -1,7 +1,4 @@
-import {
-  parseOutboundNetworkPolicy,
-  policyNamesAddress
-} from './outbound-network-policy';
+import { parseOutboundNetworkPolicy, policyNamesAddress } from './outbound-network-policy';
 
 describe('parseOutboundNetworkPolicy', () => {
   it('parses a bare mode', () => {
@@ -132,9 +129,7 @@ describe('parseOutboundNetworkPolicy', () => {
     const policy = parseOutboundNetworkPolicy('all,10.0.0.0/8');
 
     expect(policyNamesAddress(policy, 'siem.internal', 443)).toBe(false);
-    expect(
-      policyNamesAddress(parseOutboundNetworkPolicy('garbage'), '10.1.2.3', 443)
-    ).toBe(false);
+    expect(policyNamesAddress(parseOutboundNetworkPolicy('garbage'), '10.1.2.3', 443)).toBe(false);
   });
 
   it('matches an IPv4-mapped IPv6 address against an IPv4 entry', () => {

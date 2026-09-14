@@ -34,9 +34,7 @@ export const RowHandle = React.memo(function RowHandle({
   // an external drop reflows the doc before the plugin re-emits
   // hoveringCell), it can resolve to a Text node, on which `.closest` is
   // undefined. Filter to HTMLElement so downstream consumers stay safe.
-  const lookupDom = isEditorReady(editor)
-    ? editor.view.nodeDOM(anchorPos)
-    : null;
+  const lookupDom = isEditorReady(editor) ? editor.view.nodeDOM(anchorPos) : null;
   const lookupCellDom = lookupDom instanceof HTMLElement ? lookupDom : null;
   const [cellDom, setCellDom] = useState<HTMLElement | null>(lookupCellDom);
   const lastCellDomRef = useRef<HTMLElement | null>(lookupCellDom);
@@ -107,12 +105,7 @@ export const RowHandle = React.memo(function RowHandle({
         </div>
       </Menu.Target>
       <Menu.Dropdown>
-        <RowHandleMenu
-          editor={editor}
-          index={index}
-          tableNode={tableNode}
-          tablePos={tablePos}
-        />
+        <RowHandleMenu editor={editor} index={index} tableNode={tableNode} tablePos={tablePos} />
       </Menu.Dropdown>
     </Menu>
   );

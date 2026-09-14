@@ -91,19 +91,17 @@ export function SpaceTreeRow({
 
   const handleEmojiSelect = (emoji: { native: string }) => {
     handleUpdateNodeIcon(node.id, emoji.native);
-    updatePageMutation
-      .mutateAsync({ pageId: node.id, icon: emoji.native })
-      .then((data) => {
-        setTimeout(() => {
-          emit({
-            operation: 'updateOne',
-            spaceId: node.spaceId,
-            entity: ['pages'],
-            id: node.id,
-            payload: { icon: emoji.native, parentPageId: data.parentPageId }
-          });
-        }, 50);
-      });
+    updatePageMutation.mutateAsync({ pageId: node.id, icon: emoji.native }).then((data) => {
+      setTimeout(() => {
+        emit({
+          operation: 'updateOne',
+          spaceId: node.spaceId,
+          entity: ['pages'],
+          id: node.id,
+          payload: { icon: emoji.native, parentPageId: data.parentPageId }
+        });
+      }, 50);
+    });
   };
 
   const handleRemoveEmoji = () => {
@@ -128,9 +126,7 @@ export function SpaceTreeRow({
         pageId: node.id,
         spaceId: node.spaceId
       });
-      setTreeData((prev) =>
-        treeModel.appendChildren(prev, node.id, childrenTree)
-      );
+      setTreeData((prev) => treeModel.appendChildren(prev, node.id, childrenTree));
     } catch (error) {
       console.error('Failed to fetch children:', error);
     }
@@ -151,11 +147,7 @@ export function SpaceTreeRow({
       onMouseEnter={prefetchPage}
       onMouseLeave={cancelPagePrefetch}
     >
-      <PageArrow
-        isOpen={isOpen}
-        hasChildren={hasChildren}
-        onToggle={toggleOpen}
-      />
+      <PageArrow isOpen={isOpen} hasChildren={hasChildren} onToggle={toggleOpen} />
 
       <div onClick={handleEmojiIconClick} style={{ marginRight: '4px' }}>
         <EmojiPicker
@@ -175,9 +167,7 @@ export function SpaceTreeRow({
         />
       </div>
 
-      <span className={classes.text}>
-        {getPageTitle(node.name, node.isBase, t)}
-      </span>
+      <span className={classes.text}>{getPageTitle(node.name, node.isBase, t)}</span>
 
       <div className={classes.actions}>
         <NodeMenu node={node} canEdit={canEdit} />
@@ -256,13 +246,7 @@ interface CreateNodeProps {
   onExpandTree: () => Promise<void> | void;
 }
 
-function CreateNode({
-  node,
-  isOpen,
-  hasChildren,
-  onToggle,
-  onExpandTree
-}: CreateNodeProps) {
+function CreateNode({ node, isOpen, hasChildren, onToggle, onExpandTree }: CreateNodeProps) {
   const { t } = useTranslation();
   const { handleCreate } = useTreeMutation(node.spaceId);
 

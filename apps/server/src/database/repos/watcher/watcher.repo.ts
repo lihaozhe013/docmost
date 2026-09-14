@@ -38,10 +38,7 @@ export class WatcherRepo {
     });
   }
 
-  async getPageWatcherIds(
-    pageId: string,
-    trx?: KyselyTransaction
-  ): Promise<string[]> {
+  async getPageWatcherIds(pageId: string, trx?: KyselyTransaction): Promise<string[]> {
     const db = dbOrTx(this.db, trx);
     const watchers = await db
       .selectFrom('watchers')
@@ -101,10 +98,7 @@ export class WatcherRepo {
     return [...new Set(rows.map((r) => r.userId))];
   }
 
-  async insert(
-    watcher: InsertableWatcher,
-    trx?: KyselyTransaction
-  ): Promise<Watcher | undefined> {
+  async insert(watcher: InsertableWatcher, trx?: KyselyTransaction): Promise<Watcher | undefined> {
     const db = dbOrTx(this.db, trx);
     return db
       .insertInto('watchers')
@@ -114,10 +108,7 @@ export class WatcherRepo {
       .executeTakeFirst();
   }
 
-  async insertMany(
-    watchers: InsertableWatcher[],
-    trx?: KyselyTransaction
-  ): Promise<void> {
+  async insertMany(watchers: InsertableWatcher[], trx?: KyselyTransaction): Promise<void> {
     if (watchers.length === 0) return;
     const db = dbOrTx(this.db, trx);
     await db
@@ -127,10 +118,7 @@ export class WatcherRepo {
       .execute();
   }
 
-  async upsert(
-    watcher: InsertableWatcher,
-    trx?: KyselyTransaction
-  ): Promise<Watcher | undefined> {
+  async upsert(watcher: InsertableWatcher, trx?: KyselyTransaction): Promise<Watcher | undefined> {
     const db = dbOrTx(this.db, trx);
     return db
       .insertInto('watchers')
@@ -153,12 +141,7 @@ export class WatcherRepo {
     return db
       .insertInto('watchers')
       .values(watcher)
-      .onConflict((oc) =>
-        oc
-          .columns(['userId', 'spaceId'])
-          .where('pageId', 'is', null)
-          .doNothing()
-      )
+      .onConflict((oc) => oc.columns(['userId', 'spaceId']).where('pageId', 'is', null).doNothing())
       .returningAll()
       .executeTakeFirst();
   }
@@ -184,19 +167,12 @@ export class WatcherRepo {
         mutedAt
       })
       .onConflict((oc) =>
-        oc
-          .columns(['userId', 'pageId'])
-          .where('pageId', 'is not', null)
-          .doUpdateSet({ mutedAt })
+        oc.columns(['userId', 'pageId']).where('pageId', 'is not', null).doUpdateSet({ mutedAt })
       )
       .execute();
   }
 
-  async deleteSpaceWatch(
-    userId: string,
-    spaceId: string,
-    trx?: KyselyTransaction
-  ): Promise<void> {
+  async deleteSpaceWatch(userId: string, spaceId: string, trx?: KyselyTransaction): Promise<void> {
     const db = dbOrTx(this.db, trx);
     await db
       .deleteFrom('watchers')
@@ -299,11 +275,7 @@ export class WatcherRepo {
     if (pageIds.length === 0) return;
     const { trx } = opts;
     const db = dbOrTx(this.db, trx);
-    await db
-      .updateTable('watchers')
-      .set({ spaceId })
-      .where('pageId', 'in', pageIds)
-      .execute();
+    await db.updateTable('watchers').set({ spaceId }).where('pageId', 'in', pageIds).execute();
   }
 
   async deleteByPageIdsWithoutSpaceAccess(

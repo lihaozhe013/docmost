@@ -39,8 +39,7 @@ interface Props {
 export const MoreInsertsGroup: FC<Props> = ({ editor, templateMode }) => {
   const { t, i18n } = useTranslation();
 
-  const setEmbed = (provider: string) =>
-    editor.chain().focus().setEmbed({ provider }).run();
+  const setEmbed = (provider: string) => editor.chain().focus().setEmbed({ provider }).run();
 
   const insertDate = () => {
     const currentDate = new Date().toLocaleDateString(i18n.language, {
@@ -55,12 +54,7 @@ export const MoreInsertsGroup: FC<Props> = ({ editor, templateMode }) => {
     <Menu shadow="md" position="bottom-start" withArrow={false} width={240}>
       <Menu.Target>
         <Tooltip label={t('More inserts')} withArrow>
-          <ActionIcon
-            variant="subtle"
-            color="dark"
-            size="md"
-            aria-label={t('More inserts')}
-          >
+          <ActionIcon variant="subtle" color="dark" size="md" aria-label={t('More inserts')}>
             <IconChevronDown size={16} />
           </ActionIcon>
         </Tooltip>
@@ -81,9 +75,7 @@ export const MoreInsertsGroup: FC<Props> = ({ editor, templateMode }) => {
         </Menu.Item>
         <Menu.Item
           leftSection={<IconTag size={16} />}
-          onClick={() =>
-            editor.chain().focus().setStatus({ text: '', color: 'gray' }).run()
-          }
+          onClick={() => editor.chain().focus().setStatus({ text: '', color: 'gray' }).run()}
         >
           {t('Status')}
         </Menu.Item>
@@ -96,9 +88,7 @@ export const MoreInsertsGroup: FC<Props> = ({ editor, templateMode }) => {
         {!templateMode && (
           <Menu.Item
             leftSection={<IconRotate2 size={16} />}
-            onClick={() =>
-              editor.chain().focus().toggleTransclusionSource().run()
-            }
+            onClick={() => editor.chain().focus().toggleTransclusionSource().run()}
           >
             {t('Synced block')}
           </Menu.Item>
@@ -138,79 +128,43 @@ export const MoreInsertsGroup: FC<Props> = ({ editor, templateMode }) => {
 
         <Menu.Divider />
         <Menu.Label>{t('Embeds')}</Menu.Label>
-        <Menu.Item
-          leftSection={<IconAppWindow size={16} />}
-          onClick={() => setEmbed('iframe')}
-        >
+        <Menu.Item leftSection={<IconAppWindow size={16} />} onClick={() => setEmbed('iframe')}>
           Iframe
         </Menu.Item>
-        <Menu.Item
-          leftSection={<YoutubeIcon size={16} />}
-          onClick={() => setEmbed('youtube')}
-        >
+        <Menu.Item leftSection={<YoutubeIcon size={16} />} onClick={() => setEmbed('youtube')}>
           YouTube
         </Menu.Item>
-        <Menu.Item
-          leftSection={<VimeoIcon size={16} />}
-          onClick={() => setEmbed('vimeo')}
-        >
+        <Menu.Item leftSection={<VimeoIcon size={16} />} onClick={() => setEmbed('vimeo')}>
           Vimeo
         </Menu.Item>
-        <Menu.Item
-          leftSection={<LoomIcon size={16} />}
-          onClick={() => setEmbed('loom')}
-        >
+        <Menu.Item leftSection={<LoomIcon size={16} />} onClick={() => setEmbed('loom')}>
           Loom
         </Menu.Item>
-        <Menu.Item
-          leftSection={<FigmaIcon size={16} />}
-          onClick={() => setEmbed('figma')}
-        >
+        <Menu.Item leftSection={<FigmaIcon size={16} />} onClick={() => setEmbed('figma')}>
           Figma
         </Menu.Item>
-        <Menu.Item
-          leftSection={<AirtableIcon size={16} />}
-          onClick={() => setEmbed('airtable')}
-        >
+        <Menu.Item leftSection={<AirtableIcon size={16} />} onClick={() => setEmbed('airtable')}>
           Airtable
         </Menu.Item>
-        <Menu.Item
-          leftSection={<TypeformIcon size={16} />}
-          onClick={() => setEmbed('typeform')}
-        >
+        <Menu.Item leftSection={<TypeformIcon size={16} />} onClick={() => setEmbed('typeform')}>
           Typeform
         </Menu.Item>
-        <Menu.Item
-          leftSection={<MiroIcon size={16} />}
-          onClick={() => setEmbed('miro')}
-        >
+        <Menu.Item leftSection={<MiroIcon size={16} />} onClick={() => setEmbed('miro')}>
           Miro
         </Menu.Item>
-        <Menu.Item
-          leftSection={<FramerIcon size={16} />}
-          onClick={() => setEmbed('framer')}
-        >
+        <Menu.Item leftSection={<FramerIcon size={16} />} onClick={() => setEmbed('framer')}>
           Framer
         </Menu.Item>
-        <Menu.Item
-          leftSection={<GoogleDriveIcon size={16} />}
-          onClick={() => setEmbed('gdrive')}
-        >
+        <Menu.Item leftSection={<GoogleDriveIcon size={16} />} onClick={() => setEmbed('gdrive')}>
           Google Drive
         </Menu.Item>
-        <Menu.Item
-          leftSection={<GoogleSheetsIcon size={16} />}
-          onClick={() => setEmbed('gsheets')}
-        >
+        <Menu.Item leftSection={<GoogleSheetsIcon size={16} />} onClick={() => setEmbed('gsheets')}>
           Google Sheets
         </Menu.Item>
 
         <Menu.Divider />
         <Menu.Label>{t('Utility')}</Menu.Label>
-        <Menu.Item
-          leftSection={<IconCalendar size={16} />}
-          onClick={insertDate}
-        >
+        <Menu.Item leftSection={<IconCalendar size={16} />} onClick={insertDate}>
           {t('Date')}
         </Menu.Item>
         <Menu.Item

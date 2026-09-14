@@ -9,8 +9,4 @@ const cookieStorage = createJSONStorage<any>(() => {
   };
 });
 
-export const authTokensAtom = atomWithStorage<any | null>(
-  'authTokens',
-  null,
-  cookieStorage
-);
+export const authTokensAtom = atomWithStorage<any | null>('authTokens', null, cookieStorage);

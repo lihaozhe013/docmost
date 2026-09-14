@@ -21,17 +21,11 @@ import { PaginationOptions } from '@docmost/db/pagination/pagination-options';
 import { User, Workspace } from '@docmost/db/types/entity.types';
 import SpaceAbilityFactory from '../casl/abilities/space-ability.factory';
 import { PageRepo } from '@docmost/db/repos/page/page.repo';
-import {
-  SpaceCaslAction,
-  SpaceCaslSubject
-} from '../casl/interfaces/space-ability.type';
+import { SpaceCaslAction, SpaceCaslSubject } from '../casl/interfaces/space-ability.type';
 import { CommentRepo } from '@docmost/db/repos/comment/comment.repo';
 import { PageAccessService } from '../page/page-access/page-access.service';
 import { AuditEvent, AuditResource } from '../../common/events/audit-events';
-import {
-  AUDIT_SERVICE,
-  IAuditService
-} from '../../integrations/audit/audit.service';
+import { AUDIT_SERVICE, IAuditService } from '../../integrations/audit/audit.service';
 import { WsService } from '../../ws/ws.service';
 
 @UseGuards(JwtAuthGuard)
@@ -177,10 +171,7 @@ export class CommentController {
     if (isOwner) {
       await this.commentRepo.deleteComment(comment.id);
     } else {
-      const ability = await this.spaceAbility.createForUser(
-        user,
-        comment.spaceId
-      );
+      const ability = await this.spaceAbility.createForUser(user, comment.spaceId);
 
       // Space admin can delete any comment
       if (ability.cannot(SpaceCaslAction.Manage, SpaceCaslSubject.Settings)) {

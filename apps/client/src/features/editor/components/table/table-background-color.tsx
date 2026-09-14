@@ -33,9 +33,7 @@ export const TABLE_COLORS: TableColorItem[] = [
   { name: 'Purple', color: '#c1b7f2' }
 ];
 
-export const TableBackgroundColor: FC<TableBackgroundColorProps> = ({
-  editor
-}) => {
+export const TableBackgroundColor: FC<TableBackgroundColorProps> = ({ editor }) => {
   const { t } = useTranslation();
   const [opened, setOpened] = React.useState(false);
 
@@ -142,9 +140,7 @@ export const TableBackgroundColor: FC<TableBackgroundColorProps> = ({
                       size={18}
                       style={{
                         color:
-                          item.color === '' || item.color.startsWith('#F')
-                            ? '#000000'
-                            : '#ffffff'
+                          item.color === '' || item.color.startsWith('#F') ? '#000000' : '#ffffff'
                       }}
                     />
                   )}

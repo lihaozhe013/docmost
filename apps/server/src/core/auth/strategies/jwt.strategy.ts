@@ -2,21 +2,13 @@ import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-jwt';
 import { EnvironmentService } from '../../../integrations/environment/environment.service';
-import {
-  JwtApiKeyPayload,
-  JwtOAuthPayload,
-  JwtPayload,
-  JwtType
-} from '../dto/jwt-payload';
+import { JwtApiKeyPayload, JwtOAuthPayload, JwtPayload, JwtType } from '../dto/jwt-payload';
 import { WorkspaceRepo } from '@docmost/db/repos/workspace/workspace.repo';
 import { UserRepo } from '@docmost/db/repos/user/user.repo';
 import { UserSessionRepo } from '@docmost/db/repos/session/user-session.repo';
 import { SessionActivityService } from '../../session/session-activity.service';
 import { FastifyRequest } from 'fastify';
-import {
-  extractBearerTokenFromHeader,
-  isUserDisabled
-} from '../../../common/helpers';
+import { extractBearerTokenFromHeader, isUserDisabled } from '../../../common/helpers';
 import { ModuleRef } from '@nestjs/core';
 
 @Injectable()
@@ -41,10 +33,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  async validate(
-    req: any,
-    payload: JwtPayload | JwtApiKeyPayload | JwtOAuthPayload
-  ) {
+  async validate(req: any, payload: JwtPayload | JwtApiKeyPayload | JwtOAuthPayload) {
     if (!payload.workspaceId) {
       throw new UnauthorizedException();
     }
@@ -55,18 +44,12 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
     // authType lets guards tell an interactive session from a programmatic credential.
     if (payload.type === JwtType.API_KEY) {
-      const authResult = await this.validateApiKey(
-        req,
-        payload as JwtApiKeyPayload
-      );
+      const authResult = await this.validateApiKey(req, payload as JwtApiKeyPayload);
       return { ...authResult, authType: JwtType.API_KEY };
     }
 
     if (payload.type === JwtType.OAUTH_ACCESS) {
-      const authResult = await this.validateOAuthToken(
-        req,
-        payload as JwtOAuthPayload
-      );
+      const authResult = await this.validateOAuthToken(req, payload as JwtOAuthPayload);
       return { ...authResult, authType: JwtType.OAUTH_ACCESS };
     }
 
@@ -96,11 +79,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         throw new UnauthorizedException();
       }
       req.raw.sessionId = sessionId;
-      this.sessionActivityService.trackActivity(
-        sessionId,
-        payload.sub,
-        payload.workspaceId
-      );
+      this.sessionActivityService.trackActivity(sessionId, payload.sub, payload.workspaceId);
     }
 
     return { user, workspace, authType: JwtType.ACCESS };
@@ -115,9 +94,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       ApiKeyModule = require('./../../../ee/api-key/api-key.service');
       isApiKeyModuleReady = true;
     } catch (err) {
-      this.logger.debug(
-        'API Key module requested but enterprise module not bundled in this build'
-      );
+      this.logger.debug('API Key module requested but enterprise module not bundled in this build');
       isApiKeyModuleReady = false;
     }
 
@@ -141,19 +118,14 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       OAuthStrategyModule = require('./../../../ee/oauth/services/oauth-strategy.service');
       isOAuthModuleReady = true;
     } catch (err) {
-      this.logger.debug(
-        'OAuth module requested but enterprise module not bundled in this build'
-      );
+      this.logger.debug('OAuth module requested but enterprise module not bundled in this build');
       isOAuthModuleReady = false;
     }
 
     if (isOAuthModuleReady) {
-      const OAuthStrategyService = this.moduleRef.get(
-        OAuthStrategyModule.OAuthStrategyService,
-        {
-          strict: false
-        }
-      );
+      const OAuthStrategyService = this.moduleRef.get(OAuthStrategyModule.OAuthStrategyService, {
+        strict: false
+      });
 
       return OAuthStrategyService.validateOAuthToken(payload, {
         workspaceId: req.raw.workspaceId,

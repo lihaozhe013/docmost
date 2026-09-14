@@ -55,11 +55,8 @@ export class RedisSyncExtension<TCE extends CustomEvents> implements Extension {
   private readonly customEvents: TCE;
   private replyIdCounter: number = 0;
   // @ts-ignore
-  private pendingReplies: Record<number, PromiseWithResolvers<any>['resolve']> =
-    {};
-  private deriveContext: (
-    serializedHTTPRequest: SerializedHTTPRequest
-  ) => Record<string, any>;
+  private pendingReplies: Record<number, PromiseWithResolvers<any>['resolve']> = {};
+  private deriveContext: (serializedHTTPRequest: SerializedHTTPRequest) => Record<string, any>;
 
   constructor(configuration: Configuration<TCE>) {
     const {
@@ -116,12 +113,7 @@ export class RedisSyncExtension<TCE extends CustomEvents> implements Extension {
     const socketId = headers['sec-websocket-key'];
     let entry = this.proxyConnections[socketId];
     if (!entry) {
-      const socket = new CollabProxySocket(
-        this.pub,
-        this.pack,
-        replyTo,
-        socketId
-      );
+      const socket = new CollabProxySocket(this.pub, this.pack, replyTo, socketId);
       // A proxy connection with no live documents (client left the page, auth
       // failed, or the origin server crashed) is reaped by hocuspocus' message
       // timeout. Dispose it silently in that case: relaying the timeout close
@@ -179,10 +171,7 @@ export class RedisSyncExtension<TCE extends CustomEvents> implements Extension {
     return this.getOrClaimLock(documentName);
   }
 
-  private handleRedisMessage = async (
-    _channel: Buffer,
-    packedMessage: Buffer
-  ) => {
+  private handleRedisMessage = async (_channel: Buffer, packedMessage: Buffer) => {
     const msg = this.unpack(packedMessage) as RSAMessage;
     const { type } = msg;
     if (type === 'proxy') {
@@ -236,12 +225,7 @@ export class RedisSyncExtension<TCE extends CustomEvents> implements Extension {
 
   async maintainLock(documentName: string) {
     this.locks[documentName] = setInterval(() => {
-      this.pub.set(
-        this.getKey(documentName),
-        this.serverId,
-        'PX',
-        this.lockTTL
-      );
+      this.pub.set(this.getKey(documentName), this.serverId, 'PX', this.lockTTL);
     }, this.lockTTL / 2);
   }
 
@@ -320,10 +304,7 @@ export class RedisSyncExtension<TCE extends CustomEvents> implements Extension {
   }
 
   /* WebSocket Server Hooks */
-  onSocketOpen(
-    ws: WebSocketLike,
-    serializedHTTPRequest: SerializedHTTPRequest
-  ) {
+  onSocketOpen(ws: WebSocketLike, serializedHTTPRequest: SerializedHTTPRequest) {
     const socketId = serializedHTTPRequest.headers['sec-websocket-key'];
     const clientConnection = this.instance.handleConnection(
       ws,
@@ -333,10 +314,7 @@ export class RedisSyncExtension<TCE extends CustomEvents> implements Extension {
     this.originConnections[socketId] = { clientConnection, socket: ws };
   }
 
-  async onSocketMessage(
-    serializedHTTPRequest: SerializedHTTPRequest,
-    detachableMsg: ArrayBuffer
-  ) {
+  async onSocketMessage(serializedHTTPRequest: SerializedHTTPRequest, detachableMsg: ArrayBuffer) {
     const socketId = serializedHTTPRequest.headers['sec-websocket-key'];
     const entry = this.originConnections[socketId];
     if (!entry) return;
@@ -351,9 +329,7 @@ export class RedisSyncExtension<TCE extends CustomEvents> implements Extension {
       // session-aware providers suffix the documentName with \0sessionId
       const sepIdx = documentNameAndSessionId.indexOf('\0');
       documentName =
-        sepIdx === -1
-          ? documentNameAndSessionId
-          : documentNameAndSessionId.slice(0, sepIdx);
+        sepIdx === -1 ? documentNameAndSessionId : documentNameAndSessionId.slice(0, sepIdx);
     } catch (error) {
       entry.socket.close(Unauthorized.code, Unauthorized.reason);
       return;

@@ -28,9 +28,6 @@ export function dropOpToMovePayload(
   return {
     pageId: sourceId,
     parentPageId: info.parentId,
-    position: generateJitteredKeyBetween(
-      prev?.position ?? null,
-      next?.position ?? null
-    )
+    position: generateJitteredKeyBetween(prev?.position ?? null, next?.position ?? null)
   };
 }

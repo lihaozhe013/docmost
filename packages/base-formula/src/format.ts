@@ -14,10 +14,7 @@ const OP_STR: Partial<Record<OpCode, string>> = {
   '<=': ' <= '
 };
 
-export function format(
-  ast: FormulaAST,
-  idToName: ReadonlyMap<string, string>
-): string {
+export function format(ast: FormulaAST, idToName: ReadonlyMap<string, string>): string {
   switch (ast.t) {
     case 'num':
       return String(ast.v);

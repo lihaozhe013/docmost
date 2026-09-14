@@ -45,9 +45,7 @@ export function useAiPageEditingRun({
   const [tokenEstimate, setTokenEstimate] = useState(0);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [latestChangeId, setLatestChangeId] = useState<string | null>(null);
-  const [latestAffectedBlockId, setLatestAffectedBlockId] = useState<
-    string | null
-  >(null);
+  const [latestAffectedBlockId, setLatestAffectedBlockId] = useState<string | null>(null);
   const adapterRef = useRef<DocumentBuffer | null>(null);
   const runIdRef = useRef<string | null>(null);
   const messagesRef = useRef(messages);
@@ -66,11 +64,7 @@ export function useAiPageEditingRun({
   }, [messages]);
 
   useEffect(() => {
-    if (
-      !editor ||
-      editor.isDestroyed ||
-      (editor.storage as any).pageId !== pageId
-    ) {
+    if (!editor || editor.isDestroyed || (editor.storage as any).pageId !== pageId) {
       adapterRef.current?.destroy();
       adapterRef.current = null;
       return;
@@ -150,14 +144,8 @@ export function useAiPageEditingRun({
         }
         setMessages((current) => {
           const last = current[current.length - 1];
-          if (
-            last?.role === 'assistant' &&
-            last.id === assistantMessageIdRef.current
-          ) {
-            return [
-              ...current.slice(0, -1),
-              { ...last, content: last.content + delta }
-            ];
+          if (last?.role === 'assistant' && last.id === assistantMessageIdRef.current) {
+            return [...current.slice(0, -1), { ...last, content: last.content + delta }];
           }
           const id = `assistant:${messageId()}`;
           assistantMessageIdRef.current = id;
@@ -170,11 +158,7 @@ export function useAiPageEditingRun({
         // Tool arguments are model output too, so they count toward the live
         // estimate; otherwise tool-heavy runs would show no tokens at all.
         const inputText =
-          typeof raw.input === 'string'
-            ? raw.input
-            : raw.input
-              ? JSON.stringify(raw.input)
-              : '';
+          typeof raw.input === 'string' ? raw.input : raw.input ? JSON.stringify(raw.input) : '';
         if (inputText) {
           setTokenEstimate((current) => current + estimateTokens(inputText));
         }
@@ -206,9 +190,7 @@ export function useAiPageEditingRun({
             item.id === `tool:${raw.toolCallId}`
               ? {
                   ...item,
-                  content: error
-                    ? formatDisplayedError(error)
-                    : (change.summary ?? ''),
+                  content: error ? formatDisplayedError(error) : (change.summary ?? ''),
                   toolStep: {
                     toolName: raw.toolName || item.toolStep?.toolName || '',
                     status: error ? 'error' : 'done',
@@ -229,9 +211,7 @@ export function useAiPageEditingRun({
         cancelledPendingStartRef.current = false;
         if (raw.event === 'run.completed') {
           const elapsedMs =
-            runStartedAtRef.current !== null
-              ? Date.now() - runStartedAtRef.current
-              : undefined;
+            runStartedAtRef.current !== null ? Date.now() - runStartedAtRef.current : undefined;
           const finalText = raw.text || '';
           const meta = {
             ...(raw.usage ? { usage: raw.usage } : {}),
@@ -253,9 +233,7 @@ export function useAiPageEditingRun({
           } else if (hasMeta && assistantMessageIdRef.current) {
             const targetId = assistantMessageIdRef.current;
             setMessages((current) =>
-              current.map((item) =>
-                item.id === targetId ? { ...item, meta } : item
-              )
+              current.map((item) => (item.id === targetId ? { ...item, meta } : item))
             );
           }
         }
@@ -345,28 +323,17 @@ export function useAiPageEditingRun({
 
       const operation = (async (): Promise<ToolResponse> => {
         let result: BrowserToolResult | undefined;
-        let error:
-          { code: string; message: string; details?: unknown } | undefined;
+        let error: { code: string; message: string; details?: unknown } | undefined;
         const signal = runAbortRef.current?.signal;
         try {
           const adapter = adapterRef.current;
           if (!adapter) {
-            throw new BufferError(
-              'SESSION_UNAVAILABLE',
-              'The page editor is unavailable'
-            );
+            throw new BufferError('SESSION_UNAVAILABLE', 'The page editor is unavailable');
           }
           if (request.pageId !== pageId || adapter.getPageId() !== pageId) {
-            throw new BufferError(
-              'ACCESS_DENIED',
-              'The AI run is bound to a different page'
-            );
+            throw new BufferError('ACCESS_DENIED', 'The AI run is bound to a different page');
           }
-          result = await adapter.executeTool(
-            request.toolName,
-            request.input,
-            signal
-          );
+          result = await adapter.executeTool(request.toolName, request.input, signal);
         } catch (caught) {
           error = getError(caught);
         }
@@ -440,10 +407,7 @@ export function useAiPageEditingRun({
   }, [editor, pageId, socket]);
 
   const appendToolMessage = useCallback((content: string) => {
-    setMessages((current) => [
-      ...current,
-      { id: messageId(), role: 'tool', content }
-    ]);
+    setMessages((current) => [...current, { id: messageId(), role: 'tool', content }]);
   }, []);
 
   const reportLocalError = useCallback(
@@ -459,10 +423,7 @@ export function useAiPageEditingRun({
    * Validates preconditions and emits the run start request. Returns false
    * when the request was not sent; local errors are already reported.
    */
-  const startRun = (
-    value: string,
-    readyImages: ChatMessageImage[]
-  ): boolean => {
+  const startRun = (value: string, readyImages: ChatMessageImage[]): boolean => {
     if (!socket) {
       reportLocalError('The editor connection is not available yet.');
       return false;

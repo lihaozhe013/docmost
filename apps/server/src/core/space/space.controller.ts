@@ -22,10 +22,7 @@ import { AddSpaceMembersDto } from './dto/add-space-members.dto';
 import { RemoveSpaceMemberDto } from './dto/remove-space-member.dto';
 import { UpdateSpaceMemberRoleDto } from './dto/update-space-member-role.dto';
 import SpaceAbilityFactory from '../casl/abilities/space-ability.factory';
-import {
-  SpaceCaslAction,
-  SpaceCaslSubject
-} from '../casl/interfaces/space-ability.type';
+import { SpaceCaslAction, SpaceCaslSubject } from '../casl/interfaces/space-ability.type';
 import { UpdateSpaceDto } from './dto/update-space.dto';
 import { findHighestUserSpaceRole } from '@docmost/db/repos/space/utils';
 import { SpaceMemberRepo } from '@docmost/db/repos/space/space-member.repo';
@@ -55,17 +52,11 @@ export class SpaceController {
     pagination: PaginationOptions,
     @AuthUser() user: User
   ) {
-    const result = await this.spaceMemberService.getUserSpaces(
-      user.id,
-      pagination
-    );
+    const result = await this.spaceMemberService.getUserSpaces(user.id, pagination);
 
     if (result.items.length > 0) {
       const spaceIds = result.items.map((s) => s.id);
-      const roles = await this.spaceMemberRepo.getUserRolesForSpaces(
-        user.id,
-        spaceIds
-      );
+      const roles = await this.spaceMemberRepo.getUserRolesForSpaces(user.id, spaceIds);
 
       const roleMap = new Map<string, string[]>();
       for (const row of roles) {
@@ -77,9 +68,7 @@ export class SpaceController {
       result.items = result.items.map((space) => {
         const spaceRoles = roleMap.get(space.id);
         const role = spaceRoles
-          ? findHighestUserSpaceRole(
-              spaceRoles.map((r) => ({ userId: user.id, role: r }))
-            )
+          ? findHighestUserSpaceRole(spaceRoles.map((r) => ({ userId: user.id, role: r })))
           : undefined;
 
         return {
@@ -100,10 +89,7 @@ export class SpaceController {
     @AuthUser() user: User,
     @AuthWorkspace() workspace: Workspace
   ) {
-    const space = await this.spaceService.getSpaceInfo(
-      spaceIdDto.spaceId,
-      workspace.id
-    );
+    const space = await this.spaceService.getSpaceInfo(spaceIdDto.spaceId, workspace.id);
 
     if (!space) {
       throw new NotFoundException('Space not found');
@@ -114,10 +100,7 @@ export class SpaceController {
       throw new ForbiddenException();
     }
 
-    const userSpaceRoles = await this.spaceMemberRepo.getUserSpaceRoles(
-      user.id,
-      space.id
-    );
+    const userSpaceRoles = await this.spaceMemberRepo.getUserSpaceRoles(user.id, space.id);
 
     const userSpaceRole = findHighestUserSpaceRole(userSpaceRoles);
 
@@ -139,9 +122,7 @@ export class SpaceController {
     @AuthWorkspace() workspace: Workspace
   ) {
     const ability = this.workspaceAbility.createForUser(user, workspace);
-    if (
-      ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Space)
-    ) {
+    if (ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Space)) {
       throw new ForbiddenException();
     }
     return this.spaceService.createSpace(user, workspace.id, createSpaceDto);
@@ -155,10 +136,7 @@ export class SpaceController {
     @AuthUser() user: User,
     @AuthWorkspace() workspace: Workspace
   ) {
-    const ability = await this.spaceAbility.createForUser(
-      user,
-      updateSpaceDto.spaceId
-    );
+    const ability = await this.spaceAbility.createForUser(user, updateSpaceDto.spaceId);
     if (ability.cannot(SpaceCaslAction.Manage, SpaceCaslSubject.Settings)) {
       throw new ForbiddenException();
     }
@@ -172,10 +150,7 @@ export class SpaceController {
     @AuthUser() user: User,
     @AuthWorkspace() workspace: Workspace
   ) {
-    const ability = await this.spaceAbility.createForUser(
-      user,
-      spaceIdDto.spaceId
-    );
+    const ability = await this.spaceAbility.createForUser(user, spaceIdDto.spaceId);
     if (ability.cannot(SpaceCaslAction.Manage, SpaceCaslSubject.Settings)) {
       throw new ForbiddenException();
     }
@@ -191,20 +166,13 @@ export class SpaceController {
     @AuthUser() user: User,
     @AuthWorkspace() workspace: Workspace
   ) {
-    const ability = await this.spaceAbility.createForUser(
-      user,
-      spaceIdDto.spaceId
-    );
+    const ability = await this.spaceAbility.createForUser(user, spaceIdDto.spaceId);
 
     if (ability.cannot(SpaceCaslAction.Read, SpaceCaslSubject.Member)) {
       throw new ForbiddenException();
     }
 
-    return this.spaceMemberService.getSpaceMembers(
-      spaceIdDto.spaceId,
-      workspace.id,
-      pagination
-    );
+    return this.spaceMemberService.getSpaceMembers(spaceIdDto.spaceId, workspace.id, pagination);
   }
 
   @HttpCode(HttpStatus.OK)
@@ -226,11 +194,7 @@ export class SpaceController {
       throw new ForbiddenException();
     }
 
-    return this.spaceMemberService.addMembersToSpaceBatch(
-      dto,
-      user,
-      workspace.id
-    );
+    return this.spaceMemberService.addMembersToSpaceBatch(dto, user, workspace.id);
   }
 
   @HttpCode(HttpStatus.OK)
@@ -272,9 +236,7 @@ export class SpaceController {
       throw new BadRequestException('userId or groupId is required');
     }
     if (dto.userId && dto.groupId) {
-      throw new BadRequestException(
-        'please provide either a userId or groupId and both'
-      );
+      throw new BadRequestException('please provide either a userId or groupId and both');
     }
   }
 }

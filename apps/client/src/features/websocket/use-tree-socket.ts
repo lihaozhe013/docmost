@@ -61,12 +61,7 @@ export const useTreeSocket = () => {
           setTreeData((prev) => {
             if (treeModel.find(prev, event.payload.data.id)) return prev;
             const newParentId = event.payload.parentId as string | null;
-            let next = treeModel.insert(
-              prev,
-              newParentId,
-              event.payload.data,
-              event.payload.index
-            );
+            let next = treeModel.insert(prev, newParentId, event.payload.data, event.payload.index);
             // Mirror the emitter: flip new parent's hasChildren to true so
             // the chevron renders on the receiver.
             if (newParentId) {
@@ -81,8 +76,7 @@ export const useTreeSocket = () => {
           setTreeData((prev) => {
             const sourceBefore = treeModel.find(prev, event.payload.id);
             if (!sourceBefore) return prev;
-            const oldParentId =
-              (sourceBefore as SpaceTreeNode).parentPageId ?? null;
+            const oldParentId = (sourceBefore as SpaceTreeNode).parentPageId ?? null;
             const newParentId = event.payload.parentId as string | null;
 
             const placed = treeModel.place(prev, event.payload.id, {

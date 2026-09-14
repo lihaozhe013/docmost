@@ -17,20 +17,14 @@ type AffectedRange = { from: number; to: number };
  * Computes the inverse of every step in the transaction while the document is
  * still the pre-dispatch snapshot.
  */
-export function captureInverseSteps(
-  transaction: any,
-  beforeDoc: ProseMirrorNode
-): Step[] {
+export function captureInverseSteps(transaction: any, beforeDoc: ProseMirrorNode): Step[] {
   const inverseSteps: Step[] = [];
   let currentDoc = beforeDoc;
   for (const step of transaction.steps) {
     inverseSteps.push(step.invert(currentDoc));
     const applied = step.apply(currentDoc);
     if (applied.failed || !applied.doc) {
-      throw new BufferError(
-        'INVALID_CONTENT',
-        applied.failed || 'The edit is invalid'
-      );
+      throw new BufferError('INVALID_CONTENT', applied.failed || 'The edit is invalid');
     }
     currentDoc = applied.doc;
   }
@@ -52,15 +46,10 @@ export function mapAffectedRanges(
  * undo remains positionally correct, or marks entries conflicted when the
  * transaction touched the same ranges.
  */
-export function rebaseUndoEntries(
-  entries: UndoEntry[],
-  transaction: any,
-  revision: string
-): void {
+export function rebaseUndoEntries(entries: UndoEntry[], transaction: any, revision: string): void {
   const isUndo = transaction.getMeta?.('aiPageEditingUndo') === true;
   const isAiMutation = transaction.getMeta?.('aiPageEditingMutation') === true;
-  const isUniqueIdUpdate =
-    transaction.getMeta?.('__uniqueIDTransaction') === true;
+  const isUniqueIdUpdate = transaction.getMeta?.('__uniqueIDTransaction') === true;
   for (const entry of entries) {
     if (entry.conflicted) continue;
 
@@ -68,19 +57,13 @@ export function rebaseUndoEntries(
       !isUndo &&
       !isAiMutation &&
       !isUniqueIdUpdate &&
-      rangesOverlap(
-        entry.affectedRanges,
-        transaction.mapping,
-        transaction.steps
-      )
+      rangesOverlap(entry.affectedRanges, transaction.mapping, transaction.steps)
     ) {
       entry.conflicted = true;
       continue;
     }
 
-    const mappedSteps = entry.inverseSteps.map((step) =>
-      step.map(transaction.mapping)
-    );
+    const mappedSteps = entry.inverseSteps.map((step) => step.map(transaction.mapping));
     if (mappedSteps.some((step) => !step)) {
       entry.conflicted = true;
       continue;

@@ -98,25 +98,19 @@ describe('treeModel.insert', () => {
 
   it('inserts at end when index is undefined', () => {
     const t = treeModel.insert(fixture, 'a', leaf('a3'));
-    expect(treeModel.siblingsOf(t, 'a3')?.siblings.map((n) => n.id)).toEqual([
-      'a1',
-      'a2',
-      'a3'
-    ]);
+    expect(treeModel.siblingsOf(t, 'a3')?.siblings.map((n) => n.id)).toEqual(['a1', 'a2', 'a3']);
   });
   it('inserts at index 0', () => {
     const t = treeModel.insert(fixture, 'a', leaf('a0'), 0);
-    expect(treeModel.siblingsOf(t, 'a0')?.siblings.map((n) => n.id)).toEqual([
-      'a0',
-      'a1',
-      'a2'
-    ]);
+    expect(treeModel.siblingsOf(t, 'a0')?.siblings.map((n) => n.id)).toEqual(['a0', 'a1', 'a2']);
   });
   it('inserts in the middle', () => {
     const t = treeModel.insert(fixture, 'a', leaf('a1half'), 1);
-    expect(
-      treeModel.siblingsOf(t, 'a1half')?.siblings.map((n) => n.id)
-    ).toEqual(['a1', 'a1half', 'a2']);
+    expect(treeModel.siblingsOf(t, 'a1half')?.siblings.map((n) => n.id)).toEqual([
+      'a1',
+      'a1half',
+      'a2'
+    ]);
   });
   it('inserts at root when parentId is null', () => {
     const t = treeModel.insert(fixture, null, leaf('c'));
@@ -161,10 +155,7 @@ describe('treeModel.update', () => {
   });
   it("preserves children when patching parent's own fields", () => {
     const t = treeModel.update(fixture, 'a', { name: 'A-renamed' });
-    expect(treeModel.find(t, 'a')?.children?.map((n) => n.id)).toEqual([
-      'a1',
-      'a2'
-    ]);
+    expect(treeModel.find(t, 'a')?.children?.map((n) => n.id)).toEqual(['a1', 'a2']);
   });
   it('preserves reference identity of unrelated subtrees', () => {
     const t = treeModel.update(fixture, 'a1', { name: 'X' });
@@ -177,21 +168,14 @@ describe('treeModel.appendChildren', () => {
 
   it('appends to existing children', () => {
     const t = treeModel.appendChildren(fixture, 'a', [kid('a3'), kid('a4')]);
-    expect(treeModel.find(t, 'a')?.children?.map((n) => n.id)).toEqual([
-      'a1',
-      'a2',
-      'a3',
-      'a4'
-    ]);
+    expect(treeModel.find(t, 'a')?.children?.map((n) => n.id)).toEqual(['a1', 'a2', 'a3', 'a4']);
   });
   it('initializes children when parent had none', () => {
     const t = treeModel.appendChildren(fixture, 'b', [kid('b1')]);
     expect(treeModel.find(t, 'b')?.children?.map((n) => n.id)).toEqual(['b1']);
   });
   it('returns same array reference for unknown parentId', () => {
-    expect(treeModel.appendChildren(fixture, 'ghost', [kid('zz')])).toBe(
-      fixture
-    );
+    expect(treeModel.appendChildren(fixture, 'ghost', [kid('zz')])).toBe(fixture);
   });
 
   // Regression: lazy-load + auto-expand can race and call appendChildren with
@@ -199,11 +183,7 @@ describe('treeModel.appendChildren', () => {
   // keys. Defensive dedup at the model level.
   it('dedups against existing children by id', () => {
     const t1 = treeModel.appendChildren(fixture, 'a', [kid('a3'), kid('a4')]);
-    const t2 = treeModel.appendChildren(t1, 'a', [
-      kid('a3'),
-      kid('a4'),
-      kid('a5')
-    ]);
+    const t2 = treeModel.appendChildren(t1, 'a', [kid('a3'), kid('a4'), kid('a5')]);
     expect(treeModel.find(t2, 'a')?.children?.map((n) => n.id)).toEqual([
       'a1',
       'a2',
@@ -233,20 +213,13 @@ describe('treeModel.place', () => {
   });
   it('reorders within the same parent', () => {
     const t = treeModel.place(fixture, 'a2', { parentId: 'a', index: 0 });
-    expect(treeModel.find(t, 'a')?.children?.map((n) => n.id)).toEqual([
-      'a2',
-      'a1'
-    ]);
+    expect(treeModel.find(t, 'a')?.children?.map((n) => n.id)).toEqual(['a2', 'a1']);
   });
   it('returns same array reference for unknown source', () => {
-    expect(treeModel.place(fixture, 'ghost', { parentId: 'a', index: 0 })).toBe(
-      fixture
-    );
+    expect(treeModel.place(fixture, 'ghost', { parentId: 'a', index: 0 })).toBe(fixture);
   });
   it('returns same array reference for unknown destination parent', () => {
-    expect(
-      treeModel.place(fixture, 'a1', { parentId: 'ghost', index: 0 })
-    ).toBe(fixture);
+    expect(treeModel.place(fixture, 'a1', { parentId: 'ghost', index: 0 })).toBe(fixture);
   });
 });
 
@@ -256,10 +229,7 @@ describe('treeModel.move', () => {
       kind: 'reorder-before',
       targetId: 'a1'
     });
-    expect(treeModel.find(t, 'a')?.children?.map((n) => n.id)).toEqual([
-      'a2',
-      'a1'
-    ]);
+    expect(treeModel.find(t, 'a')?.children?.map((n) => n.id)).toEqual(['a2', 'a1']);
     expect(result).toEqual({ parentId: 'a', index: 0 });
   });
   it('reorder-after within same parent', () => {
@@ -267,10 +237,7 @@ describe('treeModel.move', () => {
       kind: 'reorder-after',
       targetId: 'a2'
     });
-    expect(treeModel.find(t, 'a')?.children?.map((n) => n.id)).toEqual([
-      'a2',
-      'a1'
-    ]);
+    expect(treeModel.find(t, 'a')?.children?.map((n) => n.id)).toEqual(['a2', 'a1']);
     expect(result).toEqual({ parentId: 'a', index: 1 });
   });
   it('make-child appends at end of target children', () => {
@@ -278,11 +245,7 @@ describe('treeModel.move', () => {
       kind: 'make-child',
       targetId: 'a'
     });
-    expect(treeModel.find(t, 'a')?.children?.map((n) => n.id)).toEqual([
-      'a1',
-      'a2',
-      'b'
-    ]);
+    expect(treeModel.find(t, 'a')?.children?.map((n) => n.id)).toEqual(['a1', 'a2', 'b']);
     expect(result).toEqual({ parentId: 'a', index: 2 });
   });
   it('make-child initializes children when target had none', () => {
@@ -298,11 +261,7 @@ describe('treeModel.move', () => {
       kind: 'reorder-before',
       targetId: 'a1'
     });
-    expect(treeModel.find(t, 'a')?.children?.map((n) => n.id)).toEqual([
-      'b',
-      'a1',
-      'a2'
-    ]);
+    expect(treeModel.find(t, 'a')?.children?.map((n) => n.id)).toEqual(['b', 'a1', 'a2']);
     expect(result).toEqual({ parentId: 'a', index: 0 });
   });
   it('reorder-after to root', () => {

@@ -21,14 +21,9 @@ export function throwIfEmailNotVerified(opts: {
 }): void {
   if (!opts.isCloud || opts.emailVerifiedAt) return;
 
-  const emailSignature = computeEmailSignature(
-    opts.email,
-    opts.workspaceId,
-    opts.appSecret
-  );
+  const emailSignature = computeEmailSignature(opts.email, opts.workspaceId, opts.appSecret);
   throw new BadRequestException({
-    message:
-      'Please verify your email address. Check your inbox for the verification link.',
+    message: 'Please verify your email address. Check your inbox for the verification link.',
     emailSignature
   });
 }

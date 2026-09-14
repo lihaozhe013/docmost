@@ -41,14 +41,7 @@ function isAllHeader(cells: (ProseMirrorNode | null)[]): boolean {
   return cells.every((c) => c !== null && isHeaderCell(c));
 }
 
-export function useTableSort({
-  editor,
-  orientation,
-  index,
-  tableNode,
-  tablePos,
-  direction
-}: Args) {
+export function useTableSort({ editor, orientation, index, tableNode, tablePos, direction }: Args) {
   const canSort = useMemo(() => {
     if (tableHasMergedCells(tableNode)) return false;
 
@@ -69,18 +62,16 @@ export function useTableSort({
     const rows = convertTableNodeToArrayOfRows(tableNode);
     const axes = orientation === 'col' ? rows : transpose(rows);
 
-    const items: SortableItem<(ProseMirrorNode | null)[]>[] = axes.map(
-      (cells, originalOrder) => {
-        const sortCell = cells[index];
-        return {
-          payload: cells,
-          text: sortCell ? getCellSortText(sortCell) : '',
-          isHeader: isAllHeader(cells),
-          isEmpty: !sortCell || isCellEmpty(sortCell),
-          originalOrder
-        };
-      }
-    );
+    const items: SortableItem<(ProseMirrorNode | null)[]>[] = axes.map((cells, originalOrder) => {
+      const sortCell = cells[index];
+      return {
+        payload: cells,
+        text: sortCell ? getCellSortText(sortCell) : '',
+        isHeader: isAllHeader(cells),
+        isEmpty: !sortCell || isCellEmpty(sortCell),
+        originalOrder
+      };
+    });
 
     const dataItems = items.filter((it) => !it.isHeader);
     const sortedData = sortItems(dataItems, direction);

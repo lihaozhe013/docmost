@@ -1,11 +1,4 @@
-import {
-  memo,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type ReactNode
-} from 'react';
+import { memo, useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { flushSync } from 'react-dom';
 import { createRoot } from 'react-dom/client';
 import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
@@ -86,8 +79,7 @@ function DocTreeRowInner<T extends object>(props: Props<T>) {
   // auto-expand timer recognize unloaded subtrees so the consumer's lazy-load
   // (via onToggle) can populate them on demand.
   const hasLoadedChildren = !!node.children && node.children.length > 0;
-  const declaredHasChildren =
-    (node as { hasChildren?: boolean }).hasChildren === true;
+  const declaredHasChildren = (node as { hasChildren?: boolean }).hasChildren === true;
   const hasChildren = hasLoadedChildren || declaredHasChildren;
   const isSelected = selectedId === node.id;
 
@@ -153,9 +145,7 @@ function DocTreeRowInner<T extends object>(props: Props<T>) {
                 // falls back to a default snapshot of the source row (and the
                 // stale image can linger on screen).
                 flushSync(() => {
-                  root.render(
-                    <DocTreeDragPreview label={getDragLabel(node)} />
-                  );
+                  root.render(<DocTreeDragPreview label={getDragLabel(node)} />);
                 });
                 return () => root.unmount();
               }
@@ -169,11 +159,7 @@ function DocTreeRowInner<T extends object>(props: Props<T>) {
 
     if (!dropDisabled) {
       const mode: ItemMode =
-        isOpen && hasChildren
-          ? 'expanded'
-          : isLastSibling
-            ? 'last-in-group'
-            : 'standard';
+        isOpen && hasChildren ? 'expanded' : isLastSibling ? 'last-in-group' : 'standard';
       // Always block 'reparent' (out of scope per spec).
       // Block 'reorder-below' when the row is open with children — ambiguous gesture,
       // force users to drop into the folder via 'make-child' instead.
@@ -187,11 +173,7 @@ function DocTreeRowInner<T extends object>(props: Props<T>) {
             source.data.type === DRAG_TYPE &&
             source.data.uniqueContextId === contextId &&
             source.data.id !== node.id &&
-            !treeModel.isDescendant(
-              getRootData(),
-              source.data.id as string,
-              node.id
-            ),
+            !treeModel.isDescendant(getRootData(), source.data.id as string, node.id),
           getData: ({ input, element }) =>
             attachInstruction(
               { id: node.id, type: DRAG_TYPE },
@@ -245,9 +227,7 @@ function DocTreeRowInner<T extends object>(props: Props<T>) {
                 ? getDragLabel(node)
                 : (() => {
                     const sib = treeModel.siblingsOf(liveTree, op.targetId);
-                    const parent = sib?.parentId
-                      ? treeModel.find(liveTree, sib.parentId)
-                      : null;
+                    const parent = sib?.parentId ? treeModel.find(liveTree, sib.parentId) : null;
                     return parent ? getDragLabel(parent) : 'root';
                   })();
             const sourceNode = treeModel.find(liveTree, sourceId);
@@ -286,9 +266,7 @@ function DocTreeRowInner<T extends object>(props: Props<T>) {
   useEffect(() => () => cancelAutoExpand(), [cancelAutoExpand]);
 
   const effectiveInst =
-    instruction?.type === 'instruction-blocked'
-      ? instruction.desired
-      : instruction;
+    instruction?.type === 'instruction-blocked' ? instruction.desired : instruction;
   const blocked = instruction?.type === 'instruction-blocked';
   const receivingDrop: 'before' | 'after' | 'make-child' | null = (() => {
     if (!effectiveInst) return null;
@@ -313,10 +291,7 @@ function DocTreeRowInner<T extends object>(props: Props<T>) {
   };
 
   return (
-    <div
-      className={styles.rowWrapper}
-      style={{ paddingLeft: level * indentPerLevel }}
-    >
+    <div className={styles.rowWrapper} style={{ paddingLeft: level * indentPerLevel }}>
       <div
         className={styles.node}
         data-dragging={isDragging || undefined}
@@ -344,10 +319,7 @@ function DocTreeRowInner<T extends object>(props: Props<T>) {
         })}
       </div>
       {instruction && (
-        <DocTreeDropIndicator
-          instruction={instruction}
-          indentPx={level * indentPerLevel}
-        />
+        <DocTreeDropIndicator instruction={instruction} indentPx={level * indentPerLevel} />
       )}
     </div>
   );
@@ -361,10 +333,7 @@ function DocTreeRowInner<T extends object>(props: Props<T>) {
 // Resolve openIds / selectedId per-row: only re-render if THIS row's own
 // open-state or selected-state actually flipped. Everything else uses
 // reference equality (callbacks are useCallback-stable from the parent).
-function arePropsEqual<T extends object>(
-  prev: Props<T>,
-  next: Props<T>
-): boolean {
+function arePropsEqual<T extends object>(prev: Props<T>, next: Props<T>): boolean {
   if (prev.node !== next.node) return false;
   if (prev.level !== next.level) return false;
   if (prev.isLastSibling !== next.isLastSibling) return false;
@@ -396,7 +365,4 @@ function arePropsEqual<T extends object>(
   return true;
 }
 
-export const DocTreeRow = memo(
-  DocTreeRowInner,
-  arePropsEqual
-) as typeof DocTreeRowInner;
+export const DocTreeRow = memo(DocTreeRowInner, arePropsEqual) as typeof DocTreeRowInner;

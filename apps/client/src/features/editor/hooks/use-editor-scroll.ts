@@ -28,11 +28,7 @@ export const useEditorScroll = ({
   }, [initialScrollTo]);
 
   const handleScrollTo = useCallback(
-    async (
-      editor: Editor,
-      _scrollTo: string | null = null,
-      tryCount: number = 0
-    ) => {
+    async (editor: Editor, _scrollTo: string | null = null, tryCount: number = 0) => {
       await waitForState(() => canScroll());
       return new Promise((resolve) => {
         const MAX_TRY_COUNT = 10;
@@ -51,9 +47,7 @@ export const useEditorScroll = ({
           resolve(false);
           return;
         }
-        const dom = editor.view.dom.querySelector(
-          `[id="${targetId}"], [data-id="${targetId}"]`
-        );
+        const dom = editor.view.dom.querySelector(`[id="${targetId}"], [data-id="${targetId}"]`);
         if (dom) {
           dom.scrollIntoView({ behavior: 'smooth', block: 'start' });
           resolve(true);

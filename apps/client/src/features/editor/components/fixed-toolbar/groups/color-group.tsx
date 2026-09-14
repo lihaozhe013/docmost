@@ -18,7 +18,5 @@ export const ColorGroup: FC<Props> = ({ editor }) => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen]);
 
-  return (
-    <ColorSelector editor={editor} isOpen={isOpen} setIsOpen={setIsOpen} />
-  );
+  return <ColorSelector editor={editor} isOpen={isOpen} setIsOpen={setIsOpen} />;
 };

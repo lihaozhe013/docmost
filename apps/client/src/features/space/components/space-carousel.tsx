@@ -1,8 +1,5 @@
 import { Text, Card, rem, Group, Button, Skeleton, Title } from '@mantine/core';
-import {
-  prefetchSpace,
-  useGetSpacesQuery
-} from '@/features/space/queries/space-query.ts';
+import { prefetchSpace, useGetSpacesQuery } from '@/features/space/queries/space-query.ts';
 import { getSpaceUrl } from '@/lib/config.ts';
 import { Link } from 'react-router-dom';
 import classes from './space-carousel.module.css';

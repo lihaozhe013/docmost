@@ -9,11 +9,7 @@ interface EditGroupModalProps {
   group?: IGroup;
 }
 
-export default function EditGroupModal({
-  opened,
-  onClose,
-  group
-}: EditGroupModalProps) {
+export default function EditGroupModal({ opened, onClose, group }: EditGroupModalProps) {
   const { t } = useTranslation();
 
   return (

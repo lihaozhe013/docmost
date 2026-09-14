@@ -12,8 +12,7 @@ import { formatRunMeta, toolStepLabel } from './ai-page-editing-run-status';
 import classes from './ai-page-editing-panel.module.css';
 
 type MessageBlock =
-  | { kind: 'message'; message: ChatMessage }
-  | { kind: 'steps'; messages: ChatMessage[] };
+  { kind: 'message'; message: ChatMessage } | { kind: 'steps'; messages: ChatMessage[] };
 
 function toBlocks(messages: ChatMessage[]): MessageBlock[] {
   const blocks: MessageBlock[] = [];
@@ -91,34 +90,18 @@ function UserRow({ message }: { message: ChatMessage }) {
   );
 }
 
-function AssistantRow({
-  message,
-  streaming
-}: {
-  message: ChatMessage;
-  streaming: boolean;
-}) {
+function AssistantRow({ message, streaming }: { message: ChatMessage; streaming: boolean }) {
   const meta = formatRunMeta(message.meta);
   return (
-    <div
-      className={classes.assistantRow}
-      role="article"
-      aria-label="Page AI said:"
-    >
+    <div className={classes.assistantRow} role="article" aria-label="Page AI said:">
       <Box
         component="span"
-        className={[
-          classes.assistantAvatar,
-          streaming ? classes.spinIcon : ''
-        ].join(' ')}
+        className={[classes.assistantAvatar, streaming ? classes.spinIcon : ''].join(' ')}
       >
         <IconSparkles size={13} />
       </Box>
       <div className={classes.assistantBody}>
-        <MarkdownContent
-          content={message.content}
-          className={classes.markdownMessage}
-        />
+        <MarkdownContent content={message.content} className={classes.markdownMessage} />
         {streaming && <span className={classes.streamCaret} aria-hidden />}
         {meta && (
           <Text size="xs" c="dimmed" className={classes.messageMeta}>
@@ -146,10 +129,7 @@ export function MessageList({
         const isLast = index === blocks.length - 1;
         if (block.kind === 'steps') {
           return (
-            <div
-              key={`steps:${block.messages[0].id}`}
-              className={classes.toolRail}
-            >
+            <div key={`steps:${block.messages[0].id}`} className={classes.toolRail}>
               {block.messages.map((message) => (
                 <ToolStepRow key={message.id} message={message} />
               ))}

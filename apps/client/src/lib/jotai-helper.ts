@@ -6,8 +6,7 @@ export function atomWithWebStorage<Value>(
   storage = localStorage
 ) {
   const storedValue = localStorage.getItem(key);
-  const isStringOrInt =
-    typeof initialValue === 'string' || typeof initialValue === 'number';
+  const isStringOrInt = typeof initialValue === 'string' || typeof initialValue === 'number';
 
   const storageValue = storedValue
     ? isStringOrInt

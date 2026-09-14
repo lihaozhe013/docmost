@@ -24,9 +24,7 @@ export default function AccountLanguage() {
 function LanguageSwitcher() {
   const { t, i18n } = useTranslation();
   const [user, setUser] = useAtom(userAtom);
-  const [language, setLanguage] = useState(
-    user?.locale === 'en' ? 'en-US' : user?.locale
-  );
+  const [language, setLanguage] = useState(user?.locale === 'en' ? 'en-US' : user?.locale);
 
   const handleChange = async (value: string) => {
     const updatedUser = await updateUser({ locale: value });

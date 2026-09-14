@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  Logger,
-  ForbiddenException,
-  NotFoundException
-} from '@nestjs/common';
+import { Injectable, Logger, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { isDeepStrictEqual } from 'node:util';
 import { v7 as uuid7 } from 'uuid';
 import { InjectKysely } from 'nestjs-kysely';
@@ -97,11 +92,7 @@ export class TransclusionService {
       .filter((e) => !desiredById.has(e.transclusionId))
       .map((e) => e.transclusionId);
     if (removedIds.length > 0) {
-      await this.pageTransclusionsRepo.deleteByPageAndTransclusionIds(
-        pageId,
-        removedIds,
-        trx
-      );
+      await this.pageTransclusionsRepo.deleteByPageAndTransclusionIds(pageId, removedIds, trx);
       deleted = removedIds.length;
     }
 
@@ -119,11 +110,10 @@ export class TransclusionService {
       `${s.sourcePageId}::${s.transclusionId}`;
     const desiredKeys = new Set(desired.map(keyOf));
 
-    const existing =
-      await this.pageTransclusionReferencesRepo.findByReferencePageId(
-        referencePageId,
-        trx
-      );
+    const existing = await this.pageTransclusionReferencesRepo.findByReferencePageId(
+      referencePageId,
+      trx
+    );
     const existingKeys = new Set(existing.map(keyOf));
 
     const toInsert = desired
@@ -236,11 +226,7 @@ export class TransclusionService {
       .where('id', 'in', pageIds)
       .where('workspaceId', '=', workspaceId)
       .where('deletedAt', 'is', null)
-      .where(
-        'spaceId',
-        'in',
-        this.spaceMemberRepo.getUserSpaceIdsQuery(viewerUserId)
-      )
+      .where('spaceId', 'in', this.spaceMemberRepo.getUserSpaceIdsQuery(viewerUserId))
       .execute();
     if (spaceVisible.length === 0) return [];
 
@@ -257,15 +243,9 @@ export class TransclusionService {
   ): Promise<{ items: TransclusionLookup[] }> {
     if (references.length === 0) return { items: [] };
 
-    const candidatePageIds = Array.from(
-      new Set(references.map((r) => r.sourcePageId))
-    );
+    const candidatePageIds = Array.from(new Set(references.map((r) => r.sourcePageId)));
     const accessibleSet = new Set(
-      await this.filterViewerAccessiblePageIds(
-        candidatePageIds,
-        viewerUserId,
-        workspaceId
-      )
+      await this.filterViewerAccessiblePageIds(candidatePageIds, viewerUserId, workspaceId)
     );
 
     return this.lookupWithAccessSet(references, accessibleSet, workspaceId);
@@ -370,28 +350,18 @@ export class TransclusionService {
         workspaceId
       );
 
-    const candidatePageIds = Array.from(
-      new Set([sourcePageId, ...referencePageIds])
-    );
+    const candidatePageIds = Array.from(new Set([sourcePageId, ...referencePageIds]));
     const accessibleSet = new Set(
-      await this.filterViewerAccessiblePageIds(
-        candidatePageIds,
-        viewerUserId,
-        workspaceId
-      )
+      await this.filterViewerAccessiblePageIds(candidatePageIds, viewerUserId, workspaceId)
     );
 
-    const accessibleIds = candidatePageIds.filter((id) =>
-      accessibleSet.has(id)
-    );
+    const accessibleIds = candidatePageIds.filter((id) => accessibleSet.has(id));
     if (accessibleIds.length === 0) {
       return { source: null, references: [] };
     }
 
     const rows = await Promise.all(
-      accessibleIds.map((id) =>
-        this.pageRepo.findById(id, { includeSpace: true })
-      )
+      accessibleIds.map((id) => this.pageRepo.findById(id, { includeSpace: true }))
     );
     const byId = new Map<string, ReferencingPageInfo>();
     for (const p of rows) {
@@ -451,19 +421,15 @@ export class TransclusionService {
     await this.pageAccessService.validateCanEdit(referencePage, user);
     await this.pageAccessService.validateCanView(sourcePage, user);
 
-    const transclusion =
-      await this.pageTransclusionsRepo.findByPageAndTransclusion(
-        sourcePageId,
-        transclusionId
-      );
+    const transclusion = await this.pageTransclusionsRepo.findByPageAndTransclusion(
+      sourcePageId,
+      transclusionId
+    );
     if (!transclusion) {
       throw new NotFoundException('Sync block not found');
     }
 
-    const { content, copies } = rewriteAttachmentsForUnsync(
-      transclusion.content,
-      () => uuid7()
-    );
+    const { content, copies } = rewriteAttachmentsForUnsync(transclusion.content, () => uuid7());
 
     if (copies.length > 0) {
       const oldIds = copies.map((c) => c.oldAttachmentId);
@@ -476,16 +442,11 @@ export class TransclusionService {
         const old = byOldId.get(plan.oldAttachmentId);
         if (!old) continue;
 
-        const newFilePath = old.filePath
-          .split(plan.oldAttachmentId)
-          .join(plan.newAttachmentId);
+        const newFilePath = old.filePath.split(plan.oldAttachmentId).join(plan.newAttachmentId);
         try {
           await this.storageService.copy(old.filePath, newFilePath);
         } catch (err) {
-          this.logger.error(
-            `unsync: failed to copy attachment ${old.id}`,
-            err as Error
-          );
+          this.logger.error(`unsync: failed to copy attachment ${old.id}`, err as Error);
           continue;
         }
         await this.attachmentRepo.insertAttachment({

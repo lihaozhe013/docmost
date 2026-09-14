@@ -2,11 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectKysely } from 'nestjs-kysely';
 import { KyselyDB, KyselyTransaction } from '../../types/kysely.types';
 import { dbOrTx } from '../../utils';
-import {
-  InsertableShare,
-  Share,
-  UpdatableShare
-} from '@docmost/db/types/entity.types';
+import { InsertableShare, Share, UpdatableShare } from '@docmost/db/types/entity.types';
 import { PaginationOptions } from '@docmost/db/pagination/pagination-options';
 import { executeWithCursorPagination } from '@docmost/db/pagination/cursor-pagination';
 import { validate as isValidUUID } from 'uuid';
@@ -80,10 +76,7 @@ export class ShareRepo {
   ): Promise<Share> {
     const db = dbOrTx(this.db, opts?.trx);
 
-    let query = db
-      .selectFrom('shares')
-      .select(this.baseFields)
-      .where('pageId', '=', pageId);
+    let query = db.selectFrom('shares').select(this.baseFields).where('pageId', '=', pageId);
 
     if (opts?.includeCreator) {
       query = query.select((eb) => this.withCreator(eb));
@@ -95,27 +88,16 @@ export class ShareRepo {
     return query.executeTakeFirst();
   }
 
-  async updateShare(
-    updatableShare: UpdatableShare,
-    shareId: string,
-    trx?: KyselyTransaction
-  ) {
+  async updateShare(updatableShare: UpdatableShare, shareId: string, trx?: KyselyTransaction) {
     return dbOrTx(this.db, trx)
       .updateTable('shares')
       .set({ ...updatableShare, updatedAt: new Date() })
-      .where(
-        isValidUUID(shareId) ? 'id' : sql`LOWER(key)`,
-        '=',
-        shareId.toLowerCase()
-      )
+      .where(isValidUUID(shareId) ? 'id' : sql`LOWER(key)`, '=', shareId.toLowerCase())
       .returning(this.baseFields)
       .executeTakeFirst();
   }
 
-  async insertShare(
-    insertableShare: InsertableShare,
-    trx?: KyselyTransaction
-  ): Promise<Share> {
+  async insertShare(insertableShare: InsertableShare, trx?: KyselyTransaction): Promise<Share> {
     const db = dbOrTx(this.db, trx);
     return db
       .insertInto('shares')
@@ -136,23 +118,14 @@ export class ShareRepo {
     await query.execute();
   }
 
-  async deleteBySpaceId(
-    spaceId: string,
-    trx?: KyselyTransaction
-  ): Promise<void> {
+  async deleteBySpaceId(spaceId: string, trx?: KyselyTransaction): Promise<void> {
     const db = dbOrTx(this.db, trx);
     await db.deleteFrom('shares').where('spaceId', '=', spaceId).execute();
   }
 
-  async deleteByWorkspaceId(
-    workspaceId: string,
-    trx?: KyselyTransaction
-  ): Promise<void> {
+  async deleteByWorkspaceId(workspaceId: string, trx?: KyselyTransaction): Promise<void> {
     const db = dbOrTx(this.db, trx);
-    await db
-      .deleteFrom('shares')
-      .where('workspaceId', '=', workspaceId)
-      .execute();
+    await db.deleteFrom('shares').where('workspaceId', '=', workspaceId).execute();
   }
 
   async getShares(userId: string, pagination: PaginationOptions) {
@@ -162,11 +135,7 @@ export class ShareRepo {
       .select((eb) => this.withPage(eb))
       .select((eb) => this.withSpace(eb, userId))
       .select((eb) => this.withCreator(eb))
-      .where(
-        'spaceId',
-        'in',
-        this.spaceMemberRepo.getUserSpaceIdsQuery(userId)
-      );
+      .where('spaceId', 'in', this.spaceMemberRepo.getUserSpaceIdsQuery(userId));
 
     return executeWithCursorPagination(query, {
       perPage: pagination.limit,
@@ -197,9 +166,7 @@ export class ShareRepo {
       eb
         .selectFrom('spaces')
         .select(['spaces.id', 'spaces.name', 'spaces.slug'])
-        .$if(Boolean(userId), (qb) =>
-          qb.select((eb) => this.withUserSpaceRole(eb, userId))
-        )
+        .$if(Boolean(userId), (qb) => qb.select((eb) => this.withUserSpaceRole(eb, userId)))
         .whereRef('spaces.id', '=', 'shares.spaceId')
     ).as('space');
   }
@@ -215,11 +182,7 @@ export class ShareRepo {
           .unionAll(
             eb
               .selectFrom('spaceMembers')
-              .innerJoin(
-                'groupUsers',
-                'groupUsers.groupId',
-                'spaceMembers.groupId'
-              )
+              .innerJoin('groupUsers', 'groupUsers.groupId', 'spaceMembers.groupId')
               .select(['spaceMembers.role'])
               .whereRef('spaceMembers.spaceId', '=', 'spaces.id')
               .where('groupUsers.userId', '=', userId)
@@ -254,13 +217,7 @@ export class ShareRepo {
     return jsonObjectFrom(
       eb
         .selectFrom('pages')
-        .select([
-          'pages.id',
-          'pages.slugId',
-          'pages.title',
-          'pages.icon',
-          'pages.parentPageId'
-        ])
+        .select(['pages.id', 'pages.slugId', 'pages.title', 'pages.icon', 'pages.parentPageId'])
         .whereRef('pages.id', '=', 'shares.pageId')
     ).as('sharedPage');
   }

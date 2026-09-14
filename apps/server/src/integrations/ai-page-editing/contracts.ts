@@ -5,12 +5,7 @@ export const AI_PAGE_EDITING_OPERATION = 'aiPageEditing';
 // Keep in sync with apps/client/src/features/ai-page-editing/ai-image-upload.ts
 export const MAX_AI_IMAGES = 4;
 
-export const aiPageEditingOperation = z.enum([
-  'start',
-  'stop',
-  'toolResult',
-  'event'
-]);
+export const aiPageEditingOperation = z.enum(['start', 'stop', 'toolResult', 'event']);
 
 export type AiPageEditingOperation = z.infer<typeof aiPageEditingOperation>;
 
@@ -134,8 +129,7 @@ export interface AiPageEditingToolRequest {
   input: unknown;
 }
 
-export type AiPageEditingOutboundMessage =
-  AiPageEditingEvent | AiPageEditingToolRequest;
+export type AiPageEditingOutboundMessage = AiPageEditingEvent | AiPageEditingToolRequest;
 
 export interface AiPageEditingSelection {
   text: string;

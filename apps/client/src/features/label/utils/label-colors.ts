@@ -45,10 +45,7 @@ function hashName(name: string): number {
   return h >>> 0;
 }
 
-export function getLabelColor(
-  name: string,
-  scheme: 'light' | 'dark' = 'light'
-): LabelColor {
+export function getLabelColor(name: string, scheme: 'light' | 'dark' = 'light'): LabelColor {
   const key = PALETTE_KEYS[hashName(name) % PALETTE_KEYS.length];
   const palette = scheme === 'dark' ? DARK_PALETTE : LABEL_PALETTE;
   return palette[key];

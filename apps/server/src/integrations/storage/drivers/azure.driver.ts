@@ -1,9 +1,5 @@
 import { Readable } from 'stream';
-import {
-  AzureStorageConfig,
-  StorageDriver,
-  StorageOption
-} from '../interfaces';
+import { AzureStorageConfig, StorageDriver, StorageOption } from '../interfaces';
 import {
   BlobSASPermissions,
   BlobServiceClient,
@@ -36,8 +32,7 @@ export class AzureDriver implements StorageDriver {
       throw new Error('AzureDriver: accountKey is required');
     }
 
-    this.accountUrl =
-      config.endpoint ?? `https://${config.accountName}.blob.core.windows.net`;
+    this.accountUrl = config.endpoint ?? `https://${config.accountName}.blob.core.windows.net`;
 
     this.sharedKeyCredential = new StorageSharedKeyCredential(
       config.accountName,
@@ -45,9 +40,7 @@ export class AzureDriver implements StorageDriver {
     );
 
     this.blobServiceClient = this.createBlobServiceClient();
-    this.containerClient = this.blobServiceClient.getContainerClient(
-      config.container
-    );
+    this.containerClient = this.blobServiceClient.getContainerClient(config.container);
   }
 
   private blockBlob(filePath: string): BlockBlobClient {
@@ -102,10 +95,7 @@ export class AzureDriver implements StorageDriver {
     try {
       return await this.blockBlob(filePath).downloadToBuffer();
     } catch (err) {
-      throw new Error(
-        `Failed to read file from Azure: ${(err as Error).message}`,
-        { cause: err }
-      );
+      throw new Error(`Failed to read file from Azure: ${(err as Error).message}`, { cause: err });
     }
   }
 
@@ -114,10 +104,7 @@ export class AzureDriver implements StorageDriver {
       const response = await this.blockBlob(filePath).download();
       return response.readableStreamBody as Readable;
     } catch (err) {
-      throw new Error(
-        `Failed to read file from Azure: ${(err as Error).message}`,
-        { cause: err }
-      );
+      throw new Error(`Failed to read file from Azure: ${(err as Error).message}`, { cause: err });
     }
   }
 
@@ -127,16 +114,10 @@ export class AzureDriver implements StorageDriver {
   ): Promise<Readable> {
     try {
       const count = range.end - range.start + 1;
-      const response = await this.blockBlob(filePath).download(
-        range.start,
-        count
-      );
+      const response = await this.blockBlob(filePath).download(range.start, count);
       return response.readableStreamBody as Readable;
     } catch (err) {
-      throw new Error(
-        `Failed to read file from Azure: ${(err as Error).message}`,
-        { cause: err }
-      );
+      throw new Error(`Failed to read file from Azure: ${(err as Error).message}`, { cause: err });
     }
   }
 
@@ -144,10 +125,9 @@ export class AzureDriver implements StorageDriver {
     try {
       return await this.blockBlob(filePath).exists();
     } catch (err) {
-      throw new Error(
-        `Failed to check existence in Azure: ${(err as Error).message}`,
-        { cause: err }
-      );
+      throw new Error(`Failed to check existence in Azure: ${(err as Error).message}`, {
+        cause: err
+      });
     }
   }
 
@@ -175,10 +155,9 @@ export class AzureDriver implements StorageDriver {
     try {
       await this.blockBlob(filePath).delete();
     } catch (err) {
-      throw new Error(
-        `Error deleting file ${filePath} from Azure: ${(err as Error).message}`,
-        { cause: err }
-      );
+      throw new Error(`Error deleting file ${filePath} from Azure: ${(err as Error).message}`, {
+        cause: err
+      });
     }
   }
 

@@ -35,11 +35,7 @@ export interface BubbleMenuItem {
   isActive: () => boolean;
 }
 
-export const NodeSelector: FC<NodeSelectorProps> = ({
-  editor,
-  isOpen,
-  setIsOpen
-}) => {
+export const NodeSelector: FC<NodeSelectorProps> = ({ editor, isOpen, setIsOpen }) => {
   const { t } = useTranslation();
 
   const editorState = useEditorState({
@@ -70,12 +66,9 @@ export const NodeSelector: FC<NodeSelectorProps> = ({
     {
       name: 'Text',
       icon: IconTypography,
-      command: () =>
-        editor.chain().focus().toggleNode('paragraph', 'paragraph').run(),
+      command: () => editor.chain().focus().toggleNode('paragraph', 'paragraph').run(),
       isActive: () =>
-        editorState?.isParagraph &&
-        !editorState?.isBulletList &&
-        !editorState?.isOrderedList
+        editorState?.isParagraph && !editorState?.isBulletList && !editorState?.isOrderedList
     },
     {
       name: 'Heading 1',
@@ -117,12 +110,7 @@ export const NodeSelector: FC<NodeSelectorProps> = ({
       name: 'Blockquote',
       icon: IconBlockquote,
       command: () =>
-        editor
-          .chain()
-          .focus()
-          .toggleNode('paragraph', 'paragraph')
-          .toggleBlockquote()
-          .run(),
+        editor.chain().focus().toggleNode('paragraph', 'paragraph').toggleBlockquote().run(),
       isActive: () => editorState?.isBlockquote
     },
     {
@@ -158,12 +146,7 @@ export const NodeSelector: FC<NodeSelectorProps> = ({
   return (
     <Popover opened={isOpen} onChange={setIsOpen} withArrow>
       <Popover.Target>
-        <Tooltip
-          label={t('Turn into')}
-          withArrow
-          withinPortal={false}
-          disabled={isOpen}
-        >
+        <Tooltip label={t('Turn into')} withArrow withinPortal={false} disabled={isOpen}>
           <Button
             className={classes.buttonRoot}
             variant="default"
@@ -188,9 +171,7 @@ export const NodeSelector: FC<NodeSelectorProps> = ({
                 key={index}
                 variant="default"
                 leftSection={<item.icon size={16} />}
-                rightSection={
-                  activeItem.name === item.name && <IconCheck size={16} />
-                }
+                rightSection={activeItem.name === item.name && <IconCheck size={16} />}
                 justify="left"
                 fullWidth
                 onClick={() => {

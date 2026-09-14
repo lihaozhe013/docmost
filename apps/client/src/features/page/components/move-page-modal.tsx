@@ -35,9 +35,7 @@ export default function MovePageModal({
       await movePageToSpace({ pageId, spaceId: targetSpace.id });
       queryClient.removeQueries({
         predicate: (item) =>
-          ['pages', 'sidebar-pages', 'root-sidebar-pages'].includes(
-            item.queryKey[0] as string
-          )
+          ['pages', 'sidebar-pages', 'root-sidebar-pages'].includes(item.queryKey[0] as string)
       });
 
       const pageUrl = buildPageUrl(targetSpace.slug, slugId, undefined);
@@ -82,11 +80,7 @@ export default function MovePageModal({
             {t('Move page to a different space.')}
           </Text>
 
-          <SpaceSelect
-            value={currentSpaceSlug}
-            clearable={false}
-            onChange={handleChange}
-          />
+          <SpaceSelect value={currentSpaceSlug} clearable={false} onChange={handleChange} />
           <Group justify="end" mt="md">
             <Button onClick={onClose} variant="default">
               {t('Cancel')}

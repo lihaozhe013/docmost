@@ -1,7 +1,4 @@
-import {
-  currentUserAtom,
-  userAtom
-} from '@/features/user/atoms/current-user-atom.ts';
+import { currentUserAtom, userAtom } from '@/features/user/atoms/current-user-atom.ts';
 import { useState } from 'react';
 import { useAtom } from 'jotai';
 import AvatarUploader from '@/components/common/avatar-uploader.tsx';

@@ -6,9 +6,7 @@ export async function getSessions(): Promise<ISession[]> {
   return req.data.sessions;
 }
 
-export async function revokeSession(data: {
-  sessionId: string;
-}): Promise<void> {
+export async function revokeSession(data: { sessionId: string }): Promise<void> {
   await api.post('/sessions/revoke', data);
 }
 

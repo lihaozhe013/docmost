@@ -145,8 +145,7 @@ export const AuditResource = {
   TEMPLATE: 'template'
 } as const;
 
-export type AuditResourceType =
-  (typeof AuditResource)[keyof typeof AuditResource];
+export type AuditResourceType = (typeof AuditResource)[keyof typeof AuditResource];
 
 export type ActorType = 'user' | 'system' | 'api_key';
 

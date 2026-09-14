@@ -37,10 +37,7 @@ export class AiPageEditingImageService {
     private readonly storageService: StorageService
   ) {}
 
-  async resolveImages(
-    attachmentIds: string[],
-    scope: AiImageScope
-  ): Promise<string[]> {
+  async resolveImages(attachmentIds: string[], scope: AiImageScope): Promise<string[]> {
     if (!attachmentIds.length) return [];
     if (attachmentIds.length > MAX_AI_IMAGES) {
       throw new AiPageEditingImageError(
@@ -51,8 +48,7 @@ export class AiPageEditingImageService {
 
     const dataUrls: string[] = [];
     for (const attachmentId of new Set(attachmentIds)) {
-      const attachment =
-        (await this.attachmentRepo.findById(attachmentId)) ?? null;
+      const attachment = (await this.attachmentRepo.findById(attachmentId)) ?? null;
       if (
         !attachment ||
         attachment.deletedAt ||
@@ -66,9 +62,7 @@ export class AiPageEditingImageService {
         );
       }
 
-      const extension = (attachment.fileExt || '')
-        .toLowerCase()
-        .replace(/^\./, '');
+      const extension = (attachment.fileExt || '').toLowerCase().replace(/^\./, '');
       if (!AI_IMAGE_EXTENSIONS.has(extension)) {
         throw new AiPageEditingImageError(
           'UNSUPPORTED_IMAGE_TYPE',

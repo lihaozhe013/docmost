@@ -14,17 +14,14 @@ export function isISO6391(value: unknown): boolean {
 /**
  * Check if the string is a valid [ISO 639-1](https://en.wikipedia.org/wiki/ISO_639-1) officially assigned language code.
  */
-export function IsISO6391(
-  validationOptions?: ValidationOptions
-): PropertyDecorator {
+export function IsISO6391(validationOptions?: ValidationOptions): PropertyDecorator {
   return ValidateBy(
     {
       name: IS_ISO6391,
       validator: {
         validate: (value, args): boolean => isISO6391(value),
         defaultMessage: buildMessage(
-          (eachPrefix) =>
-            eachPrefix + '$property must be a valid ISO 639-1 language code',
+          (eachPrefix) => eachPrefix + '$property must be a valid ISO 639-1 language code',
           validationOptions
         )
       }

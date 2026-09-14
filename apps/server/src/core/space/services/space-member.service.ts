@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  NotFoundException
-} from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { PaginationOptions } from '@docmost/db/pagination/pagination-options';
 import { KyselyDB, KyselyTransaction } from '@docmost/db/types/kysely.types';
 import { SpaceMemberRepo } from '@docmost/db/repos/space/space-member.repo';
@@ -20,10 +15,7 @@ import { WatcherRepo } from '@docmost/db/repos/watcher/watcher.repo';
 import { FavoriteRepo } from '@docmost/db/repos/favorite/favorite.repo';
 import { executeTx } from '@docmost/db/utils';
 import { AuditEvent, AuditResource } from '../../../common/events/audit-events';
-import {
-  AUDIT_SERVICE,
-  IAuditService
-} from '../../../integrations/audit/audit.service';
+import { AUDIT_SERVICE, IAuditService } from '../../../integrations/audit/audit.service';
 
 @Injectable()
 export class SpaceMemberService {
@@ -88,10 +80,7 @@ export class SpaceMemberService {
       throw new NotFoundException('Space not found');
     }
 
-    return await this.spaceMemberRepo.getSpaceMembersPaginated(
-      spaceId,
-      pagination
-    );
+    return await this.spaceMemberRepo.getSpaceMembersPaginated(spaceId, pagination);
   }
 
   async addMembersToSpaceBatch(
@@ -213,10 +202,7 @@ export class SpaceMemberService {
     }
   }
 
-  async removeMemberFromSpace(
-    dto: RemoveSpaceMemberDto,
-    workspaceId: string
-  ): Promise<void> {
+  async removeMemberFromSpace(dto: RemoveSpaceMemberDto, workspaceId: string): Promise<void> {
     const space = await this.spaceRepo.findById(dto.spaceId, workspaceId);
     if (!space) {
       throw new NotFoundException('Space not found');
@@ -225,23 +211,15 @@ export class SpaceMemberService {
     let spaceMember: SpaceMember = null;
 
     if (dto.userId) {
-      spaceMember = await this.spaceMemberRepo.getSpaceMemberByTypeId(
-        dto.spaceId,
-        {
-          userId: dto.userId
-        }
-      );
+      spaceMember = await this.spaceMemberRepo.getSpaceMemberByTypeId(dto.spaceId, {
+        userId: dto.userId
+      });
     } else if (dto.groupId) {
-      spaceMember = await this.spaceMemberRepo.getSpaceMemberByTypeId(
-        dto.spaceId,
-        {
-          groupId: dto.groupId
-        }
-      );
+      spaceMember = await this.spaceMemberRepo.getSpaceMemberByTypeId(dto.spaceId, {
+        groupId: dto.groupId
+      });
     } else {
-      throw new BadRequestException(
-        'Please provide a valid userId or groupId to remove'
-      );
+      throw new BadRequestException('Please provide a valid userId or groupId to remove');
     }
 
     if (!spaceMember) {
@@ -256,29 +234,17 @@ export class SpaceMemberService {
     if (dto.userId) {
       affectedUserIds = [dto.userId];
     } else if (dto.groupId) {
-      affectedUserIds = await this.groupUserRepo.getUserIdsByGroupId(
-        dto.groupId
-      );
+      affectedUserIds = await this.groupUserRepo.getUserIdsByGroupId(dto.groupId);
     }
 
     await executeTx(this.db, async (trx) => {
-      await this.spaceMemberRepo.removeSpaceMemberById(
-        spaceMember.id,
-        dto.spaceId,
-        { trx }
-      );
+      await this.spaceMemberRepo.removeSpaceMemberById(spaceMember.id, dto.spaceId, { trx });
 
-      await this.watcherRepo.deleteByUsersWithoutSpaceAccess(
-        affectedUserIds,
-        dto.spaceId,
-        { trx }
-      );
+      await this.watcherRepo.deleteByUsersWithoutSpaceAccess(affectedUserIds, dto.spaceId, { trx });
 
-      await this.favoriteRepo.deleteByUsersWithoutSpaceAccess(
-        affectedUserIds,
-        dto.spaceId,
-        { trx }
-      );
+      await this.favoriteRepo.deleteByUsersWithoutSpaceAccess(affectedUserIds, dto.spaceId, {
+        trx
+      });
     });
 
     this.auditService.log({
@@ -299,10 +265,7 @@ export class SpaceMemberService {
     });
   }
 
-  async updateSpaceMemberRole(
-    dto: UpdateSpaceMemberRoleDto,
-    workspaceId: string
-  ): Promise<void> {
+  async updateSpaceMemberRole(dto: UpdateSpaceMemberRoleDto, workspaceId: string): Promise<void> {
     const space = await this.spaceRepo.findById(dto.spaceId, workspaceId);
     if (!space) {
       throw new NotFoundException('Space not found');
@@ -311,23 +274,15 @@ export class SpaceMemberService {
     let spaceMember: SpaceMember = null;
 
     if (dto.userId) {
-      spaceMember = await this.spaceMemberRepo.getSpaceMemberByTypeId(
-        dto.spaceId,
-        {
-          userId: dto.userId
-        }
-      );
+      spaceMember = await this.spaceMemberRepo.getSpaceMemberByTypeId(dto.spaceId, {
+        userId: dto.userId
+      });
     } else if (dto.groupId) {
-      spaceMember = await this.spaceMemberRepo.getSpaceMemberByTypeId(
-        dto.spaceId,
-        {
-          groupId: dto.groupId
-        }
-      );
+      spaceMember = await this.spaceMemberRepo.getSpaceMemberByTypeId(dto.spaceId, {
+        groupId: dto.groupId
+      });
     } else {
-      throw new BadRequestException(
-        'Please provide a valid userId or groupId to remove'
-      );
+      throw new BadRequestException('Please provide a valid userId or groupId to remove');
     }
 
     if (!spaceMember) {
@@ -377,19 +332,14 @@ export class SpaceMemberService {
     });
   }
 
-  async validateLastAdmin(
-    spaceId: string,
-    trx?: KyselyTransaction
-  ): Promise<void> {
+  async validateLastAdmin(spaceId: string, trx?: KyselyTransaction): Promise<void> {
     const spaceOwnerCount = await this.spaceMemberRepo.roleCountBySpaceId(
       SpaceRole.ADMIN,
       spaceId,
       trx
     );
     if (spaceOwnerCount === 1) {
-      throw new BadRequestException(
-        'There must be at least one space admin with full access'
-      );
+      throw new BadRequestException('There must be at least one space admin with full access');
     }
   }
 

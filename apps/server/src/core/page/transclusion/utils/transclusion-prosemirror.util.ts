@@ -15,9 +15,7 @@ export type TransclusionReferenceSnapshot = {
  * duplicate ids are encountered, the later occurrence wins so the result is
  * deterministic.
  */
-export function collectTransclusionsFromPmJson(
-  doc: unknown
-): TransclusionNodeSnapshot[] {
+export function collectTransclusionsFromPmJson(doc: unknown): TransclusionNodeSnapshot[] {
   if (!doc || typeof doc !== 'object') return [];
 
   const byId = new Map<string, TransclusionNodeSnapshot>();
@@ -52,9 +50,7 @@ export function collectTransclusionsFromPmJson(
  * walk stops at source boundaries — references can only appear at page level.
  * Order preserved by first-seen.
  */
-export function collectReferencesFromPmJson(
-  doc: unknown
-): TransclusionReferenceSnapshot[] {
+export function collectReferencesFromPmJson(doc: unknown): TransclusionReferenceSnapshot[] {
   if (!doc || typeof doc !== 'object') return [];
 
   const seen = new Set<string>();

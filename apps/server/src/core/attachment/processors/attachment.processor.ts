@@ -24,9 +24,7 @@ export class AttachmentProcessor extends WorkerHost implements OnModuleDestroy {
         await this.attachmentService.handleDeleteUserAvatars(job.data.id);
       }
       if (job.name === QueueJob.DELETE_PAGE_ATTACHMENTS) {
-        await this.attachmentService.handleDeletePageAttachments(
-          job.data.pageId
-        );
+        await this.attachmentService.handleDeletePageAttachments(job.data.pageId);
       }
       if (
         job.name === QueueJob.ATTACHMENT_INDEX_CONTENT ||
@@ -42,10 +40,9 @@ export class AttachmentProcessor extends WorkerHost implements OnModuleDestroy {
           );
           return;
         }
-        const attachmentEeService = this.moduleRef.get(
-          AttachmentEeModule.AttachmentEeService,
-          { strict: false }
-        );
+        const attachmentEeService = this.moduleRef.get(AttachmentEeModule.AttachmentEeService, {
+          strict: false
+        });
 
         if (job.name === QueueJob.ATTACHMENT_INDEX_CONTENT) {
           await attachmentEeService.indexAttachment(job.data.attachmentId);
@@ -70,9 +67,7 @@ export class AttachmentProcessor extends WorkerHost implements OnModuleDestroy {
         `Error processing ${job.name} job for attachment ${job.data?.attachmentId}. Reason: ${job.failedReason}`
       );
     } else {
-      this.logger.error(
-        `Error processing ${job.name} job. Reason: ${job.failedReason}`
-      );
+      this.logger.error(`Error processing ${job.name} job. Reason: ${job.failedReason}`);
     }
   }
 

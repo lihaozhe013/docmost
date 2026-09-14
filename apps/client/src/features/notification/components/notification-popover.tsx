@@ -10,23 +10,11 @@ import {
   Title,
   Tooltip
 } from '@mantine/core';
-import {
-  IconBell,
-  IconCheck,
-  IconChecks,
-  IconDots,
-  IconFilter
-} from '@tabler/icons-react';
+import { IconBell, IconCheck, IconChecks, IconDots, IconFilter } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { NotificationList } from './notification-list';
-import {
-  NotificationFilter,
-  NotificationTab
-} from '../types/notification.types';
-import {
-  useMarkAllReadMutation,
-  useUnreadCountQuery
-} from '../queries/notification-query';
+import { NotificationFilter, NotificationTab } from '../types/notification.types';
+import { useMarkAllReadMutation, useUnreadCountQuery } from '../queries/notification-query';
 import classes from '../notification.module.css';
 
 export function NotificationPopover() {
@@ -70,12 +58,7 @@ export function NotificationPopover() {
             aria-expanded={opened}
             onClick={() => setOpened((o) => !o)}
           >
-            <Indicator
-              offset={5}
-              color="red"
-              withBorder
-              disabled={unreadCount === 0}
-            >
+            <Indicator offset={5} color="red" withBorder disabled={unreadCount === 0}>
               <IconBell size={20} />
             </Indicator>
           </ActionIcon>
@@ -101,12 +84,7 @@ export function NotificationPopover() {
             >
               <Menu.Target>
                 <Tooltip label={t('Filter')} withArrow>
-                  <ActionIcon
-                    variant="subtle"
-                    color="dark"
-                    size="sm"
-                    aria-label={t('Filter')}
-                  >
+                  <ActionIcon variant="subtle" color="dark" size="sm" aria-label={t('Filter')}>
                     <IconFilter size={16} />
                   </ActionIcon>
                 </Tooltip>
@@ -115,17 +93,13 @@ export function NotificationPopover() {
                 <Menu.Label>{t('Filter')}</Menu.Label>
                 <Menu.Item
                   onClick={() => setFilter('all')}
-                  rightSection={
-                    filter === 'all' ? <IconCheck size={14} /> : null
-                  }
+                  rightSection={filter === 'all' ? <IconCheck size={14} /> : null}
                 >
                   {t('All notifications')}
                 </Menu.Item>
                 <Menu.Item
                   onClick={() => setFilter('unread')}
-                  rightSection={
-                    filter === 'unread' ? <IconCheck size={14} /> : null
-                  }
+                  rightSection={filter === 'unread' ? <IconCheck size={14} /> : null}
                 >
                   {t('Unread only')}
                 </Menu.Item>
@@ -183,11 +157,7 @@ export function NotificationPopover() {
           scrollbarSize={6}
           style={{ overscrollBehavior: 'contain' }}
         >
-          <NotificationList
-            tab={tab}
-            filter={filter}
-            onNavigate={() => setOpened(false)}
-          />
+          <NotificationList tab={tab} filter={filter} onNavigate={() => setOpened(false)} />
         </ScrollArea.Autosize>
       </Popover.Dropdown>
     </Popover>

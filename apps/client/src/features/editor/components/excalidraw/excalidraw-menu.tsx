@@ -1,13 +1,6 @@
 import { BubbleMenu as BaseBubbleMenu } from '@tiptap/react/menus';
 import { findParentNode, posToDOMRect, useEditorState } from '@tiptap/react';
-import {
-  lazy,
-  Suspense,
-  useCallback,
-  useEffect,
-  useRef,
-  useState
-} from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useSetAtom } from 'jotai';
 import { Node as PMNode } from '@tiptap/pm/model';
 import { isEditorReady } from '@docmost/editor-ext';
@@ -15,14 +8,7 @@ import {
   EditorMenuProps,
   ShouldShowProps
 } from '@/features/editor/components/table/types/types.ts';
-import {
-  ActionIcon,
-  Button,
-  Group,
-  Text,
-  Tooltip,
-  useComputedColorScheme
-} from '@mantine/core';
+import { ActionIcon, Button, Group, Text, Tooltip, useComputedColorScheme } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { useDisclosure } from '@mantine/hooks';
 import clsx from 'clsx';
@@ -59,8 +45,7 @@ export function ExcalidrawMenu({ editor }: EditorMenuProps) {
   const { t } = useTranslation();
   const setLightboxRequest = useSetAtom(lightboxRequestAtom);
   const [opened, { open, close }] = useDisclosure(false);
-  const [excalidrawAPI, setExcalidrawAPI] =
-    useState<ExcalidrawImperativeAPI>(null);
+  const [excalidrawAPI, setExcalidrawAPI] = useState<ExcalidrawImperativeAPI>(null);
   useHandleLibrary({
     excalidrawAPI,
     adapter: localStorageLibraryAdapter
@@ -100,9 +85,7 @@ export function ExcalidrawMenu({ editor }: EditorMenuProps) {
         return false;
       }
 
-      return (
-        editor.isActive('excalidraw') && editor.getAttributes('excalidraw')?.src
-      );
+      return editor.isActive('excalidraw') && editor.getAttributes('excalidraw')?.src;
     },
     [editor]
   );
@@ -130,27 +113,15 @@ export function ExcalidrawMenu({ editor }: EditorMenuProps) {
   }, [editor]);
 
   const alignLeft = useCallback(() => {
-    editor
-      .chain()
-      .focus(undefined, { scrollIntoView: false })
-      .setExcalidrawAlign('left')
-      .run();
+    editor.chain().focus(undefined, { scrollIntoView: false }).setExcalidrawAlign('left').run();
   }, [editor]);
 
   const alignCenter = useCallback(() => {
-    editor
-      .chain()
-      .focus(undefined, { scrollIntoView: false })
-      .setExcalidrawAlign('center')
-      .run();
+    editor.chain().focus(undefined, { scrollIntoView: false }).setExcalidrawAlign('center').run();
   }, [editor]);
 
   const alignRight = useCallback(() => {
-    editor
-      .chain()
-      .focus(undefined, { scrollIntoView: false })
-      .setExcalidrawAlign('right')
-      .run();
+    editor.chain().focus(undefined, { scrollIntoView: false }).setExcalidrawAlign('right').run();
   }, [editor]);
 
   const handleDownload = useCallback(() => {
@@ -273,11 +244,7 @@ export function ExcalidrawMenu({ editor }: EditorMenuProps) {
 
     modals.openConfirmModal({
       title: t('Unsaved changes'),
-      children: (
-        <Text size="sm">
-          {t('You have unsaved changes that will be lost.')}
-        </Text>
-      ),
+      children: <Text size="sm">{t('You have unsaved changes that will be lost.')}</Text>,
       centered: true,
       labels: { confirm: t('Discard'), cancel: t('Cancel') },
       confirmProps: { color: 'red' },
@@ -318,11 +285,7 @@ export function ExcalidrawMenu({ editor }: EditorMenuProps) {
           altTextPanel
         ) : (
           <div className={classes.toolbar}>
-            <Tooltip
-              position="top"
-              label={t('Align left')}
-              withinPortal={false}
-            >
+            <Tooltip position="top" label={t('Align left')} withinPortal={false}>
               <ActionIcon
                 onClick={alignLeft}
                 size="lg"
@@ -336,11 +299,7 @@ export function ExcalidrawMenu({ editor }: EditorMenuProps) {
               </ActionIcon>
             </Tooltip>
 
-            <Tooltip
-              position="top"
-              label={t('Align center')}
-              withinPortal={false}
-            >
+            <Tooltip position="top" label={t('Align center')} withinPortal={false}>
               <ActionIcon
                 onClick={alignCenter}
                 size="lg"
@@ -354,11 +313,7 @@ export function ExcalidrawMenu({ editor }: EditorMenuProps) {
               </ActionIcon>
             </Tooltip>
 
-            <Tooltip
-              position="top"
-              label={t('Align right')}
-              withinPortal={false}
-            >
+            <Tooltip position="top" label={t('Align right')} withinPortal={false}>
               <ActionIcon
                 onClick={alignRight}
                 size="lg"
@@ -448,17 +403,8 @@ export function ExcalidrawMenu({ editor }: EditorMenuProps) {
           }
         }}
       >
-        <Group
-          justify="flex-end"
-          wrap="nowrap"
-          bg="var(--mantine-color-body)"
-          p="xs"
-        >
-          <Button
-            onClick={handleSaveAndExit}
-            size={'compact-sm'}
-            loading={isSaving}
-          >
+        <Group justify="flex-end" wrap="nowrap" bg="var(--mantine-color-body)" p="xs">
+          <Button onClick={handleSaveAndExit} size={'compact-sm'} loading={isSaving}>
             {t('Save & Exit')}
           </Button>
           <Button onClick={handleClose} color="red" size={'compact-sm'}>

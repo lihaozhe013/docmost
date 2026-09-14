@@ -16,14 +16,7 @@ export async function up(db: Kysely<any>): Promise<void> {
 }
 
 export async function down(db: Kysely<any>): Promise<void> {
-  await db.schema
-    .alterTable('attachments')
-    .dropIndex('attachments_tsv_idx')
-    .execute();
+  await db.schema.alterTable('attachments').dropIndex('attachments_tsv_idx').execute();
 
-  await db.schema
-    .alterTable('attachments')
-    .dropColumn('text_content')
-    .dropColumn('tsv')
-    .execute();
+  await db.schema.alterTable('attachments').dropColumn('text_content').dropColumn('tsv').execute();
 }

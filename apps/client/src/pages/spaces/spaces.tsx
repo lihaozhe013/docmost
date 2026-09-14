@@ -11,8 +11,7 @@ import { DocumentTitle } from '@/components/ui/document-title.tsx';
 export default function Spaces() {
   const { t } = useTranslation();
   const { isAdmin } = useUserRole();
-  const { search, cursor, goNext, goPrev, handleSearch } =
-    usePaginateAndSearch();
+  const { search, cursor, goNext, goPrev, handleSearch } = usePaginateAndSearch();
 
   const { data, isLoading } = useGetSpacesQuery({
     cursor,

@@ -17,16 +17,12 @@ export async function logout(): Promise<void> {
   await api.post<void>('/auth/logout');
 }
 
-export async function changePassword(
-  data: IChangePassword
-): Promise<IChangePassword> {
+export async function changePassword(data: IChangePassword): Promise<IChangePassword> {
   const req = await api.post<IChangePassword>('/auth/change-password', data);
   return req.data;
 }
 
-export async function setupWorkspace(
-  data: ISetupWorkspace
-): Promise<IWorkspace> {
+export async function setupWorkspace(data: ISetupWorkspace): Promise<IWorkspace> {
   const req = await api.post<IWorkspace>('/auth/setup', data);
   return req.data;
 }

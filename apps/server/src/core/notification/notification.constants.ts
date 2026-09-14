@@ -15,8 +15,7 @@ export const NotificationType = {
   SIEM_DESTINATION_RECOVERED: 'siem_destination.recovered'
 } as const;
 
-export type NotificationType =
-  (typeof NotificationType)[keyof typeof NotificationType];
+export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType];
 
 export type NotificationSettingKey =
   | 'page.updated'
@@ -48,13 +47,9 @@ export const DIRECT_NOTIFICATION_TYPES: NotificationType[] = [
   NotificationType.SIEM_DESTINATION_RECOVERED
 ];
 
-export const UPDATES_NOTIFICATION_TYPES: NotificationType[] = [
-  NotificationType.PAGE_UPDATED
-];
+export const UPDATES_NOTIFICATION_TYPES: NotificationType[] = [NotificationType.PAGE_UPDATED];
 
-export function getTypesForTab(
-  tab: NotificationTab
-): NotificationType[] | undefined {
+export function getTypesForTab(tab: NotificationTab): NotificationType[] | undefined {
   if (tab === 'direct') return DIRECT_NOTIFICATION_TYPES;
   if (tab === 'updates') return UPDATES_NOTIFICATION_TYPES;
   return undefined;

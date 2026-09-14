@@ -1,9 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import {
-  watchPage,
-  unwatchPage,
-  getWatchStatus
-} from '@/features/page/services/watcher-service';
+import { watchPage, unwatchPage, getWatchStatus } from '@/features/page/services/watcher-service';
 import { notifications } from '@mantine/notifications';
 import { useTranslation } from 'react-i18next';
 

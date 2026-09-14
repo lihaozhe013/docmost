@@ -2,11 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectKysely } from 'nestjs-kysely';
 import { KyselyDB, KyselyTransaction } from '../../types/kysely.types';
 import { dbOrTx } from '../../utils';
-import {
-  InsertablePageHistory,
-  Page,
-  PageHistory
-} from '@docmost/db/types/entity.types';
+import { InsertablePageHistory, Page, PageHistory } from '@docmost/db/types/entity.types';
 import { PaginationOptions } from '@docmost/db/pagination/pagination-options';
 import { executeWithCursorPagination } from '@docmost/db/pagination/cursor-pagination';
 import { jsonArrayFrom, jsonObjectFrom } from 'kysely/helpers/postgres';
@@ -133,11 +129,7 @@ export class PageHistoryRepo {
       eb
         .selectFrom('users')
         .select(['users.id', 'users.name', 'users.avatarUrl'])
-        .whereRef(
-          'users.id',
-          '=',
-          sql`ANY(${eb.ref('pageHistory.contributorIds')})`
-        )
+        .whereRef('users.id', '=', sql`ANY(${eb.ref('pageHistory.contributorIds')})`)
     ).as('contributors');
   }
 }

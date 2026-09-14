@@ -15,10 +15,7 @@ export function isSupportedAiImage(file: File): boolean {
   return IMAGE_EXTENSIONS.includes(extension);
 }
 
-export function validateAiImageBatch(
-  currentCount: number,
-  incoming: File[]
-): string | null {
+export function validateAiImageBatch(currentCount: number, incoming: File[]): string | null {
   if (currentCount + incoming.length > MAX_AI_IMAGES) {
     return `You can attach at most ${MAX_AI_IMAGES} images per message.`;
   }

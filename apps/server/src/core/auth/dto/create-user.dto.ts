@@ -1,11 +1,4 @@
-import {
-  IsEmail,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  MaxLength,
-  MinLength
-} from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 import { Transform, TransformFnParams } from 'class-transformer';
 import { NoUrls } from '../../../common/validators/no-urls.validator';
 

@@ -17,8 +17,7 @@ import GroupActionMenu from '@/features/group/components/group-action-menu.tsx';
 
 export default function GroupList() {
   const { t } = useTranslation();
-  const { search, cursor, goNext, goPrev, handleSearch } =
-    usePaginateAndSearch();
+  const { search, cursor, goNext, goPrev, handleSearch } = usePaginateAndSearch();
   const { data, isLoading } = useGetGroupsQuery({ cursor, query: search });
 
   const prefetchGroupMembers = (groupId: string) => {

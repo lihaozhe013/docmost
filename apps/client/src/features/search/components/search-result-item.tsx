@@ -1,22 +1,11 @@
 import React from 'react';
-import {
-  Group,
-  Center,
-  Text,
-  Badge,
-  ActionIcon,
-  Tooltip,
-  getDefaultZIndex
-} from '@mantine/core';
+import { Group, Center, Text, Badge, ActionIcon, Tooltip, getDefaultZIndex } from '@mantine/core';
 import { Spotlight } from '@mantine/spotlight';
 import { Link } from 'react-router-dom';
 import { IconFile, IconDownload } from '@tabler/icons-react';
 import { buildPageUrl } from '@/features/page/page.utils';
 import { getPageIcon } from '@/lib';
-import {
-  IAttachmentSearch,
-  IPageSearch
-} from '@/features/search/types/search.types';
+import { IAttachmentSearch, IPageSearch } from '@/features/search/types/search.types';
 import DOMPurify from 'dompurify';
 import { useTranslation } from 'react-i18next';
 import { timeAgo } from '@/lib/time.ts';
@@ -35,11 +24,7 @@ const makeActionTabbable = (el: HTMLElement | null) => {
   }
 };
 
-export function SearchResultItem({
-  result,
-  isAttachmentResult,
-  showSpace
-}: SearchResultItemProps) {
+export function SearchResultItem({ result, isAttachmentResult, showSpace }: SearchResultItemProps) {
   const { t } = useTranslation();
 
   if (isAttachmentResult) {
@@ -94,11 +79,7 @@ export function SearchResultItem({
             )}
           </div>
 
-          <Tooltip
-            label={t('Download attachment')}
-            zIndex={getDefaultZIndex('max')}
-            withArrow
-          >
+          <Tooltip label={t('Download attachment')} zIndex={getDefaultZIndex('max')} withArrow>
             <ActionIcon variant="subtle" color="gray" onClick={handleDownload}>
               <IconDownload size={18} />
             </ActionIcon>
@@ -113,11 +94,7 @@ export function SearchResultItem({
         component={Link}
         ref={makeActionTabbable}
         //@ts-ignore
-        to={buildPageUrl(
-          pageResult.space.slug,
-          pageResult.slugId,
-          pageResult.title
-        )}
+        to={buildPageUrl(pageResult.space.slug, pageResult.slugId, pageResult.title)}
         style={{ userSelect: 'none' }}
       >
         <Group wrap="nowrap" w="100%">

@@ -4,10 +4,7 @@ import { IconFileDescription } from '@tabler/icons-react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { usePageQuery } from '@/features/page/queries/page-query.ts';
 import { useSharePageQuery } from '@/features/share/queries/share-query.ts';
-import {
-  buildPageUrl,
-  buildSharedPageUrl
-} from '@/features/page/page.utils.ts';
+import { buildPageUrl, buildSharedPageUrl } from '@/features/page/page.utils.ts';
 import { extractPageSlugId } from '@/lib';
 import classes from './mention.module.css';
 
@@ -111,12 +108,7 @@ export default function MentionView(props: NodeViewProps) {
         <Anchor
           component={Link}
           fw={500}
-          to={buildPageUrl(
-            page?.space?.slug || spaceSlug,
-            slugId,
-            page?.title || label,
-            anchorId
-          )}
+          to={buildPageUrl(page?.space?.slug || spaceSlug, slugId, page?.title || label, anchorId)}
           onClick={handleClick}
           underline="never"
           className={classes.pageMentionLink}
@@ -135,9 +127,7 @@ export default function MentionView(props: NodeViewProps) {
             </ActionIcon>
           )}
 
-          <span className={classes.pageMentionText}>
-            {page?.title || label}
-          </span>
+          <span className={classes.pageMentionText}>{page?.title || label}</span>
         </Anchor>
       )}
     </NodeViewWrapper>

@@ -58,14 +58,12 @@ export function SearchSpotlight({ spaceId }: SearchSpotlightProps) {
 
   const { data: searchResults, isFetching } = useUnifiedSearch(searchParams);
 
-  const isFilterBrowse =
-    (filters.labelIds?.length ?? 0) > 0 || !!filters.creatorId;
+  const isFilterBrowse = (filters.labelIds?.length ?? 0) > 0 || !!filters.creatorId;
   // while the debounce is pending the empty list is not a settled "no results"
   const isQuerySettled = query === debouncedSearchQuery;
 
   // Determine result type for rendering
-  const isAttachmentSearch =
-    filters.contentType === 'attachment' && hasAttachmentIndexing;
+  const isAttachmentSearch = filters.contentType === 'attachment' && hasAttachmentIndexing;
 
   const resultItems = (searchResults || []).map((result) => (
     <SearchResultItem
@@ -110,10 +108,7 @@ export function SearchSpotlight({ spaceId }: SearchSpotlightProps) {
             padding: '4px 16px'
           }}
         >
-          <SearchSpotlightFilters
-            onFiltersChange={handleFiltersChange}
-            spaceId={spaceId}
-          />
+          <SearchSpotlightFilters onFiltersChange={handleFiltersChange} spaceId={spaceId} />
         </div>
 
         <VisuallyHidden role="status" aria-live="polite">
@@ -125,13 +120,9 @@ export function SearchSpotlight({ spaceId }: SearchSpotlightProps) {
         </VisuallyHidden>
 
         <Spotlight.ActionsList>
-          {query.length === 0 &&
-            !isFilterBrowse &&
-            resultItems.length === 0 && (
-              <Spotlight.Empty>
-                {t('Start typing to search...')}
-              </Spotlight.Empty>
-            )}
+          {query.length === 0 && !isFilterBrowse && resultItems.length === 0 && (
+            <Spotlight.Empty>{t('Start typing to search...')}</Spotlight.Empty>
+          )}
 
           {(query.length > 0 || isFilterBrowse) &&
             !isFetching &&
@@ -142,15 +133,13 @@ export function SearchSpotlight({ spaceId }: SearchSpotlightProps) {
 
           {resultItems.length > 0 && <>{resultItems}</>}
 
-          {(query.length > 0 || isFilterBrowse) &&
-            isFetching &&
-            resultItems.length === 0 && (
-              <Spotlight.Empty>
-                <Text size="sm" style={{ marginTop: 10 }}>
-                  {t('Searching...')}
-                </Text>
-              </Spotlight.Empty>
-            )}
+          {(query.length > 0 || isFilterBrowse) && isFetching && resultItems.length === 0 && (
+            <Spotlight.Empty>
+              <Text size="sm" style={{ marginTop: 10 }}>
+                {t('Searching...')}
+              </Text>
+            </Spotlight.Empty>
+          )}
         </Spotlight.ActionsList>
       </Spotlight.Root>
     </>

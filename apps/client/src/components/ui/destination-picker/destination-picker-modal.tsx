@@ -2,10 +2,7 @@ import { useState, useEffect } from 'react';
 import { Modal, Button, Group, Divider } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { DestinationPicker } from './destination-picker';
-import {
-  DestinationPickerModalProps,
-  DestinationSelection
-} from './destination-picker.types';
+import { DestinationPickerModalProps, DestinationSelection } from './destination-picker.types';
 
 export function DestinationPickerModal({
   opened,

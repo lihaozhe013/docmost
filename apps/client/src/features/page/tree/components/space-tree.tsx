@@ -72,10 +72,7 @@ export default function SpaceTree({ spaceId, readOnly }: SpaceTreeProps) {
       // and open-state when the user returns to a previously-visited space.
       const otherSpaces = prev.filter((n) => n?.spaceId !== spaceId);
       const currentSpace = prev.filter((n) => n?.spaceId === spaceId);
-      const refreshed =
-        currentSpace.length > 0
-          ? mergeRootTrees(currentSpace, treeData)
-          : treeData;
+      const refreshed = currentSpace.length > 0 ? mergeRootTrees(currentSpace, treeData) : treeData;
       return [...otherSpaces, ...refreshed];
     });
     setIsDataLoaded(true);
@@ -112,15 +109,11 @@ export default function SpaceTree({ spaceId, readOnly }: SpaceTreeProps) {
 
             flatTreeItems = [
               ...flatTreeItems,
-              ...children.filter(
-                (child) => !flatTreeItems.some((item) => item.id === child.id)
-              )
+              ...children.filter((child) => !flatTreeItems.some((item) => item.id === child.id))
             ];
           };
 
-          const fetchPromises = ancestors.map((ancestor) =>
-            fetchAndUpdateChildren(ancestor)
-          );
+          const fetchPromises = ancestors.map((ancestor) => fetchAndUpdateChildren(ancestor));
 
           Promise.all(fetchPromises).then(() => {
             if (spaceIdRef.current !== effectSpaceId) return;
@@ -132,11 +125,7 @@ export default function SpaceTree({ spaceId, readOnly }: SpaceTreeProps) {
 
             // attach built ancestors to tree using functional updater
             setData((currentData) =>
-              treeModel.appendChildren(
-                currentData,
-                rootChild.id,
-                rootChild.children ?? []
-              )
+              treeModel.appendChildren(currentData, rootChild.id, rootChild.children ?? [])
             );
 
             // open all ancestors of the current page. DocTree picks up the
@@ -167,10 +156,7 @@ export default function SpaceTree({ spaceId, readOnly }: SpaceTreeProps) {
       setOpenTreeNodes((prev) => ({ ...prev, [id]: isOpen }));
       if (isOpen) {
         const node = treeModel.find(data, id) as SpaceTreeNode | null;
-        if (
-          node?.hasChildren &&
-          (!node.children || node.children.length === 0)
-        ) {
+        if (node?.hasChildren && (!node.children || node.children.length === 0)) {
           const fetched = await fetchAllAncestorChildren({
             pageId: id,
             spaceId: node.spaceId
@@ -196,14 +182,8 @@ export default function SpaceTree({ spaceId, readOnly }: SpaceTreeProps) {
     ),
     [readOnly]
   );
-  const disableDragDrop = useCallback(
-    (n: SpaceTreeNode) => n.canEdit === false,
-    []
-  );
-  const getDragLabel = useCallback(
-    (n: SpaceTreeNode) => getPageTitle(n.name, n.isBase, t),
-    [t]
-  );
+  const disableDragDrop = useCallback((n: SpaceTreeNode) => n.canEdit === false, []);
+  const getDragLabel = useCallback((n: SpaceTreeNode) => getPageTitle(n.name, n.isBase, t), [t]);
 
   return (
     <div className={classes.treeContainer}>

@@ -17,8 +17,7 @@ export default function AudioView(props: NodeViewProps) {
   }, [src]);
 
   const previewSrc = useMemo(() => {
-    editor.storage.shared.audioPreviews =
-      editor.storage.shared.audioPreviews || {};
+    editor.storage.shared.audioPreviews = editor.storage.shared.audioPreviews || {};
 
     if (placeholder?.id) {
       return editor.storage.shared.audioPreviews[placeholder.id];
@@ -29,9 +28,7 @@ export default function AudioView(props: NodeViewProps) {
 
   return (
     <NodeViewWrapper data-drag-handle>
-      <div
-        className={`${classes.audioWrapper} ${!safeSrc && placeholder ? classes.skeleton : ''}`}
-      >
+      <div className={`${classes.audioWrapper} ${!safeSrc && placeholder ? classes.skeleton : ''}`}>
         {safeSrc && (
           <audio
             className={classes.audio}
@@ -54,14 +51,7 @@ export default function AudioView(props: NodeViewProps) {
           </Group>
         )}
         {!safeSrc && !previewSrc && placeholder && (
-          <Group
-            justify="center"
-            wrap="nowrap"
-            gap="xs"
-            maw="100%"
-            px="md"
-            h={54}
-          >
+          <Group justify="center" wrap="nowrap" gap="xs" maw="100%" px="md" h={54}>
             <Loader size={20} style={{ flexShrink: 0 }} />
             <Text component="span" size="sm" truncate="end">
               {placeholder?.name

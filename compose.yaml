@@ -7,9 +7,9 @@ services:
       DATABASE_URL: 'postgresql://docmost:STRONG_DB_PASSWORD@host.docker.internal:5432/docmost'
       REDIS_URL: 'redis://host.docker.internal:6379'
     ports:
-      - "127.0.0.1:3000:3000"
+      - '127.0.0.1:3000:3000'
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - 'host.docker.internal:host-gateway'
     restart: unless-stopped
     volumes:
       - docmost:/app/data/storage

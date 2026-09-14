@@ -1,7 +1,4 @@
-import {
-  initProseMirrorDoc,
-  relativePositionToAbsolutePosition
-} from '@tiptap/y-tiptap';
+import { initProseMirrorDoc, relativePositionToAbsolutePosition } from '@tiptap/y-tiptap';
 import * as Y from 'yjs';
 import { Document } from '@hocuspocus/server';
 import { getSchema } from '@tiptap/core';
@@ -26,23 +23,11 @@ export function setYjsMark(
   const anchorRelPos = Y.createRelativePositionFromJSON(yjsSelection.anchor);
   const headRelPos = Y.createRelativePositionFromJSON(yjsSelection.head);
 
-  const anchor = relativePositionToAbsolutePosition(
-    doc,
-    fragment,
-    anchorRelPos,
-    mapping
-  );
-  const head = relativePositionToAbsolutePosition(
-    doc,
-    fragment,
-    headRelPos,
-    mapping
-  );
+  const anchor = relativePositionToAbsolutePosition(doc, fragment, anchorRelPos, mapping);
+  const head = relativePositionToAbsolutePosition(doc, fragment, headRelPos, mapping);
 
   if (anchor === null || head === null) {
-    throw new Error(
-      'Could not resolve Y.js relative positions to absolute positions'
-    );
+    throw new Error('Could not resolve Y.js relative positions to absolute positions');
   }
 
   const from = Math.min(anchor, head);
@@ -153,10 +138,7 @@ export function updateYjsMarkAttribute(
         const attributes = delta.attributes ?? {};
         const markAttr = attributes[markName];
 
-        if (
-          markAttr &&
-          markAttr[findByAttribute.name] === findByAttribute.value
-        ) {
+        if (markAttr && markAttr[findByAttribute.name] === findByAttribute.value) {
           // Update the mark with new attributes (merge with existing)
           item.format(offset, length, {
             [markName]: { ...markAttr, ...newAttributes }

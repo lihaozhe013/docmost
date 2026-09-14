@@ -1,13 +1,7 @@
 import { ReactRenderer } from '@tiptap/react';
 import type { SuggestionProps } from '@tiptap/suggestion';
 import CommandList from '@/features/editor/components/slash-menu/command-list';
-import {
-  autoUpdate,
-  computePosition,
-  flip,
-  offset,
-  shift
-} from '@floating-ui/dom';
+import { autoUpdate, computePosition, flip, offset, shift } from '@floating-ui/dom';
 
 const renderItems = () => {
   let component: ReactRenderer | null = null;
@@ -59,9 +53,7 @@ const renderItems = () => {
         // @ts-ignore
         {
           getBoundingClientRect: () => {
-            return getReferenceClientRect
-              ? getReferenceClientRect()
-              : new DOMRect();
+            return getReferenceClientRect ? getReferenceClientRect() : new DOMRect();
           }
         },
         popup,

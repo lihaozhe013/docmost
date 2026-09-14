@@ -1,10 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectKysely } from 'nestjs-kysely';
 import { KyselyDB } from '../../types/kysely.types';
-import {
-  InsertableNotification,
-  Notification
-} from '@docmost/db/types/entity.types';
+import { InsertableNotification, Notification } from '@docmost/db/types/entity.types';
 import { PaginationOptions } from '@docmost/db/pagination/pagination-options';
 import { executeWithCursorPagination } from '@docmost/db/pagination/cursor-pagination';
 import { ExpressionBuilder } from 'kysely';
@@ -31,11 +28,7 @@ export class NotificationRepo {
       .executeTakeFirst();
   }
 
-  async findByUserId(
-    userId: string,
-    pagination: PaginationOptions,
-    type: NotificationTab = 'all'
-  ) {
+  async findByUserId(userId: string, pagination: PaginationOptions, type: NotificationTab = 'all') {
     let query = this.db
       .selectFrom('notifications')
       .selectAll('notifications')
@@ -100,10 +93,7 @@ export class NotificationRepo {
       .execute();
   }
 
-  async markMultipleAsRead(
-    notificationIds: string[],
-    userId: string
-  ): Promise<void> {
+  async markMultipleAsRead(notificationIds: string[], userId: string): Promise<void> {
     if (notificationIds.length === 0) {
       return;
     }

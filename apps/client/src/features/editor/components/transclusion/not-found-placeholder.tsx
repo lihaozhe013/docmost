@@ -6,11 +6,7 @@ export default function NotFoundPlaceholder() {
   const { t } = useTranslation();
   return (
     <div className={classes.placeholder}>
-      <IconInfoCircle
-        size={18}
-        stroke={1.6}
-        className={classes.placeholderIcon}
-      />
+      <IconInfoCircle size={18} stroke={1.6} className={classes.placeholderIcon} />
       <span>{t('The original synced block no longer exists')}</span>
     </div>
   );

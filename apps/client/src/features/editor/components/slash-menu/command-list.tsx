@@ -54,9 +54,7 @@ const CommandList = ({
         e.preventDefault();
 
         if (e.key === 'ArrowUp') {
-          setSelectedIndex(
-            (selectedIndex + flatItems.length - 1) % flatItems.length
-          );
+          setSelectedIndex((selectedIndex + flatItems.length - 1) % flatItems.length);
           return true;
         }
 
@@ -89,9 +87,7 @@ const CommandList = ({
       setCountAnnouncement('');
       return;
     }
-    setCountAnnouncement(
-      t('{{count}} command available', { count: flatItems.length })
-    );
+    setCountAnnouncement(t('{{count}} command available', { count: flatItems.length }));
   }, [flatItems.length, t]);
 
   useEffect(() => {
@@ -155,11 +151,7 @@ const CommandList = ({
                     })}
                   >
                     <Group wrap="nowrap">
-                      <ActionIcon
-                        variant="default"
-                        component="div"
-                        aria-hidden="true"
-                      >
+                      <ActionIcon variant="default" component="div" aria-hidden="true">
                         <item.icon size={18} />
                       </ActionIcon>
 

@@ -1,12 +1,4 @@
-import {
-  ActionIcon,
-  CloseButton,
-  Group,
-  Paper,
-  ScrollArea,
-  Switch,
-  Text
-} from '@mantine/core';
+import { ActionIcon, CloseButton, Group, Paper, ScrollArea, Switch, Text } from '@mantine/core';
 import HistoryList from '@/features/page-history/components/history-list';
 import classes from './css/history.module.css';
 import { useAtom, useAtomValue } from 'jotai';
@@ -21,10 +13,7 @@ import HistoryView from '@/features/page-history/components/history-view';
 import { useMemo, useRef } from 'react';
 import { IconChevronUp, IconChevronDown } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import {
-  useDiffNavigation,
-  useHistoryReset
-} from '@/features/page-history/hooks';
+import { useDiffNavigation, useHistoryReset } from '@/features/page-history/hooks';
 import { usePageHistoryListQuery } from '@/features/page-history/queries/page-history-query';
 import { formattedDate } from '@/lib/time';
 
@@ -50,12 +39,8 @@ export default function HistoryModalBody({ pageId }: Props) {
 
   const compareLabel = useMemo(() => {
     if (!comparePair) return null;
-    const newerItem = historyItems.find(
-      (item) => item.id === comparePair.newerId
-    );
-    const olderItem = historyItems.find(
-      (item) => item.id === comparePair.olderId
-    );
+    const newerItem = historyItems.find((item) => item.id === comparePair.newerId);
+    const olderItem = historyItems.find((item) => item.id === comparePair.olderId);
     if (!newerItem || !olderItem) return null;
     return t('Comparing {{newer}} and {{older}}', {
       newer: formattedDate(new Date(newerItem.createdAt)),
@@ -95,18 +80,10 @@ export default function HistoryModalBody({ pageId }: Props) {
           </Group>
         )}
 
-        <ScrollArea
-          h={650}
-          w="100%"
-          scrollbarSize={5}
-          viewportRef={scrollViewportRef}
-        >
+        <ScrollArea h={650} w="100%" scrollbarSize={5} viewportRef={scrollViewportRef}>
           <div className={classes.sidebarRightSection}>
             {comparePair ? (
-              <HistoryView
-                historyId={comparePair.newerId}
-                prevHistoryId={comparePair.olderId}
-              />
+              <HistoryView historyId={comparePair.newerId} prevHistoryId={comparePair.olderId} />
             ) : (
               activeHistoryId && <HistoryView />
             )}
@@ -138,18 +115,10 @@ export default function HistoryModalBody({ pageId }: Props) {
                   <Text size="sm" c="dimmed" style={{ whiteSpace: 'nowrap' }}>
                     {currentChangeIndex} of {diffCounts.total}
                   </Text>
-                  <ActionIcon
-                    variant="subtle"
-                    size="sm"
-                    onClick={handlePrevChange}
-                  >
+                  <ActionIcon variant="subtle" size="sm" onClick={handlePrevChange}>
                     <IconChevronUp size={16} />
                   </ActionIcon>
-                  <ActionIcon
-                    variant="subtle"
-                    size="sm"
-                    onClick={handleNextChange}
-                  >
+                  <ActionIcon variant="subtle" size="sm" onClick={handleNextChange}>
                     <IconChevronDown size={16} />
                   </ActionIcon>
                 </Group>

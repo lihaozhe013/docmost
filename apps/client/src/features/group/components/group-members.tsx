@@ -19,8 +19,7 @@ import { usePaginateAndSearch } from '@/hooks/use-paginate-and-search.tsx';
 export default function GroupMembersList() {
   const { t } = useTranslation();
   const { groupId } = useParams();
-  const { search, cursor, goNext, goPrev, handleSearch } =
-    usePaginateAndSearch();
+  const { search, cursor, goNext, goPrev, handleSearch } = usePaginateAndSearch();
   const { data, isLoading } = useGroupMembersQuery(groupId, {
     cursor,
     query: search
@@ -71,10 +70,7 @@ export default function GroupMembersList() {
                 <Table.Tr key={index}>
                   <Table.Td>
                     <Group gap="sm" wrap="nowrap">
-                      <CustomAvatar
-                        avatarUrl={user.avatarUrl}
-                        name={user.name}
-                      />
+                      <CustomAvatar avatarUrl={user.avatarUrl} name={user.name} />
                       <div>
                         <Text fz="sm" fw={500} lineClamp={1}>
                           {user.name}

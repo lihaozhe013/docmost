@@ -39,8 +39,7 @@ function infer(
       if (ARITH_OPS.includes(ast.op)) {
         // '+' is overloaded to match the evaluator: any string operand makes
         // it string concatenation; otherwise it's numeric addition.
-        if (ast.op === '+' && argTypes.some((t) => t === 'string'))
-          return 'string';
+        if (ast.op === '+' && argTypes.some((t) => t === 'string')) return 'string';
         const allow = argTypes.every((t) => t === 'number' || t === 'null');
         if (!allow) throw typeErr(`Operator '${ast.op}' needs numbers`);
         return 'number';
@@ -70,8 +69,7 @@ function infer(
     case 'or':
       ast.args.forEach((a) => {
         const t = infer(a, propertyTypes, registry);
-        if (t !== 'boolean' && t !== 'null')
-          throw typeErr(`'${ast.t}' needs boolean args`);
+        if (t !== 'boolean' && t !== 'null') throw typeErr(`'${ast.t}' needs boolean args`);
       });
       return 'boolean';
     case 'call': {
@@ -97,15 +95,11 @@ function infer(
           }
         ]);
       }
-      return typeof fn.returnType === 'function'
-        ? fn.returnType(argTypes)
-        : fn.returnType;
+      return typeof fn.returnType === 'function' ? fn.returnType(argTypes) : fn.returnType;
     }
   }
 }
 
 function typeErr(message: string): FormulaParseError {
-  return new FormulaParseError([
-    { code: 'TYPE_MISMATCH', message, span: { start: 0, end: 0 } }
-  ]);
+  return new FormulaParseError([{ code: 'TYPE_MISMATCH', message, span: { start: 0, end: 0 } }]);
 }

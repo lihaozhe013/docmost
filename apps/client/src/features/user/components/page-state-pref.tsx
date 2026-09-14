@@ -35,13 +35,10 @@ interface PageStateSegmentedControlProps {
   size?: MantineSize;
 }
 
-export function PageStateSegmentedControl({
-  size
-}: PageStateSegmentedControlProps) {
+export function PageStateSegmentedControl({ size }: PageStateSegmentedControlProps) {
   const { t } = useTranslation();
   const [user, setUser] = useAtom(userAtom);
-  const pageEditMode =
-    user?.settings?.preferences?.pageEditMode ?? PageEditMode.Edit;
+  const pageEditMode = user?.settings?.preferences?.pageEditMode ?? PageEditMode.Edit;
   const [value, setValue] = useState(pageEditMode);
 
   const handleChange = useCallback(
@@ -81,9 +78,7 @@ export function PageStateSegmentedControl({
 // the preference to the server.
 export function PageEditModeToggle({ size }: { size?: MantineSize }) {
   const { t } = useTranslation();
-  const [currentPageEditMode, setCurrentPageEditMode] = useAtom(
-    currentPageEditModeAtom
-  );
+  const [currentPageEditMode, setCurrentPageEditMode] = useAtom(currentPageEditModeAtom);
 
   return (
     <SegmentedControl

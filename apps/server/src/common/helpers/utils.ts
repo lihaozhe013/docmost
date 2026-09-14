@@ -37,15 +37,7 @@ export type RedisConfig = {
 export function parseRedisUrl(redisUrl: string): RedisConfig {
   // format - redis[s]://[[username][:password]@][host][:port][/db-number][?family=4|6][&rejectUnauthorized=false]
   const url = new URL(redisUrl);
-  const {
-    hostname,
-    port,
-    username,
-    password,
-    pathname,
-    protocol,
-    searchParams
-  } = url;
+  const { hostname, port, username, password, pathname, protocol, searchParams } = url;
   const portInt = port ? parseInt(port, 10) : 6379;
 
   let db: number = 0;
@@ -103,10 +95,7 @@ export type SanitizeFileNameOptions = {
   preserveSpaces?: boolean;
 };
 
-export function sanitizeFileName(
-  fileName: string,
-  options: SanitizeFileNameOptions = {}
-): string {
+export function sanitizeFileName(fileName: string, options: SanitizeFileNameOptions = {}): string {
   // Decode percent-encoded sequences so that bypasses like "..%2F" reach
   // sanitize() as literal "../" and get stripped. sanitize-filename only
   // strips literal characters and won't catch encoded path separators
@@ -131,9 +120,7 @@ export function removeAccent(str: string): string {
   return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
 
-export function extractBearerTokenFromHeader(
-  request: FastifyRequest
-): string | undefined {
+export function extractBearerTokenFromHeader(request: FastifyRequest): string | undefined {
   const [type, token] = request.headers.authorization?.split(' ') ?? [];
   return type?.toLowerCase() === 'bearer' ? token : undefined;
 }

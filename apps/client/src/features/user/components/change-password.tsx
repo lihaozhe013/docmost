@@ -26,15 +26,8 @@ export default function ChangePassword() {
         {t('Change password')}
       </Button>
 
-      <Modal
-        opened={opened}
-        onClose={close}
-        title={t('Change password')}
-        centered
-      >
-        <Text mb="md">
-          {t('Your password must be a minimum of 8 characters.')}
-        </Text>
+      <Modal opened={opened} onClose={close} title={t('Change password')} centered>
+        <Text mb="md">{t('Your password must be a minimum of 8 characters.')}</Text>
         <ChangePasswordForm onClose={close} />
       </Modal>
     </Group>

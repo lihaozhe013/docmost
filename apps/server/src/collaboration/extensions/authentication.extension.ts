@@ -1,10 +1,5 @@
 import { Extension, onAuthenticatePayload } from '@hocuspocus/server';
-import {
-  Injectable,
-  Logger,
-  NotFoundException,
-  UnauthorizedException
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { TokenService } from '../../core/auth/services/token.service';
 import { UserRepo } from '@docmost/db/repos/user/user.repo';
 import { PageRepo } from '@docmost/db/repos/page/page.repo';
@@ -59,10 +54,7 @@ export class AuthenticationExtension implements Extension {
       throw new NotFoundException('Page not found');
     }
 
-    const userSpaceRoles = await this.spaceMemberRepo.getUserSpaceRoles(
-      user.id,
-      page.spaceId
-    );
+    const userSpaceRoles = await this.spaceMemberRepo.getUserSpaceRoles(user.id, page.spaceId);
 
     const userSpaceRole = findHighestUserSpaceRole(userSpaceRoles);
 
@@ -72,22 +64,20 @@ export class AuthenticationExtension implements Extension {
     }
 
     // Check page-level permissions
-    const { hasAnyRestriction, canAccess, canEdit } =
-      await this.pagePermissionRepo.canUserEditPage(user.id, page.id);
+    const { hasAnyRestriction, canAccess, canEdit } = await this.pagePermissionRepo.canUserEditPage(
+      user.id,
+      page.id
+    );
 
     if (hasAnyRestriction) {
       if (!canAccess) {
-        this.logger.warn(
-          `User ${user.id} denied page-level access to page: ${pageId}`
-        );
+        this.logger.warn(`User ${user.id} denied page-level access to page: ${pageId}`);
         throw new UnauthorizedException();
       }
 
       if (!canEdit) {
         data.connectionConfig.readOnly = true;
-        this.logger.debug(
-          `User ${user.id} granted readonly access to restricted page: ${pageId}`
-        );
+        this.logger.debug(`User ${user.id} granted readonly access to restricted page: ${pageId}`);
       }
     } else {
       // No restrictions - use space-level permissions

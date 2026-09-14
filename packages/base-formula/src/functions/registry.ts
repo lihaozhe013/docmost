@@ -4,9 +4,7 @@ export type FormulaFn = {
   name: string;
   arity: { min: number; max: number | null };
   paramTypes: FormulaResultType[] | 'any' | 'variadic-any';
-  returnType:
-    | FormulaResultType
-    | ((argTypes: FormulaResultType[]) => FormulaResultType);
+  returnType: FormulaResultType | ((argTypes: FormulaResultType[]) => FormulaResultType);
   eval: (args: Value[], ctx: EvalContext) => Value;
   doc: string;
   category: 'logic' | 'math' | 'string' | 'date' | 'coercion';

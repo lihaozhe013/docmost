@@ -24,10 +24,7 @@
   user-select: none;
 
   @mixin hover {
-    background-color: light-dark(
-      var(--mantine-color-gray-1),
-      var(--mantine-color-dark-6)
-    );
+    background-color: light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-6));
     color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
   }
 
@@ -39,10 +36,7 @@
   &[data-active] {
     &,
     & :hover {
-      background-color: light-dark(
-        var(--mantine-color-gray-2),
-        var(--mantine-color-dark-6)
-      );
+      background-color: light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-6));
       color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
     }
   }
@@ -53,10 +47,7 @@
 
     @mixin hover {
       background-color: transparent;
-      color: light-dark(
-        var(--mantine-color-gray-7),
-        var(--mantine-color-dark-1)
-      );
+      color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-dark-1));
     }
   }
 }
@@ -83,8 +74,7 @@
 
 .bottomSection {
   padding-top: var(--mantine-spacing-xs);
-  border-top: rem(1px) solid
-    light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  border-top: rem(1px) solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
 }
 
 .spaceItem {
@@ -102,10 +92,7 @@
   user-select: none;
 
   @mixin hover {
-    background-color: light-dark(
-      var(--mantine-color-gray-1),
-      var(--mantine-color-dark-6)
-    );
+    background-color: light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-6));
     color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
   }
 

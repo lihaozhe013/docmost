@@ -12,25 +12,19 @@ export async function up(db: Kysely<any>): Promise<void> {
   // Add resolved_by_id column to comments table
   await db.schema
     .alterTable('comments')
-    .addColumn('resolved_by_id', 'uuid', (col) =>
-      col.references('users.id').onDelete('set null')
-    )
+    .addColumn('resolved_by_id', 'uuid', (col) => col.references('users.id').onDelete('set null'))
     .execute();
 
   // Add updated_at timestamp column to comments table
   await db.schema
     .alterTable('comments')
-    .addColumn('updated_at', 'timestamptz', (col) =>
-      col.notNull().defaultTo(sql`now()`)
-    )
+    .addColumn('updated_at', 'timestamptz', (col) => col.notNull().defaultTo(sql`now()`))
     .execute();
 
   // Add space_id column to comments table
   await db.schema
     .alterTable('comments')
-    .addColumn('space_id', 'uuid', (col) =>
-      col.references('spaces.id').onDelete('cascade')
-    )
+    .addColumn('space_id', 'uuid', (col) => col.references('spaces.id').onDelete('cascade'))
     .execute();
 
   // Backfill space_id from the related pages
@@ -51,10 +45,7 @@ export async function up(db: Kysely<any>): Promise<void> {
 }
 
 export async function down(db: Kysely<any>): Promise<void> {
-  await db.schema
-    .alterTable('comments')
-    .dropColumn('last_edited_by_id')
-    .execute();
+  await db.schema.alterTable('comments').dropColumn('last_edited_by_id').execute();
   await db.schema.alterTable('comments').dropColumn('resolved_by_id').execute();
   await db.schema.alterTable('comments').dropColumn('updated_at').execute();
   await db.schema.alterTable('comments').dropColumn('space_id').execute();

@@ -7,10 +7,7 @@ export async function getNotifications(params: {
   cursor?: string;
   type?: string;
 }): Promise<IPagination<INotification>> {
-  const req = await api.post<IPagination<INotification>>(
-    '/notifications',
-    params
-  );
+  const req = await api.post<IPagination<INotification>>('/notifications', params);
   return req.data;
 }
 
@@ -19,9 +16,7 @@ export async function getUnreadCount(): Promise<{ count: number }> {
   return req.data;
 }
 
-export async function markNotificationsRead(
-  notificationIds: string[]
-): Promise<void> {
+export async function markNotificationsRead(notificationIds: string[]): Promise<void> {
   await api.post('/notifications/mark-read', { notificationIds });
 }
 

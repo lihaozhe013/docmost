@@ -1,8 +1,4 @@
-import {
-  keepPreviousData,
-  useQuery,
-  UseQueryResult
-} from '@tanstack/react-query';
+import { keepPreviousData, useQuery, UseQueryResult } from '@tanstack/react-query';
 import {
   searchAttachments,
   searchPage,

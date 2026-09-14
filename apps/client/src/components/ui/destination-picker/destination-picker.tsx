@@ -36,31 +36,25 @@ export function DestinationPicker({
     limit: 100
   });
 
-  const searchEnabled =
-    !searchSpacesOnly && debouncedQuery && debouncedQuery.length >= 2;
+  const searchEnabled = !searchSpacesOnly && debouncedQuery && debouncedQuery.length >= 2;
 
-  const { data: searchData, isLoading: searchLoading } =
-    useSearchSuggestionsQuery({
-      query: searchEnabled ? debouncedQuery : '',
-      includePages: true,
-      limit: 20
-    });
+  const { data: searchData, isLoading: searchLoading } = useSearchSuggestionsQuery({
+    query: searchEnabled ? debouncedQuery : '',
+    includePages: true,
+    limit: 20
+  });
 
   const isSearching = !!searchEnabled;
 
   const filteredSpaces = useMemo(() => {
     const items = spacesData?.items ?? [];
     if (!searchSpacesOnly || !debouncedQuery) return items;
-    const fold = (s: string) =>
-      s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLocaleLowerCase();
+    const fold = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLocaleLowerCase();
     const term = fold(debouncedQuery);
     return items.filter((s) => fold(s.name).includes(term));
   }, [spacesData, searchSpacesOnly, debouncedQuery]);
 
-  const selectedId =
-    selection?.type === 'space'
-      ? selection.spaceId
-      : (selection?.pageId ?? null);
+  const selectedId = selection?.type === 'space' ? selection.spaceId : (selection?.pageId ?? null);
 
   const updateSelection = useCallback(
     (next: DestinationSelection | null) => {
@@ -112,9 +106,7 @@ export function DestinationPicker({
     if (match) {
       updateSelection({ type: 'space', spaceId: match.id, space: match });
       requestAnimationFrame(() => {
-        const el = viewportRef.current?.querySelector<HTMLElement>(
-          `[data-space-id="${match.id}"]`
-        );
+        const el = viewportRef.current?.querySelector<HTMLElement>(`[data-space-id="${match.id}"]`);
         el?.scrollIntoView({ block: 'nearest' });
       });
     }
@@ -124,16 +116,8 @@ export function DestinationPicker({
     <>
       <TextInput
         leftSection={<IconSearch size={16} />}
-        placeholder={
-          searchSpacesOnly
-            ? t('Search spaces...')
-            : t('Search pages and spaces...')
-        }
-        aria-label={
-          searchSpacesOnly
-            ? t('Search spaces...')
-            : t('Search pages and spaces...')
-        }
+        placeholder={searchSpacesOnly ? t('Search spaces...') : t('Search pages and spaces...')}
+        aria-label={searchSpacesOnly ? t('Search spaces...') : t('Search pages and spaces...')}
         variant="filled"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.currentTarget.value)}
@@ -172,22 +156,13 @@ export function DestinationPicker({
                       {page.icon ? (
                         page.icon
                       ) : (
-                        <ActionIcon
-                          component="div"
-                          variant="transparent"
-                          c="gray"
-                          size={22}
-                        >
+                        <ActionIcon component="div" variant="transparent" c="gray" size={22}>
                           <IconFileDescription size={18} />
                         </ActionIcon>
                       )}
                     </div>
-                    <div className={classes.pageTitle}>
-                      {page.title || t('Untitled')}
-                    </div>
-                    {page.space && (
-                      <div className={classes.spaceName}>{page.space.name}</div>
-                    )}
+                    <div className={classes.pageTitle}>{page.title || t('Untitled')}</div>
+                    {page.space && <div className={classes.spaceName}>{page.space.name}</div>}
                   </div>
                 )
             )
@@ -200,9 +175,7 @@ export function DestinationPicker({
           </div>
         ) : filteredSpaces.length === 0 ? (
           <div className={classes.emptyState}>
-            {searchSpacesOnly && debouncedQuery
-              ? t('No spaces found')
-              : t('No results found')}
+            {searchSpacesOnly && debouncedQuery ? t('No spaces found') : t('No results found')}
           </div>
         ) : (
           filteredSpaces.map((space) => (

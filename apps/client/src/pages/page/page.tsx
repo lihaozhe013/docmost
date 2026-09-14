@@ -32,12 +32,7 @@ export default function Page() {
           icon={IconAlertTriangle}
           title={t('Failed to load page. An error occurred.')}
           action={
-            <Button
-              variant="default"
-              size="sm"
-              mt="xs"
-              onClick={resetErrorBoundary}
-            >
+            <Button variant="default" size="sm" mt="xs" onClick={resetErrorBoundary}>
               {t('Try again')}
             </Button>
           }
@@ -61,8 +56,7 @@ function PageContent({ pageSlug }: { pageSlug: string | undefined }) {
   const { data: space } = useGetSpaceBySlugQuery(page?.space?.slug);
 
   const canEdit = !page?.deletedAt && (page?.permissions?.canEdit ?? false);
-  const canComment =
-    canEdit || space?.settings?.comments?.allowViewerComments === true;
+  const canComment = canEdit || space?.settings?.comments?.allowViewerComments === true;
 
   if (isLoading) {
     return <></>;
@@ -74,26 +68,16 @@ function PageContent({ pageSlug }: { pageSlug: string | undefined }) {
         <EmptyState
           icon={IconFileOff}
           title={t('Page not found')}
-          description={t(
-            'This page may have been deleted, moved, or you may not have access.'
-          )}
+          description={t('This page may have been deleted, moved, or you may not have access.')}
           action={
-            <Button
-              component={Link}
-              to="/home"
-              variant="default"
-              size="sm"
-              mt="xs"
-            >
+            <Button component={Link} to="/home" variant="default" size="sm" mt="xs">
               {t('Go to homepage')}
             </Button>
           }
         />
       );
     }
-    return (
-      <EmptyState icon={IconFileOff} title={t('Error fetching page data.')} />
-    );
+    return <EmptyState icon={IconFileOff} title={t('Error fetching page data.')} />;
   }
 
   if (!space) {
@@ -105,9 +89,7 @@ function PageContent({ pageSlug }: { pageSlug: string | undefined }) {
       <EmptyState
         icon={IconFileOff}
         title={t('Page type unavailable')}
-        description={t(
-          'This page uses bases, which are not supported in this edition.'
-        )}
+        description={t('This page uses bases, which are not supported in this edition.')}
       />
     );
   }

@@ -15,9 +15,7 @@ export type SharedPageTreeNode = {
   value: string;
 };
 
-export function buildSharedPageTree(
-  pages: Partial<IPage[]>
-): SharedPageTreeNode[] {
+export function buildSharedPageTree(pages: Partial<IPage[]>): SharedPageTreeNode[] {
   const pageMap: Record<string, SharedPageTreeNode> = {};
 
   // Initialize each page as a tree node and store it in a map.
@@ -68,10 +66,7 @@ export function buildSharedPageTree(
 }
 
 // Recursively checks if a page exists in the shared page tree.
-export function isPageInTree(
-  tree: SharedPageTreeNode[],
-  pageSlugId: string
-): boolean {
+export function isPageInTree(tree: SharedPageTreeNode[], pageSlugId: string): boolean {
   for (const node of tree) {
     if (node.slugId === pageSlugId) {
       return true;

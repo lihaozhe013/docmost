@@ -38,13 +38,9 @@ export function getToolError(
   };
   return envelope.ok === false && typeof envelope.error?.message === 'string'
     ? {
-        ...(typeof envelope.error.code === 'string'
-          ? { code: envelope.error.code }
-          : {}),
+        ...(typeof envelope.error.code === 'string' ? { code: envelope.error.code } : {}),
         message: envelope.error.message,
-        ...(envelope.error.details !== undefined
-          ? { details: envelope.error.details }
-          : {})
+        ...(envelope.error.details !== undefined ? { details: envelope.error.details } : {})
       }
     : undefined;
 }
@@ -117,10 +113,7 @@ export function getToolChange(output: unknown): {
         .join('; ')
     : undefined;
   return {
-    changeId:
-      typeof envelope.result.changeId === 'string'
-        ? envelope.result.changeId
-        : undefined,
+    changeId: typeof envelope.result.changeId === 'string' ? envelope.result.changeId : undefined,
     affectedBlockId:
       (Array.isArray(envelope.result.affectedBlockIds) &&
         typeof envelope.result.affectedBlockIds[0] === 'string' &&
@@ -137,10 +130,7 @@ export function getBoundedHistory(messages: ChatMessage[]) {
     const message = messages[index];
     if (message.role !== 'user' && message.role !== 'assistant') continue;
     const content = message.content.slice(0, 20_000);
-    if (
-      selected.length > 0 &&
-      totalChars + content.length > MAX_HISTORY_CHARS
-    ) {
+    if (selected.length > 0 && totalChars + content.length > MAX_HISTORY_CHARS) {
       break;
     }
     selected.unshift({ role: message.role, content });
@@ -149,10 +139,7 @@ export function getBoundedHistory(messages: ChatMessage[]) {
   return selected;
 }
 
-export function rememberCancelledRun(
-  cancelledRunIds: Set<string>,
-  runId: string | null
-): void {
+export function rememberCancelledRun(cancelledRunIds: Set<string>, runId: string | null): void {
   if (!runId) return;
   cancelledRunIds.add(runId);
   if (cancelledRunIds.size <= MAX_CANCELLED_RUN_IDS) return;

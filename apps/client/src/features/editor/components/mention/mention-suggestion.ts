@@ -1,11 +1,5 @@
 import { ReactRenderer, useEditor } from '@tiptap/react';
-import {
-  autoUpdate,
-  computePosition,
-  flip,
-  offset,
-  shift
-} from '@floating-ui/dom';
+import { autoUpdate, computePosition, flip, offset, shift } from '@floating-ui/dom';
 import MentionList from '@/features/editor/components/mention/mention-list.tsx';
 
 function getWhitespaceCount(query: string) {
@@ -84,8 +78,7 @@ const mentionRenderItems = () => {
 
       updatePositionCleanup = autoUpdate(
         {
-          getBoundingClientRect: () =>
-            activeClientRect ? activeClientRect() : new DOMRect()
+          getBoundingClientRect: () => (activeClientRect ? activeClientRect() : new DOMRect())
         },
         element,
         () => {

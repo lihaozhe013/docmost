@@ -5,10 +5,7 @@ import { uploadPdfAction } from '../pdf/upload-pdf-action';
 import { createMentionAction } from '@/features/editor/components/link/internal-link-paste.ts';
 import { INTERNAL_LINK_REGEX } from '@/lib/constants.ts';
 import { Editor } from '@tiptap/core';
-import {
-  getAttachmentInfo,
-  uploadFile
-} from '@/features/page/services/page-service.ts';
+import { getAttachmentInfo, uploadFile } from '@/features/page/services/page-service.ts';
 
 const ATTACHMENT_NODE_TYPES = [
   'image',
@@ -44,16 +41,8 @@ export const handlePaste = (
     }
 
     const anchorId = match[6] ? match[6].split('#')[0] : undefined;
-    const urlWithoutAnchor = anchorId
-      ? url.substring(0, url.indexOf('#'))
-      : url;
-    createMentionAction(
-      urlWithoutAnchor,
-      editor.view,
-      pos,
-      creatorId,
-      anchorId
-    );
+    const urlWithoutAnchor = anchorId ? url.substring(0, url.indexOf('#')) : url;
+    createMentionAction(urlWithoutAnchor, editor.view, pos, creatorId, anchorId);
     return true;
   }
 
@@ -82,11 +71,7 @@ export const handlePaste = (
   return false;
 };
 
-async function reuploadPastedAttachments(
-  editor: Editor,
-  pageId: string,
-  pasteFrom: number
-) {
+async function reuploadPastedAttachments(editor: Editor, pageId: string, pasteFrom: number) {
   const pasteEnd = editor.state.selection.from;
   if (pasteEnd <= pasteFrom) return;
 
@@ -194,8 +179,7 @@ async function reuploadPastedAttachments(
         if (!result) continue;
 
         const node = tr.doc.nodeAt(pastedNode.pos);
-        if (!node || node.attrs.attachmentId !== pastedNode.attachmentId)
-          continue;
+        if (!node || node.attrs.attachmentId !== pastedNode.attachmentId) continue;
 
         const newAttrs = { ...node.attrs };
         newAttrs.attachmentId = result.id;

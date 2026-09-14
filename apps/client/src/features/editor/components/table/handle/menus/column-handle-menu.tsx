@@ -35,22 +35,8 @@ export const ColumnHandleMenu = React.memo(function ColumnHandleMenu({
 }: ColumnHandleMenuProps) {
   const { t } = useTranslation();
 
-  const moveLeft = useTableMoveRowColumn(
-    editor,
-    'col',
-    index,
-    'left',
-    tableNode,
-    tablePos
-  );
-  const moveRight = useTableMoveRowColumn(
-    editor,
-    'col',
-    index,
-    'right',
-    tableNode,
-    tablePos
-  );
+  const moveLeft = useTableMoveRowColumn(editor, 'col', index, 'left', tableNode, tablePos);
+  const moveRight = useTableMoveRowColumn(editor, 'col', index, 'right', tableNode, tablePos);
   const clearCol = useTableClear(editor, tableNode, tablePos, {
     kind: 'col',
     index

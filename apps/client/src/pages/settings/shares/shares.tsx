@@ -15,9 +15,7 @@ export default function Shares() {
       <SettingsTitle title={t('Public sharing')} />
 
       <Alert variant="light" color="blue" icon={<IconInfoCircle />}>
-        {t(
-          'Publicly shared pages from spaces you are a member of will appear here'
-        )}
+        {t('Publicly shared pages from spaces you are a member of will appear here')}
       </Alert>
 
       <ShareList />

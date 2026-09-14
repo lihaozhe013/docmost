@@ -63,10 +63,7 @@ export const MarkdownClipboard = Extension.create({
             }
 
             if (isPlainTextOnly) {
-              if (
-                (view as any).input?.shiftKey ||
-                !this.options.transformPastedText
-              ) {
+              if ((view as any).input?.shiftKey || !this.options.transformPastedText) {
                 return false;
               }
 
@@ -86,20 +83,13 @@ export const MarkdownClipboard = Extension.create({
             const body = elementFromString(parsed);
             normalizeTableColumnWidths(body);
 
-            const contentNodes = DOMParser.fromSchema(
-              this.editor.schema
-            ).parseSlice(body, {
+            const contentNodes = DOMParser.fromSchema(this.editor.schema).parseSlice(body, {
               preserveWhitespace: true
             });
 
             tr.replaceRange(from, to, contentNodes);
             const insertEnd = tr.mapping.map(from, 1);
-            tr.setSelection(
-              TextSelection.near(
-                tr.doc.resolve(Math.max(from, insertEnd - 2)),
-                -1
-              )
-            );
+            tr.setSelection(TextSelection.near(tr.doc.resolve(Math.max(from, insertEnd - 2)), -1));
             tr.setMeta('paste', true);
             view.dispatch(tr);
             return true;
@@ -116,10 +106,7 @@ export const MarkdownClipboard = Extension.create({
             // Remove trailing paragraphs that contain only whitespace
             while (content.childCount > 1) {
               const lastChild = content.lastChild;
-              if (
-                lastChild?.type.name === 'paragraph' &&
-                lastChild.textContent.trim() === ''
-              ) {
+              if (lastChild?.type.name === 'paragraph' && lastChild.textContent.trim() === '') {
                 const children = [];
                 for (let i = 0; i < content.childCount - 1; i++) {
                   children.push(content.child(i));

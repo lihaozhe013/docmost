@@ -12,9 +12,7 @@ describe('rewriteAttachmentsForUnsync', () => {
   it('returns content unchanged when no attachment nodes are present', () => {
     const content = {
       type: 'doc',
-      content: [
-        { type: 'paragraph', content: [{ type: 'text', text: 'hello' }] }
-      ]
+      content: [{ type: 'paragraph', content: [{ type: 'text', text: 'hello' }] }]
     };
     const r = rewriteAttachmentsForUnsync(content, fixedIds());
     expect(r.content).toEqual(content);
@@ -49,15 +47,7 @@ describe('rewriteAttachmentsForUnsync', () => {
   });
 
   it('rewrites every attachment node type (image, video, audio, attachment, drawio, excalidraw, pdf)', () => {
-    const types = [
-      'image',
-      'video',
-      'audio',
-      'attachment',
-      'drawio',
-      'excalidraw',
-      'pdf'
-    ] as const;
+    const types = ['image', 'video', 'audio', 'attachment', 'drawio', 'excalidraw', 'pdf'] as const;
     const content = {
       type: 'doc',
       content: types.map((t, i) => ({
@@ -70,9 +60,9 @@ describe('rewriteAttachmentsForUnsync', () => {
     };
     const r = rewriteAttachmentsForUnsync(content, fixedIds());
     expect(r.copies).toHaveLength(types.length);
-    expect(
-      (r.content as any).content.map((n: any) => n.attrs.attachmentId)
-    ).toEqual(Array.from({ length: types.length }, (_, i) => `new-${i + 1}`));
+    expect((r.content as any).content.map((n: any) => n.attrs.attachmentId)).toEqual(
+      Array.from({ length: types.length }, (_, i) => `new-${i + 1}`)
+    );
   });
 
   it('reuses one new id per old attachmentId across nodes (dedupe)', () => {

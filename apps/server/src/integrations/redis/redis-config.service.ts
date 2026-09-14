@@ -1,8 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-  RedisModuleOptions,
-  RedisOptionsFactory
-} from '@nestjs-labs/nestjs-ioredis';
+import { RedisModuleOptions, RedisOptionsFactory } from '@nestjs-labs/nestjs-ioredis';
 import { createRetryStrategy, parseRedisUrl } from '../../common/helpers';
 import { EnvironmentService } from '../environment/environment.service';
 

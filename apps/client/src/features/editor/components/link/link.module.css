@@ -4,17 +4,12 @@
 }
 
 .linkInput {
-  border: 1.5px solid
-    light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  border: 1.5px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
   background: transparent;
 
   &:focus {
-    border-color: light-dark(
-      var(--mantine-color-blue-4),
-      var(--mantine-color-blue-6)
-    );
-    box-shadow: 0 0 0 1px
-      light-dark(var(--mantine-color-blue-4), var(--mantine-color-blue-6));
+    border-color: light-dark(var(--mantine-color-blue-4), var(--mantine-color-blue-6));
+    box-shadow: 0 0 0 1px light-dark(var(--mantine-color-blue-4), var(--mantine-color-blue-6));
   }
 }
 

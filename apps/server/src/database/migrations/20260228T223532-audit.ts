@@ -4,16 +4,12 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable('audit')
     .ifNotExists()
-    .addColumn('id', 'uuid', (col) =>
-      col.primaryKey().defaultTo(sql`gen_uuid_v7()`)
-    )
+    .addColumn('id', 'uuid', (col) => col.primaryKey().defaultTo(sql`gen_uuid_v7()`))
     .addColumn('workspace_id', 'uuid', (col) =>
       col.notNull().references('workspaces.id').onDelete('cascade')
     )
     .addColumn('actor_id', 'uuid')
-    .addColumn('actor_type', 'varchar', (col) =>
-      col.notNull().defaultTo('user')
-    )
+    .addColumn('actor_type', 'varchar', (col) => col.notNull().defaultTo('user'))
     .addColumn('event', 'varchar', (col) => col.notNull())
     .addColumn('resource_type', 'varchar', (col) => col.notNull())
     .addColumn('resource_id', 'uuid')
@@ -21,9 +17,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('changes', 'jsonb')
     .addColumn('metadata', 'jsonb')
     .addColumn('ip_address', sql`inet`)
-    .addColumn('created_at', 'timestamptz', (col) =>
-      col.notNull().defaultTo(sql`now()`)
-    )
+    .addColumn('created_at', 'timestamptz', (col) => col.notNull().defaultTo(sql`now()`))
     .execute();
 
   await db.schema
@@ -46,15 +40,9 @@ export async function up(db: Kysely<any>): Promise<void> {
 }
 
 export async function down(db: Kysely<any>): Promise<void> {
-  await db.schema
-    .alterTable('workspaces')
-    .dropColumn('audit_retention_days')
-    .execute();
+  await db.schema.alterTable('workspaces').dropColumn('audit_retention_days').execute();
 
-  await db.schema
-    .alterTable('workspaces')
-    .dropColumn('trash_retention_days')
-    .execute();
+  await db.schema.alterTable('workspaces').dropColumn('trash_retention_days').execute();
 
   await db.schema.dropTable('audit').execute();
 }

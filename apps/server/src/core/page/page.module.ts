@@ -12,19 +12,8 @@ import { LabelModule } from '../label/label.module';
 
 @Module({
   controllers: [PageController],
-  providers: [
-    PageService,
-    PageHistoryService,
-    TrashCleanupService,
-    BacklinkService
-  ],
+  providers: [PageService, PageHistoryService, TrashCleanupService, BacklinkService],
   exports: [PageService, PageHistoryService],
-  imports: [
-    StorageModule,
-    CollaborationModule,
-    WatcherModule,
-    TransclusionModule,
-    LabelModule
-  ]
+  imports: [StorageModule, CollaborationModule, WatcherModule, TransclusionModule, LabelModule]
 })
 export class PageModule {}

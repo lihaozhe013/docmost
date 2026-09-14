@@ -1,12 +1,6 @@
 import { Alert, Menu, ActionIcon, Text, Button, Group } from '@mantine/core';
 import React, { useState } from 'react';
-import {
-  IconDots,
-  IconTrash,
-  IconUserOff,
-  IconUserCheck,
-  IconKey
-} from '@tabler/icons-react';
+import { IconDots, IconTrash, IconUserOff, IconUserCheck, IconKey } from '@tabler/icons-react';
 import { modals } from '@mantine/modals';
 import {
   useDeleteWorkspaceMemberMutation,
@@ -22,11 +16,7 @@ interface Props {
   name: string;
   deactivatedAt: Date | null;
 }
-export default function MemberActionMenu({
-  userId,
-  name,
-  deactivatedAt
-}: Props) {
+export default function MemberActionMenu({ userId, name, deactivatedAt }: Props) {
   const { t } = useTranslation();
   const deleteWorkspaceMemberMutation = useDeleteWorkspaceMemberMutation();
   const deactivateMutation = useDeactivateWorkspaceMemberMutation();
@@ -75,9 +65,7 @@ export default function MemberActionMenu({
       title: t('Delete member'),
       children: (
         <Text size="sm">
-          {t(
-            'Are you sure you want to delete this workspace member? This action is irreversible.'
-          )}
+          {t('Are you sure you want to delete this workspace member? This action is irreversible.')}
         </Text>
       ),
       centered: true,
@@ -118,9 +106,7 @@ export default function MemberActionMenu({
           m="sm"
         >
           <Text size="sm">
-            {t(
-              'Share this password with the member. It will not be shown again.'
-            )}
+            {t('Share this password with the member. It will not be shown again.')}
           </Text>
           <Text size="sm" fw={700} ta="center" my="sm">
             {resetPassword}
@@ -164,13 +150,7 @@ export default function MemberActionMenu({
 
           <Menu.Item
             onClick={openDeactivateModal}
-            leftSection={
-              isDeactivated ? (
-                <IconUserCheck size={16} />
-              ) : (
-                <IconUserOff size={16} />
-              )
-            }
+            leftSection={isDeactivated ? <IconUserCheck size={16} /> : <IconUserOff size={16} />}
             disabled={!isAdmin}
           >
             {isDeactivated ? t('Activate member') : t('Deactivate member')}

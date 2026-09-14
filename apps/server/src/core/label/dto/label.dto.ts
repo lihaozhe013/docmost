@@ -24,9 +24,7 @@ export class AddLabelsDto extends PageIdDto {
   @ArrayMaxSize(25)
   @IsString({ each: true })
   @IsNotEmpty({ each: true })
-  @Transform(({ value }) =>
-    Array.isArray(value) ? value.map(normalizeLabelName) : value
-  )
+  @Transform(({ value }) => (Array.isArray(value) ? value.map(normalizeLabelName) : value))
   @MaxLength(100, { each: true })
   @Matches(/^[a-z0-9_-][a-z0-9_~-]*$/, {
     each: true,
@@ -48,9 +46,7 @@ export class FindPagesByLabelDto {
 
   @IsOptional()
   @IsString()
-  @Transform(({ value }) =>
-    typeof value === 'string' ? normalizeLabelName(value) : value
-  )
+  @Transform(({ value }) => (typeof value === 'string' ? normalizeLabelName(value) : value))
   @MaxLength(100)
   name?: string;
 
@@ -62,9 +58,7 @@ export class FindPagesByLabelDto {
 export class LabelInfoDto {
   @IsString()
   @IsNotEmpty()
-  @Transform(({ value }) =>
-    typeof value === 'string' ? normalizeLabelName(value) : value
-  )
+  @Transform(({ value }) => (typeof value === 'string' ? normalizeLabelName(value) : value))
   @MaxLength(100)
   name: string;
 

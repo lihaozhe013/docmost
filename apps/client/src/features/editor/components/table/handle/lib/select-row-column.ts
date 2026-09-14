@@ -17,8 +17,7 @@ export function buildRowOrColumnSelection(
   if (orientation === 'col') {
     if (index < 0 || index >= map.width) return null;
     const firstCellPos = tableStart + map.map[index];
-    const lastCellPos =
-      tableStart + map.map[(map.height - 1) * map.width + index];
+    const lastCellPos = tableStart + map.map[(map.height - 1) * map.width + index];
     const $first = state.doc.resolve(firstCellPos);
     const $last = state.doc.resolve(lastCellPos);
     return CellSelection.colSelection($first, $last);

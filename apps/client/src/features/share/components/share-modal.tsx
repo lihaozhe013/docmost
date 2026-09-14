@@ -83,9 +83,7 @@ export default function ShareModal({ readOnly }: ShareModalProps) {
     }
   };
 
-  const handleSubPagesChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleSubPagesChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.currentTarget.checked;
     try {
       await updateShareMutation.mutateAsync({
@@ -97,9 +95,7 @@ export default function ShareModal({ readOnly }: ShareModalProps) {
     }
   };
 
-  const handleIndexSearchChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleIndexSearchChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.currentTarget.checked;
     try {
       await updateShareMutation.mutateAsync({
@@ -121,13 +117,7 @@ export default function ShareModal({ readOnly }: ShareModalProps) {
           rightSection={<CopyTextButton text={publicLink} />}
           style={{ width: '100%' }}
         />
-        <ActionIcon
-          component="a"
-          variant="default"
-          target="_blank"
-          href={publicLink}
-          size="sm"
-        >
+        <ActionIcon component="a" variant="default" target="_blank" href={publicLink} size="sm">
           <IconExternalLink size={16} />
         </ActionIcon>
       </Group>
@@ -141,12 +131,7 @@ export default function ShareModal({ readOnly }: ShareModalProps) {
         <Button
           size="compact-sm"
           leftSection={
-            <Indicator
-              color="green"
-              offset={5}
-              disabled={!isPagePublic}
-              withBorder
-            >
+            <Indicator color="green" offset={5} disabled={!isPagePublic} withBorder>
               <IconWorld size={20} stroke={1.5} />
             </Indicator>
           }
@@ -182,11 +167,7 @@ export default function ShareModal({ readOnly }: ShareModalProps) {
                 color: 'var(--mantine-color-text)'
               }}
               component={Link}
-              to={buildPageUrl(
-                spaceSlug,
-                share.sharedPage.slugId,
-                share.sharedPage.title
-              )}
+              to={buildPageUrl(spaceSlug, share.sharedPage.slugId, share.sharedPage.title)}
             >
               <Group gap="4" wrap="nowrap" my="sm">
                 {getPageIcon(share.sharedPage.icon)}
@@ -204,9 +185,7 @@ export default function ShareModal({ readOnly }: ShareModalProps) {
           <>
             <Group justify="space-between" wrap="nowrap" gap="xl">
               <div>
-                <Text size="sm">
-                  {isPagePublic ? t('Shared to web') : t('Share to web')}
-                </Text>
+                <Text size="sm">{isPagePublic ? t('Shared to web') : t('Share to web')}</Text>
                 <Text size="xs" c="dimmed">
                   {isPagePublic
                     ? t('Anyone with the link can view this page')

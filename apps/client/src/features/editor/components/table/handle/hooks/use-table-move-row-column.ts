@@ -14,8 +14,7 @@ export function useTableMoveRowColumn(
   tableNode: ProseMirrorNode,
   tablePos: number
 ) {
-  const target =
-    direction === 'left' || direction === 'up' ? index - 1 : index + 1;
+  const target = direction === 'left' || direction === 'up' ? index - 1 : index + 1;
 
   const maxIndex = useMemo(() => {
     const map = TableMap.get(tableNode);

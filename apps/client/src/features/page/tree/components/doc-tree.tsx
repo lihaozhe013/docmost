@@ -75,10 +75,7 @@ export type DocTreeProps<T extends object> = {
 };
 
 export type DocTreeApi = {
-  select: (
-    id: string,
-    opts?: { scrollIntoView?: boolean; focus?: boolean }
-  ) => void;
+  select: (id: string, opts?: { scrollIntoView?: boolean; focus?: boolean }) => void;
   scrollTo: (id: string) => void;
   focus: (id: string) => void;
 };
@@ -112,10 +109,7 @@ function flattenVisible<T extends object>(
 
 type RowElementMap = Map<string, HTMLElement>;
 
-function DocTreeInner<T extends object>(
-  props: DocTreeProps<T>,
-  ref: Ref<DocTreeApi>
-) {
+function DocTreeInner<T extends object>(props: DocTreeProps<T>, ref: Ref<DocTreeApi>) {
   const {
     data,
     openIds,
@@ -148,27 +142,21 @@ function DocTreeInner<T extends object>(
   // to selectedId, then to the first visible row, when the tracked id is
   // gone from the flat list (e.g. its branch was collapsed).
   const [activeId, setActiveId] = useState<string | undefined>(undefined);
-  const contextId = useMemo(
-    () => uniqueContextId ?? Symbol('doc-tree'),
-    [uniqueContextId]
-  );
+  const contextId = useMemo(() => uniqueContextId ?? Symbol('doc-tree'), [uniqueContextId]);
 
-  const registerRowElement = useCallback(
-    (id: string, el: HTMLElement | null) => {
-      if (el) {
-        rowElementsRef.current.set(id, el);
-        if (pendingFocusIdRef.current === id) {
-          pendingFocusIdRef.current = null;
-          // rAF lets the virtualizer settle layout/transform before focus,
-          // so the freshly-scrolled-in row is actually painted in view.
-          requestAnimationFrame(() => el.focus());
-        }
-      } else {
-        rowElementsRef.current.delete(id);
+  const registerRowElement = useCallback((id: string, el: HTMLElement | null) => {
+    if (el) {
+      rowElementsRef.current.set(id, el);
+      if (pendingFocusIdRef.current === id) {
+        pendingFocusIdRef.current = null;
+        // rAF lets the virtualizer settle layout/transform before focus,
+        // so the freshly-scrolled-in row is actually painted in view.
+        requestAnimationFrame(() => el.focus());
       }
-    },
-    []
-  );
+    } else {
+      rowElementsRef.current.delete(id);
+    }
+  }, []);
 
   // Stable live tree accessor — keeps the row useEffect deps stable across
   // tree mutations.
@@ -295,8 +283,7 @@ function DocTreeInner<T extends object>(
       const isActivateKey = e.key === ' ';
       // Single printable character → typeahead. e.key.length === 1 excludes
       // multi-char names like "ArrowDown", "Enter", "Tab", etc.
-      const isTypeahead =
-        e.key.length === 1 && !isNavKey && !isStarKey && !isActivateKey;
+      const isTypeahead = e.key.length === 1 && !isNavKey && !isStarKey && !isActivateKey;
       if (!isNavKey && !isTypeahead && !isStarKey && !isActivateKey) return;
 
       const target = e.target as HTMLElement;
@@ -341,9 +328,7 @@ function DocTreeInner<T extends object>(
       if (isTypeahead) {
         e.preventDefault();
         const wasEmpty = typeaheadBufferRef.current.length === 0;
-        typeaheadBufferRef.current = (
-          typeaheadBufferRef.current + e.key
-        ).toLowerCase();
+        typeaheadBufferRef.current = (typeaheadBufferRef.current + e.key).toLowerCase();
         const buffer = typeaheadBufferRef.current;
         if (typeaheadTimerRef.current) {
           clearTimeout(typeaheadTimerRef.current);
@@ -405,11 +390,7 @@ function DocTreeInner<T extends object>(
           e.preventDefault();
           if (hasChildren && !isOpen) {
             onToggle(row.node.id, true);
-          } else if (
-            isOpen &&
-            row.node.children &&
-            row.node.children.length > 0
-          ) {
+          } else if (isOpen && row.node.children && row.node.children.length > 0) {
             focusByIndex(idx + 1);
           }
           break;

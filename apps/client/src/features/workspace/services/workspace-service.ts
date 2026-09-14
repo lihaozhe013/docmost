@@ -19,35 +19,25 @@ export async function getWorkspacePublicData(): Promise<IPublicWorkspace> {
   return req.data;
 }
 
-export async function getCheckHostname(
-  hostname: string
-): Promise<{ hostname: string }> {
+export async function getCheckHostname(hostname: string): Promise<{ hostname: string }> {
   const req = await api.post('/workspace/check-hostname', { hostname });
   return req.data;
 }
 
-export async function getWorkspaceMembers(
-  params?: QueryParams
-): Promise<IPagination<IUser>> {
+export async function getWorkspaceMembers(params?: QueryParams): Promise<IPagination<IUser>> {
   const req = await api.post('/workspace/members', params);
   return req.data;
 }
 
-export async function deleteWorkspaceMember(data: {
-  userId: string;
-}): Promise<void> {
+export async function deleteWorkspaceMember(data: { userId: string }): Promise<void> {
   await api.post('/workspace/members/delete', data);
 }
 
-export async function deactivateWorkspaceMember(data: {
-  userId: string;
-}): Promise<void> {
+export async function deactivateWorkspaceMember(data: { userId: string }): Promise<void> {
   await api.post('/workspace/members/deactivate', data);
 }
 
-export async function activateWorkspaceMember(data: {
-  userId: string;
-}): Promise<void> {
+export async function activateWorkspaceMember(data: { userId: string }): Promise<void> {
   await api.post('/workspace/members/activate', data);
 }
 
@@ -56,10 +46,7 @@ export async function updateWorkspace(data: Partial<IWorkspace>) {
   return req.data;
 }
 
-export async function changeMemberRole(data: {
-  userId: string;
-  role: string;
-}): Promise<void> {
+export async function changeMemberRole(data: { userId: string; role: string }): Promise<void> {
   await api.post('/workspace/members/change-role', data);
 }
 

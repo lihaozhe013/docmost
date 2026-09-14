@@ -3,29 +3,21 @@ import { Kysely, sql } from 'kysely';
 export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable('oauth_clients')
-    .addColumn('id', 'uuid', (col) =>
-      col.primaryKey().defaultTo(sql`gen_uuid_v7()`)
-    )
+    .addColumn('id', 'uuid', (col) => col.primaryKey().defaultTo(sql`gen_uuid_v7()`))
     .addColumn('name', 'text', (col) => col.notNull())
     .addColumn('redirect_uris', 'jsonb', (col) => col.notNull())
     .addColumn('client_uri', 'text')
     .addColumn('logo_uri', 'text')
     .addColumn('grant_types', 'jsonb', (col) => col.notNull())
     .addColumn('scopes', 'jsonb', (col) => col.notNull())
-    .addColumn('token_endpoint_auth_method', 'text', (col) =>
-      col.notNull().defaultTo('none')
-    )
+    .addColumn('token_endpoint_auth_method', 'text', (col) => col.notNull().defaultTo('none'))
     .addColumn('secret_hash', 'text')
     .addColumn('is_dynamic', 'boolean', (col) => col.notNull().defaultTo(true))
     .addColumn('workspace_id', 'uuid', (col) =>
       col.notNull().references('workspaces.id').onDelete('cascade')
     )
-    .addColumn('created_at', 'timestamptz', (col) =>
-      col.notNull().defaultTo(sql`now()`)
-    )
-    .addColumn('updated_at', 'timestamptz', (col) =>
-      col.notNull().defaultTo(sql`now()`)
-    )
+    .addColumn('created_at', 'timestamptz', (col) => col.notNull().defaultTo(sql`now()`))
+    .addColumn('updated_at', 'timestamptz', (col) => col.notNull().defaultTo(sql`now()`))
     .addColumn('deleted_at', 'timestamptz')
     .execute();
   await db.schema
@@ -36,16 +28,12 @@ export async function up(db: Kysely<any>): Promise<void> {
 
   await db.schema
     .createTable('oauth_authorization_codes')
-    .addColumn('id', 'uuid', (col) =>
-      col.primaryKey().defaultTo(sql`gen_uuid_v7()`)
-    )
+    .addColumn('id', 'uuid', (col) => col.primaryKey().defaultTo(sql`gen_uuid_v7()`))
     .addColumn('code_hash', 'text', (col) => col.notNull().unique())
     .addColumn('client_id', 'uuid', (col) =>
       col.notNull().references('oauth_clients.id').onDelete('cascade')
     )
-    .addColumn('user_id', 'uuid', (col) =>
-      col.notNull().references('users.id').onDelete('cascade')
-    )
+    .addColumn('user_id', 'uuid', (col) => col.notNull().references('users.id').onDelete('cascade'))
     .addColumn('workspace_id', 'uuid', (col) =>
       col.notNull().references('workspaces.id').onDelete('cascade')
     )
@@ -55,9 +43,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('code_challenge_method', 'text')
     .addColumn('expires_at', 'timestamptz', (col) => col.notNull())
     .addColumn('consumed_at', 'timestamptz')
-    .addColumn('created_at', 'timestamptz', (col) =>
-      col.notNull().defaultTo(sql`now()`)
-    )
+    .addColumn('created_at', 'timestamptz', (col) => col.notNull().defaultTo(sql`now()`))
     .execute();
 
   await db.schema
@@ -88,12 +74,8 @@ export async function up(db: Kysely<any>): Promise<void> {
 
   await db.schema
     .createTable('oauth_grants')
-    .addColumn('id', 'uuid', (col) =>
-      col.primaryKey().defaultTo(sql`gen_uuid_v7()`)
-    )
-    .addColumn('user_id', 'uuid', (col) =>
-      col.notNull().references('users.id').onDelete('cascade')
-    )
+    .addColumn('id', 'uuid', (col) => col.primaryKey().defaultTo(sql`gen_uuid_v7()`))
+    .addColumn('user_id', 'uuid', (col) => col.notNull().references('users.id').onDelete('cascade'))
     .addColumn('client_id', 'uuid', (col) =>
       col.notNull().references('oauth_clients.id').onDelete('cascade')
     )
@@ -101,18 +83,11 @@ export async function up(db: Kysely<any>): Promise<void> {
       col.notNull().references('workspaces.id').onDelete('cascade')
     )
     .addColumn('scopes', 'jsonb', (col) => col.notNull())
-    .addColumn('created_at', 'timestamptz', (col) =>
-      col.notNull().defaultTo(sql`now()`)
-    )
-    .addColumn('updated_at', 'timestamptz', (col) =>
-      col.notNull().defaultTo(sql`now()`)
-    )
+    .addColumn('created_at', 'timestamptz', (col) => col.notNull().defaultTo(sql`now()`))
+    .addColumn('updated_at', 'timestamptz', (col) => col.notNull().defaultTo(sql`now()`))
     .addColumn('last_used_at', 'timestamptz')
     .addColumn('revoked_at', 'timestamptz')
-    .addUniqueConstraint('oauth_grants_user_client_unique', [
-      'user_id',
-      'client_id'
-    ])
+    .addUniqueConstraint('oauth_grants_user_client_unique', ['user_id', 'client_id'])
     .execute();
 
   // The user_id/client_id unique constraint cannot serve client-side FK lookups.
@@ -124,9 +99,7 @@ export async function up(db: Kysely<any>): Promise<void> {
 
   await db.schema
     .createTable('oauth_tokens')
-    .addColumn('id', 'uuid', (col) =>
-      col.primaryKey().defaultTo(sql`gen_uuid_v7()`)
-    )
+    .addColumn('id', 'uuid', (col) => col.primaryKey().defaultTo(sql`gen_uuid_v7()`))
     .addColumn('grant_id', 'uuid', (col) =>
       col.notNull().references('oauth_grants.id').onDelete('cascade')
     )
@@ -139,9 +112,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('access_expires_at', 'timestamptz', (col) => col.notNull())
     .addColumn('refresh_expires_at', 'timestamptz')
     .addColumn('revoked_at', 'timestamptz')
-    .addColumn('created_at', 'timestamptz', (col) =>
-      col.notNull().defaultTo(sql`now()`)
-    )
+    .addColumn('created_at', 'timestamptz', (col) => col.notNull().defaultTo(sql`now()`))
     .execute();
   await db.schema
     .createIndex('oauth_tokens_grant_id_idx')

@@ -30,9 +30,7 @@ const nameToId = new Map<string, string>([
 
 const propertyTypes = new Map<string, FormulaResultType>([
   ['prop_name', 'string'],
-  ...NUM_PROPS.map(
-    (p) => [`prop_${p}`, 'number'] as [string, FormulaResultType]
-  )
+  ...NUM_PROPS.map((p) => [`prop_${p}`, 'number'] as [string, FormulaResultType])
 ]);
 
 // Base (non-formula) property lookup. Nested-formula cases extend this.
@@ -87,10 +85,7 @@ function astStats(ast: FormulaAST): { nodes: number; depth: number } {
 }
 
 // timing harness
-function timed(
-  fn: () => void,
-  targetMs = 600
-): { opsPerSec: number; nsPerOp: number } {
+function timed(fn: () => void, targetMs = 600): { opsPerSec: number; nsPerOp: number } {
   // warmup ~150ms to let V8 JIT settle
   const warmEnd = performance.now() + 150;
   while (performance.now() < warmEnd) fn();
@@ -107,9 +102,7 @@ function timed(
       const t1 = process.hrtime.bigint();
       elapsedMs = Number(t1 - t0) / 1e6;
       if (elapsedMs >= targetMs) break;
-      iters = Math.ceil(
-        iters * Math.max(2, targetMs / Math.max(elapsedMs, 0.01))
-      );
+      iters = Math.ceil(iters * Math.max(2, targetMs / Math.max(elapsedMs, 0.01)));
     }
     const nsPerOp = (elapsedMs * 1e6) / iters;
     bestNsPerOp = Math.min(bestNsPerOp, nsPerOp);
@@ -143,10 +136,8 @@ function buildIfChain(tiers: number): string {
 
 function buildBalancedAddTree(depth: number): string {
   // add(add(.., ..), add(.., ..)) = full binary tree of `add` calls
-  const leaf = () =>
-    `prop("${NUM_PROPS[Math.floor(Math.random() * NUM_PROPS.length)]}")`;
-  const build = (d: number): string =>
-    d === 0 ? leaf() : `add(${build(d - 1)}, ${build(d - 1)})`;
+  const leaf = () => `prop("${NUM_PROPS[Math.floor(Math.random() * NUM_PROPS.length)]}")`;
+  const build = (d: number): string => (d === 0 ? leaf() : `add(${build(d - 1)}, ${build(d - 1)})`);
   return build(depth);
 }
 
@@ -242,11 +233,7 @@ function buildNestedFormulaCtx(): {
 
 // run
 const fmt = (n: number) =>
-  n >= 1e6
-    ? `${(n / 1e6).toFixed(2)}M`
-    : n >= 1e3
-      ? `${(n / 1e3).toFixed(1)}K`
-      : n.toFixed(0);
+  n >= 1e6 ? `${(n / 1e6).toFixed(2)}M` : n >= 1e3 ? `${(n / 1e3).toFixed(1)}K` : n.toFixed(0);
 
 console.log(`\nnode ${process.version} | base-formula engine benchmark\n`);
 console.log(
@@ -305,9 +292,7 @@ for (const c of cases) {
 }
 
 // whole-table simulation: eval N rows for the complex grade formula
-console.log(
-  '\nwhole-table recompute simulation (mixed math+string+logic formula):'
-);
+console.log('\nwhole-table recompute simulation (mixed math+string+logic formula):');
 const tableAst = resolve(
   parseRaw(
     'if(and(prop("a") > 0, prop("b") > 0), concat("ok:", toString(round(prop("a") / prop("b"), 2))), "n/a")'

@@ -9,11 +9,7 @@ export class DomainMiddleware implements NestMiddleware {
     private workspaceRepo: WorkspaceRepo,
     private environmentService: EnvironmentService
   ) {}
-  async use(
-    req: FastifyRequest['raw'],
-    res: FastifyReply['raw'],
-    next: () => void
-  ) {
+  async use(req: FastifyRequest['raw'], res: FastifyReply['raw'], next: () => void) {
     if (this.environmentService.isSelfHosted()) {
       const workspace = await this.workspaceRepo.findFirst();
       if (!workspace) {

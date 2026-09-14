@@ -1,9 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import {
-  AbilityBuilder,
-  createMongoAbility,
-  MongoAbility
-} from '@casl/ability';
+import { AbilityBuilder, createMongoAbility, MongoAbility } from '@casl/ability';
 import { UserRole } from '../../../common/helpers/types/permission';
 import { User, Workspace } from '@docmost/db/types/entity.types';
 import {
@@ -31,9 +27,7 @@ export default class WorkspaceAbilityFactory {
 }
 
 function buildWorkspaceOwnerAbility() {
-  const { can, build } = new AbilityBuilder<MongoAbility<IWorkspaceAbility>>(
-    createMongoAbility
-  );
+  const { can, build } = new AbilityBuilder<MongoAbility<IWorkspaceAbility>>(createMongoAbility);
   can(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Settings);
   can(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Member);
   can(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Space);
@@ -47,9 +41,7 @@ function buildWorkspaceOwnerAbility() {
 }
 
 function buildWorkspaceAdminAbility() {
-  const { can, build } = new AbilityBuilder<MongoAbility<IWorkspaceAbility>>(
-    createMongoAbility
-  );
+  const { can, build } = new AbilityBuilder<MongoAbility<IWorkspaceAbility>>(createMongoAbility);
 
   can(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Settings);
   can(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Member);
@@ -63,9 +55,7 @@ function buildWorkspaceAdminAbility() {
 }
 
 function buildWorkspaceMemberAbility() {
-  const { can, build } = new AbilityBuilder<MongoAbility<IWorkspaceAbility>>(
-    createMongoAbility
-  );
+  const { can, build } = new AbilityBuilder<MongoAbility<IWorkspaceAbility>>(createMongoAbility);
   can(WorkspaceCaslAction.Read, WorkspaceCaslSubject.Settings);
   can(WorkspaceCaslAction.Read, WorkspaceCaslSubject.Member);
   can(WorkspaceCaslAction.Read, WorkspaceCaslSubject.Space);

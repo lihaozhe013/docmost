@@ -75,15 +75,11 @@ export function resolveResponsesEndpoint(rawUrl: string): string {
   try {
     url = new URL(rawUrl.trim());
   } catch {
-    throw new ServiceUnavailableException(
-      'AI_API_URL must be a valid HTTP(S) URL.'
-    );
+    throw new ServiceUnavailableException('AI_API_URL must be a valid HTTP(S) URL.');
   }
 
   if (url.protocol !== 'http:' && url.protocol !== 'https:') {
-    throw new ServiceUnavailableException(
-      'AI_API_URL must be a valid HTTP(S) URL.'
-    );
+    throw new ServiceUnavailableException('AI_API_URL must be a valid HTTP(S) URL.');
   }
 
   const path = normalizedPath(url.pathname);
@@ -97,8 +93,7 @@ export function resolveResponsesEndpoint(rawUrl: string): string {
     const basePath = prefix || (hostname === OPENAI_API_HOST ? '/v1' : '');
     url.pathname = `${basePath}${RESPONSES_PATH}`;
   } else if (path === '/') {
-    url.pathname =
-      hostname === OPENAI_API_HOST ? `/v1${RESPONSES_PATH}` : RESPONSES_PATH;
+    url.pathname = hostname === OPENAI_API_HOST ? `/v1${RESPONSES_PATH}` : RESPONSES_PATH;
   } else {
     url.pathname = `${path}${RESPONSES_PATH}`;
   }
@@ -114,9 +109,7 @@ export function redactResponsesEndpoint(endpoint: string): string {
 }
 
 function finiteNumber(value: unknown): number | undefined {
-  return typeof value === 'number' && Number.isFinite(value)
-    ? value
-    : undefined;
+  return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
 }
 
 function normalizeUsage(value: unknown): ResponsesUsage | undefined {
@@ -127,9 +120,7 @@ function normalizeUsage(value: unknown): ResponsesUsage | undefined {
     outputTokens: finiteNumber(usage.output_tokens ?? usage.outputTokens),
     totalTokens: finiteNumber(usage.total_tokens ?? usage.totalTokens)
   };
-  return Object.values(normalized).some((item) => item !== undefined)
-    ? normalized
-    : undefined;
+  return Object.values(normalized).some((item) => item !== undefined) ? normalized : undefined;
 }
 
 function appendSseData(buffer: string): {
@@ -160,16 +151,11 @@ function parseSseBlock(block: string): SseEvent | undefined {
     }
     return parsed as SseEvent;
   } catch (error) {
-    throw new Error(
-      `Invalid Responses API stream event: ${errorMessage(error)}`,
-      { cause: error }
-    );
+    throw new Error(`Invalid Responses API stream event: ${errorMessage(error)}`, { cause: error });
   }
 }
 
-async function* parseSseStream(
-  body: ReadableStream<Uint8Array>
-): AsyncGenerator<SseEvent> {
+async function* parseSseStream(body: ReadableStream<Uint8Array>): AsyncGenerator<SseEvent> {
   const reader = body.getReader();
   const decoder = new TextDecoder();
   let buffer = '';
@@ -209,9 +195,7 @@ function outputItemFromEvent(event: SseEvent): ResponsesInputItem | undefined {
   return event.item as ResponsesInputItem;
 }
 
-function functionCallFromItem(
-  item: ResponsesInputItem
-): ResponsesFunctionCall | undefined {
+function functionCallFromItem(item: ResponsesInputItem): ResponsesFunctionCall | undefined {
   if (item.type !== 'function_call') return undefined;
   const callId = typeof item.call_id === 'string' ? item.call_id : undefined;
   const name = typeof item.name === 'string' ? item.name : undefined;
@@ -230,9 +214,7 @@ function responseError(event: SseEvent): Error {
       if (typeof message === 'string') return new Error(message);
     }
     if (typeof value.status === 'string') {
-      return new Error(
-        `The Responses API response ended with status ${value.status}`
-      );
+      return new Error(`The Responses API response ended with status ${value.status}`);
     }
   }
   if (event.error && typeof event.error === 'object') {
@@ -263,10 +245,7 @@ function responseOutput(event: SseEvent): ResponsesInputItem[] {
   if (!event.response || typeof event.response !== 'object') return [];
   const output = (event.response as Record<string, unknown>).output;
   return Array.isArray(output)
-    ? output.filter(
-        (item): item is ResponsesInputItem =>
-          Boolean(item) && typeof item === 'object'
-      )
+    ? output.filter((item): item is ResponsesInputItem => Boolean(item) && typeof item === 'object')
     : [];
 }
 
@@ -285,9 +264,7 @@ export class OpenAiResponsesHttpClient implements ResponsesApiClient {
     this.apiKey = apiKey;
   }
 
-  async stream(
-    options: ResponsesStreamOptions
-  ): Promise<ResponsesStreamResult> {
+  async stream(options: ResponsesStreamOptions): Promise<ResponsesStreamResult> {
     let httpResponse: Response;
     try {
       httpResponse = await fetch(this.apiUrl, {
@@ -349,11 +326,7 @@ export class OpenAiResponsesHttpClient implements ResponsesApiClient {
       if (eventType === 'response.function_call_arguments.delta') {
         const index = outputItemIndex(event);
         const item = outputItems.get(index);
-        if (
-          item &&
-          item.type === 'function_call' &&
-          typeof event.delta === 'string'
-        ) {
+        if (item && item.type === 'function_call' && typeof event.delta === 'string') {
           item.arguments = `${typeof item.arguments === 'string' ? item.arguments : ''}${event.delta}`;
         }
         continue;
@@ -362,11 +335,7 @@ export class OpenAiResponsesHttpClient implements ResponsesApiClient {
       if (eventType === 'response.function_call_arguments.done') {
         const index = outputItemIndex(event);
         const item = outputItems.get(index);
-        if (
-          item &&
-          item.type === 'function_call' &&
-          typeof event.arguments === 'string'
-        ) {
+        if (item && item.type === 'function_call' && typeof event.arguments === 'string') {
           item.arguments = event.arguments;
         }
         continue;
@@ -399,9 +368,7 @@ export class OpenAiResponsesHttpClient implements ResponsesApiClient {
     const completedOutput = responseOutput(completedEvent);
     const output = completedOutput.length
       ? completedOutput
-      : [...outputItems.entries()]
-          .sort(([left], [right]) => left - right)
-          .map(([, item]) => item);
+      : [...outputItems.entries()].sort(([left], [right]) => left - right).map(([, item]) => item);
     const functionCalls = output
       .map(functionCallFromItem)
       .filter((call): call is ResponsesFunctionCall => Boolean(call));

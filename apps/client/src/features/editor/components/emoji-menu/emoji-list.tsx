@@ -3,12 +3,7 @@ import clsx from 'clsx';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EmojiMenuItemType } from './types';
-import {
-  EmojiCategory,
-  EmojiIndexEntry,
-  getEmojiCategories,
-  incrementEmojiUsage
-} from './utils';
+import { EmojiCategory, EmojiIndexEntry, getEmojiCategories, incrementEmojiUsage } from './utils';
 import classes from './emoji-menu.module.css';
 
 const COLS = 8;
@@ -92,9 +87,7 @@ function EmojiList({
   // ignore content that's present at mount time).
   useEffect(() => {
     const timer = setTimeout(() => {
-      setAnnounce(
-        t('Emoji picker open. Use arrow keys to navigate, Enter to select.')
-      );
+      setAnnounce(t('Emoji picker open. Use arrow keys to navigate, Enter to select.'));
     }, 100);
     return () => clearTimeout(timer);
   }, [t]);
@@ -156,11 +149,7 @@ function EmojiList({
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (
-        ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter'].includes(
-          e.key
-        )
-      ) {
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter'].includes(e.key)) {
         userInteractedRef.current = true;
       }
       if (searching) {
@@ -213,17 +202,7 @@ function EmojiList({
     }
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [
-    searching,
-    items,
-    idx,
-    gridItems,
-    pickSearchItem,
-    pickGridItem,
-    focusZone,
-    cats,
-    activeCat
-  ]);
+  }, [searching, items, idx, gridItems, pickSearchItem, pickGridItem, focusZone, cats, activeCat]);
 
   return (
     <Paper
@@ -256,11 +235,7 @@ function EmojiList({
       {searching ? (
         <>
           {isLoading && <Loader m="xs" size="xs" color="blue" type="dots" />}
-          <ScrollArea.Autosize
-            mah={260}
-            scrollbarSize={6}
-            viewportRef={listViewport}
-          >
+          <ScrollArea.Autosize mah={260} scrollbarSize={6} viewportRef={listViewport}>
             <div style={{ padding: 4 }}>
               {items.length === 0 && !isLoading ? (
                 <Text size="sm" c="dimmed" p="xs">
@@ -280,9 +255,7 @@ function EmojiList({
                     role="option"
                     aria-selected={i === idx}
                   >
-                    <span style={{ fontSize: 20, lineHeight: 1, minWidth: 26 }}>
-                      {item.emoji}
-                    </span>
+                    <span style={{ fontSize: 20, lineHeight: 1, minWidth: 26 }}>{item.emoji}</span>
                     <Text size="sm" c="dimmed" ff="monospace" span>
                       :{item.id}:
                     </Text>
@@ -323,15 +296,8 @@ function EmojiList({
               );
             })}
           </div>
-          <ScrollArea.Autosize
-            mah={220}
-            scrollbarSize={6}
-            viewportRef={gridViewport}
-          >
-            <div
-              className={classes.grid}
-              style={{ gridTemplateColumns: `repeat(${COLS}, 1fr)` }}
-            >
+          <ScrollArea.Autosize mah={220} scrollbarSize={6} viewportRef={gridViewport}>
+            <div className={classes.grid} style={{ gridTemplateColumns: `repeat(${COLS}, 1fr)` }}>
               {gridItems.map((entry, i) => (
                 <button
                   key={entry.id}

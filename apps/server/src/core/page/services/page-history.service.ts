@@ -18,9 +18,6 @@ export class PageHistoryService {
     pageId: string,
     paginationOptions: PaginationOptions
   ): Promise<CursorPaginationResult<PageHistory>> {
-    return this.pageHistoryRepo.findPageHistoryByPageId(
-      pageId,
-      paginationOptions
-    );
+    return this.pageHistoryRepo.findPageHistoryByPageId(pageId, paginationOptions);
   }
 }

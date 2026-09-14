@@ -16,10 +16,7 @@ import { executeTx } from '@docmost/db/utils';
 import { InjectQueue } from '@nestjs/bullmq';
 import { QueueJob, QueueName } from '../../integrations/queue/constants';
 import { Queue } from 'bullmq';
-import {
-  extractMentions,
-  extractUserMentions
-} from '../../common/helpers/prosemirror/utils';
+import { extractMentions, extractUserMentions } from '../../common/helpers/prosemirror/utils';
 import { isDeepStrictEqual } from 'node:util';
 import {
   IPageHistoryJob,
@@ -27,11 +24,7 @@ import {
 } from '../../integrations/queue/constants/queue.interface';
 import { Page } from '@docmost/db/types/entity.types';
 import { CollabHistoryService } from '../services/collab-history.service';
-import {
-  HISTORY_FAST_INTERVAL,
-  HISTORY_FAST_THRESHOLD,
-  HISTORY_INTERVAL
-} from '../constants';
+import { HISTORY_FAST_INTERVAL, HISTORY_FAST_THRESHOLD, HISTORY_INTERVAL } from '../constants';
 import { TransclusionService } from '../../core/page/transclusion/transclusion.service';
 
 @Injectable()
@@ -81,11 +74,7 @@ export class PersistenceExtension implements Extension {
     if (page.content) {
       this.logger.debug(`converting json to ydoc: ${pageId}`);
 
-      const ydoc = TiptapTransformer.toYdoc(
-        page.content,
-        'default',
-        tiptapExtensions
-      );
+      const ydoc = TiptapTransformer.toYdoc(page.content, 'default', tiptapExtensions);
 
       Y.encodeStateAsUpdate(ydoc);
       return ydoc;
@@ -136,11 +125,7 @@ export class PersistenceExtension implements Extension {
         try {
           const existingContributors = page.contributorIds || [];
           contributorIds = Array.from(
-            new Set([
-              ...existingContributors,
-              ...editingUserIds,
-              page.creatorId
-            ])
+            new Set([...existingContributors, ...editingUserIds, page.creatorId])
           );
         } catch (err) {
           //this.logger.debug('Contributors error:' + err?.['message']);
@@ -190,9 +175,7 @@ export class PersistenceExtension implements Extension {
 
       const userMentions = extractUserMentions(mentions);
       const oldMentions = page.content ? extractMentions(page.content) : [];
-      const oldMentionedUserIds = extractUserMentions(oldMentions).map(
-        (m) => m.entityId
-      );
+      const oldMentionedUserIds = extractUserMentions(oldMentions).map((m) => m.entityId);
 
       if (userMentions.length > 0) {
         await this.notificationQueue.add(QueueJob.PAGE_MENTION_NOTIFICATION, {
@@ -245,16 +228,12 @@ export class PersistenceExtension implements Extension {
 
   private async enqueuePageHistory(page: Page): Promise<void> {
     const pageAge = Date.now() - new Date(page.createdAt).getTime();
-    const delay =
-      pageAge < HISTORY_FAST_THRESHOLD
-        ? HISTORY_FAST_INTERVAL
-        : HISTORY_INTERVAL;
+    const delay = pageAge < HISTORY_FAST_THRESHOLD ? HISTORY_FAST_INTERVAL : HISTORY_INTERVAL;
 
-    await this.historyQueue.add(
-      QueueJob.PAGE_HISTORY,
-      { pageId: page.id } as IPageHistoryJob,
-      { jobId: page.id, delay }
-    );
+    await this.historyQueue.add(QueueJob.PAGE_HISTORY, { pageId: page.id } as IPageHistoryJob, {
+      jobId: page.id,
+      delay
+    });
   }
 
   /**
@@ -269,28 +248,14 @@ export class PersistenceExtension implements Extension {
     tiptapJson: unknown
   ): Promise<void> {
     try {
-      await this.transclusionService.syncPageTransclusions(
-        pageId,
-        workspaceId,
-        tiptapJson
-      );
+      await this.transclusionService.syncPageTransclusions(pageId, workspaceId, tiptapJson);
     } catch (err) {
-      this.logger.error(
-        { err, pageId },
-        'Failed to sync transclusions for page'
-      );
+      this.logger.error({ err, pageId }, 'Failed to sync transclusions for page');
     }
     try {
-      await this.transclusionService.syncPageReferences(
-        pageId,
-        workspaceId,
-        tiptapJson
-      );
+      await this.transclusionService.syncPageReferences(pageId, workspaceId, tiptapJson);
     } catch (err) {
-      this.logger.error(
-        { err, pageId },
-        'Failed to sync transclusion references for page'
-      );
+      this.logger.error({ err, pageId }, 'Failed to sync transclusion references for page');
     }
   }
 }

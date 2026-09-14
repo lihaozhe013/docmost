@@ -115,8 +115,7 @@ function findRefusal(
 ): Refusal | undefined {
   for (const { address } of resolved) {
     // Reject invalid resolver output before policy checks.
-    if (!isIPv4(address) && !isIPv6(address))
-      return { address, kind: 'not-an-ip' };
+    if (!isIPv4(address) && !isIPv6(address)) return { address, kind: 'not-an-ip' };
     if (isHardBlockedAddress(address)) return { address, kind: 'hard-blocked' };
     if (policyNamesAddress(policy, address, port)) continue;
     if (isPrivateNetworkAddress(address)) {
@@ -135,8 +134,7 @@ function describeRefusal(hostname: string, { address, kind }: Refusal): string {
   if (kind === 'hard-blocked') {
     return `Destination host "${hostname}" resolves to a link-local, metadata or reserved address (${address}), which is never allowed`;
   }
-  const description =
-    kind === 'private' ? 'a private address' : 'a loopback or reserved address';
+  const description = kind === 'private' ? 'a private address' : 'a loopback or reserved address';
   return `Destination host "${hostname}" resolves to ${description} (${address}). Set ALLOWED_PRIVATE_NETWORKS on the server to allow it`;
 }
 
@@ -190,9 +188,7 @@ export class OutboundUrlGuard {
       throw new OutboundUrlError('Destination URL must use https');
     }
     if (url.username || url.password) {
-      throw new OutboundUrlError(
-        'Destination URL must not contain credentials'
-      );
+      throw new OutboundUrlError('Destination URL must not contain credentials');
     }
 
     const hostname = url.hostname.replace(/^\[|\]$/g, '');
@@ -203,17 +199,11 @@ export class OutboundUrlGuard {
       try {
         resolved = await this.lookup(hostname);
       } catch {
-        throw new OutboundUrlError(
-          `Could not resolve destination host "${hostname}"`,
-          true
-        );
+        throw new OutboundUrlError(`Could not resolve destination host "${hostname}"`, true);
       }
     }
     if (resolved.length === 0) {
-      throw new OutboundUrlError(
-        `Could not resolve destination host "${hostname}"`,
-        true
-      );
+      throw new OutboundUrlError(`Could not resolve destination host "${hostname}"`, true);
     }
 
     if (isCloud) {
@@ -224,13 +214,8 @@ export class OutboundUrlGuard {
         );
       }
     } else {
-      const refusal = findRefusal(
-        resolved,
-        effectivePort(url),
-        this.resolvePolicy()
-      );
-      if (refusal)
-        throw new OutboundUrlError(describeRefusal(hostname, refusal));
+      const refusal = findRefusal(resolved, effectivePort(url), this.resolvePolicy());
+      if (refusal) throw new OutboundUrlError(describeRefusal(hostname, refusal));
     }
 
     const pick = resolved[0];

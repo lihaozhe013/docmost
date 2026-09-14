@@ -13,10 +13,7 @@ import { User, Workspace } from '@docmost/db/types/entity.types';
 import { GroupUserRepo } from '@docmost/db/repos/group/group-user.repo';
 import { UserRole } from '../../../common/helpers/types/permission';
 import { AuditEvent, AuditResource } from '../../../common/events/audit-events';
-import {
-  AUDIT_SERVICE,
-  IAuditService
-} from '../../../integrations/audit/audit.service';
+import { AUDIT_SERVICE, IAuditService } from '../../../integrations/audit/audit.service';
 
 @Injectable()
 export class SignupService {
@@ -34,15 +31,10 @@ export class SignupService {
     workspaceId: string,
     trx?: KyselyTransaction
   ): Promise<User> {
-    const userCheck = await this.userRepo.findByEmail(
-      createUserDto.email,
-      workspaceId
-    );
+    const userCheck = await this.userRepo.findByEmail(createUserDto.email, workspaceId);
 
     if (userCheck) {
-      throw new BadRequestException(
-        'An account with this email already exists in this workspace'
-      );
+      throw new BadRequestException('An account with this email already exists in this workspace');
     }
 
     const user = await executeTx(
@@ -62,19 +54,10 @@ export class SignupService {
         );
 
         // add user to workspace
-        await this.workspaceService.addUserToWorkspace(
-          user.id,
-          workspaceId,
-          undefined,
-          trx
-        );
+        await this.workspaceService.addUserToWorkspace(user.id, workspaceId, undefined, trx);
 
         // add user to default group
-        await this.groupUserRepo.addUserToDefaultGroup(
-          user.id,
-          workspaceId,
-          trx
-        );
+        await this.groupUserRepo.addUserToDefaultGroup(user.id, workspaceId, trx);
         return user;
       },
       trx
@@ -99,10 +82,7 @@ export class SignupService {
     return user;
   }
 
-  async initialSetup(
-    createAdminUserDto: CreateAdminUserDto,
-    trx?: KyselyTransaction
-  ) {
+  async initialSetup(createAdminUserDto: CreateAdminUserDto, trx?: KyselyTransaction) {
     let user: User,
       workspace: Workspace = null;
 
@@ -127,11 +107,7 @@ export class SignupService {
           hostname: createAdminUserDto.hostname
         };
 
-        workspace = await this.workspaceService.create(
-          user,
-          workspaceData,
-          trx
-        );
+        workspace = await this.workspaceService.create(user, workspaceData, trx);
 
         user.workspaceId = workspace.id;
         return user;

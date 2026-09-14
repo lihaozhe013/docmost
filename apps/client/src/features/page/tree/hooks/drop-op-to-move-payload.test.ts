@@ -7,17 +7,10 @@ vi.mock('fractional-indexing-jittered', () => ({
     `${a ?? 'START'}|${b ?? 'END'}`
 }));
 
-const n = (
-  id: string,
-  position: string,
-  children?: SpaceTreeNode[]
-): SpaceTreeNode =>
+const n = (id: string, position: string, children?: SpaceTreeNode[]): SpaceTreeNode =>
   ({ id, position, children, name: id }) as unknown as SpaceTreeNode;
 
-const tree: SpaceTreeNode[] = [
-  n('a', 'A', [n('a1', 'AA'), n('a2', 'AB')]),
-  n('b', 'B')
-];
+const tree: SpaceTreeNode[] = [n('a', 'A', [n('a1', 'AA'), n('a2', 'AB')]), n('b', 'B')];
 
 describe('dropOpToMovePayload', () => {
   it('reorder-before computes parentId + position between prev and target', () => {
@@ -62,12 +55,7 @@ describe('dropOpToMovePayload', () => {
   // The fix uses the AFTER-tree, where source occupies its destination slot
   // surrounded by its REAL neighbors.
   it('reorder-after when source is immediately after target uses post-move neighbors', () => {
-    const adjacent: SpaceTreeNode[] = [
-      n('a', 'A'),
-      n('b', 'AB'),
-      n('c', 'B'),
-      n('d', 'BC')
-    ];
+    const adjacent: SpaceTreeNode[] = [n('a', 'A'), n('b', 'AB'), n('c', 'B'), n('d', 'BC')];
     const p = dropOpToMovePayload(adjacent, 'b', {
       kind: 'reorder-after',
       targetId: 'a'
@@ -78,12 +66,7 @@ describe('dropOpToMovePayload', () => {
   });
 
   it('reorder-before when source is immediately before target uses post-move neighbors', () => {
-    const adjacent: SpaceTreeNode[] = [
-      n('a', 'A'),
-      n('b', 'AB'),
-      n('c', 'B'),
-      n('d', 'BC')
-    ];
+    const adjacent: SpaceTreeNode[] = [n('a', 'A'), n('b', 'AB'), n('c', 'B'), n('d', 'BC')];
     const p = dropOpToMovePayload(adjacent, 'b', {
       kind: 'reorder-before',
       targetId: 'c'

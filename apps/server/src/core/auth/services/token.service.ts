@@ -1,8 +1,4 @@
-import {
-  ForbiddenException,
-  Injectable,
-  UnauthorizedException
-} from '@nestjs/common';
+import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import type { StringValue } from 'ms';
 import { EnvironmentService } from '../../../integrations/environment/environment.service';
@@ -56,10 +52,7 @@ export class TokenService {
     return this.jwtService.sign(payload, { expiresIn });
   }
 
-  async generateExchangeToken(
-    userId: string,
-    workspaceId: string
-  ): Promise<string> {
+  async generateExchangeToken(userId: string, workspaceId: string): Promise<string> {
     const payload: JwtExchangePayload = {
       sub: userId,
       workspaceId: workspaceId,
@@ -117,10 +110,7 @@ export class TokenService {
     return this.jwtService.sign(payload, expiresIn ? { expiresIn } : {});
   }
 
-  async generatePdfRenderToken(
-    pageId: string,
-    workspaceId: string
-  ): Promise<string> {
+  async generatePdfRenderToken(pageId: string, workspaceId: string): Promise<string> {
     const payload: JwtPdfRenderPayload = {
       pageId,
       workspaceId,
@@ -129,10 +119,7 @@ export class TokenService {
     return this.jwtService.sign(payload, { expiresIn: '60s' });
   }
 
-  async generatePdfExportDownloadToken(
-    fileTaskId: string,
-    workspaceId: string
-  ): Promise<string> {
+  async generatePdfExportDownloadToken(fileTaskId: string, workspaceId: string): Promise<string> {
     const payload: JwtPdfExportDownloadPayload = {
       fileTaskId,
       workspaceId,
@@ -147,9 +134,7 @@ export class TokenService {
     });
 
     if (payload.type !== tokenType) {
-      throw new UnauthorizedException(
-        'Invalid JWT token. Token type does not match.'
-      );
+      throw new UnauthorizedException('Invalid JWT token. Token type does not match.');
     }
 
     return payload;

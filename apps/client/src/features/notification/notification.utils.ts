@@ -26,11 +26,7 @@ export function getTimeGroup(dateStr: string): TimeGroup {
   const date = new Date(dateStr);
   const now = new Date();
 
-  const startOfToday = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate()
-  );
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const startOfYesterday = new Date(startOfToday);
   startOfYesterday.setDate(startOfYesterday.getDate() - 1);
   const startOfWeek = new Date(startOfToday);

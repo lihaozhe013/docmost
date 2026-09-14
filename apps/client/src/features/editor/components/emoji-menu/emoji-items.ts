@@ -1,9 +1,5 @@
 import { CommandProps, EmojiMenuItemType } from './types';
-import {
-  buildEmojiIndex,
-  getFrequentlyUsedEmoji,
-  sortFrequentlyUsedEmoji
-} from './utils';
+import { buildEmojiIndex, getFrequentlyUsedEmoji, sortFrequentlyUsedEmoji } from './utils';
 
 const MAX_RESULTS = 5;
 
@@ -32,11 +28,7 @@ const searchEmoji = async (query: string): Promise<EmojiMenuItemType[]> => {
     }));
 };
 
-export const getEmojiItems = async ({
-  query
-}: {
-  query: string;
-}): Promise<EmojiMenuItemType[]> => {
+export const getEmojiItems = async ({ query }: { query: string }): Promise<EmojiMenuItemType[]> => {
   return searchEmoji(query);
 };
 

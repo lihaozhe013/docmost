@@ -2,11 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectKysely } from 'nestjs-kysely';
 import { KyselyDB, KyselyTransaction } from '../../types/kysely.types';
 import { dbOrTx } from '../../utils';
-import {
-  InsertableWorkspace,
-  UpdatableWorkspace,
-  Workspace
-} from '@docmost/db/types/entity.types';
+import { InsertableWorkspace, UpdatableWorkspace, Workspace } from '@docmost/db/types/entity.types';
 import { ExpressionBuilder, sql } from 'kysely';
 import { DB, Workspaces } from '@docmost/db/types/db';
 
@@ -48,10 +44,7 @@ export class WorkspaceRepo {
   ): Promise<Workspace> {
     const db = dbOrTx(this.db, opts?.trx);
 
-    let query = db
-      .selectFrom('workspaces')
-      .select(this.baseFields)
-      .where('id', '=', workspaceId);
+    let query = db.selectFrom('workspaces').select(this.baseFields).where('id', '=', workspaceId);
 
     if (opts?.withMemberCount) {
       query = query.select(this.withMemberCount);
@@ -81,10 +74,7 @@ export class WorkspaceRepo {
       .executeTakeFirst();
   }
 
-  async hostnameExists(
-    hostname: string,
-    trx?: KyselyTransaction
-  ): Promise<boolean> {
+  async hostnameExists(hostname: string, trx?: KyselyTransaction): Promise<boolean> {
     if (hostname?.length < 1) return false;
 
     const db = dbOrTx(this.db, trx);

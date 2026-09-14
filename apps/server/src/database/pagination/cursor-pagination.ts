@@ -40,74 +40,50 @@ type ExtractSortFieldKey<
         : never
       : never;
 
-type Fields<DB, TB extends keyof DB, O> = ReadonlyArray<
-  Readonly<SortField<DB, TB, O>>
->;
+type Fields<DB, TB extends keyof DB, O> = ReadonlyArray<Readonly<SortField<DB, TB, O>>>;
 
 type FieldNames<DB, TB extends keyof DB, O, T extends Fields<DB, TB, O>> = {
   [TIndex in keyof T]: ExtractSortFieldKey<DB, TB, O, T[TIndex]>;
 };
 
-type EncodeCursorValues<
-  DB,
-  TB extends keyof DB,
-  O,
-  T extends Fields<DB, TB, O>
-> = {
+type EncodeCursorValues<DB, TB extends keyof DB, O, T extends Fields<DB, TB, O>> = {
   [TIndex in keyof T]: [
     ExtractSortFieldKey<DB, TB, O, T[TIndex]>,
     O[ExtractSortFieldKey<DB, TB, O, T[TIndex]>]
   ];
 };
 
-export type CursorEncoder<
-  DB,
-  TB extends keyof DB,
-  O,
-  T extends Fields<DB, TB, O>
-> = (values: EncodeCursorValues<DB, TB, O, T>) => string;
+export type CursorEncoder<DB, TB extends keyof DB, O, T extends Fields<DB, TB, O>> = (
+  values: EncodeCursorValues<DB, TB, O, T>
+) => string;
 
 type DecodedCursor<DB, TB extends keyof DB, O, T extends Fields<DB, TB, O>> = {
   [TField in ExtractSortFieldKey<DB, TB, O, T[number]>]: string;
 };
 
-export type CursorDecoder<
-  DB,
-  TB extends keyof DB,
-  O,
-  T extends Fields<DB, TB, O>
-> = (
+export type CursorDecoder<DB, TB extends keyof DB, O, T extends Fields<DB, TB, O>> = (
   cursor: string,
   fields: FieldNames<DB, TB, O, T>
 ) => DecodedCursor<DB, TB, O, T>;
 
-type ParsedCursorValues<
-  DB,
-  TB extends keyof DB,
-  O,
-  T extends Fields<DB, TB, O>
-> = {
+type ParsedCursorValues<DB, TB extends keyof DB, O, T extends Fields<DB, TB, O>> = {
   [TField in ExtractSortFieldKey<DB, TB, O, T[number]>]: O[TField];
 };
 
-export type CursorParser<
-  DB,
-  TB extends keyof DB,
-  O,
-  T extends Fields<DB, TB, O>
-> = (cursor: DecodedCursor<DB, TB, O, T>) => ParsedCursorValues<DB, TB, O, T>;
+export type CursorParser<DB, TB extends keyof DB, O, T extends Fields<DB, TB, O>> = (
+  cursor: DecodedCursor<DB, TB, O, T>
+) => ParsedCursorValues<DB, TB, O, T>;
 
-type CursorPaginationResultRow<
-  TRow,
-  TCursorKey extends string | boolean | undefined
-> = TRow & {
-  [K in TCursorKey extends undefined
-    ? never
-    : TCursorKey extends false
+type CursorPaginationResultRow<TRow, TCursorKey extends string | boolean | undefined> = TRow & {
+  [
+    K in TCursorKey extends undefined
       ? never
-      : TCursorKey extends true
-        ? '$cursor'
-        : TCursorKey]: string;
+      : TCursorKey extends false
+        ? never
+        : TCursorKey extends true
+          ? '$cursor'
+          : TCursorKey
+  ]: string;
 };
 
 type CursorPaginationMeta = {
@@ -142,18 +118,14 @@ export async function executeWithCursorPagination<
     fields: TFields;
     encodeCursor?: CursorEncoder<DB, TB, O, TFields>;
     decodeCursor?: CursorDecoder<DB, TB, O, TFields>;
-    parseCursor:
-      | CursorParser<DB, TB, O, TFields>
-      | { parse: CursorParser<DB, TB, O, TFields> };
+    parseCursor: CursorParser<DB, TB, O, TFields> | { parse: CursorParser<DB, TB, O, TFields> };
   }
 ): Promise<CursorPaginationResult<O, TCursorKey>> {
   const encodeCursor = opts.encodeCursor ?? defaultEncodeCursor;
   const decodeCursor = opts.decodeCursor ?? defaultDecodeCursor;
 
   const parseCursor =
-    typeof opts.parseCursor === 'function'
-      ? opts.parseCursor
-      : opts.parseCursor.parse;
+    typeof opts.parseCursor === 'function' ? opts.parseCursor : opts.parseCursor.parse;
 
   const fields = opts.fields.map((field) => {
     let key = field.key;
@@ -161,9 +133,7 @@ export async function executeWithCursorPagination<
     if (!key && typeof field.expression === 'string') {
       const expressionParts = field.expression.split('.');
 
-      key = (expressionParts[1] ?? expressionParts[0]) as
-        | (keyof O & string)
-        | undefined;
+      key = (expressionParts[1] ?? expressionParts[0]) as (keyof O & string) | undefined;
     }
 
     if (!key) throw new Error('missing key');
@@ -172,20 +142,17 @@ export async function executeWithCursorPagination<
   });
 
   function generateCursor(row: O): string {
-    const cursorFieldValues = fields.map(({ key }) => [
-      key,
-      row[key]
-    ]) as EncodeCursorValues<DB, TB, O, TFields>;
+    const cursorFieldValues = fields.map(({ key }) => [key, row[key]]) as EncodeCursorValues<
+      DB,
+      TB,
+      O,
+      TFields
+    >;
 
     return encodeCursor(cursorFieldValues);
   }
 
-  const fieldNames = fields.map((field) => field.key) as FieldNames<
-    DB,
-    TB,
-    O,
-    TFields
-  >;
+  const fieldNames = fields.map((field) => field.key) as FieldNames<DB, TB, O, TFields>;
 
   function applyCursor(
     qb: SelectQueryBuilder<DB, TB, O>,
@@ -230,8 +197,7 @@ export async function executeWithCursorPagination<
   for (const { expression, direction, orderModifier } of fields) {
     qb = qb.orderBy(
       expression,
-      orderModifier ??
-        (reversed ? (direction === 'asc' ? 'desc' : 'asc') : direction)
+      orderModifier ?? (reversed ? (direction === 'asc' ? 'desc' : 'asc') : direction)
     );
   }
 
@@ -255,8 +221,7 @@ export async function executeWithCursorPagination<
   return {
     items: rows.map((row) => {
       if (opts.cursorPerRow) {
-        const cursorKey =
-          typeof opts.cursorPerRow === 'string' ? opts.cursorPerRow : '$cursor';
+        const cursorKey = typeof opts.cursorPerRow === 'string' ? opts.cursorPerRow : '$cursor';
 
         (row as any)[cursorKey] = generateCursor(row);
       }
@@ -273,12 +238,9 @@ export async function executeWithCursorPagination<
   };
 }
 
-export function defaultEncodeCursor<
-  DB,
-  TB extends keyof DB,
-  O,
-  T extends Fields<DB, TB, O>
->(values: EncodeCursorValues<DB, TB, O, T>) {
+export function defaultEncodeCursor<DB, TB extends keyof DB, O, T extends Fields<DB, TB, O>>(
+  values: EncodeCursorValues<DB, TB, O, T>
+) {
   const cursor = new URLSearchParams();
 
   for (const [key, value] of values) {
@@ -308,9 +270,7 @@ export function defaultEncodeCursor<
   return Buffer.from(cursor.toString(), 'utf8').toString('base64url');
 }
 
-export function emptyCursorPaginationResult<T>(
-  limit: number
-): CursorPaginationResult<T> {
+export function emptyCursorPaginationResult<T>(limit: number): CursorPaginationResult<T> {
   return {
     items: [],
     meta: {
@@ -323,23 +283,14 @@ export function emptyCursorPaginationResult<T>(
   };
 }
 
-export function defaultDecodeCursor<
-  DB,
-  TB extends keyof DB,
-  O,
-  T extends Fields<DB, TB, O>
->(
+export function defaultDecodeCursor<DB, TB extends keyof DB, O, T extends Fields<DB, TB, O>>(
   cursor: string,
   fields: FieldNames<DB, TB, O, T>
 ): DecodedCursor<DB, TB, O, T> {
   let parsed;
 
   try {
-    parsed = [
-      ...new URLSearchParams(
-        Buffer.from(cursor, 'base64url').toString('utf8')
-      ).entries()
-    ];
+    parsed = [...new URLSearchParams(Buffer.from(cursor, 'base64url').toString('utf8')).entries()];
   } catch {
     throw new Error('Unparsable cursor');
   }

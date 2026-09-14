@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  Logger,
-  NotFoundException
-} from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { jsonToHtml, jsonToNode } from '../../collaboration/collaboration.util';
 import { ExportFormat } from './dto/export-dto';
 import { Page } from '@docmost/db/types/entity.types';
@@ -34,10 +29,7 @@ import slugify from '@sindresorhus/slugify';
 const packageJson = require('../../../package.json');
 import { EnvironmentService } from '../environment/environment.service';
 import { DomainService } from '../environment/domain.service';
-import {
-  getAttachmentIds,
-  getProsemirrorContent
-} from '../../common/helpers/prosemirror/utils';
+import { getAttachmentIds, getProsemirrorContent } from '../../common/helpers/prosemirror/utils';
 import { htmlToMarkdown } from '@docmost/editor-ext';
 
 type AllowedAttachment = { id: string; fileName: string; filePath: string };
@@ -93,10 +85,7 @@ export class ExportService {
     }
 
     if (format === ExportFormat.Markdown) {
-      const newPageHtml = pageHtml.replace(
-        /<colgroup[^>]*>[\s\S]*?<\/colgroup>/gim,
-        ''
-      );
+      const newPageHtml = pageHtml.replace(/<colgroup[^>]*>[\s\S]*?<\/colgroup>/gim, '');
       return htmlToMarkdown(newPageHtml);
     }
 
@@ -133,12 +122,7 @@ export class ExportService {
     }
 
     if (!ignorePermissions && userId) {
-      pages = await this.filterPagesForExport(
-        pages,
-        pageId,
-        userId,
-        pages[0].spaceId
-      );
+      pages = await this.filterPagesForExport(pages, pageId, userId, pages[0].spaceId);
       if (pages.length === 0) {
         throw new BadRequestException('No accessible pages to export');
       }
@@ -164,15 +148,7 @@ export class ExportService {
 
     const baseUrl = await this.getWorkspaceBaseUrl(pages[0].workspaceId);
     const zip = new JSZip();
-    await this.zipPages(
-      tree,
-      format,
-      zip,
-      includeAttachments,
-      baseUrl,
-      userId,
-      ignorePermissions
-    );
+    await this.zipPages(tree, format, zip, includeAttachments, baseUrl, userId, ignorePermissions);
 
     const zipFile = zip.generateNodeStream({
       type: 'nodebuffer',
@@ -220,12 +196,7 @@ export class ExportService {
       .execute();
 
     if (!ignorePermissions && userId) {
-      pages = await this.filterPagesForExport(
-        pages as Page[],
-        null,
-        userId,
-        spaceId
-      );
+      pages = await this.filterPagesForExport(pages as Page[], null, userId, spaceId);
       if (pages.length === 0) {
         throw new BadRequestException('No accessible pages to export');
       }
@@ -236,15 +207,7 @@ export class ExportService {
     const baseUrl = await this.getWorkspaceBaseUrl(pages[0].workspaceId);
     const zip = new JSZip();
 
-    await this.zipPages(
-      tree,
-      format,
-      zip,
-      includeAttachments,
-      baseUrl,
-      userId,
-      ignorePermissions
-    );
+    await this.zipPages(tree, format, zip, includeAttachments, baseUrl, userId, ignorePermissions);
 
     const zipFile = zip.generateNodeStream({
       type: 'nodebuffer',
@@ -310,13 +273,8 @@ export class ExportService {
         );
 
         if (includeAttachments) {
-          await this.zipAttachments(
-            updatedJsonContent,
-            folder,
-            allowedAttachments
-          );
-          updatedJsonContent =
-            updateAttachmentUrlsToLocalPaths(updatedJsonContent);
+          await this.zipAttachments(updatedJsonContent, folder, allowedAttachments);
+          updatedJsonContent = updateAttachmentUrlsToLocalPaths(updatedJsonContent);
         }
 
         const pageTitle = getSafePageTitle(page.title);
@@ -325,10 +283,7 @@ export class ExportService {
           content: updatedJsonContent
         });
 
-        folder.file(
-          `${pageTitle}${getExportExtension(format)}`,
-          pageExportContent
-        );
+        folder.file(`${pageTitle}${getExportExtension(format)}`, pageExportContent);
 
         pageIdToFilePath[page.id] = currentPagePath;
 
@@ -360,11 +315,7 @@ export class ExportService {
     zip.file('docmost-metadata.json', JSON.stringify(metadata, null, 2));
   }
 
-  async zipAttachments(
-    prosemirrorJson: any,
-    zip: JSZip,
-    allowed: Map<string, AllowedAttachment>
-  ) {
+  async zipAttachments(prosemirrorJson: any, zip: JSZip, allowed: Map<string, AllowedAttachment>) {
     const attachmentIds = getAttachmentIds(prosemirrorJson);
 
     await Promise.all(
@@ -372,9 +323,7 @@ export class ExportService {
         const attachment = allowed.get(id);
         if (!attachment) return;
         try {
-          const fileBuffer = await this.storageService.read(
-            attachment.filePath
-          );
+          const fileBuffer = await this.storageService.read(attachment.filePath);
           const filePath = `/files/${attachment.id}/${attachment.fileName}`;
           zip.file(filePath, fileBuffer);
         } catch (err) {
@@ -394,9 +343,7 @@ export class ExportService {
     for (const siblings of Object.values(tree)) {
       for (const page of siblings) {
         if (!spaceId) spaceId = page.spaceId;
-        for (const id of getAttachmentIds(
-          getProsemirrorContent(page.content)
-        )) {
+        for (const id of getAttachmentIds(getProsemirrorContent(page.content))) {
           allAttachmentIds.add(id);
         }
       }
@@ -416,9 +363,7 @@ export class ExportService {
     let visible = attachments;
     if (!ignorePermissions && userId) {
       const ownerPageIds = [
-        ...new Set(
-          attachments.map((a) => a.pageId).filter((id): id is string => !!id)
-        )
+        ...new Set(attachments.map((a) => a.pageId).filter((id): id is string => !!id))
       ];
       const accessible = ownerPageIds.length
         ? await this.pagePermissionRepo.filterAccessiblePageIds({
@@ -428,9 +373,7 @@ export class ExportService {
           })
         : [];
       const accessibleSet = new Set(accessible);
-      visible = attachments.filter(
-        (a) => a.pageId && accessibleSet.has(a.pageId)
-      );
+      visible = attachments.filter((a) => a.pageId && accessibleSet.has(a.pageId));
     }
 
     return new Map(visible.map((a) => [a.id, a]));
@@ -471,14 +414,7 @@ export class ExportService {
       pageMentionIds.length > 0
         ? await this.db
             .selectFrom('pages')
-            .select([
-              'id',
-              'slugId',
-              'title',
-              'creatorId',
-              'spaceId',
-              'workspaceId'
-            ])
+            .select(['id', 'slugId', 'title', 'creatorId', 'spaceId', 'workspaceId'])
             .select((eb) => this.pageRepo.withSpace(eb))
             .where('id', 'in', pageMentionIds)
             .where('workspaceId', '=', workspaceId)
@@ -532,13 +468,7 @@ export class ExportService {
         const page = pageMap.get(pageId);
 
         if (page) {
-          replaceMentionWithLink(
-            node,
-            pos,
-            page.title,
-            page.slugId,
-            page.space.slug
-          );
+          replaceMentionWithLink(node, pos, page.title, page.slugId, page.space.slug);
         } else {
           // if page is not found, default to  the node label and slugId
           replaceMentionWithLink(node, pos, label, slugId, 'undefined');
@@ -574,13 +504,11 @@ export class ExportService {
     if (pages.length === 0) return [];
 
     const pageIds = pages.map((p) => p.id);
-    const accessibleIds = await this.pagePermissionRepo.filterAccessiblePageIds(
-      {
-        pageIds,
-        userId,
-        spaceId
-      }
-    );
+    const accessibleIds = await this.pagePermissionRepo.filterAccessiblePageIds({
+      pageIds,
+      userId,
+      spaceId
+    });
     const accessibleSet = new Set(accessibleIds);
 
     const includedIds = new Set<string>();
@@ -593,10 +521,7 @@ export class ExportService {
         if (!accessibleSet.has(page.id)) continue;
 
         // Root page or top-level page in space export
-        if (
-          page.id === rootPageId ||
-          (rootPageId === null && page.parentPageId === null)
-        ) {
+        if (page.id === rootPageId || (rootPageId === null && page.parentPageId === null)) {
           includedIds.add(page.id);
           changed = true;
           continue;

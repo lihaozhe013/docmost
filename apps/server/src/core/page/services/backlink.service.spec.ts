@@ -30,17 +30,15 @@ describe('BacklinkService.countByPageId', () => {
 
     service = module.get(BacklinkService);
     backlinkRepo = module.get(BacklinkRepo) as jest.Mocked<BacklinkRepo>;
-    permissionRepo = module.get(
-      PagePermissionRepo
-    ) as jest.Mocked<PagePermissionRepo>;
+    permissionRepo = module.get(PagePermissionRepo) as jest.Mocked<PagePermissionRepo>;
   });
 
   it('returns post-filter counts for both directions', async () => {
     backlinkRepo.findRelatedPageIds.mockImplementation(async (_id, dir) =>
       dir === 'incoming' ? ['a', 'b', 'c'] : ['x', 'y']
     );
-    permissionRepo.filterAccessiblePageIds.mockImplementation(
-      async ({ pageIds }) => pageIds.filter((id) => id !== 'b' && id !== 'y')
+    permissionRepo.filterAccessiblePageIds.mockImplementation(async ({ pageIds }) =>
+      pageIds.filter((id) => id !== 'b' && id !== 'y')
     );
 
     const result = await service.countByPageId(pageId, userId);
@@ -71,16 +69,8 @@ describe('BacklinkService.countByPageId', () => {
 
     await service.countByPageId(pageId, userId);
 
-    expect(backlinkRepo.findRelatedPageIds).toHaveBeenCalledWith(
-      pageId,
-      'incoming',
-      userId
-    );
-    expect(backlinkRepo.findRelatedPageIds).toHaveBeenCalledWith(
-      pageId,
-      'outgoing',
-      userId
-    );
+    expect(backlinkRepo.findRelatedPageIds).toHaveBeenCalledWith(pageId, 'incoming', userId);
+    expect(backlinkRepo.findRelatedPageIds).toHaveBeenCalledWith(pageId, 'outgoing', userId);
   });
 });
 
@@ -111,9 +101,7 @@ describe('BacklinkService.findByPageId', () => {
 
     service = module.get(BacklinkService);
     backlinkRepo = module.get(BacklinkRepo) as jest.Mocked<BacklinkRepo>;
-    permissionRepo = module.get(
-      PagePermissionRepo
-    ) as jest.Mocked<PagePermissionRepo>;
+    permissionRepo = module.get(PagePermissionRepo) as jest.Mocked<PagePermissionRepo>;
   });
 
   it('passes filtered ids through to the paginated repo call', async () => {

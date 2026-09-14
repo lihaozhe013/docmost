@@ -17,11 +17,7 @@ interface SpaceSettingsModalProps {
   onClose: () => void;
 }
 
-export default function SpaceSettingsModal({
-  spaceId,
-  opened,
-  onClose
-}: SpaceSettingsModalProps) {
+export default function SpaceSettingsModal({ spaceId, opened, onClose }: SpaceSettingsModalProps) {
   const { t } = useTranslation();
   const { data: space, isLoading } = useSpaceQuery(spaceId);
 
@@ -77,18 +73,14 @@ export default function SpaceSettingsModal({
 
                 <Tabs.Panel value="members">
                   <Group my="md" justify="flex-end">
-                    {spaceAbility.can(
-                      SpaceCaslAction.Manage,
-                      SpaceCaslSubject.Member
-                    ) && <AddSpaceMembersModal spaceId={space?.id} />}
+                    {spaceAbility.can(SpaceCaslAction.Manage, SpaceCaslSubject.Member) && (
+                      <AddSpaceMembersModal spaceId={space?.id} />
+                    )}
                   </Group>
 
                   <SpaceMembersList
                     spaceId={space?.id}
-                    readOnly={spaceAbility.cannot(
-                      SpaceCaslAction.Manage,
-                      SpaceCaslSubject.Member
-                    )}
+                    readOnly={spaceAbility.cannot(SpaceCaslAction.Manage, SpaceCaslSubject.Member)}
                   />
                 </Tabs.Panel>
               </Tabs>

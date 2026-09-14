@@ -16,8 +16,7 @@ export class EnvironmentService {
 
   getAppUrl(): string {
     const rawUrl =
-      this.configService.get<string>('APP_URL') ||
-      `http://localhost:${this.getPort()}`;
+      this.configService.get<string>('APP_URL') || `http://localhost:${this.getPort()}`;
 
     const { origin } = new URL(rawUrl);
     return origin;
@@ -54,10 +53,7 @@ export class EnvironmentService {
   }
 
   getRedisUrl(): string {
-    return this.configService.get<string>(
-      'REDIS_URL',
-      'redis://localhost:6379'
-    );
+    return this.configService.get<string>('REDIS_URL', 'redis://localhost:6379');
   }
 
   getJwtTokenExpiresIn(): string {
@@ -147,9 +143,7 @@ export class EnvironmentService {
   }
 
   isCloud(): boolean {
-    const cloudConfig = this.configService
-      .get<string>('CLOUD', 'false')
-      .toLowerCase();
+    const cloudConfig = this.configService.get<string>('CLOUD', 'false').toLowerCase();
     return cloudConfig === 'true';
   }
 
@@ -169,9 +163,7 @@ export class EnvironmentService {
   }
 
   isDisableTelemetry(): boolean {
-    const disable = this.configService
-      .get<string>('DISABLE_TELEMETRY', 'false')
-      .toLowerCase();
+    const disable = this.configService.get<string>('DISABLE_TELEMETRY', 'false').toLowerCase();
     return disable === 'true';
   }
 
@@ -184,15 +176,11 @@ export class EnvironmentService {
   }
 
   getSearchDriver(): string {
-    return this.configService
-      .get<string>('SEARCH_DRIVER', 'database')
-      .toLowerCase();
+    return this.configService.get<string>('SEARCH_DRIVER', 'database').toLowerCase();
   }
 
   getTypesenseUrl(): string {
-    return this.configService
-      .get<string>('TYPESENSE_URL', 'http://localhost:8108')
-      .toLowerCase();
+    return this.configService.get<string>('TYPESENSE_URL', 'http://localhost:8108').toLowerCase();
   }
 
   getTypesenseApiKey(): string {
@@ -200,9 +188,7 @@ export class EnvironmentService {
   }
 
   getTypesenseLocale(): string {
-    return this.configService
-      .get<string>('TYPESENSE_LOCALE', 'en')
-      .toLowerCase();
+    return this.configService.get<string>('TYPESENSE_LOCALE', 'en').toLowerCase();
   }
 
   getAiApiUrl(): string {
@@ -218,9 +204,7 @@ export class EnvironmentService {
   }
 
   getEventStoreDriver(): string {
-    return this.configService
-      .get<string>('EVENT_STORE_DRIVER', 'postgres')
-      .toLowerCase();
+    return this.configService.get<string>('EVENT_STORE_DRIVER', 'postgres').toLowerCase();
   }
 
   getClickHouseUrl(): string {
@@ -235,9 +219,7 @@ export class EnvironmentService {
   }
 
   isIframeEmbedAllowed(): boolean {
-    const allowed = this.configService
-      .get<string>('IFRAME_EMBED_ALLOWED', 'false')
-      .toLowerCase();
+    const allowed = this.configService.get<string>('IFRAME_EMBED_ALLOWED', 'false').toLowerCase();
     return allowed === 'true';
   }
 

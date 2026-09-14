@@ -17,11 +17,8 @@ const decodeEnvelope = (encrypted: string) =>
     cipherText: string;
   };
 
-const encodeEnvelope = (envelope: {
-  iv: string;
-  authTag: string;
-  cipherText: string;
-}) => Buffer.from(JSON.stringify(envelope)).toString('base64');
+const encodeEnvelope = (envelope: { iv: string; authTag: string; cipherText: string }) =>
+  Buffer.from(JSON.stringify(envelope)).toString('base64');
 
 describe('EncryptionService', () => {
   let service: EncryptionService;
@@ -133,9 +130,7 @@ describe('EncryptionService', () => {
 
   describe('malformed payloads', () => {
     it('rejects non-base64 garbage', () => {
-      expect(() => service.decrypt('!!!not-valid-base64!!!')).toThrow(
-        UnableToDecrypt
-      );
+      expect(() => service.decrypt('!!!not-valid-base64!!!')).toThrow(UnableToDecrypt);
     });
 
     it('rejects base64 of non-JSON', () => {

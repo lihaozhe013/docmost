@@ -138,11 +138,7 @@ export class AttachmentRepo {
     if (ids.length === 0) return [];
     const db = dbOrTx(this.db, opts?.trx);
 
-    return db
-      .selectFrom('attachments')
-      .select(this.baseFields)
-      .where('id', 'in', ids)
-      .execute();
+    return db.selectFrom('attachments').select(this.baseFields).where('id', 'in', ids).execute();
   }
 
   updateAttachmentsByPageId(
@@ -171,10 +167,7 @@ export class AttachmentRepo {
   }
 
   async deleteAttachmentById(attachmentId: string): Promise<void> {
-    await this.db
-      .deleteFrom('attachments')
-      .where('id', '=', attachmentId)
-      .executeTakeFirst();
+    await this.db.deleteFrom('attachments').where('id', '=', attachmentId).executeTakeFirst();
   }
 
   async deleteAttachmentByFilePath(attachmentFilePath: string): Promise<void> {

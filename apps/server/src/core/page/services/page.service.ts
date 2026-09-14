@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  Logger,
-  NotFoundException
-} from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreatePageDto, ContentFormat } from '../dto/create-page.dto';
 import { ContentOperation, UpdatePageDto } from '../dto/update-page.dto';
 import { PageRepo } from '@docmost/db/repos/page/page.repo';
@@ -30,15 +25,8 @@ import {
   isAttachmentNode,
   removeMarkTypeFromDoc
 } from '../../../common/helpers/prosemirror/utils';
-import {
-  htmlToJson,
-  jsonToNode,
-  jsonToText
-} from '../../../collaboration/collaboration.util';
-import {
-  CopyPageMapEntry,
-  ICopyPageAttachment
-} from '../dto/duplicate-page.dto';
+import { htmlToJson, jsonToNode, jsonToText } from '../../../collaboration/collaboration.util';
+import { CopyPageMapEntry, ICopyPageAttachment } from '../dto/duplicate-page.dto';
 import { Node as PMNode } from '@tiptap/pm/model';
 import { StorageService } from '../../../integrations/storage/storage.service';
 import { InjectQueue } from '@nestjs/bullmq';
@@ -47,10 +35,7 @@ import { QueueJob, QueueName } from '../../../integrations/queue/constants';
 import { EventName } from '../../../common/events/event.contants';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CollaborationGateway } from '../../../collaboration/collaboration.gateway';
-import {
-  INTERNAL_LINK_REGEX,
-  extractPageSlugId
-} from '../../../integrations/export/utils';
+import { INTERNAL_LINK_REGEX, extractPageSlugId } from '../../../integrations/export/utils';
 import { markdownToHtml } from '@docmost/editor-ext';
 import { WatcherService } from '../../watcher/watcher.service';
 import { sql } from 'kysely';
@@ -99,15 +84,9 @@ export class PageService {
 
     // check if parent page exists
     if (createPageDto.parentPageId) {
-      const parentPage = await this.pageRepo.findById(
-        createPageDto.parentPageId
-      );
+      const parentPage = await this.pageRepo.findById(createPageDto.parentPageId);
 
-      if (
-        !parentPage ||
-        parentPage.deletedAt ||
-        parentPage.spaceId !== createPageDto.spaceId
-      ) {
+      if (!parentPage || parentPage.deletedAt || parentPage.spaceId !== createPageDto.spaceId) {
         throw new NotFoundException('Parent page not found');
       }
 
@@ -133,10 +112,7 @@ export class PageService {
       {
         slugId: generateSlugId(),
         title: createPageDto.title,
-        position: await this.nextPagePosition(
-          createPageDto.spaceId,
-          parentPageId
-        ),
+        position: await this.nextPagePosition(createPageDto.spaceId, parentPageId),
         icon: createPageDto.icon,
         parentPageId: parentPageId,
         spaceId: createPageDto.spaceId,
@@ -169,9 +145,7 @@ export class PageService {
           spaceId: createPageDto.spaceId,
           workspaceId
         })
-        .catch((err) =>
-          this.logger.warn(`Failed to queue add-page-watchers: ${err.message}`)
-        );
+        .catch((err) => this.logger.warn(`Failed to queue add-page-watchers: ${err.message}`));
     }
 
     return page;
@@ -202,9 +176,7 @@ export class PageService {
       }
     } else {
       // for root page
-      const lastPage = await lastPageQuery
-        .where('parentPageId', 'is', null)
-        .executeTakeFirst();
+      const lastPage = await lastPageQuery.where('parentPageId', 'is', null).executeTakeFirst();
 
       // if no existing page, make this the first
       if (!lastPage) {
@@ -218,11 +190,7 @@ export class PageService {
     return pagePosition;
   }
 
-  async update(
-    page: Page,
-    updatePageDto: UpdatePageDto,
-    user: User
-  ): Promise<Page> {
+  async update(page: Page, updatePageDto: UpdatePageDto, user: User): Promise<Page> {
     const contributors = new Set<string>(page.contributorIds);
     contributors.add(user.id);
     const contributorIds = Array.from(contributors);
@@ -245,15 +213,9 @@ export class PageService {
         spaceId: page.spaceId,
         workspaceId: page.workspaceId
       })
-      .catch((err) =>
-        this.logger.warn(`Failed to queue add-page-watchers: ${err.message}`)
-      );
+      .catch((err) => this.logger.warn(`Failed to queue add-page-watchers: ${err.message}`));
 
-    if (
-      updatePageDto.content &&
-      updatePageDto.operation &&
-      updatePageDto.format
-    ) {
+    if (updatePageDto.content && updatePageDto.operation && updatePageDto.format) {
       await this.updatePageContent(
         page.id,
         updatePageDto.content,
@@ -282,11 +244,11 @@ export class PageService {
     const prosemirrorJson = await this.parseProsemirrorContent(content, format);
 
     const documentName = `page.${pageId}`;
-    await this.collaborationGateway.handleYjsEvent(
-      'updatePageContent',
-      documentName,
-      { operation, prosemirrorJson, user }
-    );
+    await this.collaborationGateway.handleYjsEvent('updatePageContent', documentName, {
+      operation,
+      prosemirrorJson,
+      user
+    });
   }
 
   async getSidebarPages(
@@ -340,8 +302,7 @@ export class PageService {
     });
 
     if (userId && result.items.length > 0) {
-      const hasRestrictions =
-        await this.pagePermissionRepo.hasRestrictedPagesInSpace(spaceId);
+      const hasRestrictions = await this.pagePermissionRepo.hasRestrictedPagesInSpace(spaceId);
 
       if (!hasRestrictions) {
         result.items = result.items.map((p: any) => ({
@@ -352,14 +313,9 @@ export class PageService {
         const pageIds = result.items.map((p: any) => p.id);
 
         const accessiblePages =
-          await this.pagePermissionRepo.filterAccessiblePageIdsWithPermissions(
-            pageIds,
-            userId
-          );
+          await this.pagePermissionRepo.filterAccessiblePageIdsWithPermissions(pageIds, userId);
 
-        const permissionMap = new Map(
-          accessiblePages.map((p) => [p.id, p.canEdit])
-        );
+        const permissionMap = new Map(accessiblePages.map((p) => [p.id, p.canEdit]));
 
         result.items = result.items
           .filter((p: any) => permissionMap.has(p.id))
@@ -368,19 +324,12 @@ export class PageService {
             canEdit: permissionMap.get(p.id) && (spaceCanEdit ?? true)
           }));
 
-        const pagesWithChildren = result.items.filter(
-          (p: any) => p.hasChildren
-        );
+        const pagesWithChildren = result.items.filter((p: any) => p.hasChildren);
         if (pagesWithChildren.length > 0) {
           const parentIds = pagesWithChildren.map((p: any) => p.id);
           const parentsWithAccessibleChildren =
-            await this.pagePermissionRepo.getParentIdsWithAccessibleChildren(
-              parentIds,
-              userId
-            );
-          const hasAccessibleChildrenSet = new Set(
-            parentsWithAccessibleChildren
-          );
+            await this.pagePermissionRepo.getParentIdsWithAccessibleChildren(parentIds, userId);
+          const hasAccessibleChildrenSet = new Set(parentsWithAccessibleChildren);
 
           result.items = result.items.map((p: any) => ({
             ...p,
@@ -411,19 +360,13 @@ export class PageService {
 
     // Find inaccessible pages whose parent is being moved - these need to be orphaned
     const pagesToOrphan = allPages.filter(
-      (p) =>
-        !accessibleIds.has(p.id) &&
-        p.parentPageId &&
-        accessibleIds.has(p.parentPageId)
+      (p) => !accessibleIds.has(p.id) && p.parentPageId && accessibleIds.has(p.parentPageId)
     );
 
     await executeTx(this.db, async (trx) => {
       // Orphan inaccessible child pages (make them root pages in original space)
       for (const page of pagesToOrphan) {
-        const orphanPosition = await this.nextPagePosition(
-          rootPage.spaceId,
-          null
-        );
+        const orphanPosition = await this.nextPagePosition(rootPage.spaceId, null);
         await this.pageRepo.updatePage(
           { parentPageId: null, position: orphanPosition },
           page.id,
@@ -484,20 +427,12 @@ export class PageService {
           .execute();
 
         // Update attachments
-        await this.attachmentRepo.updateAttachmentsByPageId(
-          { spaceId },
-          pageIdsToMove,
-          trx
-        );
+        await this.attachmentRepo.updateAttachmentsByPageId({ spaceId }, pageIdsToMove, trx);
 
         // Update watchers and remove those without access to new space
-        await this.watcherService.movePageWatchersToSpace(
-          pageIdsToMove,
-          spaceId,
-          {
-            trx
-          }
-        );
+        await this.watcherService.movePageWatchersToSpace(pageIdsToMove, spaceId, {
+          trx
+        });
 
         await this.aiQueue.add(
           QueueJob.PAGE_MOVED_TO_SPACE,
@@ -520,14 +455,9 @@ export class PageService {
     return { childPageIds };
   }
 
-  async duplicatePage(
-    rootPage: Page,
-    targetSpaceId: string | undefined,
-    authUser: User
-  ) {
+  async duplicatePage(rootPage: Page, targetSpaceId: string | undefined, authUser: User) {
     const spaceId = targetSpaceId || rootPage.spaceId;
-    const isDuplicateInSameSpace =
-      !targetSpaceId || targetSpaceId === rootPage.spaceId;
+    const isDuplicateInSameSpace = !targetSpaceId || targetSpaceId === rootPage.spaceId;
 
     let nextPosition: string;
 
@@ -596,17 +526,11 @@ export class PageService {
 
                   if (node.attrs.src) {
                     //@ts-ignore
-                    node.attrs.src = node.attrs.src.replace(
-                      attachmentId,
-                      newAttachmentId
-                    );
+                    node.attrs.src = node.attrs.src.replace(attachmentId, newAttachmentId);
                   }
                   if (node.attrs.src) {
                     //@ts-ignore
-                    node.attrs.src = node.attrs.src.replace(
-                      attachmentId,
-                      newAttachmentId
-                    );
+                    node.attrs.src = node.attrs.src.replace(attachmentId, newAttachmentId);
                   }
                 }
               }
@@ -616,10 +540,7 @@ export class PageService {
 
         // Update internal page links in mention nodes
         prosemirrorDoc.descendants((node: PMNode) => {
-          if (
-            node.type.name === 'mention' &&
-            node.attrs.entityType === 'page'
-          ) {
+          if (node.type.name === 'mention' && node.attrs.entityType === 'page') {
             const referencedPageId = node.attrs.entityId;
 
             // Check if the referenced page is within the pages being copied
@@ -645,21 +566,14 @@ export class PageService {
 
           // Update internal page links in link marks
           for (const mark of node.marks) {
-            if (
-              mark.type.name === 'link' &&
-              mark.attrs.internal &&
-              mark.attrs.href
-            ) {
+            if (mark.type.name === 'link' && mark.attrs.internal && mark.attrs.href) {
               const match = mark.attrs.href.match(INTERNAL_LINK_REGEX);
               if (match) {
                 const slugId = extractPageSlugId(match[5]);
                 if (slugId && slugIdMap.has(slugId)) {
                   const mappedPage = slugIdMap.get(slugId);
                   //@ts-ignore
-                  mark.attrs.href = mark.attrs.href.replace(
-                    slugId,
-                    mappedPage.newSlugId
-                  );
+                  mark.attrs.href = mark.attrs.href.replace(slugId, mappedPage.newSlugId);
                 }
               }
             }
@@ -714,10 +628,7 @@ export class PageService {
         }))
       );
     } catch (err) {
-      this.logger.error(
-        'Failed to insert transclusions for duplicated pages',
-        err
-      );
+      this.logger.error('Failed to insert transclusions for duplicated pages', err);
     }
 
     try {
@@ -729,10 +640,7 @@ export class PageService {
         }))
       );
     } catch (err) {
-      this.logger.error(
-        'Failed to insert transclusion references for duplicated pages',
-        err
-      );
+      this.logger.error('Failed to insert transclusion references for duplicated pages', err);
     }
 
     const insertedPageIds = insertablePages.map((page) => page.id);
@@ -764,10 +672,7 @@ export class PageService {
 
           const newPageId = pageAttachment.newPageId;
 
-          const newPathFile = attachment.filePath.replace(
-            attachment.id,
-            newAttachmentId
-          );
+          const newPathFile = attachment.filePath.replace(attachment.id, newAttachmentId);
 
           try {
             await this.storageService.copy(attachment.filePath, newPathFile);
@@ -789,10 +694,7 @@ export class PageService {
               })
               .execute();
           } catch (err) {
-            this.logger.error(
-              `Duplicate page: failed to copy attachment ${attachment.id}`,
-              err
-            );
+            this.logger.error(`Duplicate page: failed to copy attachment ${attachment.id}`, err);
             // Continue with other attachments even if one fails
           }
         } catch (err) {
@@ -835,11 +737,7 @@ export class PageService {
       // changing the page's parent
       if (dto.parentPageId) {
         const parentPage = await this.pageRepo.findById(dto.parentPageId);
-        if (
-          !parentPage ||
-          parentPage.deletedAt ||
-          parentPage.spaceId !== movedPage.spaceId
-        ) {
+        if (!parentPage || parentPage.deletedAt || parentPage.spaceId !== movedPage.spaceId) {
           throw new NotFoundException('Parent page not found');
         }
         parentPageId = parentPage.id;
@@ -914,19 +812,15 @@ export class PageService {
     userId: string,
     pagination: PaginationOptions
   ): Promise<CursorPaginationResult<Page>> {
-    const result = await this.pageRepo.getRecentPagesInSpace(
-      spaceId,
-      pagination
-    );
+    const result = await this.pageRepo.getRecentPagesInSpace(spaceId, pagination);
 
     if (result.items.length > 0) {
       const pageIds = result.items.map((p) => p.id);
-      const accessibleIds =
-        await this.pagePermissionRepo.filterAccessiblePageIds({
-          pageIds,
-          userId,
-          spaceId
-        });
+      const accessibleIds = await this.pagePermissionRepo.filterAccessiblePageIds({
+        pageIds,
+        userId,
+        spaceId
+      });
       const accessibleSet = new Set(accessibleIds);
       result.items = result.items.filter((p) => accessibleSet.has(p.id));
     }
@@ -942,11 +836,10 @@ export class PageService {
 
     if (result.items.length > 0) {
       const pageIds = result.items.map((p) => p.id);
-      const accessibleIds =
-        await this.pagePermissionRepo.filterAccessiblePageIds({
-          pageIds,
-          userId
-        });
+      const accessibleIds = await this.pagePermissionRepo.filterAccessiblePageIds({
+        pageIds,
+        userId
+      });
       const accessibleSet = new Set(accessibleIds);
       result.items = result.items.filter((p) => accessibleSet.has(p.id));
     }
@@ -969,11 +862,10 @@ export class PageService {
 
     if (result.items.length > 0) {
       const pageIds = result.items.map((p) => p.id);
-      const accessibleIds =
-        await this.pagePermissionRepo.filterAccessiblePageIds({
-          pageIds,
-          userId: requestingUserId
-        });
+      const accessibleIds = await this.pagePermissionRepo.filterAccessiblePageIds({
+        pageIds,
+        userId: requestingUserId
+      });
       const accessibleSet = new Set(accessibleIds);
       result.items = result.items.filter((p) => accessibleSet.has(p.id));
     }
@@ -986,19 +878,15 @@ export class PageService {
     userId: string,
     pagination: PaginationOptions
   ): Promise<CursorPaginationResult<Page>> {
-    const result = await this.pageRepo.getDeletedPagesInSpace(
-      spaceId,
-      pagination
-    );
+    const result = await this.pageRepo.getDeletedPagesInSpace(spaceId, pagination);
 
     if (result.items.length > 0) {
       const pageIds = result.items.map((p) => p.id);
-      const accessibleIds =
-        await this.pagePermissionRepo.filterAccessiblePageIds({
-          pageIds,
-          userId,
-          spaceId
-        });
+      const accessibleIds = await this.pagePermissionRepo.filterAccessiblePageIds({
+        pageIds,
+        userId,
+        spaceId
+      });
       const accessibleSet = new Set(accessibleIds);
       result.items = result.items.filter((p) => accessibleSet.has(p.id));
     }
@@ -1054,11 +942,7 @@ export class PageService {
     }
   }
 
-  async removePage(
-    pageId: string,
-    userId: string,
-    workspaceId: string
-  ): Promise<void> {
+  async removePage(pageId: string, userId: string, workspaceId: string): Promise<void> {
     await this.pageRepo.removePage(pageId, userId, workspaceId);
   }
 
@@ -1101,9 +985,7 @@ export class PageService {
    * 2. Its parent is also included (or it's the root page)
    * This ensures that if a middle page is inaccessible, its entire subtree is excluded.
    */
-  private async filterAccessibleTreePages<
-    T extends { id: string; parentPageId: string | null }
-  >(
+  private async filterAccessibleTreePages<T extends { id: string; parentPageId: string | null }>(
     pages: T[],
     rootPageId: string,
     userId: string,
@@ -1112,13 +994,11 @@ export class PageService {
     if (pages.length === 0) return [];
 
     const pageIds = pages.map((p) => p.id);
-    const accessibleIds = await this.pagePermissionRepo.filterAccessiblePageIds(
-      {
-        pageIds,
-        userId,
-        spaceId
-      }
-    );
+    const accessibleIds = await this.pagePermissionRepo.filterAccessiblePageIds({
+      pageIds,
+      userId,
+      spaceId
+    });
     const accessibleSet = new Set(accessibleIds);
 
     // Prune: include a page only if it's accessible AND its parent chain to root is included

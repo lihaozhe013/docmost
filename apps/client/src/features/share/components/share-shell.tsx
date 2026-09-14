@@ -1,17 +1,5 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from 'react';
-import {
-  ActionIcon,
-  AppShell,
-  Group,
-  ScrollArea,
-  Tooltip
-} from '@mantine/core';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ActionIcon, AppShell, Group, ScrollArea, Tooltip } from '@mantine/core';
 import { useGetSharedPageTreeQuery } from '@/features/share/queries/share-query.ts';
 import { useParams } from 'react-router-dom';
 import SharedTree from '@/features/share/components/shared-tree.tsx';
@@ -52,11 +40,7 @@ import { MAIN_CONTENT_ID, SkipToMain } from '@/components/ui/skip-to-main.tsx';
 
 const MemoizedSharedTree = React.memo(SharedTree);
 
-export default function ShareShell({
-  children
-}: {
-  children: React.ReactNode;
-}) {
+export default function ShareShell({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation();
   const [mobileOpened] = useAtom(mobileSidebarAtom);
   const [desktopOpened] = useAtom(desktopSidebarAtom);
@@ -84,8 +68,7 @@ export default function ShareShell({
   const resize = useCallback(
     (e: MouseEvent) => {
       if (!isResizing || !sidebarRef.current) return;
-      const newWidth =
-        e.clientX - sidebarRef.current.getBoundingClientRect().left;
+      const newWidth = e.clientX - sidebarRef.current.getBoundingClientRect().left;
       if (newWidth < 220) {
         setSidebarWidth(220);
         return;
@@ -254,20 +237,10 @@ export default function ShareShell({
           {data && shareId && !(data.features?.length > 0) && <ShareBranding />}
         </AppShell.Main>
 
-        <AppShell.Aside
-          p="md"
-          withBorder={mobileTocOpened}
-          className={classes.aside}
-        >
-          <ScrollArea
-            style={{ height: '80vh' }}
-            scrollbarSize={5}
-            type="scroll"
-          >
+        <AppShell.Aside p="md" withBorder={mobileTocOpened} className={classes.aside}>
+          <ScrollArea style={{ height: '80vh' }} scrollbarSize={5} type="scroll">
             <div style={{ paddingBottom: '50px' }}>
-              {readOnlyEditor && (
-                <TableOfContents isShare={true} editor={readOnlyEditor} />
-              )}
+              {readOnlyEditor && <TableOfContents isShare={true} editor={readOnlyEditor} />}
             </div>
           </ScrollArea>
         </AppShell.Aside>

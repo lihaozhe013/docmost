@@ -12,10 +12,7 @@ export async function withCache<T>(
       return cached.v;
     }
   } catch (err) {
-    console.warn(
-      `[withCache] get failed for "${key}", falling back to source`,
-      err
-    );
+    console.warn(`[withCache] get failed for "${key}", falling back to source`, err);
   }
 
   const value = await fn();

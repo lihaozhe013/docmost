@@ -205,10 +205,6 @@ export class EnvironmentService {
       .toLowerCase();
   }
 
-  getAiEmbeddingModel(): string {
-    return this.configService.get<string>('AI_EMBEDDING_MODEL');
-  }
-
   getAiApiUrl(): string {
     return this.configService.get<string>('AI_API_URL');
   }
@@ -219,44 +215,6 @@ export class EnvironmentService {
 
   getAiModel(): string {
     return this.configService.get<string>('AI_MODEL');
-  }
-
-  getAiEmbeddingDimension(): number {
-    return parseInt(
-      this.configService.get<string>('AI_EMBEDDING_DIMENSION'),
-      10
-    );
-  }
-
-  getAiEmbeddingSupportsMrl(): boolean | undefined {
-    const val = this.configService.get<string>('AI_EMBEDDING_SUPPORTS_MRL');
-    if (val === undefined || val === null || val === '') return undefined;
-    return val === 'true';
-  }
-
-  getAiVectorDriver(): string {
-    return this.configService
-      .get<string>('AI_VECTOR_DRIVER', 'pgvector')
-      .toLowerCase();
-  }
-
-  getTurbopufferApiKey(): string {
-    return this.configService.get<string>('TURBOPUFFER_API_KEY');
-  }
-
-  getTurbopufferRegion(): string {
-    return this.configService.get<string>('TURBOPUFFER_REGION');
-  }
-
-  getTurbopufferBaseUrl(): string {
-    return this.configService.get<string>('TURBOPUFFER_BASE_URL');
-  }
-
-  getTurbopufferNamespacePrefix(): string {
-    return this.configService.get<string>(
-      'TURBOPUFFER_NAMESPACE_PREFIX',
-      'docmost'
-    );
   }
 
   getEventStoreDriver(): string {

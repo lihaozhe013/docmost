@@ -16,7 +16,6 @@ export enum QueueJob {
   ATTACHMENT_INDEX_CONTENT = 'attachment-index-content',
   ATTACHMENT_INDEXING = 'attachment-indexing',
   DELETE_PAGE_ATTACHMENTS = 'delete-page-attachments',
-  DELETE_AI_CHAT_ATTACHMENTS = 'delete-ai-chat-attachments',
 
   DELETE_USER_AVATARS = 'delete-user-avatars',
 
@@ -52,8 +51,6 @@ export enum QueueJob {
   WORKSPACE_CREATED = 'workspace-created',
   WORKSPACE_SPACE_UPDATED = 'workspace-updated',
   WORKSPACE_DELETED = 'workspace-deleted',
-  WORKSPACE_CREATE_EMBEDDINGS = 'workspace-create-embeddings',
-  WORKSPACE_DELETE_EMBEDDINGS = 'workspace-delete-embeddings',
   WORKSPACE_RESET_EMBEDDINGS = 'workspace-reset-embeddings',
 
   GENERATE_PAGE_EMBEDDINGS = 'generate-page-embeddings',

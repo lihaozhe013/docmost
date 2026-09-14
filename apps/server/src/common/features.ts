@@ -5,13 +5,11 @@ export const Feature = {
   API_KEYS: 'api:keys',
   COMMENT_RESOLUTION: 'comment:resolution',
   PAGE_PERMISSIONS: 'page:permissions',
-  AI: 'ai',
   CONFLUENCE_IMPORT: 'import:confluence',
   DOCX_IMPORT: 'import:docx',
   PDF_IMPORT: 'import:pdf',
   ATTACHMENT_INDEXING: 'attachment:indexing',
   SECURITY_SETTINGS: 'security:settings',
-  MCP: 'mcp',
   SCIM: 'scim',
   PAGE_VERIFICATION: 'page:verification',
   AUDIT_LOGS: 'audit:logs',
@@ -24,8 +22,6 @@ export const Feature = {
   DOCX_EXPORT: 'export:docx',
   BASES: 'bases',
   OAUTH: 'oauth',
-  AI_CONTROLS: 'ai:controls',
-  MCP_CONTROLS: 'mcp:controls',
   SIEM: 'siem'
 } as const;
 

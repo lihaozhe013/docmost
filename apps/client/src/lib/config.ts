@@ -43,10 +43,6 @@ export function isCloud(): boolean {
   return castToBoolean(getConfigValue('CLOUD'));
 }
 
-export function getAiVectorDriver(): string {
-  return getConfigValue('AI_VECTOR_DRIVER');
-}
-
 export function getAvatarUrl(
   avatarUrl: string,
   type: AvatarIconType = AvatarIconType.AVATAR

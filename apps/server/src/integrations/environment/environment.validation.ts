@@ -99,57 +99,6 @@ export class EnvironmentVariables {
   @IsString()
   TYPESENSE_LOCALE: string;
 
-  @IsOptional()
-  @ValidateIf((obj) => obj.AI_VECTOR_DRIVER)
-  @IsIn(['pgvector', 'turbopuffer'])
-  @IsString()
-  AI_VECTOR_DRIVER: string;
-
-  @ValidateIf((obj) => obj.AI_VECTOR_DRIVER === 'turbopuffer')
-  @IsNotEmpty()
-  @IsString()
-  TURBOPUFFER_API_KEY: string;
-
-  @ValidateIf(
-    (obj) => obj.AI_VECTOR_DRIVER === 'turbopuffer' && !obj.TURBOPUFFER_BASE_URL
-  )
-  @IsNotEmpty({
-    message:
-      'TURBOPUFFER_REGION is required when AI_VECTOR_DRIVER is turbopuffer, unless TURBOPUFFER_BASE_URL is set'
-  })
-  @IsString()
-  TURBOPUFFER_REGION: string;
-
-  @IsOptional()
-  @ValidateIf(
-    (obj) => obj.TURBOPUFFER_BASE_URL != '' && obj.TURBOPUFFER_BASE_URL != null
-  )
-  @IsUrl({ protocols: ['http', 'https'], require_tld: false })
-  TURBOPUFFER_BASE_URL: string;
-
-  @IsOptional()
-  @IsString()
-  @Matches(/^[A-Za-z0-9\-_.]{1,90}$/, {
-    message:
-      'TURBOPUFFER_NAMESPACE_PREFIX may only contain letters, digits, dot, dash, underscore (max 90 chars)'
-  })
-  TURBOPUFFER_NAMESPACE_PREFIX: string;
-
-  @IsOptional()
-  @IsString()
-  AI_EMBEDDING_MODEL: string;
-
-  @ValidateIf((obj) => obj.AI_EMBEDDING_DIMENSION)
-  @IsIn(['768', '1024', '1536', '2000', '3072'])
-  @IsString()
-  AI_EMBEDDING_DIMENSION: string;
-
-  @IsOptional()
-  @ValidateIf((obj) => obj.AI_EMBEDDING_SUPPORTS_MRL)
-  @IsIn(['true', 'false'])
-  @IsString()
-  AI_EMBEDDING_SUPPORTS_MRL: string;
-
   @ValidateIf((obj) => obj.AI_API_URL || obj.AI_API_KEY || obj.AI_MODEL)
   @IsUrl({ protocols: ['http', 'https'], require_tld: false })
   @IsNotEmpty()

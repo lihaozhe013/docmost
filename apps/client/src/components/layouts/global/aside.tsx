@@ -23,9 +23,6 @@ const TableOfContents = lazy(() =>
     (m) => ({ default: m.TableOfContents })
   )
 );
-const AsideChatPanel = lazy(
-  () => import('@/ee/ai-chat/components/aside-chat-panel')
-);
 const PageDetailsAside = lazy(() =>
   import('@/features/page-details/components/page-details-aside.tsx').then(
     (m) => ({ default: m.PageDetailsAside })
@@ -55,10 +52,6 @@ export default function Aside() {
       component = <TableOfContents editor={pageEditor} />;
       title = 'Table of contents';
       break;
-    case 'chat':
-      component = <AsideChatPanel />;
-      title = 'AI Chat';
-      break;
     case 'details':
       component = <PageDetailsAside />;
       title = 'Details';
@@ -75,26 +68,24 @@ export default function Aside() {
     >
       {component && (
         <>
-          {tab !== 'chat' && (
-            <Group justify="space-between" wrap="nowrap" mb="md">
-              <Title order={2} size="h6" fw={500}>
-                {t(title)}
-              </Title>
-              <Tooltip label={t('Close')} withArrow>
-                <ActionIcon
-                  variant="subtle"
-                  color="gray"
-                  onClick={closeAside}
-                  aria-label={t('Close')}
-                >
-                  <IconX size={18} />
-                </ActionIcon>
-              </Tooltip>
-            </Group>
-          )}
+          <Group justify="space-between" wrap="nowrap" mb="md">
+            <Title order={2} size="h6" fw={500}>
+              {t(title)}
+            </Title>
+            <Tooltip label={t('Close')} withArrow>
+              <ActionIcon
+                variant="subtle"
+                color="gray"
+                onClick={closeAside}
+                aria-label={t('Close')}
+              >
+                <IconX size={18} />
+              </ActionIcon>
+            </Tooltip>
+          </Group>
 
           <Suspense fallback={null}>
-            {tab === 'comments' || tab === 'chat' ? (
+            {tab === 'comments' ? (
               component
             ) : (
               <ScrollArea

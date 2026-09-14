@@ -34,9 +34,7 @@ const ShareLayout = lazy(
 const ShareRedirect = lazy(() => import('@/pages/share/share-redirect.tsx'));
 const SpacesPage = lazy(() => import('@/pages/spaces/spaces.tsx'));
 const SpaceTrash = lazy(() => import('@/pages/space/space-trash.tsx'));
-const AiSettings = lazy(() => import('@/ee/ai/pages/ai-settings.tsx'));
 const FavoritesPage = lazy(() => import('@/pages/favorites/favorites-page'));
-const AiChat = lazy(() => import('@/ee/ai-chat/pages/ai-chat.tsx'));
 const LabelPage = lazy(() => import('@/pages/label/label-page'));
 
 export default function App() {
@@ -69,8 +67,6 @@ export default function App() {
 
         <Route element={<Layout />}>
           <Route path={'/home'} element={<Home />} />
-          <Route path={'/ai'} element={<AiChat />} />
-          <Route path={'/ai/chat/:chatId'} element={<AiChat />} />
           <Route path={'/spaces'} element={<SpacesPage />} />
           <Route path={'/favorites'} element={<FavoritesPage />} />
           <Route path={'/labels/:labelName'} element={<LabelPage />} />
@@ -90,8 +86,6 @@ export default function App() {
             <Route path={'groups/:groupId'} element={<GroupInfo />} />
             <Route path={'spaces'} element={<Spaces />} />
             <Route path={'sharing'} element={<Shares />} />
-            <Route path={'ai'} element={<AiSettings />} />
-            <Route path={'ai/mcp'} element={<AiSettings />} />
           </Route>
         </Route>
 

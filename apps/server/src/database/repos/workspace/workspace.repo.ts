@@ -175,26 +175,6 @@ export class WorkspaceRepo {
       .executeTakeFirst();
   }
 
-  async updateAiSettings(
-    workspaceId: string,
-    prefKey: string,
-    prefValue: string | boolean,
-    trx?: KyselyTransaction
-  ) {
-    const db = dbOrTx(this.db, trx);
-    return db
-      .updateTable('workspaces')
-      .set({
-        settings: sql`COALESCE(settings, '{}'::jsonb)
-                || jsonb_build_object('ai', COALESCE(settings->'ai', '{}'::jsonb)
-                || jsonb_build_object('${sql.raw(prefKey)}', ${sql.lit(prefValue)}))`,
-        updatedAt: new Date()
-      })
-      .where('id', '=', workspaceId)
-      .returning(this.baseFields)
-      .executeTakeFirst();
-  }
-
   async updateAiEmbeddingFingerprint(
     workspaceId: string,
     fingerprint: { driver: string; model: string; dimensions: number },

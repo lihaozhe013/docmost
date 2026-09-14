@@ -6,7 +6,6 @@ import {
   Text,
   Badge,
   Group,
-  Switch,
   getDefaultZIndex
 } from '@mantine/core';
 import {
@@ -27,22 +26,16 @@ import { RadioMenuItem } from '@/components/ui/radio-menu-item';
 import { useHasFeature } from '@/ee/hooks/use-feature';
 import { Feature } from '@/ee/features';
 import classes from './search-spotlight-filters.module.css';
-import { useAtom } from 'jotai';
-import { workspaceAtom } from '@/features/user/atoms/current-user-atom.ts';
 import { LabelFilterMenu } from './label-filter-menu';
 
 interface SearchSpotlightFiltersProps {
   onFiltersChange?: (filters: any) => void;
-  onAskClick?: () => void;
   spaceId?: string;
-  isAiMode?: boolean;
 }
 
 export function SearchSpotlightFilters({
   onFiltersChange,
-  onAskClick,
-  spaceId,
-  isAiMode = false
+  spaceId
 }: SearchSpotlightFiltersProps) {
   const { t } = useTranslation();
   const hasAttachmentIndexing = useHasFeature(Feature.ATTACHMENT_INDEXING);
@@ -60,7 +53,6 @@ export function SearchSpotlightFilters({
   const [titleOnly, setTitleOnly] = useState(false);
   const [openedFilter, setOpenedFilter] = useState<string | null>(null);
   const [visibleFilters, setVisibleFilters] = useState<string[]>([]);
-  const [workspace] = useAtom(workspaceAtom);
 
   const { data: spacesData } = useGetSpacesQuery({ limit: 100 });
   const selectedSpaceData = selectedSpaceId
@@ -144,40 +136,6 @@ export function SearchSpotlightFilters({
 
   return (
     <div className={classes.filtersContainer}>
-      {workspace?.settings?.ai?.search === true && (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            height: '32px',
-            paddingLeft: '8px',
-            paddingRight: '8px'
-          }}
-        >
-          <Switch
-            checked={isAiMode}
-            onChange={(event) => onAskClick()}
-            label={t('AI Answers')}
-            size="sm"
-            color="blue"
-            labelPosition="left"
-            styles={{
-              root: {
-                display: 'flex',
-                alignItems: 'center',
-                flexShrink: 0
-              },
-              label: {
-                whiteSpace: 'nowrap',
-                paddingRight: '8px',
-                fontSize: '13px',
-                fontWeight: 500
-              }
-            }}
-          />
-        </div>
-      )}
-
       <SpaceFilterMenu
         value={selectedSpaceId}
         onChange={handleSpaceSelect}
@@ -232,9 +190,7 @@ export function SearchSpotlightFilters({
                 contentType !== option.value &&
                 handleChangeContentType(option.value)
               }
-              disabled={
-                option.disabled || (isAiMode && option.value === 'attachment')
-              }
+              disabled={option.disabled}
             >
               <Group flex="1" gap="xs">
                 <div>
@@ -244,13 +200,6 @@ export function SearchSpotlightFilters({
                       {t('Enterprise')}
                     </Badge>
                   )}
-                  {!option.disabled &&
-                    isAiMode &&
-                    option.value === 'attachment' && (
-                      <Text size="xs" mt={4}>
-                        {t('AI Answers not available for attachments')}
-                      </Text>
-                    )}
                 </div>
                 {contentType === option.value && (
                   <IconCheck size={20} aria-hidden />
@@ -261,93 +210,90 @@ export function SearchSpotlightFilters({
         </Menu.Dropdown>
       </Menu>
 
-      {!isAiMode && (
-        <Button
-          variant={titleOnly ? 'light' : 'subtle'}
-          color={titleOnly ? 'blue' : 'gray'}
-          size="sm"
-          radius="xl"
-          leftSection={<IconLetterCase size={16} />}
-          className={cx(
-            classes.filterButton,
-            titleOnly && classes.filterButtonActive
-          )}
-          fw={500}
-          aria-pressed={titleOnly}
-          onClick={() => setTitleOnly(!titleOnly)}
-        >
-          {t('Title only')}
-        </Button>
-      )}
+      <Button
+        variant={titleOnly ? 'light' : 'subtle'}
+        color={titleOnly ? 'blue' : 'gray'}
+        size="sm"
+        radius="xl"
+        leftSection={<IconLetterCase size={16} />}
+        className={cx(
+          classes.filterButton,
+          titleOnly && classes.filterButtonActive
+        )}
+        fw={500}
+        aria-pressed={titleOnly}
+        onClick={() => setTitleOnly(!titleOnly)}
+      >
+        {t('Title only')}
+      </Button>
 
-      {!isAiMode &&
-        orderedVisibleFilters.map((filterKey) => {
-          if (filterKey === 'creator') {
-            return (
-              <CreatorFilterMenu
-                key="creator"
-                value={selectedCreatorId}
-                onChange={handleCreatorSelect}
-                position="bottom-start"
-                width={250}
-                zIndex={getDefaultZIndex('max')}
-                opened={openedFilter === 'creator'}
-                onOpenChange={(opened) =>
-                  setOpenedFilter(opened ? 'creator' : null)
-                }
+      {orderedVisibleFilters.map((filterKey) => {
+        if (filterKey === 'creator') {
+          return (
+            <CreatorFilterMenu
+              key="creator"
+              value={selectedCreatorId}
+              onChange={handleCreatorSelect}
+              position="bottom-start"
+              width={250}
+              zIndex={getDefaultZIndex('max')}
+              opened={openedFilter === 'creator'}
+              onOpenChange={(opened) =>
+                setOpenedFilter(opened ? 'creator' : null)
+              }
+            >
+              <Button
+                variant="subtle"
+                color="gray"
+                size="sm"
+                rightSection={<IconChevronDown size={14} />}
+                leftSection={<IconUser size={16} />}
+                className={classes.filterButton}
+                fw={500}
               >
-                <Button
-                  variant="subtle"
-                  color="gray"
-                  size="sm"
-                  rightSection={<IconChevronDown size={14} />}
-                  leftSection={<IconUser size={16} />}
-                  className={classes.filterButton}
-                  fw={500}
-                >
-                  {selectedCreatorId
-                    ? `${t('Created by')}: ${selectedCreatorName || t('Unknown')}`
-                    : `${t('Created by')}: ${t('Anyone')}`}
-                </Button>
-              </CreatorFilterMenu>
-            );
-          }
+                {selectedCreatorId
+                  ? `${t('Created by')}: ${selectedCreatorName || t('Unknown')}`
+                  : `${t('Created by')}: ${t('Anyone')}`}
+              </Button>
+            </CreatorFilterMenu>
+          );
+        }
 
-          if (filterKey === 'labels') {
-            return (
-              <LabelFilterMenu
-                key="labels"
-                value={selectedLabelIds}
-                onChange={handleLabelsSelect}
-                position="bottom-start"
-                width={250}
-                zIndex={getDefaultZIndex('max')}
-                opened={openedFilter === 'labels'}
-                onOpenChange={(opened) =>
-                  setOpenedFilter(opened ? 'labels' : null)
-                }
+        if (filterKey === 'labels') {
+          return (
+            <LabelFilterMenu
+              key="labels"
+              value={selectedLabelIds}
+              onChange={handleLabelsSelect}
+              position="bottom-start"
+              width={250}
+              zIndex={getDefaultZIndex('max')}
+              opened={openedFilter === 'labels'}
+              onOpenChange={(opened) =>
+                setOpenedFilter(opened ? 'labels' : null)
+              }
+            >
+              <Button
+                variant="subtle"
+                color="gray"
+                size="sm"
+                rightSection={<IconChevronDown size={14} />}
+                leftSection={<IconTag size={16} />}
+                className={classes.filterButton}
+                fw={500}
               >
-                <Button
-                  variant="subtle"
-                  color="gray"
-                  size="sm"
-                  rightSection={<IconChevronDown size={14} />}
-                  leftSection={<IconTag size={16} />}
-                  className={classes.filterButton}
-                  fw={500}
-                >
-                  {selectedLabelIds.length > 0
-                    ? `${t('Labels')} (${selectedLabelIds.length})`
-                    : t('Labels')}
-                </Button>
-              </LabelFilterMenu>
-            );
-          }
+                {selectedLabelIds.length > 0
+                  ? `${t('Labels')} (${selectedLabelIds.length})`
+                  : t('Labels')}
+              </Button>
+            </LabelFilterMenu>
+          );
+        }
 
-          return null;
-        })}
+        return null;
+      })}
 
-      {!isAiMode && addableFilters.length > 0 && (
+      {addableFilters.length > 0 && (
         <Menu
           shadow="md"
           width={200}

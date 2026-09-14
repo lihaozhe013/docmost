@@ -33,13 +33,7 @@ export interface IWorkspace {
   memberCount?: number;
   plan?: string;
   enforceMfa?: boolean;
-  aiSearch?: boolean;
-  generativeAi?: boolean;
   disablePublicSharing?: boolean;
-  mcpEnabled?: boolean;
-  aiChatReadOnly?: boolean;
-  aiChatWorkspaceKnowledgeOnly?: boolean;
-  enforceMcpOauth?: boolean;
   trashRetentionDays?: number;
   restrictApiToAdmins?: boolean;
   allowMemberTemplates?: boolean;
@@ -49,7 +43,6 @@ export interface IWorkspace {
 }
 
 export interface IWorkspaceSettings {
-  ai?: IWorkspaceAiSettings;
   sharing?: IWorkspaceSharingSettings;
   api?: IWorkspaceApiSettings;
   templates?: IWorkspaceTemplateSettings;
@@ -59,16 +52,6 @@ export interface IWorkspaceSettings {
 
 export interface IWorkspaceApiSettings {
   restrictToAdmins?: boolean;
-}
-
-export interface IWorkspaceAiSettings {
-  search?: boolean;
-  generative?: boolean;
-  mcp?: boolean;
-  enforceMcpOauth?: boolean;
-  chat?: boolean;
-  chatReadOnly?: boolean;
-  chatWorkspaceKnowledgeOnly?: boolean;
 }
 
 export interface IWorkspaceSharingSettings {

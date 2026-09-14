@@ -29,27 +29,11 @@ export class UpdateWorkspaceDto extends PartialType(CreateWorkspaceDto) {
 
   @IsOptional()
   @IsBoolean()
-  aiSearch: boolean;
-
-  @IsOptional()
-  @IsBoolean()
-  generativeAi: boolean;
-
-  @IsOptional()
-  @IsBoolean()
   disablePublicSharing: boolean;
 
   @IsOptional()
   @IsBoolean()
-  mcpEnabled: boolean;
-
-  @IsOptional()
-  @IsBoolean()
   isScimEnabled: boolean;
-
-  @IsOptional()
-  @IsBoolean()
-  aiChat: boolean;
 
   @IsOptional()
   @IsInt()
@@ -68,16 +52,4 @@ export class UpdateWorkspaceDto extends PartialType(CreateWorkspaceDto) {
   @IsString()
   @IsIn(['read', 'edit'])
   defaultPageEditMode: string;
-
-  @IsOptional()
-  @IsBoolean()
-  aiChatReadOnly: boolean;
-
-  @IsOptional()
-  @IsBoolean()
-  aiChatWorkspaceKnowledgeOnly: boolean;
-
-  @IsOptional()
-  @IsBoolean()
-  enforceMcpOauth: boolean;
 }

@@ -45,11 +45,7 @@ export class StaticModule implements OnModuleInit {
           : undefined,
         COLLAB_URL: this.environmentService.getCollabUrl(),
         POSTHOG_HOST: this.environmentService.getPostHogHost(),
-        POSTHOG_KEY: this.environmentService.getPostHogKey(),
-        AI_VECTOR_DRIVER:
-          this.environmentService.getAiVectorDriver() === 'turbopuffer'
-            ? 'turbopuffer'
-            : undefined
+        POSTHOG_KEY: this.environmentService.getPostHogKey()
       };
 
       const windowScriptContent = `<script>window.CONFIG=${JSON.stringify(configString)};</script>`;

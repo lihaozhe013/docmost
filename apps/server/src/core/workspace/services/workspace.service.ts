@@ -44,7 +44,6 @@ import {
   hashPassword,
   nanoIdGen
 } from '../../../common/helpers';
-import { isPageEmbeddingsTableExists } from '@docmost/db/helpers/helpers';
 import { CursorPaginationResult } from '@docmost/db/pagination/cursor-pagination';
 import { ShareRepo } from '@docmost/db/repos/share/share.repo';
 import { WatcherRepo } from '@docmost/db/repos/watcher/watcher.repo';
@@ -74,7 +73,6 @@ export class WorkspaceService {
     private favoriteRepo: FavoriteRepo,
     @InjectKysely() private readonly db: KyselyDB,
     @InjectQueue(QueueName.ATTACHMENT_QUEUE) private attachmentQueue: Queue,
-    @InjectQueue(QueueName.AI_QUEUE) private aiQueue: Queue,
     @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService,
     private userSessionRepo: UserSessionRepo
   ) {}
@@ -283,14 +281,10 @@ export class WorkspaceService {
     if (
       typeof updateWorkspaceDto.disablePublicSharing !== 'undefined' ||
       typeof updateWorkspaceDto.trashRetentionDays !== 'undefined' ||
-      typeof updateWorkspaceDto.mcpEnabled !== 'undefined' ||
       typeof updateWorkspaceDto.restrictApiToAdmins !== 'undefined' ||
       typeof updateWorkspaceDto.allowMemberTemplates !== 'undefined' ||
       typeof updateWorkspaceDto.isScimEnabled !== 'undefined' ||
-      typeof updateWorkspaceDto.allowPersonalSpaces !== 'undefined' ||
-      typeof updateWorkspaceDto.aiChatReadOnly !== 'undefined' ||
-      typeof updateWorkspaceDto.aiChatWorkspaceKnowledgeOnly !== 'undefined' ||
-      typeof updateWorkspaceDto.enforceMcpOauth !== 'undefined'
+      typeof updateWorkspaceDto.allowPersonalSpaces !== 'undefined'
     ) {
       const ws = await this.db
         .selectFrom('workspaces')
@@ -300,14 +294,6 @@ export class WorkspaceService {
 
       if (!ws) {
         throw new NotFoundException('Workspace not found');
-      }
-
-      if (typeof updateWorkspaceDto.mcpEnabled !== 'undefined') {
-        if (
-          !this.licenseCheckService.hasFeature(ws.licenseKey, 'mcp', ws.plan)
-        ) {
-          throw new ForbiddenException('This feature requires a valid license');
-        }
       }
 
       if (typeof updateWorkspaceDto.isScimEnabled !== 'undefined') {
@@ -327,33 +313,6 @@ export class WorkspaceService {
           !this.licenseCheckService.hasFeature(
             ws.licenseKey,
             Feature.PERSONAL_SPACES,
-            ws.plan
-          )
-        ) {
-          throw new ForbiddenException('This feature requires a valid license');
-        }
-      }
-
-      if (
-        typeof updateWorkspaceDto.aiChatReadOnly !== 'undefined' ||
-        typeof updateWorkspaceDto.aiChatWorkspaceKnowledgeOnly !== 'undefined'
-      ) {
-        if (
-          !this.licenseCheckService.hasFeature(
-            ws.licenseKey,
-            Feature.AI_CONTROLS,
-            ws.plan
-          )
-        ) {
-          throw new ForbiddenException('This feature requires a valid license');
-        }
-      }
-
-      if (typeof updateWorkspaceDto.enforceMcpOauth !== 'undefined') {
-        if (
-          !this.licenseCheckService.hasFeature(
-            ws.licenseKey,
-            Feature.MCP_CONTROLS,
             ws.plan
           )
         ) {
@@ -387,18 +346,6 @@ export class WorkspaceService {
       }
     }
 
-    if (
-      updateWorkspaceDto.aiSearch &&
-      this.environmentService.getAiVectorDriver() !== 'turbopuffer'
-    ) {
-      const tableExists = await isPageEmbeddingsTableExists(this.db);
-      if (!tableExists) {
-        throw new BadRequestException(
-          'Failed to activate. Make sure pgvector postgres extension is installed.'
-        );
-      }
-    }
-
     const workspaceBefore = await this.workspaceRepo.findById(workspaceId);
     const settingsBefore = (workspaceBefore?.settings ?? {}) as Record<
       string,
@@ -420,34 +367,6 @@ export class WorkspaceService {
         );
       }
 
-      if (typeof updateWorkspaceDto.aiSearch !== 'undefined') {
-        const prev = settingsBefore?.ai?.search ?? false;
-        if (prev !== updateWorkspaceDto.aiSearch) {
-          before.aiSearch = prev;
-          after.aiSearch = updateWorkspaceDto.aiSearch;
-        }
-        await this.workspaceRepo.updateAiSettings(
-          workspaceId,
-          'search',
-          updateWorkspaceDto.aiSearch,
-          trx
-        );
-      }
-
-      if (typeof updateWorkspaceDto.generativeAi !== 'undefined') {
-        const prev = settingsBefore?.ai?.generative ?? false;
-        if (prev !== updateWorkspaceDto.generativeAi) {
-          before.generativeAi = prev;
-          after.generativeAi = updateWorkspaceDto.generativeAi;
-        }
-        await this.workspaceRepo.updateAiSettings(
-          workspaceId,
-          'generative',
-          updateWorkspaceDto.generativeAi,
-          trx
-        );
-      }
-
       if (typeof updateWorkspaceDto.disablePublicSharing !== 'undefined') {
         const prev = settingsBefore?.sharing?.disabled ?? false;
         if (prev !== updateWorkspaceDto.disablePublicSharing) {
@@ -465,20 +384,6 @@ export class WorkspaceService {
         }
       }
 
-      if (typeof updateWorkspaceDto.mcpEnabled !== 'undefined') {
-        const prev = settingsBefore?.ai?.mcp ?? false;
-        if (prev !== updateWorkspaceDto.mcpEnabled) {
-          before.mcpEnabled = prev;
-          after.mcpEnabled = updateWorkspaceDto.mcpEnabled;
-        }
-        await this.workspaceRepo.updateAiSettings(
-          workspaceId,
-          'mcp',
-          updateWorkspaceDto.mcpEnabled,
-          trx
-        );
-      }
-
       if (typeof updateWorkspaceDto.allowMemberTemplates !== 'undefined') {
         const prev = settingsBefore?.templates?.allowMemberTemplates ?? false;
         if (prev !== updateWorkspaceDto.allowMemberTemplates) {
@@ -489,65 +394,6 @@ export class WorkspaceService {
           workspaceId,
           'allowMemberTemplates',
           updateWorkspaceDto.allowMemberTemplates,
-          trx
-        );
-      }
-
-      if (typeof updateWorkspaceDto.aiChat !== 'undefined') {
-        const prev = settingsBefore?.ai?.chat ?? false;
-        if (prev !== updateWorkspaceDto.aiChat) {
-          before.aiChat = prev;
-          after.aiChat = updateWorkspaceDto.aiChat;
-        }
-        await this.workspaceRepo.updateAiSettings(
-          workspaceId,
-          'chat',
-          updateWorkspaceDto.aiChat,
-          trx
-        );
-      }
-
-      if (typeof updateWorkspaceDto.aiChatReadOnly !== 'undefined') {
-        const prev = settingsBefore?.ai?.chatReadOnly ?? false;
-        if (prev !== updateWorkspaceDto.aiChatReadOnly) {
-          before.aiChatReadOnly = prev;
-          after.aiChatReadOnly = updateWorkspaceDto.aiChatReadOnly;
-        }
-        await this.workspaceRepo.updateAiSettings(
-          workspaceId,
-          'chatReadOnly',
-          updateWorkspaceDto.aiChatReadOnly,
-          trx
-        );
-      }
-
-      if (
-        typeof updateWorkspaceDto.aiChatWorkspaceKnowledgeOnly !== 'undefined'
-      ) {
-        const prev = settingsBefore?.ai?.chatWorkspaceKnowledgeOnly ?? false;
-        if (prev !== updateWorkspaceDto.aiChatWorkspaceKnowledgeOnly) {
-          before.aiChatWorkspaceKnowledgeOnly = prev;
-          after.aiChatWorkspaceKnowledgeOnly =
-            updateWorkspaceDto.aiChatWorkspaceKnowledgeOnly;
-        }
-        await this.workspaceRepo.updateAiSettings(
-          workspaceId,
-          'chatWorkspaceKnowledgeOnly',
-          updateWorkspaceDto.aiChatWorkspaceKnowledgeOnly,
-          trx
-        );
-      }
-
-      if (typeof updateWorkspaceDto.enforceMcpOauth !== 'undefined') {
-        const prev = settingsBefore?.ai?.enforceMcpOauth ?? false;
-        if (prev !== updateWorkspaceDto.enforceMcpOauth) {
-          before.enforceMcpOauth = prev;
-          after.enforceMcpOauth = updateWorkspaceDto.enforceMcpOauth;
-        }
-        await this.workspaceRepo.updateAiSettings(
-          workspaceId,
-          'enforceMcpOauth',
-          updateWorkspaceDto.enforceMcpOauth,
           trx
         );
       }
@@ -581,17 +427,10 @@ export class WorkspaceService {
       }
 
       delete updateWorkspaceDto.restrictApiToAdmins;
-      delete updateWorkspaceDto.aiSearch;
-      delete updateWorkspaceDto.generativeAi;
       delete updateWorkspaceDto.disablePublicSharing;
-      delete updateWorkspaceDto.mcpEnabled;
       delete updateWorkspaceDto.allowMemberTemplates;
-      delete updateWorkspaceDto.aiChat;
       delete updateWorkspaceDto.allowPersonalSpaces;
       delete updateWorkspaceDto.defaultPageEditMode;
-      delete updateWorkspaceDto.aiChatReadOnly;
-      delete updateWorkspaceDto.aiChatWorkspaceKnowledgeOnly;
-      delete updateWorkspaceDto.enforceMcpOauth;
 
       await this.workspaceRepo.updateWorkspace(
         updateWorkspaceDto,
@@ -599,24 +438,6 @@ export class WorkspaceService {
         trx
       );
     });
-
-    if (after.aiSearch === true) {
-      await this.aiQueue.add(QueueJob.WORKSPACE_CREATE_EMBEDDINGS, {
-        workspaceId
-      });
-    } else if (after.aiSearch === false) {
-      const deleteJobId = `ai-search-disabled-${workspaceId}`;
-      await this.aiQueue.add(
-        QueueJob.WORKSPACE_DELETE_EMBEDDINGS,
-        { workspaceId },
-        {
-          jobId: deleteJobId,
-          delay: 24 * 60 * 60 * 1000,
-          removeOnComplete: true,
-          removeOnFail: true
-        }
-      );
-    }
 
     const workspace = await this.workspaceRepo.findById(workspaceId, {
       withMemberCount: true

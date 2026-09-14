@@ -8,12 +8,12 @@ import {
   IconItalic,
   IconStrikethrough,
   IconUnderline,
-  IconMessage,
-  IconSparkles
+  IconMessage
 } from '@tabler/icons-react';
 import clsx from 'clsx';
+import { useTranslation } from 'react-i18next';
 import classes from './bubble-menu.module.css';
-import { ActionIcon, Button, rem, Tooltip } from '@mantine/core';
+import { ActionIcon, rem, Tooltip } from '@mantine/core';
 import { ColorSelector } from './color-selector';
 import { NodeSelector } from './node-selector';
 import { TextAlignmentSelector } from './text-alignment-selector';
@@ -29,15 +29,8 @@ import {
   isTextSelected
 } from '@docmost/editor-ext';
 import { LinkSelector } from '@/features/editor/components/bubble-menu/link-selector.tsx';
-import { useTranslation } from 'react-i18next';
-import {
-  showAiMenuAtom,
-  showLinkMenuAtom
-} from '@/features/editor/atoms/editor-atoms';
-import {
-  userAtom,
-  workspaceAtom
-} from '@/features/user/atoms/current-user-atom';
+import { showLinkMenuAtom } from '@/features/editor/atoms/editor-atoms';
+import { userAtom } from '@/features/user/atoms/current-user-atom';
 
 export interface BubbleMenuItem {
   name: string;
@@ -54,26 +47,18 @@ type EditorBubbleMenuProps = Omit<BubbleMenuProps, 'children' | 'editor'> & {
 export const EditorBubbleMenu: FC<EditorBubbleMenuProps> = (props) => {
   const { templateMode = false } = props;
   const { t } = useTranslation();
-  const [showAiMenu, setShowAiMenu] = useAtom(showAiMenuAtom);
   const [showCommentPopup, setShowCommentPopup] = useAtom(showCommentPopupAtom);
-  const workspace = useAtomValue(workspaceAtom);
-  const isGenerativeAiEnabled = workspace?.settings?.ai?.generative === true;
   const user = useAtomValue(userAtom);
   const editorToolbarEnabled =
     user?.settings?.preferences?.editorToolbar ?? false;
   const [, setDraftCommentId] = useAtom(draftCommentIdAtom);
   const showCommentPopupRef = useRef(showCommentPopup);
-  const showAiMenuRef = useRef(showAiMenu);
   const [showLinkMenu] = useAtom(showLinkMenuAtom);
   const showLinkMenuRef = useRef(showLinkMenu);
 
   useEffect(() => {
     showCommentPopupRef.current = showCommentPopup;
   }, [showCommentPopup]);
-
-  useEffect(() => {
-    showAiMenuRef.current = showAiMenu;
-  }, [showAiMenu]);
 
   useEffect(() => {
     showLinkMenuRef.current = showLinkMenu;
@@ -155,7 +140,6 @@ export const EditorBubbleMenu: FC<EditorBubbleMenuProps> = (props) => {
         empty ||
         isNodeSelection(selection) ||
         isCellSelection(selection) ||
-        showAiMenuRef.current ||
         showLinkMenuRef.current ||
         showCommentPopupRef?.current
       ) {
@@ -179,7 +163,7 @@ export const EditorBubbleMenu: FC<EditorBubbleMenuProps> = (props) => {
   const [isColorSelectorOpen, setIsColorSelectorOpen] = useState(false);
 
   // Hide the bubble menu immediately when AI menu is shown
-  if (showAiMenu || showLinkMenu) return;
+  if (showLinkMenu) return;
 
   return (
     <BubbleMenu
@@ -187,22 +171,6 @@ export const EditorBubbleMenu: FC<EditorBubbleMenuProps> = (props) => {
       style={{ zIndex: 199, position: 'relative' }}
     >
       <div className={classes.bubbleMenu}>
-        {isGenerativeAiEnabled && (
-          <>
-            <Button
-              variant="default"
-              className={clsx(classes.buttonRoot)}
-              radius="0"
-              leftSection={<IconSparkles size={16} />}
-              onClick={() => {
-                setShowAiMenu(true);
-              }}
-            >
-              {t('Ask AI')}
-            </Button>
-            <div className={classes.divider} />
-          </>
-        )}
         {!editorToolbarEnabled && (
           <>
             <NodeSelector

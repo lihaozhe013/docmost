@@ -194,25 +194,16 @@ export class AttachmentController {
       throw new NotFoundException();
     }
 
-    if (attachment.aiChatId) {
-      // Chat-owned attachment: only the user who uploaded (and therefore
-      // owns the chat, per AttachmentRepo.claimAttachmentsForChat) can
-      // read it back.
-      if (attachment.creatorId !== user.id) {
-        throw new NotFoundException();
-      }
-    } else {
-      if (!attachment.pageId || !attachment.spaceId) {
-        throw new NotFoundException();
-      }
-
-      const page = await this.pageRepo.findById(attachment.pageId);
-      if (!page) {
-        throw new NotFoundException();
-      }
-
-      await this.pageAccessService.validateCanView(page, user);
+    if (!attachment.pageId || !attachment.spaceId) {
+      throw new NotFoundException();
     }
+
+    const page = await this.pageRepo.findById(attachment.pageId);
+    if (!page) {
+      throw new NotFoundException();
+    }
+
+    await this.pageAccessService.validateCanView(page, user);
 
     try {
       return await this.sendFileResponse(req, res, attachment, 'private');

@@ -1,7 +1,5 @@
 import {
   ActionIcon,
-  Badge,
-  Box,
   Button,
   Divider,
   Group,
@@ -11,7 +9,8 @@ import {
   Stack,
   Text,
   Textarea,
-  Tooltip
+  Tooltip,
+  Box
 } from '@mantine/core';
 import {
   IconAlertTriangle,
@@ -39,7 +38,8 @@ import {
 import { getError, messageId } from './ai-page-editing-utils';
 import type { PendingImage } from './ai-page-editing-types';
 import { useAiPageEditingRun } from './use-ai-page-editing-run';
-import { MarkdownContent } from '@/components/common/markdown-content';
+import { MessageList } from './message-list';
+import { RunStatus } from './run-status';
 import classes from './ai-page-editing-panel.module.css';
 
 export function AiPageEditingPanel({
@@ -61,6 +61,8 @@ export function AiPageEditingPanel({
   const {
     messages,
     running,
+    phase,
+    tokenEstimate,
     latestChangeId,
     latestAffectedBlockId,
     startRun,
@@ -211,7 +213,6 @@ export function AiPageEditingPanel({
             <Group gap="xs">
               <IconSparkles size={18} />
               <Text fw={600}>Page AI</Text>
-              {running && <Badge size="xs">Working</Badge>}
             </Group>
             <Group gap={4}>
               <Tooltip label="New session">
@@ -241,47 +242,18 @@ export function AiPageEditingPanel({
                   the open editor.
                 </Text>
               )}
-              {messages.map((message) => (
-                <div key={message.id}>
-                  <Text size="xs" c="dimmed" mb={2}>
-                    {message.role === 'user'
-                      ? 'You'
-                      : message.role === 'assistant'
-                        ? 'Page AI'
-                        : 'Tool'}
-                  </Text>
-                  {message.role === 'user' && message.images?.length ? (
-                    <Group gap={4} mb={2}>
-                      {message.images.map((image) => (
-                        <img
-                          key={image.attachmentId}
-                          src={image.url}
-                          alt={image.fileName}
-                          title={image.fileName}
-                          className={classes.bubbleImage}
-                        />
-                      ))}
-                    </Group>
-                  ) : null}
-                  {message.role === 'assistant' ? (
-                    <MarkdownContent
-                      content={message.content}
-                      className={classes.markdownMessage}
-                    />
-                  ) : (
-                    <Text
-                      size="sm"
-                      className={
-                        message.role === 'tool' ? classes.tool : classes.message
-                      }
-                    >
-                      {message.content}
-                    </Text>
-                  )}
-                </div>
-              ))}
+              <MessageList
+                messages={messages}
+                running={running}
+                phase={phase}
+              />
             </Stack>
           </ScrollArea>
+          {running && (
+            <Box mt="xs" flex="none">
+              <RunStatus phase={phase} tokenEstimate={tokenEstimate} />
+            </Box>
+          )}
           {pendingImages.length > 0 && (
             <Group gap="xs" mt="sm" wrap="nowrap">
               {pendingImages.map((image) => (

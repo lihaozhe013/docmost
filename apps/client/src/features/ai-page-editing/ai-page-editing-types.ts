@@ -1,11 +1,37 @@
 import type { BrowserToolResult } from './document-buffer';
 
+export type AiRunUsage = {
+  inputTokens?: number;
+  outputTokens?: number;
+  totalTokens?: number;
+};
+
+export type ToolStepStatus = 'running' | 'done' | 'error';
+
+export type ToolStep = {
+  toolName: string;
+  status: ToolStepStatus;
+  summary?: string;
+  error?: string;
+};
+
 export type ChatMessage = {
   id: string;
   role: 'user' | 'assistant' | 'tool';
   content: string;
   images?: ChatMessageImage[];
+  toolStep?: ToolStep;
+  meta?: { usage?: AiRunUsage; elapsedMs?: number };
 };
+
+export type RunPhase =
+  | 'idle'
+  | 'thinking'
+  | 'reading'
+  | 'editing'
+  | 'inserting'
+  | 'applying'
+  | 'generating';
 
 export type ChatMessageImage = {
   attachmentId: string;
@@ -35,6 +61,7 @@ export type EditingEvent = {
   toolCallId?: string;
   input?: unknown;
   output?: unknown;
+  usage?: AiRunUsage;
   error?: { code?: string; message: string; details?: unknown };
 };
 

@@ -7,6 +7,7 @@ import type {
   ChatMessage,
   ChatMessageImage,
   EditingEvent,
+  RunPhase,
   ToolRequest,
   ToolResponse
 } from './ai-page-editing-types';
@@ -20,6 +21,7 @@ import {
   messageId,
   rememberCancelledRun
 } from './ai-page-editing-utils';
+import { estimateTokens, toolPhase } from './ai-page-editing-run-status';
 
 /**
  * Owns the Page AI run protocol: adapter lifecycle, socket event reduction,
@@ -39,6 +41,8 @@ export function useAiPageEditingRun({
   onShowPanel: () => void;
 }) {
   const [running, setRunning] = useState(false);
+  const [phase, setPhase] = useState<RunPhase>('idle');
+  const [tokenEstimate, setTokenEstimate] = useState(0);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [latestChangeId, setLatestChangeId] = useState<string | null>(null);
   const [latestAffectedBlockId, setLatestAffectedBlockId] = useState<
@@ -48,6 +52,7 @@ export function useAiPageEditingRun({
   const runIdRef = useRef<string | null>(null);
   const messagesRef = useRef(messages);
   const assistantMessageIdRef = useRef<string | null>(null);
+  const runStartedAtRef = useRef<number | null>(null);
   const toolResultsRef = useRef(new Map<string, ToolResponse>());
   const toolPromisesRef = useRef(new Map<string, Promise<ToolResponse>>());
   const lastSequenceRef = useRef(0);
@@ -129,12 +134,20 @@ export function useAiPageEditingRun({
         runAbortRef.current = new AbortController();
         runIdRef.current = raw.runId;
         assistantMessageIdRef.current = null;
+        runStartedAtRef.current = Date.now();
         toolResultsRef.current.clear();
         toolPromisesRef.current.clear();
         setRunning(true);
+        setPhase('thinking');
+        setTokenEstimate(0);
         return;
       }
       if (raw.event === 'text.delta') {
+        const delta = raw.text || '';
+        setPhase('generating');
+        if (delta) {
+          setTokenEstimate((current) => current + estimateTokens(delta));
+        }
         setMessages((current) => {
           const last = current[current.length - 1];
           if (
@@ -143,25 +156,38 @@ export function useAiPageEditingRun({
           ) {
             return [
               ...current.slice(0, -1),
-              { ...last, content: last.content + (raw.text || '') }
+              { ...last, content: last.content + delta }
             ];
           }
           const id = `assistant:${messageId()}`;
           assistantMessageIdRef.current = id;
-          return [
-            ...current,
-            { id, role: 'assistant', content: raw.text || '' }
-          ];
+          return [...current, { id, role: 'assistant', content: delta }];
         });
         return;
       }
       if (raw.event === 'tool.started') {
+        setPhase(toolPhase(raw.toolName));
+        // Tool arguments are model output too, so they count toward the live
+        // estimate; otherwise tool-heavy runs would show no tokens at all.
+        const inputText =
+          typeof raw.input === 'string'
+            ? raw.input
+            : raw.input
+              ? JSON.stringify(raw.input)
+              : '';
+        if (inputText) {
+          setTokenEstimate((current) => current + estimateTokens(inputText));
+        }
         setMessages((current) => [
           ...current,
           {
             id: `tool:${raw.toolCallId || messageId()}`,
             role: 'tool',
-            content: `Running ${raw.toolName || 'document tool'}…`
+            content: '',
+            toolStep: {
+              toolName: raw.toolName || 'document_tool',
+              status: 'running'
+            }
           }
         ]);
         return;
@@ -174,16 +200,20 @@ export function useAiPageEditingRun({
         }
         const toolError = getToolError(raw.output);
         const error = raw.error || toolError;
+        setPhase(error ? 'thinking' : 'applying');
         setMessages((current) =>
           current.map((item) =>
             item.id === `tool:${raw.toolCallId}`
               ? {
                   ...item,
                   content: error
-                    ? `${raw.toolName || 'Document tool'} failed: ${formatDisplayedError(error)}`
-                    : change.summary
-                      ? `${raw.toolName || 'Document tool'} applied: ${change.summary}`
-                      : `${raw.toolName || 'Document tool'} completed`
+                    ? formatDisplayedError(error)
+                    : (change.summary ?? ''),
+                  toolStep: {
+                    toolName: raw.toolName || item.toolStep?.toolName || '',
+                    status: error ? 'error' : 'done',
+                    ...(change.summary ? { summary: change.summary } : {})
+                  }
                 }
               : item
           )
@@ -197,23 +227,44 @@ export function useAiPageEditingRun({
       ) {
         pendingStartRef.current = false;
         cancelledPendingStartRef.current = false;
-        if (
-          raw.event === 'run.completed' &&
-          raw.text &&
-          !assistantMessageIdRef.current
-        ) {
-          setMessages((current) => [
-            ...current,
-            {
-              id: `assistant:${messageId()}`,
-              role: 'assistant',
-              content: raw.text
-            }
-          ]);
+        if (raw.event === 'run.completed') {
+          const elapsedMs =
+            runStartedAtRef.current !== null
+              ? Date.now() - runStartedAtRef.current
+              : undefined;
+          const finalText = raw.text || '';
+          const meta = {
+            ...(raw.usage ? { usage: raw.usage } : {}),
+            ...(elapsedMs !== undefined ? { elapsedMs } : {})
+          };
+          const hasMeta = Object.keys(meta).length > 0;
+          if (finalText && !assistantMessageIdRef.current) {
+            const id = `assistant:${messageId()}`;
+            assistantMessageIdRef.current = id;
+            setMessages((current) => [
+              ...current,
+              {
+                id,
+                role: 'assistant',
+                content: finalText,
+                ...(hasMeta ? { meta } : {})
+              }
+            ]);
+          } else if (hasMeta && assistantMessageIdRef.current) {
+            const targetId = assistantMessageIdRef.current;
+            setMessages((current) =>
+              current.map((item) =>
+                item.id === targetId ? { ...item, meta } : item
+              )
+            );
+          }
         }
         runAbortRef.current?.abort();
         runAbortRef.current = null;
         setRunning(false);
+        setPhase('idle');
+        setTokenEstimate(0);
+        runStartedAtRef.current = null;
         runIdRef.current = null;
         assistantMessageIdRef.current = null;
         if (raw.event !== 'run.completed' && raw.error?.message) {
@@ -244,9 +295,12 @@ export function useAiPageEditingRun({
       }
       runIdRef.current = null;
       assistantMessageIdRef.current = null;
+      runStartedAtRef.current = null;
       toolPromisesRef.current.clear();
       lastSequenceRef.current = 0;
       setRunning(false);
+      setPhase('idle');
+      setTokenEstimate(0);
     };
 
     socket.on('message', handleMessage);
@@ -267,6 +321,8 @@ export function useAiPageEditingRun({
         toolPromisesRef.current.clear();
         lastSequenceRef.current = 0;
         setRunning(false);
+        setPhase('idle');
+        setTokenEstimate(0);
       } else {
         pendingStartRef.current = false;
         cancelledPendingStartRef.current = false;
@@ -359,7 +415,10 @@ export function useAiPageEditingRun({
       runId: runIdRef.current
     });
     runIdRef.current = null;
+    runStartedAtRef.current = null;
     setRunning(false);
+    setPhase('idle');
+    setTokenEstimate(0);
   }, [enabled, socket]);
 
   useEffect(() => {
@@ -374,7 +433,10 @@ export function useAiPageEditingRun({
     });
     runIdRef.current = null;
     assistantMessageIdRef.current = null;
+    runStartedAtRef.current = null;
     setRunning(false);
+    setPhase('idle');
+    setTokenEstimate(0);
   }, [editor, pageId, socket]);
 
   const appendToolMessage = useCallback((content: string) => {
@@ -435,6 +497,9 @@ export function useAiPageEditingRun({
       }
     ]);
     setRunning(true);
+    setPhase('thinking');
+    setTokenEstimate(0);
+    runStartedAtRef.current = Date.now();
     pendingStartRef.current = true;
     cancelledPendingStartRef.current = false;
     socket.emit('message', {
@@ -478,12 +543,15 @@ export function useAiPageEditingRun({
     }
     runIdRef.current = null;
     assistantMessageIdRef.current = null;
+    runStartedAtRef.current = null;
     toolResultsRef.current.clear();
     toolPromisesRef.current.clear();
     lastSequenceRef.current = 0;
     messagesRef.current = [];
     setMessages([]);
     setRunning(false);
+    setPhase('idle');
+    setTokenEstimate(0);
     setLatestChangeId(null);
     setLatestAffectedBlockId(null);
   };
@@ -514,6 +582,8 @@ export function useAiPageEditingRun({
   return {
     messages,
     running,
+    phase,
+    tokenEstimate,
     latestChangeId,
     latestAffectedBlockId,
     startRun,

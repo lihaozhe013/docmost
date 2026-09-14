@@ -380,4 +380,126 @@ describe('AiPageEditingPanel', () => {
       })
     );
   });
+
+  it('shows the live run status with phase verbs and token estimates', () => {
+    const { emitMessage } = renderPanel();
+    const input = screen.getByPlaceholderText('Ask Page AI…');
+
+    fireEvent.change(input, { target: { value: 'Polish this page' } });
+    fireEvent.click(screen.getByLabelText('Send to Page AI'));
+    expect(screen.getByText('Thinking…')).toBeTruthy();
+
+    emitMessage({
+      operation: 'aiPageEditing.event',
+      sessionId: SOCKET_ID,
+      pageId: PAGE_ID,
+      runId: 'run-status-1',
+      event: 'run.started'
+    });
+    emitMessage({
+      operation: 'aiPageEditing.event',
+      sessionId: SOCKET_ID,
+      pageId: PAGE_ID,
+      runId: 'run-status-1',
+      event: 'text.delta',
+      text: 'Rewrite me now'
+    });
+
+    expect(screen.getByText('Generating…')).toBeTruthy();
+    expect(screen.getByText('~4 tokens')).toBeTruthy();
+
+    emitMessage({
+      operation: 'aiPageEditing.event',
+      sessionId: SOCKET_ID,
+      pageId: PAGE_ID,
+      runId: 'run-status-1',
+      event: 'run.completed',
+      usage: { inputTokens: 1200, outputTokens: 300, totalTokens: 1500 }
+    });
+
+    expect(screen.queryByText('Generating…')).toBeNull();
+    expect(screen.queryByText('~4 tokens')).toBeNull();
+    expect(screen.getByText(/1\.5k tokens/)).toBeTruthy();
+  });
+
+  it('renders tool steps as live rows that update on completion', () => {
+    const { emitMessage } = renderPanel();
+    const input = screen.getByPlaceholderText('Ask Page AI…');
+
+    fireEvent.change(input, { target: { value: 'Fix the table' } });
+    fireEvent.click(screen.getByLabelText('Send to Page AI'));
+    emitMessage({
+      operation: 'aiPageEditing.event',
+      sessionId: SOCKET_ID,
+      pageId: PAGE_ID,
+      runId: 'run-tool-1',
+      event: 'run.started'
+    });
+    emitMessage({
+      operation: 'aiPageEditing.event',
+      sessionId: SOCKET_ID,
+      pageId: PAGE_ID,
+      runId: 'run-tool-1',
+      event: 'tool.started',
+      toolCallId: 'call-a',
+      toolName: 'edit_buffer',
+      input: '{"operations":[{"type":"replace_text"}]}'
+    });
+
+    expect(screen.getAllByText('Editing the page…').length).toBe(2);
+    expect(screen.getByText(/tokens/)).toBeTruthy();
+    expect(screen.getByText(/0s$/)).toBeTruthy();
+
+    emitMessage({
+      operation: 'aiPageEditing.event',
+      sessionId: SOCKET_ID,
+      pageId: PAGE_ID,
+      runId: 'run-tool-1',
+      event: 'tool.completed',
+      toolCallId: 'call-a',
+      toolName: 'edit_buffer',
+      output: { ok: true, result: { changeId: 'change-a' } }
+    });
+
+    expect(screen.getByText('Applied edits')).toBeTruthy();
+    expect(screen.getByText('Applying changes…')).toBeTruthy();
+    expect(screen.queryAllByText('Editing the page…')).toHaveLength(0);
+  });
+
+  it('surfaces tool failures in the step row', () => {
+    const { emitMessage } = renderPanel();
+    const input = screen.getByPlaceholderText('Ask Page AI…');
+
+    fireEvent.change(input, { target: { value: 'Insert a diagram' } });
+    fireEvent.click(screen.getByLabelText('Send to Page AI'));
+    emitMessage({
+      operation: 'aiPageEditing.event',
+      sessionId: SOCKET_ID,
+      pageId: PAGE_ID,
+      runId: 'run-tool-2',
+      event: 'run.started'
+    });
+    emitMessage({
+      operation: 'aiPageEditing.event',
+      sessionId: SOCKET_ID,
+      pageId: PAGE_ID,
+      runId: 'run-tool-2',
+      event: 'tool.started',
+      toolCallId: 'call-b',
+      toolName: 'insert_blocks'
+    });
+    emitMessage({
+      operation: 'aiPageEditing.event',
+      sessionId: SOCKET_ID,
+      pageId: PAGE_ID,
+      runId: 'run-tool-2',
+      event: 'tool.completed',
+      toolCallId: 'call-b',
+      toolName: 'insert_blocks',
+      error: { code: 'INVALID_CONTENT', message: 'bad markdown' }
+    });
+
+    expect(screen.getByText('Insert failed')).toBeTruthy();
+    expect(screen.getByText('[INVALID_CONTENT] bad markdown')).toBeTruthy();
+  });
 });

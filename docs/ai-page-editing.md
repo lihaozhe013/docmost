@@ -188,13 +188,15 @@ specifications. This document defines the behavior required by Docmost.
 
 ### 5.1 Responses API configuration
 
-Page editing is configured with three server-only environment variables:
+Page editing is configured with three required and two optional server-only environment variables:
 
 | Variable     | Meaning                                                                                |
 | ------------ | -------------------------------------------------------------------------------------- |
 | `AI_API_URL` | Provider base URL or complete Responses endpoint, such as `https://api.openai.com/v1`. |
 | `AI_API_KEY` | Bearer credential sent only by the server.                                             |
 | `AI_MODEL`   | Model identifier accepted by the configured endpoint.                                  |
+| `AI_REASONING_EFFORT` | Optional Responses reasoning effort: `none`, `minimal`, `low`, `medium`, `high`, `xhigh`, or `max`. |
+| `AI_TEXT_VERBOSITY` | Optional Responses text verbosity: `low`, `medium`, or `high`. |
 
 All three values must be set to enable page editing. The URL is used exactly as configured when it
 already ends in `/responses`; otherwise the server resolves the Responses endpoint before sending a
@@ -204,7 +206,18 @@ rewritten to the corresponding `/responses` path. The resolver does not send pro
 a 404. Requests use `stream: true`, `store: false`, and include encrypted reasoning content so the
 stateless tool loop can replay reasoning items on the next request. The configured service must
 support standard Responses streaming and function calling. Chat Completions-only services are
-outside the supported contract.
+outside the supported contract. Empty optional values are omitted from the request; non-empty
+invalid values fail environment validation at startup. Reasoning summaries are not sent to the
+browser.
+
+The Page AI toolbar exposes a Web Search toggle, which is off by default and is remembered only
+for the current panel session. When enabled, the server adds the Responses hosted `web_search`
+tool and lets the model decide whether to call it; it does not force a search. Search output is
+treated as untrusted data, and the UI shows search status, clickable inline citations, and a
+deduplicated source list. Web Search can result in additional provider tool-call charges, and the
+selected model/provider must support the Responses Web Search tool and the configured parameters.
+Closing the panel keeps the toggle, while a new session or page resets it. Reasoning is controlled
+only by the server environment variables and is never exposed as a user setting.
 
 For example, these configurations resolve to the provider endpoints shown:
 
@@ -563,6 +576,13 @@ Define application-owned messages for:
 - Tool requests and tool results.
 - Run completion, failure, and stopping.
 
+Runs also emit `run.status` events with one of `thinking`, `web-searching`, `reading`, `editing`,
+`inserting`, or `writing`. The client uses these events as the source of truth for its status bar;
+text and tool events do not infer a phase. A completed run may include structured URL citations
+(`startIndex`, `endIndex`, `url`, and `title`) alongside the raw assistant text. The browser keeps
+that raw text for history and adds safe, clickable markers and a deduplicated source list only when
+rendering the message.
+
 Every run-scoped outbound event and tool request carries the owning Socket.IO session ID and page
 ID; run events carry a run ID and tool requests carry a tool-call ID. The host adds a monotonic
 sequence number to outbound messages within a run for ordered UI processing. Sequence numbers do not
@@ -854,6 +874,8 @@ should be added only with corresponding tool contracts, consistency rules, and a
   function definitions, call arguments, and tool outputs.
 - [Responses API streaming](https://developers.openai.com/api/docs/guides/streaming-responses):
   streamed text and function-call event handling.
+- [Responses API Web Search](https://developers.openai.com/api/docs/guides/tools-web-search):
+  hosted search tools, streaming events, and user-facing citation requirements.
 - [Responses API migration guide](https://developers.openai.com/api/docs/guides/migrate-to-responses):
   replaying output and encrypted reasoning items with `store: false`.
 - [Pi agent core](https://github.com/earendil-works/pi/tree/main/packages/agent): independent agent

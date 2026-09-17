@@ -203,6 +203,16 @@ export class EnvironmentService {
     return this.configService.get<string>('AI_MODEL');
   }
 
+  getAiReasoningEffort(): string | undefined {
+    const value = this.configService.get<string>('AI_REASONING_EFFORT')?.trim();
+    return value || undefined;
+  }
+
+  getAiTextVerbosity(): string | undefined {
+    const value = this.configService.get<string>('AI_TEXT_VERBOSITY')?.trim();
+    return value || undefined;
+  }
+
   getEventStoreDriver(): string {
     return this.configService.get<string>('EVENT_STORE_DRIVER', 'postgres').toLowerCase();
   }

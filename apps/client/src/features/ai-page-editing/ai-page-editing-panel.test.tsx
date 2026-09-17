@@ -369,6 +369,37 @@ describe('AiPageEditingPanel', () => {
     );
   });
 
+  it('keeps the web-search choice in a session and disables it while running', () => {
+    const { socket, emitMessage } = renderPanel();
+    const toggle = screen.getByLabelText('Enable web search');
+    expect(toggle.getAttribute('aria-pressed')).toBe('false');
+
+    fireEvent.click(toggle);
+    expect(screen.getByLabelText('Disable web search').getAttribute('aria-pressed')).toBe('true');
+    fireEvent.click(screen.getByLabelText('Close Page AI'));
+    fireEvent.click(screen.getByLabelText('Open Page AI'));
+    expect(screen.getByLabelText('Disable web search').getAttribute('aria-pressed')).toBe('true');
+
+    fireEvent.change(screen.getByPlaceholderText('Ask Page AI…'), {
+      target: { value: 'Search this page' }
+    });
+    fireEvent.click(screen.getByLabelText('Send to Page AI'));
+    expect(socket.emit).toHaveBeenCalledWith(
+      'message',
+      expect.objectContaining({ operation: 'aiPageEditing.start', webSearch: true })
+    );
+    emitMessage({
+      operation: 'aiPageEditing.event',
+      sessionId: SOCKET_ID,
+      pageId: PAGE_ID,
+      runId: 'run-search-1',
+      event: 'run.started'
+    });
+    expect((screen.getByLabelText('Disable web search') as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(screen.getByLabelText('New session'));
+    expect(screen.getByLabelText('Enable web search').getAttribute('aria-pressed')).toBe('false');
+  });
+
   it('shows the live run status with phase verbs and token estimates', () => {
     const { emitMessage } = renderPanel();
     const input = screen.getByPlaceholderText('Ask Page AI…');
@@ -389,11 +420,19 @@ describe('AiPageEditingPanel', () => {
       sessionId: SOCKET_ID,
       pageId: PAGE_ID,
       runId: 'run-status-1',
+      event: 'run.status',
+      status: 'writing'
+    });
+    emitMessage({
+      operation: 'aiPageEditing.event',
+      sessionId: SOCKET_ID,
+      pageId: PAGE_ID,
+      runId: 'run-status-1',
       event: 'text.delta',
       text: 'Rewrite me now'
     });
 
-    expect(screen.getByText('Generating…')).toBeTruthy();
+    expect(screen.getByText('Writing…')).toBeTruthy();
     expect(screen.getByText('~4 tokens')).toBeTruthy();
 
     emitMessage({
@@ -405,7 +444,7 @@ describe('AiPageEditingPanel', () => {
       usage: { inputTokens: 1200, outputTokens: 300, totalTokens: 1500 }
     });
 
-    expect(screen.queryByText('Generating…')).toBeNull();
+    expect(screen.queryByText('Writing…')).toBeNull();
     expect(screen.queryByText('~4 tokens')).toBeNull();
     expect(screen.getByText(/1\.5k tokens/)).toBeTruthy();
   });
@@ -422,6 +461,14 @@ describe('AiPageEditingPanel', () => {
       pageId: PAGE_ID,
       runId: 'run-tool-1',
       event: 'run.started'
+    });
+    emitMessage({
+      operation: 'aiPageEditing.event',
+      sessionId: SOCKET_ID,
+      pageId: PAGE_ID,
+      runId: 'run-tool-1',
+      event: 'run.status',
+      status: 'editing'
     });
     emitMessage({
       operation: 'aiPageEditing.event',
@@ -450,8 +497,7 @@ describe('AiPageEditingPanel', () => {
     });
 
     expect(screen.getByText('Applied edits')).toBeTruthy();
-    expect(screen.getByText('Applying changes…')).toBeTruthy();
-    expect(screen.queryAllByText('Editing the page…')).toHaveLength(0);
+    expect(screen.getAllByText('Editing the page…').length).toBe(1);
   });
 
   it('surfaces tool failures in the step row', () => {

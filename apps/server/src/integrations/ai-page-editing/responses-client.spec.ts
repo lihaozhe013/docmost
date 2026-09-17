@@ -168,6 +168,100 @@ describe('OpenAiResponsesHttpClient', () => {
       store: false,
       include: ['reasoning.encrypted_content']
     });
+    expect(body.tool_choice).toBe('auto');
+    expect(body.reasoning).toBeUndefined();
+    expect(body.text).toBeUndefined();
+  });
+
+  it('sends optional tuning and reports deduplicated web-search activity and citations', async () => {
+    const outputText = {
+      type: 'message',
+      role: 'assistant',
+      content: [
+        {
+          type: 'output_text',
+          text: 'Fact',
+          annotations: [
+            {
+              type: 'url_citation',
+              start_index: 0,
+              end_index: 4,
+              url: 'https://example.com/fact',
+              title: 'Fact source'
+            }
+          ]
+        }
+      ]
+    };
+    const events = [
+      sseEvent({
+        type: 'response.output_item.added',
+        output_index: 0,
+        item: { type: 'reasoning' }
+      }),
+      sseEvent({ type: 'response.web_search_call.in_progress', item_id: 'ws-1' }),
+      sseEvent({ type: 'response.web_search_call.searching', item_id: 'ws-1' }),
+      sseEvent({ type: 'response.reasoning_summary_text.delta', delta: 'hidden' }),
+      sseEvent({ type: 'response.web_search_call.completed', item_id: 'ws-1' }),
+      sseEvent({ type: 'response.output_text.delta', delta: 'Fact' }),
+      sseEvent({
+        type: 'response.completed',
+        response: {
+          id: 'resp-web-1',
+          output: [{ type: 'web_search_call', id: 'ws-1' }, outputText]
+        }
+      })
+    ];
+    const fetchMock = jest.fn() as jest.MockedFunction<typeof fetch>;
+    fetchMock.mockResolvedValue(responseWithChunks(events));
+    globalThis.fetch = fetchMock;
+    const statuses: string[] = [];
+    const activity: string[] = [];
+    const client = new OpenAiResponsesHttpClient('https://example.test', 'secret-key');
+
+    const result = await client.stream({
+      model: 'test-model',
+      instructions: 'Use the tools',
+      input: [{ role: 'user', content: 'Search this' }],
+      tools: [
+        {
+          type: 'function',
+          name: 'read_buffer',
+          description: 'Read the page',
+          parameters: { type: 'object' },
+          strict: false
+        },
+        { type: 'web_search' }
+      ],
+      reasoningEffort: 'high',
+      textVerbosity: 'low',
+      signal: new AbortController().signal,
+      onStatus: (status) => {
+        statuses.push(status);
+      },
+      onHostedToolActivity: (event) => {
+        activity.push(`${event.status}:${event.toolCallId}`);
+      }
+    });
+
+    expect(statuses).toEqual(['thinking', 'web-searching', 'thinking', 'writing']);
+    expect(activity).toEqual(['started:ws-1', 'completed:ws-1']);
+    expect(result.text).toBe('Fact');
+    expect(result.citations).toEqual([
+      {
+        startIndex: 0,
+        endIndex: 4,
+        url: 'https://example.com/fact',
+        title: 'Fact source'
+      }
+    ]);
+    const body = JSON.parse(String((fetchMock.mock.calls[0]?.[1] as RequestInit).body));
+    expect(body.tools).toEqual([
+      expect.objectContaining({ type: 'function' }),
+      { type: 'web_search' }
+    ]);
+    expect(body.reasoning).toEqual({ effort: 'high' });
+    expect(body.text).toEqual({ verbosity: 'low' });
   });
 
   it('rejects HTTP failures and incomplete streams', async () => {

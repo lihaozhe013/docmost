@@ -263,4 +263,60 @@ describe('AgentRuntime', () => {
       ]
     });
   });
+
+  it('adds web search without exposing reasoning content and accumulates citations', async () => {
+    let capturedTools: unknown;
+    const events: string[] = [];
+    const client: ResponsesApiClient = {
+      stream: async (options) => {
+        capturedTools = options.tools;
+        await options.onStatus?.('web-searching');
+        await options.onHostedToolActivity?.({
+          status: 'started',
+          toolName: 'web_search',
+          toolCallId: 'ws-1'
+        });
+        await options.onHostedToolActivity?.({
+          status: 'completed',
+          toolName: 'web_search',
+          toolCallId: 'ws-1'
+        });
+        await options.onTextDelta?.('Fact');
+        return {
+          text: 'Fact',
+          output: [{ type: 'web_search_call', id: 'ws-1' }],
+          functionCalls: [],
+          citations: [{ startIndex: 0, endIndex: 4, url: 'https://example.com', title: 'Example' }]
+        };
+      }
+    };
+
+    const result = await new AgentRuntime().run({
+      client,
+      model: 'test-model',
+      system: 'Search safely',
+      prompt: 'Find a fact',
+      tools: {},
+      webSearch: true,
+      signal: new AbortController().signal,
+      onEvent: async (event) => {
+        if (event.type === 'status') events.push(`status:${event.status}`);
+        if (event.type === 'tool-start') events.push(`start:${event.toolName}`);
+        if (event.type === 'tool-result') events.push(`done:${event.toolName}`);
+      }
+    });
+
+    expect(capturedTools).toEqual([{ type: 'web_search' }]);
+    expect(events).toEqual([
+      'status:thinking',
+      'status:web-searching',
+      'start:web_search',
+      'done:web_search',
+      'status:writing'
+    ]);
+    expect(result).toEqual({
+      text: 'Fact',
+      citations: [{ startIndex: 0, endIndex: 4, url: 'https://example.com', title: 'Example' }]
+    });
+  });
 });

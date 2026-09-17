@@ -15,17 +15,25 @@ export type ToolStep = {
   error?: string;
 };
 
+export type AiCitation = {
+  startIndex: number;
+  endIndex: number;
+  url: string;
+  title: string;
+};
+
 export type ChatMessage = {
   id: string;
   role: 'user' | 'assistant' | 'tool';
   content: string;
   images?: ChatMessageImage[];
   toolStep?: ToolStep;
+  citations?: AiCitation[];
   meta?: { usage?: AiRunUsage; elapsedMs?: number };
 };
 
 export type RunPhase =
-  'idle' | 'thinking' | 'reading' | 'editing' | 'inserting' | 'applying' | 'generating';
+  'idle' | 'thinking' | 'web-searching' | 'reading' | 'editing' | 'inserting' | 'writing';
 
 export type ChatMessageImage = {
   attachmentId: string;
@@ -50,12 +58,14 @@ export type EditingEvent = {
   pageId?: string;
   runId: string;
   event: string;
+  status?: RunPhase;
   text?: string;
   toolName?: string;
   toolCallId?: string;
   input?: unknown;
   output?: unknown;
   usage?: AiRunUsage;
+  citations?: AiCitation[];
   error?: { code?: string; message: string; details?: unknown };
 };
 

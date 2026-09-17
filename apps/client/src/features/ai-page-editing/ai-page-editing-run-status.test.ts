@@ -5,31 +5,17 @@ import {
   formatRunMeta,
   formatTokenCount,
   phaseVerb,
-  toolPhase,
   toolStepLabel
 } from './ai-page-editing-run-status';
-
-describe('toolPhase', () => {
-  it('maps known document tools to phases', () => {
-    expect(toolPhase('read_buffer')).toBe('reading');
-    expect(toolPhase('edit_buffer')).toBe('editing');
-    expect(toolPhase('insert_blocks')).toBe('inserting');
-  });
-
-  it('falls back to thinking for unknown tools', () => {
-    expect(toolPhase('custom_tool')).toBe('thinking');
-    expect(toolPhase(undefined)).toBe('thinking');
-  });
-});
 
 describe('phaseVerb', () => {
   it('returns run-status verbs per phase', () => {
     expect(phaseVerb('thinking')).toBe('Thinking…');
+    expect(phaseVerb('web-searching')).toBe('Searching the web…');
     expect(phaseVerb('reading')).toBe('Reading the page…');
     expect(phaseVerb('editing')).toBe('Editing the page…');
     expect(phaseVerb('inserting')).toBe('Inserting content…');
-    expect(phaseVerb('applying')).toBe('Applying changes…');
-    expect(phaseVerb('generating')).toBe('Generating…');
+    expect(phaseVerb('writing')).toBe('Writing…');
     expect(phaseVerb('idle')).toBe('');
   });
 });

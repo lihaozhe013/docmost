@@ -15,6 +15,7 @@ export const aiPageEditingMessageSchema = z.discriminatedUnion('operation', [
       operation: z.literal('aiPageEditing.start'),
       pageId: z.string().min(1).max(128),
       prompt: z.string().trim().max(20_000),
+      webSearch: z.boolean().optional().default(false),
       attachmentIds: z.array(z.string().uuid()).max(MAX_AI_IMAGES).optional(),
       messages: z
         .array(
@@ -85,8 +86,19 @@ export const aiPageEditingMessageSchema = z.discriminatedUnion('operation', [
 
 export type AiPageEditingMessage = z.infer<typeof aiPageEditingMessageSchema>;
 
+export type AiPageEditingRunStatus =
+  'thinking' | 'web-searching' | 'reading' | 'editing' | 'inserting' | 'writing';
+
+export interface AiPageEditingCitation {
+  startIndex: number;
+  endIndex: number;
+  url: string;
+  title: string;
+}
+
 export type AiPageEditingEventName =
   | 'run.started'
+  | 'run.status'
   | 'text.delta'
   | 'tool.started'
   | 'tool.completed'
@@ -101,6 +113,7 @@ export interface AiPageEditingEvent {
   pageId?: string;
   runId: string;
   event: AiPageEditingEventName;
+  status?: AiPageEditingRunStatus;
   text?: string;
   toolCallId?: string;
   toolName?: string;
@@ -116,6 +129,7 @@ export interface AiPageEditingEvent {
     outputTokens?: number;
     totalTokens?: number;
   };
+  citations?: AiPageEditingCitation[];
 }
 
 export interface AiPageEditingToolRequest {

@@ -3,6 +3,8 @@ import { EnvironmentService } from '../environment/environment.service';
 import {
   createOpenAiResponsesClient,
   OpenAiResponsesHttpClient,
+  ResponsesReasoningEffort,
+  ResponsesTextVerbosity,
   redactResponsesEndpoint,
   resolveResponsesEndpoint
 } from './responses-client';
@@ -32,5 +34,13 @@ export class OpenAiResponsesClientFactory {
 
   getModel(): string {
     return this.environmentService.getAiModel();
+  }
+
+  getReasoningEffort(): ResponsesReasoningEffort | undefined {
+    return this.environmentService.getAiReasoningEffort() as ResponsesReasoningEffort | undefined;
+  }
+
+  getTextVerbosity(): ResponsesTextVerbosity | undefined {
+    return this.environmentService.getAiTextVerbosity() as ResponsesTextVerbosity | undefined;
   }
 }

@@ -114,6 +114,18 @@ export class EnvironmentVariables {
   AI_MODEL: string;
 
   @IsOptional()
+  @ValidateIf((obj) => obj.AI_REASONING_EFFORT !== undefined && obj.AI_REASONING_EFFORT !== '')
+  @IsIn(['none', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max'])
+  @IsString()
+  AI_REASONING_EFFORT: string;
+
+  @IsOptional()
+  @ValidateIf((obj) => obj.AI_TEXT_VERBOSITY !== undefined && obj.AI_TEXT_VERBOSITY !== '')
+  @IsIn(['low', 'medium', 'high'])
+  @IsString()
+  AI_TEXT_VERBOSITY: string;
+
+  @IsOptional()
   @IsIn(['postgres', 'clickhouse'])
   @IsString()
   EVENT_STORE_DRIVER: string;

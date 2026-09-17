@@ -10,6 +10,36 @@ export interface ResponsesFunctionTool {
   strict: false;
 }
 
+export interface ResponsesWebSearchTool {
+  type: 'web_search';
+  name?: never;
+  description?: never;
+  parameters?: never;
+  strict?: never;
+}
+
+export type ResponsesTool = ResponsesFunctionTool | ResponsesWebSearchTool;
+
+export type ResponsesReasoningEffort =
+  'none' | 'minimal' | 'low' | 'medium' | 'high' | 'xhigh' | 'max';
+
+export type ResponsesTextVerbosity = 'low' | 'medium' | 'high';
+
+export type ResponsesStatus = 'thinking' | 'web-searching' | 'writing';
+
+export interface ResponsesCitation {
+  startIndex: number;
+  endIndex: number;
+  url: string;
+  title: string;
+}
+
+export interface ResponsesHostedToolActivity {
+  status: 'started' | 'completed';
+  toolName: 'web_search';
+  toolCallId: string;
+}
+
 export type ResponsesInputItem = Record<string, unknown>;
 
 export interface ResponsesUsage {
@@ -28,6 +58,7 @@ export interface ResponsesStreamResult {
   text: string;
   output: ResponsesInputItem[];
   functionCalls: ResponsesFunctionCall[];
+  citations?: ResponsesCitation[];
   usage?: ResponsesUsage;
   responseId?: string;
 }
@@ -36,9 +67,13 @@ export interface ResponsesStreamOptions {
   model: string;
   instructions: string;
   input: ResponsesInputItem[];
-  tools: ResponsesFunctionTool[];
+  tools: ResponsesTool[];
+  reasoningEffort?: ResponsesReasoningEffort;
+  textVerbosity?: ResponsesTextVerbosity;
   signal: AbortSignal;
   onTextDelta?: (text: string) => void | Promise<void>;
+  onStatus?: (status: ResponsesStatus) => void | Promise<void>;
+  onHostedToolActivity?: (activity: ResponsesHostedToolActivity) => void | Promise<void>;
 }
 
 export interface ResponsesApiClient {
@@ -255,6 +290,92 @@ function responseId(event: SseEvent): string | undefined {
   return typeof id === 'string' ? id : undefined;
 }
 
+function outputTextFromItem(item: ResponsesInputItem): {
+  text: string;
+  citations: ResponsesCitation[];
+  hasText: boolean;
+} {
+  if (item.type !== 'message' || !Array.isArray(item.content)) {
+    return { text: '', citations: [], hasText: false };
+  }
+
+  let text = '';
+  const citations: ResponsesCitation[] = [];
+  let hasText = false;
+  for (const content of item.content) {
+    if (!content || typeof content !== 'object') continue;
+    const part = content as Record<string, unknown>;
+    if (part.type !== 'output_text' || typeof part.text !== 'string') continue;
+    hasText = true;
+    const partOffset = text.length;
+    text += part.text;
+
+    if (!Array.isArray(part.annotations)) continue;
+    for (const annotation of part.annotations) {
+      if (!annotation || typeof annotation !== 'object') continue;
+      const value = annotation as Record<string, unknown>;
+      const nested =
+        value.url_citation && typeof value.url_citation === 'object'
+          ? (value.url_citation as Record<string, unknown>)
+          : value;
+      if (
+        value.type !== 'url_citation' &&
+        !('url' in nested) &&
+        !('start_index' in nested) &&
+        !('startIndex' in nested)
+      ) {
+        continue;
+      }
+      const start = nested.start_index ?? nested.startIndex;
+      const end = nested.end_index ?? nested.endIndex;
+      if (
+        typeof start !== 'number' ||
+        !Number.isInteger(start) ||
+        start < 0 ||
+        typeof end !== 'number' ||
+        !Number.isInteger(end) ||
+        end < start ||
+        typeof nested.url !== 'string' ||
+        typeof nested.title !== 'string'
+      ) {
+        continue;
+      }
+      citations.push({
+        startIndex: partOffset + start,
+        endIndex: partOffset + end,
+        url: nested.url,
+        title: nested.title
+      });
+    }
+  }
+  return { text, citations, hasText };
+}
+
+function outputTextFromItems(output: ResponsesInputItem[]): {
+  text: string;
+  citations: ResponsesCitation[];
+  hasText: boolean;
+} {
+  let text = '';
+  const citations: ResponsesCitation[] = [];
+  let hasText = false;
+  for (const item of output) {
+    const part = outputTextFromItem(item);
+    if (!part.hasText) continue;
+    hasText = true;
+    const offset = text.length;
+    text += part.text;
+    citations.push(
+      ...part.citations.map((citation) => ({
+        ...citation,
+        startIndex: offset + citation.startIndex,
+        endIndex: offset + citation.endIndex
+      }))
+    );
+  }
+  return { text, citations, hasText };
+}
+
 export class OpenAiResponsesHttpClient implements ResponsesApiClient {
   private readonly apiUrl: string;
   private readonly apiKey: string;
@@ -279,6 +400,9 @@ export class OpenAiResponsesHttpClient implements ResponsesApiClient {
           instructions: options.instructions,
           input: options.input,
           tools: options.tools,
+          tool_choice: 'auto',
+          ...(options.reasoningEffort ? { reasoning: { effort: options.reasoningEffort } } : {}),
+          ...(options.textVerbosity ? { text: { verbosity: options.textVerbosity } } : {}),
           stream: true,
           store: false,
           include: ['reasoning.encrypted_content']
@@ -306,20 +430,92 @@ export class OpenAiResponsesHttpClient implements ResponsesApiClient {
     const outputItems = new Map<number, ResponsesInputItem>();
     let completedEvent: SseEvent | undefined;
     let text = '';
+    const hostedToolIds = new Set<string>();
+    const activeHostedToolIds = new Set<string>();
+    const completedHostedToolIds = new Set<string>();
+    let lastStatus: ResponsesStatus | undefined;
+    const emitStatus = async (status: ResponsesStatus): Promise<void> => {
+      if (lastStatus === status) return;
+      lastStatus = status;
+      await options.onStatus?.(status);
+    };
 
     for await (const event of parseSseStream(httpResponse.body)) {
       const eventType = typeof event.type === 'string' ? event.type : '';
-      if (eventType === 'response.output_text.delta') {
-        if (typeof event.delta === 'string') {
-          text += event.delta;
-          await options.onTextDelta?.(event.delta);
-        }
+      if (
+        eventType === 'response.reasoning_summary_part.added' ||
+        eventType === 'response.reasoning_summary_part.done' ||
+        eventType === 'response.reasoning_summary_text.delta' ||
+        eventType === 'response.reasoning_summary_text.done' ||
+        eventType === 'response.reasoning_text.delta' ||
+        eventType === 'response.reasoning_text.done'
+      ) {
+        await emitStatus('thinking');
         continue;
       }
 
       if (eventType === 'response.output_item.added') {
         const item = outputItemFromEvent(event);
-        if (item) outputItems.set(outputItemIndex(event), item);
+        if (item) {
+          outputItems.set(outputItemIndex(event), item);
+          if (item.type === 'reasoning') {
+            await emitStatus('thinking');
+          }
+        }
+        continue;
+      }
+
+      if (
+        eventType === 'response.web_search_call.in_progress' ||
+        eventType === 'response.web_search_call.searching'
+      ) {
+        await emitStatus('web-searching');
+        const toolCallId = typeof event.item_id === 'string' ? event.item_id : undefined;
+        if (toolCallId && !hostedToolIds.has(toolCallId)) {
+          hostedToolIds.add(toolCallId);
+          await options.onHostedToolActivity?.({
+            status: 'started',
+            toolName: 'web_search',
+            toolCallId
+          });
+        }
+        if (toolCallId) activeHostedToolIds.add(toolCallId);
+        continue;
+      }
+
+      if (eventType === 'response.web_search_call.completed') {
+        const toolCallId = typeof event.item_id === 'string' ? event.item_id : undefined;
+        if (toolCallId) {
+          if (!hostedToolIds.has(toolCallId)) {
+            hostedToolIds.add(toolCallId);
+            await options.onHostedToolActivity?.({
+              status: 'started',
+              toolName: 'web_search',
+              toolCallId
+            });
+          }
+          if (!completedHostedToolIds.has(toolCallId)) {
+            completedHostedToolIds.add(toolCallId);
+            await options.onHostedToolActivity?.({
+              status: 'completed',
+              toolName: 'web_search',
+              toolCallId
+            });
+          }
+          activeHostedToolIds.delete(toolCallId);
+        } else {
+          activeHostedToolIds.clear();
+        }
+        if (activeHostedToolIds.size === 0) await emitStatus('thinking');
+        continue;
+      }
+
+      if (eventType === 'response.output_text.delta') {
+        if (typeof event.delta === 'string') {
+          await emitStatus('writing');
+          text += event.delta;
+          await options.onTextDelta?.(event.delta);
+        }
         continue;
       }
 
@@ -369,6 +565,7 @@ export class OpenAiResponsesHttpClient implements ResponsesApiClient {
     const output = completedOutput.length
       ? completedOutput
       : [...outputItems.entries()].sort(([left], [right]) => left - right).map(([, item]) => item);
+    const completedText = outputTextFromItems(output);
     const functionCalls = output
       .map(functionCallFromItem)
       .filter((call): call is ResponsesFunctionCall => Boolean(call));
@@ -379,9 +576,10 @@ export class OpenAiResponsesHttpClient implements ResponsesApiClient {
         : undefined;
 
     return {
-      text,
+      text: completedText.hasText ? completedText.text : text,
       output,
       functionCalls,
+      ...(completedText.citations.length ? { citations: completedText.citations } : {}),
       usage,
       responseId: responseId(completedEvent)
     };

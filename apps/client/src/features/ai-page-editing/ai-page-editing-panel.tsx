@@ -20,6 +20,7 @@ import {
   IconPlus,
   IconRotate2,
   IconSparkles,
+  IconWorldSearch,
   IconX
 } from '@tabler/icons-react';
 import { useAtom } from 'jotai';
@@ -47,6 +48,7 @@ export function AiPageEditingPanel({ pageId, enabled }: { pageId: string; enable
   const [editor] = useAtom(pageEditorAtom);
   const [open, setOpen] = useState(false);
   const [prompt, setPrompt] = useState('');
+  const [webSearch, setWebSearch] = useState(false);
   const [pendingImages, setPendingImages] = useState<PendingImage[]>([]);
   const pendingImagesRef = useRef(pendingImages);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -171,7 +173,7 @@ export function AiPageEditingPanel({ pageId, enabled }: { pageId: string; enable
     );
     if (running || blockedImages) return;
     if (!value && readyImages.length === 0) return;
-    if (!startRun(value, readyImages)) return;
+    if (!startRun(value, readyImages, webSearch)) return;
     setPrompt('');
     setOpen(true);
     clearPendingImages();
@@ -180,6 +182,7 @@ export function AiPageEditingPanel({ pageId, enabled }: { pageId: string; enable
   const handleNewSession = () => {
     resetSession();
     setPrompt('');
+    setWebSearch(false);
     clearPendingImages();
   };
 
@@ -275,6 +278,18 @@ export function AiPageEditingPanel({ pageId, enabled }: { pageId: string; enable
                 aria-label="Attach images to Page AI"
               >
                 <IconPhoto size={16} />
+              </ActionIcon>
+            </Tooltip>
+            <Tooltip label={webSearch ? 'Disable web search' : 'Enable web search'}>
+              <ActionIcon
+                variant={webSearch ? 'light' : 'subtle'}
+                color={webSearch ? 'blue' : undefined}
+                onClick={() => setWebSearch((current) => !current)}
+                disabled={running}
+                aria-label={webSearch ? 'Disable web search' : 'Enable web search'}
+                aria-pressed={webSearch}
+              >
+                <IconWorldSearch size={16} />
               </ActionIcon>
             </Tooltip>
             <input

@@ -20,7 +20,13 @@ AI_API_URL=
 # Examples: https://api.openai.com/v1 or https://api.openai.com/v1/responses
 AI_API_KEY=
 AI_MODEL=
+# Optional Responses API tuning. Leave empty to use the provider defaults.
+AI_REASONING_EFFORT=
+AI_TEXT_VERBOSITY=
 ```
+
+Page AI uses the Responses API only. Web Search is optional and user-controlled from the Page AI
+toolbar; it is disabled by default and may incur additional provider tool-call charges.
 
 run this to create a db:
 

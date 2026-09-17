@@ -6,13 +6,14 @@ import classes from './markdown-content.module.css';
 export interface MarkdownContentProps {
   content: string;
   className?: string;
+  preserveLinkTargets?: boolean;
 }
 
-export function MarkdownContent({ content, className }: MarkdownContentProps) {
+export function MarkdownContent({ content, className, preserveLinkTargets }: MarkdownContentProps) {
   const sanitizedHtml = useMemo(() => {
     const html = markdownToHtml(content) as string;
-    return DOMPurify.sanitize(html);
-  }, [content]);
+    return DOMPurify.sanitize(html, preserveLinkTargets ? { ADD_ATTR: ['target'] } : undefined);
+  }, [content, preserveLinkTargets]);
 
   return (
     <div

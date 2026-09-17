@@ -1,8 +1,14 @@
 import { z } from 'zod';
 import {
   ResponsesApiClient,
+  ResponsesCitation,
   ResponsesFunctionTool,
+  ResponsesHostedToolActivity,
   ResponsesInputItem,
+  ResponsesReasoningEffort,
+  ResponsesStatus,
+  ResponsesTextVerbosity,
+  ResponsesTool,
   ResponsesUsage
 } from './responses-client';
 
@@ -41,13 +47,14 @@ export interface RuntimeMessage {
 }
 
 export interface AgentRuntimeEvent {
-  type: 'text-delta' | 'tool-start' | 'tool-result' | 'tool-error' | 'finish' | 'error';
+  type: 'status' | 'text-delta' | 'tool-start' | 'tool-result' | 'tool-error' | 'finish' | 'error';
   toolCallId?: string;
   toolName?: string;
   input?: unknown;
   output?: unknown;
   error?: unknown;
   text?: string;
+  status?: ResponsesStatus;
   usage?: ResponsesUsage;
 }
 
@@ -59,6 +66,9 @@ export interface AgentRuntimeRunOptions {
   images?: string[];
   messages?: RuntimeMessage[];
   tools: Record<string, RuntimeToolDefinition>;
+  webSearch?: boolean;
+  reasoningEffort?: ResponsesReasoningEffort;
+  textVerbosity?: ResponsesTextVerbosity;
   signal: AbortSignal;
   maxSteps?: number;
   onEvent?: (event: AgentRuntimeEvent) => void | Promise<void>;
@@ -74,14 +84,20 @@ function jsonSchemaFor(schema: z.ZodType): Record<string, unknown> {
   return parameters;
 }
 
-function runtimeTools(definitions: Record<string, RuntimeToolDefinition>): ResponsesFunctionTool[] {
-  return Object.entries(definitions).map(([name, definition]) => ({
-    type: 'function',
-    name,
-    description: definition.description,
-    parameters: jsonSchemaFor(definition.inputSchema),
-    strict: false
-  }));
+function runtimeTools(
+  definitions: Record<string, RuntimeToolDefinition>,
+  webSearch: boolean
+): ResponsesTool[] {
+  const functionTools: ResponsesFunctionTool[] = Object.entries(definitions).map(
+    ([name, definition]) => ({
+      type: 'function',
+      name,
+      description: definition.description,
+      parameters: jsonSchemaFor(definition.inputSchema),
+      strict: false
+    })
+  );
+  return webSearch ? [...functionTools, { type: 'web_search' }] : functionTools;
 }
 
 function mergeUsage(
@@ -229,39 +245,89 @@ function isFatalToolError(error: RuntimeToolError): boolean {
  * Responses client owns HTTP and wire-format details.
  */
 export class AgentRuntime {
-  async run(options: AgentRuntimeRunOptions): Promise<{ text: string }> {
+  async run(
+    options: AgentRuntimeRunOptions
+  ): Promise<{ text: string; citations?: ResponsesCitation[] }> {
     const input: ResponsesInputItem[] = [
       ...inputFromMessages(options.messages),
       userPromptItem(options.prompt, options.images)
     ];
-    const tools = runtimeTools(options.tools);
+    const tools = runtimeTools(options.tools, options.webSearch === true);
     const cachedToolResults = new Map<string, CachedToolResult>();
     const failedToolAttempts = new Map<string, number>();
     const maxSteps = options.maxSteps ?? 8;
     let text = '';
+    let citations: ResponsesCitation[] = [];
     let usage: ResponsesUsage | undefined;
+    let lastStatus: ResponsesStatus | undefined;
+
+    const emitStatus = async (status: ResponsesStatus): Promise<void> => {
+      if (lastStatus === status) return;
+      lastStatus = status;
+      await options.onEvent?.({ type: 'status', status });
+    };
+
+    const emitHostedToolActivity = async (activity: ResponsesHostedToolActivity): Promise<void> => {
+      if (activity.status === 'started') {
+        await options.onEvent?.({
+          type: 'tool-start',
+          toolCallId: activity.toolCallId,
+          toolName: activity.toolName
+        });
+      } else {
+        await options.onEvent?.({
+          type: 'tool-result',
+          toolCallId: activity.toolCallId,
+          toolName: activity.toolName
+        });
+      }
+    };
 
     try {
       for (let step = 0; step < maxSteps; step += 1) {
         if (options.signal.aborted) throw cancellationError();
+        await emitStatus('thinking');
+
+        const textBeforeResponse = text.length;
 
         const response = await options.client.stream({
           model: options.model,
           instructions: options.system,
           input,
           tools,
+          reasoningEffort: options.reasoningEffort,
+          textVerbosity: options.textVerbosity,
           signal: options.signal,
           onTextDelta: async (delta) => {
+            await emitStatus('writing');
             text += delta;
             await options.onEvent?.({ type: 'text-delta', text: delta });
-          }
+          },
+          onStatus: emitStatus,
+          onHostedToolActivity: emitHostedToolActivity
         });
+        const streamedResponseText = text.slice(textBeforeResponse);
+        if (response.text !== streamedResponseText) {
+          text = `${text.slice(0, textBeforeResponse)}${response.text}`;
+        }
+        if (response.citations?.length) {
+          citations.push(
+            ...response.citations.map((citation) => ({
+              ...citation,
+              startIndex: textBeforeResponse + citation.startIndex,
+              endIndex: textBeforeResponse + citation.endIndex
+            }))
+          );
+        }
         usage = mergeUsage(usage, response.usage);
         input.push(...response.output);
 
         if (response.functionCalls.length === 0) {
           await options.onEvent?.({ type: 'finish', usage });
-          return { text };
+          return {
+            text,
+            ...(citations.length ? { citations } : {})
+          };
         }
 
         for (const call of response.functionCalls) {
@@ -415,6 +481,11 @@ export class AgentRuntime {
             }
           }
         }
+
+        // A completed function call is a phase boundary. Allow the next
+        // model turn to publish a fresh thinking status even when the prior
+        // turn also started in thinking.
+        lastStatus = undefined;
       }
 
       throw new AgentRuntimeError('STEP_LIMIT', `The AI run exceeded its ${maxSteps}-step limit`);

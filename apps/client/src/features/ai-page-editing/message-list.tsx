@@ -10,6 +10,7 @@ import { MarkdownContent } from '@/components/common/markdown-content';
 import type { ChatMessage, RunPhase } from './ai-page-editing-types';
 import { formatRunMeta, toolStepLabel } from './ai-page-editing-run-status';
 import classes from './ai-page-editing-panel.module.css';
+import { CitedMarkdownContent } from './cited-markdown-content';
 
 type MessageBlock =
   { kind: 'message'; message: ChatMessage } | { kind: 'steps'; messages: ChatMessage[] };
@@ -101,7 +102,15 @@ function AssistantRow({ message, streaming }: { message: ChatMessage; streaming:
         <IconSparkles size={13} />
       </Box>
       <div className={classes.assistantBody}>
-        <MarkdownContent content={message.content} className={classes.markdownMessage} />
+        {message.citations?.length ? (
+          <CitedMarkdownContent
+            content={message.content}
+            citations={message.citations}
+            className={classes.markdownMessage}
+          />
+        ) : (
+          <MarkdownContent content={message.content} className={classes.markdownMessage} />
+        )}
         {streaming && <span className={classes.streamCaret} aria-hidden />}
         {meta && (
           <Text size="xs" c="dimmed" className={classes.messageMeta}>
@@ -145,7 +154,7 @@ export function MessageList({
             <AssistantRow
               key={message.id}
               message={message}
-              streaming={running && isLast && phase === 'generating'}
+              streaming={running && isLast && phase === 'writing'}
             />
           );
         }

@@ -1,30 +1,25 @@
 import type { AiRunUsage, RunPhase, ToolStepStatus } from './ai-page-editing-types';
 
-const TOOL_PHASES: Record<string, RunPhase> = {
-  read_buffer: 'reading',
-  edit_buffer: 'editing',
-  insert_blocks: 'inserting'
-};
-
-export function toolPhase(toolName?: string): RunPhase {
-  return (toolName && TOOL_PHASES[toolName]) || 'thinking';
-}
-
 const PHASE_VERBS: Record<RunPhase, string> = {
   idle: '',
   thinking: 'Thinking…',
+  'web-searching': 'Searching the web…',
   reading: 'Reading the page…',
   editing: 'Editing the page…',
   inserting: 'Inserting content…',
-  applying: 'Applying changes…',
-  generating: 'Generating…'
+  writing: 'Writing…'
 };
 
 export function phaseVerb(phase: RunPhase): string {
-  return PHASE_VERBS[phase];
+  return PHASE_VERBS[phase] ?? '';
 }
 
 const TOOL_STEP_LABELS: Record<string, Record<ToolStepStatus, string>> = {
+  web_search: {
+    running: 'Searching the web…',
+    done: 'Searched the web',
+    error: 'Web search failed'
+  },
   read_buffer: {
     running: 'Reading the page…',
     done: 'Read the page',

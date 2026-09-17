@@ -21,7 +21,7 @@ import {
   messageId,
   rememberCancelledRun
 } from './ai-page-editing-utils';
-import { estimateTokens, toolPhase } from './ai-page-editing-run-status';
+import { estimateTokens } from './ai-page-editing-run-status';
 
 /**
  * Owns the Page AI run protocol: adapter lifecycle, socket event reduction,
@@ -136,9 +136,21 @@ export function useAiPageEditingRun({
         setTokenEstimate(0);
         return;
       }
+      if (raw.event === 'run.status') {
+        if (
+          raw.status === 'thinking' ||
+          raw.status === 'web-searching' ||
+          raw.status === 'reading' ||
+          raw.status === 'editing' ||
+          raw.status === 'inserting' ||
+          raw.status === 'writing'
+        ) {
+          setPhase(raw.status);
+        }
+        return;
+      }
       if (raw.event === 'text.delta') {
         const delta = raw.text || '';
-        setPhase('generating');
         if (delta) {
           setTokenEstimate((current) => current + estimateTokens(delta));
         }
@@ -154,7 +166,6 @@ export function useAiPageEditingRun({
         return;
       }
       if (raw.event === 'tool.started') {
-        setPhase(toolPhase(raw.toolName));
         // Tool arguments are model output too, so they count toward the live
         // estimate; otherwise tool-heavy runs would show no tokens at all.
         const inputText =
@@ -184,7 +195,6 @@ export function useAiPageEditingRun({
         }
         const toolError = getToolError(raw.output);
         const error = raw.error || toolError;
-        setPhase(error ? 'thinking' : 'applying');
         setMessages((current) =>
           current.map((item) =>
             item.id === `tool:${raw.toolCallId}`
@@ -212,13 +222,17 @@ export function useAiPageEditingRun({
         if (raw.event === 'run.completed') {
           const elapsedMs =
             runStartedAtRef.current !== null ? Date.now() - runStartedAtRef.current : undefined;
-          const finalText = raw.text || '';
+          const finalText = typeof raw.text === 'string' ? raw.text : '';
+          const hasFinalText = typeof raw.text === 'string';
+          const citations = Array.isArray(raw.citations) && raw.citations.length
+            ? raw.citations
+            : undefined;
           const meta = {
             ...(raw.usage ? { usage: raw.usage } : {}),
             ...(elapsedMs !== undefined ? { elapsedMs } : {})
           };
           const hasMeta = Object.keys(meta).length > 0;
-          if (finalText && !assistantMessageIdRef.current) {
+          if (!assistantMessageIdRef.current && (finalText || citations)) {
             const id = `assistant:${messageId()}`;
             assistantMessageIdRef.current = id;
             setMessages((current) => [
@@ -227,13 +241,23 @@ export function useAiPageEditingRun({
                 id,
                 role: 'assistant',
                 content: finalText,
+                ...(citations ? { citations } : {}),
                 ...(hasMeta ? { meta } : {})
               }
             ]);
-          } else if (hasMeta && assistantMessageIdRef.current) {
+          } else if (assistantMessageIdRef.current) {
             const targetId = assistantMessageIdRef.current;
             setMessages((current) =>
-              current.map((item) => (item.id === targetId ? { ...item, meta } : item))
+              current.map((item) =>
+                item.id === targetId
+                  ? {
+                      ...item,
+                      content: hasFinalText ? finalText : item.content,
+                      ...(citations ? { citations } : { citations: undefined }),
+                      ...(hasMeta ? { meta } : {})
+                    }
+                  : item
+              )
             );
           }
         }
@@ -423,7 +447,7 @@ export function useAiPageEditingRun({
    * Validates preconditions and emits the run start request. Returns false
    * when the request was not sent; local errors are already reported.
    */
-  const startRun = (value: string, readyImages: ChatMessageImage[]): boolean => {
+  const startRun = (value: string, readyImages: ChatMessageImage[], webSearch = false): boolean => {
     if (!socket) {
       reportLocalError('The editor connection is not available yet.');
       return false;
@@ -467,6 +491,7 @@ export function useAiPageEditingRun({
       operation: 'aiPageEditing.start',
       pageId,
       prompt: value,
+      webSearch,
       ...(readyImages.length
         ? {
             attachmentIds: readyImages.map((image) => image.attachmentId)

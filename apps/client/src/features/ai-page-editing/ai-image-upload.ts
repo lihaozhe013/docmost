@@ -1,5 +1,5 @@
 // Keep in sync with apps/server/src/integrations/ai-page-editing/contracts.ts
-export const MAX_AI_IMAGES = 4;
+export const MAX_AI_IMAGES = 20;
 export const MAX_AI_IMAGE_BYTES = 10 * 1024 * 1024;
 export const AI_IMAGE_ACCEPT = '.png,.jpg,.jpeg,.webp,.gif';
 

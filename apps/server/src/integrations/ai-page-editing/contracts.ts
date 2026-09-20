@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const AI_PAGE_EDITING_OPERATION = 'aiPageEditing';
 
 // Keep in sync with apps/client/src/features/ai-page-editing/ai-image-upload.ts
-export const MAX_AI_IMAGES = 4;
+export const MAX_AI_IMAGES = 20;
 
 export const aiPageEditingOperation = z.enum(['start', 'stop', 'toolResult', 'event']);
 

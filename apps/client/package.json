@@ -53,6 +53,7 @@
     "mermaid": "11.17.2",
     "mitt": "3.0.1",
     "nanoid": "6.0.1",
+    "pdfjs-dist": "^6.3.289",
     "posthog-js": "1.427.2",
     "react": "19.2.8",
     "react-clear-modal": "^3.0.3",

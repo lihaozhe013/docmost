@@ -43,9 +43,12 @@ export type ChatMessageImage = {
 
 export type PendingImage = {
   localId: string;
-  file: File;
-  previewUrl: string;
-  status: 'uploading' | 'ready' | 'error';
+  // Absent only for 'converting' PDF placeholder chips, which show progress instead.
+  file?: File;
+  previewUrl?: string;
+  name: string;
+  status: 'converting' | 'uploading' | 'ready' | 'error';
+  progress?: { done: number; total: number };
   attachmentId?: string;
   url?: string;
   error?: string;

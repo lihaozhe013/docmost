@@ -620,9 +620,15 @@ further work; it does not automatically resend the mutation after reconnecting.
 
 ### 9.1 Image attachments
 
-A start message may reference up to four images with `attachmentIds`. The browser uploads images
+A start message may reference up to twenty images with `attachmentIds`. The browser uploads images
 through the existing `POST /api/files/upload` endpoint before sending the start message; raw image
 bytes never travel over Socket.IO because its default payload limit is about 1 MB.
+
+PDFs are converted entirely in the browser: Page AI renders the selected pages to JPEG images with
+pdf.js (lazily loaded), then uploads each page image through the same image path. The server never
+sees PDF bytes or a PDF attachment for AI purposes. A single conversion is capped at 20 pages;
+longer PDFs require the user to pick a page range, and converted pages share the per-message image
+budget with manually attached images.
 
 The server re-validates every referenced attachment before the run: it must exist, belong to the
 requesting user and workspace, be attached to the same page as the run, not be deleted, carry an
@@ -656,7 +662,8 @@ initial read, a 45-second browser result timeout, a five-minute run timeout, a 2
 window with an 80,000-character aggregate history budget, 20,000-character prompt and block-text
 limits, a 40,000-character Markdown insertion limit, 100 blocks per read page, an 80,000-character
 read-result budget, and a 60,000-character initial buffer context. Image attachments allow at most
-four per message, each no larger than 10 MB, and only for the current run. These limits are
+twenty per message, each no larger than 10 MB, and only for the current run; a browser PDF-to-image
+conversion contributes at most 20 page images to that same budget. These limits are
 implementation defaults and must be changed together with this document and the corresponding
 schemas.
 

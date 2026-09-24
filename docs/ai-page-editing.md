@@ -192,7 +192,7 @@ Page editing is configured with three required and two optional server-only envi
 
 | Variable     | Meaning                                                                                |
 | ------------ | -------------------------------------------------------------------------------------- |
-| `AI_API_URL` | Provider base URL or complete Responses endpoint, such as `https://api.openai.com/v1`. |
+| `AI_API_URL` | Provider base URL or complete Responses endpoint, such as `https://api.openai.com/v1` or `https://openrouter.ai/api/v1`. |
 | `AI_API_KEY` | Bearer credential sent only by the server.                                             |
 | `AI_MODEL`   | Model identifier accepted by the configured endpoint.                                  |
 | `AI_REASONING_EFFORT` | Optional Responses reasoning effort: `none`, `minimal`, `low`, `medium`, `high`, `xhigh`, or `max`. |
@@ -200,19 +200,20 @@ Page editing is configured with three required and two optional server-only envi
 
 All three values must be set to enable page editing. The URL is used exactly as configured when it
 already ends in `/responses`; otherwise the server resolves the Responses endpoint before sending a
-request. The official OpenAI host gets `/v1/responses` from a root URL, a URL ending in `/v1` gets
-`/v1/responses`, and other provider roots get `/responses`. A URL ending in `/chat/completions` is
-rewritten to the corresponding `/responses` path. The resolver does not send probe requests or retry
-a 404. Requests use `stream: true`, `store: false`, and include encrypted reasoning content so the
-stateless tool loop can replay reasoning items on the next request. The configured service must
-support standard Responses streaming and function calling. Chat Completions-only services are
-outside the supported contract. Empty optional values are omitted from the request; non-empty
-invalid values fail environment validation at startup. Reasoning summaries are not sent to the
-browser.
+request. The official OpenAI host gets `/v1/responses` from a root URL, OpenRouter gets
+`/api/v1/responses`, a URL ending in `/v1` gets `/v1/responses`, and other provider roots get
+`/responses`. A URL ending in `/chat/completions` is rewritten to the corresponding `/responses`
+path. The resolver does not send probe requests or retry a 404. Requests use `stream: true`,
+`store: false`, and include encrypted reasoning content so the stateless tool loop can replay
+reasoning items on the next request. The configured service must support standard Responses
+streaming and function calling. Chat Completions-only services are outside the supported contract.
+Empty optional values are omitted from the request; non-empty invalid values fail environment
+validation at startup. Reasoning summaries are not sent to the browser.
 
 The Page AI toolbar exposes a Web Search toggle, which is off by default and is remembered only
 for the current panel session. When enabled, the server adds the Responses hosted `web_search`
-tool and lets the model decide whether to call it; it does not force a search. Search output is
+tool and lets the model decide whether to call it; it does not force a search. For OpenRouter, the
+server sends its `openrouter:web_search` tool and reads its streamed search items. Search output is
 treated as untrusted data, and the UI shows search status, clickable inline citations, and a
 deduplicated source list. Web Search can result in additional provider tool-call charges, and the
 selected model/provider must support the Responses Web Search tool and the configured parameters.
@@ -225,7 +226,10 @@ For example, these configurations resolve to the provider endpoints shown:
 # Choose one provider base URL:
 # OpenAI: https://api.openai.com/v1
 # DeepSeek: https://api.deepseek.com
-AI_API_URL=https://api.deepseek.com
+# OpenRouter: https://openrouter.ai/api/v1
+AI_API_URL=https://openrouter.ai/api/v1
+AI_API_KEY=your-openrouter-api-key
+AI_MODEL=openai/gpt-6-luna
 ```
 
 An unavailable or incomplete configuration fails the run with a structured error. Credentials,

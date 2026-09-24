@@ -17,9 +17,10 @@ REDIS_URL=redis://127.0.0.1:6379
 STORAGE_DRIVER=local
 
 AI_API_URL=
-# Examples: https://api.openai.com/v1 or https://api.openai.com/v1/responses
+# Examples: https://api.openai.com/v1 or https://openrouter.ai/api/v1
 AI_API_KEY=
 AI_MODEL=
+# OpenRouter model example: openai/gpt-6-luna
 # Optional Responses API tuning. Leave empty to use the provider defaults.
 AI_REASONING_EFFORT=
 AI_TEXT_VERBOSITY=

@@ -81,6 +81,7 @@ export interface ResponsesApiClient {
 }
 
 const OPENAI_API_HOST = 'api.openai.com';
+const OPENROUTER_API_HOST = 'openrouter.ai';
 const RESPONSES_PATH = '/responses';
 const CHAT_COMPLETIONS_SUFFIX = '/chat/completions';
 
@@ -101,8 +102,8 @@ function normalizedPath(pathname: string): string {
 /**
  * Resolves a configured base URL or endpoint to a Responses API endpoint.
  *
- * Providers use different base path conventions: the official OpenAI API
- * includes /v1, while DeepSeek exposes /responses from its root. Complete
+ * Providers use different base path conventions: OpenAI uses /v1, OpenRouter
+ * uses /api/v1, and DeepSeek exposes /responses from its root. Complete
  * endpoints remain unchanged so custom gateways can provide their own path.
  */
 export function resolveResponsesEndpoint(rawUrl: string): string {
@@ -125,10 +126,21 @@ export function resolveResponsesEndpoint(rawUrl: string): string {
     url.pathname = path;
   } else if (lowerPath.endsWith(CHAT_COMPLETIONS_SUFFIX)) {
     const prefix = path.slice(0, -CHAT_COMPLETIONS_SUFFIX.length);
-    const basePath = prefix || (hostname === OPENAI_API_HOST ? '/v1' : '');
+    const basePath =
+      prefix ||
+      (hostname === OPENAI_API_HOST
+        ? '/v1'
+        : hostname === OPENROUTER_API_HOST
+          ? '/api/v1'
+          : '');
     url.pathname = `${basePath}${RESPONSES_PATH}`;
   } else if (path === '/') {
-    url.pathname = hostname === OPENAI_API_HOST ? `/v1${RESPONSES_PATH}` : RESPONSES_PATH;
+    url.pathname =
+      hostname === OPENAI_API_HOST
+        ? `/v1${RESPONSES_PATH}`
+        : hostname === OPENROUTER_API_HOST
+          ? `/api/v1${RESPONSES_PATH}`
+          : RESPONSES_PATH;
   } else {
     url.pathname = `${path}${RESPONSES_PATH}`;
   }
@@ -379,14 +391,23 @@ function outputTextFromItems(output: ResponsesInputItem[]): {
 export class OpenAiResponsesHttpClient implements ResponsesApiClient {
   private readonly apiUrl: string;
   private readonly apiKey: string;
+  private readonly isOpenRouter: boolean;
 
   constructor(apiUrl: string, apiKey: string) {
     this.apiUrl = resolveResponsesEndpoint(apiUrl);
     this.apiKey = apiKey;
+    this.isOpenRouter = new URL(this.apiUrl).hostname.toLowerCase() === OPENROUTER_API_HOST;
   }
 
   async stream(options: ResponsesStreamOptions): Promise<ResponsesStreamResult> {
     let httpResponse: Response;
+    const tools = options.tools.map((tool) => {
+      if (this.isOpenRouter && tool.type === 'web_search') {
+        return { type: 'openrouter:web_search' };
+      }
+      return tool;
+    });
+
     try {
       httpResponse = await fetch(this.apiUrl, {
         method: 'POST',
@@ -399,7 +420,7 @@ export class OpenAiResponsesHttpClient implements ResponsesApiClient {
           model: options.model,
           instructions: options.instructions,
           input: options.input,
-          tools: options.tools,
+          tools,
           tool_choice: 'auto',
           ...(options.reasoningEffort ? { reasoning: { effort: options.reasoningEffort } } : {}),
           ...(options.textVerbosity ? { text: { verbosity: options.textVerbosity } } : {}),
@@ -439,6 +460,37 @@ export class OpenAiResponsesHttpClient implements ResponsesApiClient {
       lastStatus = status;
       await options.onStatus?.(status);
     };
+    const startHostedSearch = async (toolCallId: string): Promise<void> => {
+      await emitStatus('web-searching');
+      if (!hostedToolIds.has(toolCallId)) {
+        hostedToolIds.add(toolCallId);
+        await options.onHostedToolActivity?.({
+          status: 'started',
+          toolName: 'web_search',
+          toolCallId
+        });
+      }
+      activeHostedToolIds.add(toolCallId);
+    };
+    const completeHostedSearch = async (toolCallId?: string): Promise<void> => {
+      if (toolCallId) {
+        if (!hostedToolIds.has(toolCallId)) {
+          await startHostedSearch(toolCallId);
+        }
+        if (!completedHostedToolIds.has(toolCallId)) {
+          completedHostedToolIds.add(toolCallId);
+          await options.onHostedToolActivity?.({
+            status: 'completed',
+            toolName: 'web_search',
+            toolCallId
+          });
+        }
+        activeHostedToolIds.delete(toolCallId);
+      } else {
+        activeHostedToolIds.clear();
+      }
+      if (activeHostedToolIds.size === 0) await emitStatus('thinking');
+    };
 
     for await (const event of parseSseStream(httpResponse.body)) {
       const eventType = typeof event.type === 'string' ? event.type : '';
@@ -460,6 +512,9 @@ export class OpenAiResponsesHttpClient implements ResponsesApiClient {
           outputItems.set(outputItemIndex(event), item);
           if (item.type === 'reasoning') {
             await emitStatus('thinking');
+          } else if (item.type === 'web_search_call') {
+            const toolCallId = typeof item.id === 'string' ? item.id : undefined;
+            if (toolCallId) await startHostedSearch(toolCallId);
           }
         }
         continue;
@@ -469,44 +524,15 @@ export class OpenAiResponsesHttpClient implements ResponsesApiClient {
         eventType === 'response.web_search_call.in_progress' ||
         eventType === 'response.web_search_call.searching'
       ) {
-        await emitStatus('web-searching');
         const toolCallId = typeof event.item_id === 'string' ? event.item_id : undefined;
-        if (toolCallId && !hostedToolIds.has(toolCallId)) {
-          hostedToolIds.add(toolCallId);
-          await options.onHostedToolActivity?.({
-            status: 'started',
-            toolName: 'web_search',
-            toolCallId
-          });
-        }
-        if (toolCallId) activeHostedToolIds.add(toolCallId);
+        if (toolCallId) await startHostedSearch(toolCallId);
+        else await emitStatus('web-searching');
         continue;
       }
 
       if (eventType === 'response.web_search_call.completed') {
         const toolCallId = typeof event.item_id === 'string' ? event.item_id : undefined;
-        if (toolCallId) {
-          if (!hostedToolIds.has(toolCallId)) {
-            hostedToolIds.add(toolCallId);
-            await options.onHostedToolActivity?.({
-              status: 'started',
-              toolName: 'web_search',
-              toolCallId
-            });
-          }
-          if (!completedHostedToolIds.has(toolCallId)) {
-            completedHostedToolIds.add(toolCallId);
-            await options.onHostedToolActivity?.({
-              status: 'completed',
-              toolName: 'web_search',
-              toolCallId
-            });
-          }
-          activeHostedToolIds.delete(toolCallId);
-        } else {
-          activeHostedToolIds.clear();
-        }
-        if (activeHostedToolIds.size === 0) await emitStatus('thinking');
+        await completeHostedSearch(toolCallId);
         continue;
       }
 
@@ -539,7 +565,13 @@ export class OpenAiResponsesHttpClient implements ResponsesApiClient {
 
       if (eventType === 'response.output_item.done') {
         const item = outputItemFromEvent(event);
-        if (item) outputItems.set(outputItemIndex(event), item);
+        if (item) {
+          outputItems.set(outputItemIndex(event), item);
+          if (item.type === 'web_search_call') {
+            const toolCallId = typeof item.id === 'string' ? item.id : undefined;
+            await completeHostedSearch(toolCallId);
+          }
+        }
         continue;
       }
 

@@ -36,6 +36,17 @@ describe('OpenAiResponsesHttpClient', () => {
     ['https://api.openai.com/v1/', 'https://api.openai.com/v1/responses'],
     ['https://api.openai.com/chat/completions', 'https://api.openai.com/v1/responses'],
     ['https://api.openai.com/v1/chat/completions', 'https://api.openai.com/v1/responses'],
+    ['https://openrouter.ai', 'https://openrouter.ai/api/v1/responses'],
+    ['https://openrouter.ai/', 'https://openrouter.ai/api/v1/responses'],
+    ['https://openrouter.ai/api/v1', 'https://openrouter.ai/api/v1/responses'],
+    [
+      'https://openrouter.ai/chat/completions',
+      'https://openrouter.ai/api/v1/responses'
+    ],
+    [
+      'https://openrouter.ai/api/v1/chat/completions',
+      'https://openrouter.ai/api/v1/responses'
+    ],
     ['https://api.deepseek.com', 'https://api.deepseek.com/responses'],
     ['https://api.deepseek.com/responses/', 'https://api.deepseek.com/responses'],
     ['https://gateway.example/v1', 'https://gateway.example/v1/responses'],
@@ -262,6 +273,108 @@ describe('OpenAiResponsesHttpClient', () => {
     ]);
     expect(body.reasoning).toEqual({ effort: 'high' });
     expect(body.text).toEqual({ verbosity: 'low' });
+  });
+
+  it('uses OpenRouter web search and reports its output-item lifecycle', async () => {
+    const outputText = {
+      type: 'message',
+      role: 'assistant',
+      content: [
+        {
+          type: 'output_text',
+          text: 'Found it',
+          annotations: [
+            {
+              type: 'url_citation',
+              start_index: 0,
+              end_index: 8,
+              url: 'https://example.com/result',
+              title: 'Example result'
+            }
+          ]
+        }
+      ]
+    };
+    const searchItem = { type: 'web_search_call', id: 'ws-openrouter-1' };
+    const events = [
+      sseEvent({ type: 'response.output_item.added', output_index: 0, item: searchItem }),
+      sseEvent({ type: 'response.web_search_call.searching', item_id: 'ws-openrouter-1' }),
+      sseEvent({ type: 'response.output_item.done', output_index: 0, item: searchItem }),
+      sseEvent({ type: 'response.web_search_call.completed', item_id: 'ws-openrouter-1' }),
+      sseEvent({ type: 'response.output_text.delta', delta: 'Found it' }),
+      sseEvent({
+        type: 'response.completed',
+        response: {
+          id: 'resp-openrouter-1',
+          output: [searchItem, outputText]
+        }
+      })
+    ];
+    const fetchMock = jest.fn() as jest.MockedFunction<typeof fetch>;
+    fetchMock.mockResolvedValue(responseWithChunks(events));
+    globalThis.fetch = fetchMock;
+    const statuses: string[] = [];
+    const activity: string[] = [];
+    const client = new OpenAiResponsesHttpClient('https://openrouter.ai/api/v1', 'secret-key');
+
+    const result = await client.stream({
+      model: 'openai/gpt-6-luna',
+      instructions: 'Use the tools',
+      input: [
+        {
+          role: 'user',
+          content: [
+            { type: 'input_text', text: 'Search this image' },
+            { type: 'input_image', image_url: 'data:image/png;base64,YWJj' }
+          ]
+        }
+      ],
+      tools: [
+        {
+          type: 'function',
+          name: 'read_buffer',
+          description: 'Read the page',
+          parameters: { type: 'object' },
+          strict: false
+        },
+        { type: 'web_search' }
+      ],
+      signal: new AbortController().signal,
+      onStatus: (status) => {
+        statuses.push(status);
+      },
+      onHostedToolActivity: (event) => {
+        activity.push(`${event.status}:${event.toolCallId}`);
+      }
+    });
+
+    expect(fetchMock.mock.calls[0]?.[0]).toBe('https://openrouter.ai/api/v1/responses');
+    const body = JSON.parse(String((fetchMock.mock.calls[0]?.[1] as RequestInit).body));
+    expect(body.model).toBe('openai/gpt-6-luna');
+    expect(body.input).toEqual([
+      {
+        role: 'user',
+        content: [
+          { type: 'input_text', text: 'Search this image' },
+          { type: 'input_image', image_url: 'data:image/png;base64,YWJj' }
+        ]
+      }
+    ]);
+    expect(body.tools).toEqual([
+      expect.objectContaining({ type: 'function', name: 'read_buffer' }),
+      { type: 'openrouter:web_search' }
+    ]);
+    expect(statuses).toEqual(['web-searching', 'thinking', 'writing']);
+    expect(activity).toEqual(['started:ws-openrouter-1', 'completed:ws-openrouter-1']);
+    expect(result.text).toBe('Found it');
+    expect(result.citations).toEqual([
+      {
+        startIndex: 0,
+        endIndex: 8,
+        url: 'https://example.com/result',
+        title: 'Example result'
+      }
+    ]);
   });
 
   it('rejects HTTP failures and incomplete streams', async () => {
